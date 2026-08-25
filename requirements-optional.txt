@@ -1,0 +1,21 @@
+# Optional capabilities. None of these is required: if one is missing the
+# program says so at startup, records the limitation, and carries on.
+#
+#   pip install -r requirements-optional.txt
+#
+# playwright additionally needs its browser:  python -m playwright install chromium
+
+pdfplumber>=0.11            # table extraction from PDFs, with layout
+playwright>=1.44            # rendering JavaScript-only pages
+xlrd>=2.0                   # legacy .xls spreadsheets
+olefile>=0.47               # legacy binary .doc documents
+anthropic>=0.34             # the optional semantic extraction layer
+pytesseract>=0.3            # OCR for scanned PDFs (also needs the tesseract binary)
+pdf2image>=1.17             # rendering PDF pages for OCR (also needs poppler)
+python-pptx>=0.6            # slide decks
+langdetect>=1.0             # sharper language detection
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.23
+reportlab>=4.0              # generates the PDFs the test fixture serves

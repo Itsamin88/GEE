@@ -1,0 +1,291 @@
+# ============================================================================
+# DISCOVERY REGISTER — where to look, in what order, and what it is worth.
+# Stage numbers follow the ten-stage protocol in register v2.4 Part B.
+# ============================================================================
+version: "1.0.0"
+
+# --- Stage 2a: well-known paths probed on every conventional website -------
+well_known_paths:
+  en: [/about, /about-us, /who-we-are, /history, /our-story, /timeline, /vision, /mission,
+       /values, /projects, /land, /farm, /garden, /agriculture, /permaculture, /food-forest,
+       /forest, /reforestation, /restoration, /water, /ecology, /sustainability, /regeneration,
+       /soil, /blog, /news, /journal, /updates, /reports, /publications, /research, /documents,
+       /downloads, /resources, /library, /gallery, /photos, /visit, /volunteer, /wwoof,
+       /internship, /courses, /education, /people, /members, /contact, /faq]
+  fr: [/a-propos, /apropos, /histoire, /notre-histoire, /qui-sommes-nous, /projets, /le-lieu,
+       /la-ferme, /jardin, /agriculture, /permaculture, /foret, /reforestation, /eau, /ecologie,
+       /actualites, /blog, /journal, /documents, /ressources, /galerie, /nous-contacter, /benevolat]
+  nl: [/over-ons, /overons, /geschiedenis, /projecten, /het-terrein, /tuin, /landbouw,
+       /permacultuur, /bos, /water, /ecologie, /nieuws, /blog, /documenten, /fotos, /contact, /vrijwilligers]
+  de: [/ueber-uns, /uber-uns, /geschichte, /projekte, /landwirtschaft, /permakultur, /wald,
+       /wasser, /oekologie, /aktuelles, /blog, /dokumente, /galerie, /kontakt, /mitmachen]
+  es: [/sobre-nosotros, /nosotros, /quienes-somos, /historia, /proyectos, /la-tierra, /huerta,
+       /agricultura, /permacultura, /bosque, /agua, /ecologia, /noticias, /blog, /documentos,
+       /galeria, /contacto, /voluntariado]
+  pt: [/sobre, /sobre-nos, /quem-somos, /historia, /projetos, /a-terra, /horta, /agricultura,
+       /permacultura, /floresta, /agua, /ecologia, /noticias, /blog, /documentos, /galeria,
+       /contacto, /contato, /voluntariado]
+  it: [/chi-siamo, /storia, /progetti, /il-luogo, /orto, /agricoltura, /permacultura, /bosco,
+       /acqua, /ecologia, /notizie, /blog, /documenti, /galleria, /contatti, /volontariato]
+  sv: [/om-oss, /om, /historia, /projekt, /odling, /skog, /vatten, /nyheter, /blogg, /kontakt]
+  da: [/om-os, /historie, /projekter, /have, /skov, /vand, /nyheder, /blog, /kontakt]
+  no: [/om-oss, /historie, /prosjekter, /hage, /skog, /vann, /nyheter, /blogg, /kontakt]
+  fi: [/tietoa, /historia, /projektit, /puutarha, /metsa, /vesi, /uutiset, /blogi, /yhteystiedot]
+  pl: [/o-nas, /historia, /projekty, /ogrod, /las, /woda, /aktualnosci, /blog, /kontakt]
+  cs: [/o-nas, /historie, /projekty, /zahrada, /les, /voda, /aktuality, /blog, /kontakt]
+  ro: [/despre-noi, /istoric, /proiecte, /gradina, /padure, /apa, /noutati, /blog, /contact]
+  hu: [/rolunk, /tortenet, /projektek, /kert, /erdo, /viz, /hirek, /blog, /kapcsolat]
+  el: [/sxetika, /istoria, /erga, /kipos, /dasos, /nero, /nea, /epikoinonia]
+  tr: [/hakkimizda, /tarihce, /projeler, /bahce, /orman, /su, /haberler, /iletisim]
+
+# --- Feed and sitemap probes ------------------------------------------------
+feed_paths: ["/feed", "/feed/", "/rss", "/rss.xml", "/atom.xml", "/index.xml", "/feed/atom",
+             "/blog/feed", "/news/feed", "/?feed=rss2", "/feeds/posts/default", "/rss/",
+             "/blog/rss.xml"]
+sitemap_paths: [/sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, /sitemap.xml.gz,
+                /wp-sitemap.xml, /sitemap/sitemap.xml, /sitemaps.xml, /page-sitemap.xml,
+                /post-sitemap.xml]
+robots_path: /robots.txt
+
+# --- Stage 0: platform detection -------------------------------------------
+# Maps a host pattern to the O11_Source_Set platform_type vocabulary.
+platform_patterns:
+  Facebook:      ["facebook.com", "fb.com", "m.facebook.com", "fb.me"]
+  Instagram:     ["instagram.com", "instagr.am"]
+  YouTube:       ["youtube.com", "youtu.be", "m.youtube.com"]
+  Vimeo:         ["vimeo.com"]
+  LinkedIn:      ["linkedin.com"]
+  blog platform: ["wordpress.com", "blogspot.", "medium.com", "substack.com", "ghost.io",
+                  "tumblr.com", "blogger.com", "over-blog.com", "canalblog.com", "wixsite.com"]
+  directory listing:
+    ["ecovillage.org", "gen-europe.org", "ic.org", "fic.ic.org", "numundo.org", "wwoof.",
+     "workaway.info", "helpx.net", "eurotopia.de", "diggersanddreamers.org.uk",
+     "permaculture.org", "permacultureglobal.org", "ecobasa.org", "gen-africa.org",
+     "casacollettiva.it", "colibris-lemouvement.org", "oasis.colibris-lemouvement.org",
+     "reseau-colibris.org", "ecolise.eu", "globalecovillagenetwork.org", "ecovillage.nl",
+     "gen-nl.nl", "vivremieux.org", "habitatparticipatif.net"]
+  crowdfunding:
+    ["kickstarter.com", "gofundme.com", "ulule.com", "kisskissbankbank.com", "betterplace.org",
+     "indiegogo.com", "helloasso.com", "voordekunst.nl", "crowdfunding.nl", "leetchi.com",
+     "miimosa.com", "zaar.mt", "goteo.org", "verkami.com", "produzionidalbasso.com",
+     "startnext.com", "wemakeit.com", "patreon.com", "opencollective.com"]
+  booking or hosting:
+    ["airbnb.", "booking.com", "hostelworld.com", "bookyogaretreats.com", "retreat.guru",
+     "tripadvisor.", "gites.fr", "natuurhuisje.nl", "hipcamp.com", "welcometomyfarm.com"]
+  news outlet:
+    ["ladepeche.fr", "lemonde.fr", "francetvinfo.fr", "ouest-france.fr", "sudouest.fr",
+     "reporterre.net", "nrc.nl", "volkskrant.nl", "trouw.nl", "ad.nl", "bd.nl", "omroepbrabant.nl",
+     "theguardian.com", "bbc.co.uk", "elpais.com", "publico.pt", "repubblica.it"]
+
+# --- Stage 0.2: source-set discovery query templates ------------------------
+# {name} community name, {alt} alternative name, {place} locality/municipality,
+# {country} country, {founder} founder name, {entity} legal entity name.
+discovery_queries:
+  platform_accounts:
+    - '"{name}" facebook'
+    - '"{name}" instagram'
+    - '"{name}" youtube'
+    - '"{name}" vimeo'
+    - '"{name}" linkedin'
+  former_domain:
+    - '"{name}" formerly'
+    - '"{name}" ancien site'
+    - '"{name}" old website'
+    - '"{name}" "was previously known as"'
+  directories:
+    - '"{name}" ecovillage.org'
+    - '"{name}" site:ic.org'
+    - '"{name}" site:numundo.org'
+    - '"{name}" wwoof'
+    - '"{name}" workaway'
+    - '"{name}" {country} ecovillage directory'
+  contact_trace:
+    - '"{address}"'
+    - '"{email}"'
+    - '"{phone}"'
+  entity:
+    - '"{entity}"'
+    - '"{entity}" {country} association registre'
+    - '"{entity}" statuts'
+  domain_guesses:
+    - "{slug}.org"
+    - "{slug}.com"
+    - "{slug}.net"
+    - "{slug}.{cc}"
+    - "{slug}.eu"
+
+# --- Stage 4: web archive ---------------------------------------------------
+archive:
+  cdx_endpoint: "http://web.archive.org/cdx/search/cdx"
+  cdx_params:
+    fl: "original,timestamp,mimetype,statuscode,digest"
+    collapse: "urlkey"
+    limit: 5000
+    filter: "statuscode:200"
+  wayback_available_endpoint: "https://archive.org/wayback/available"
+  snapshot_url_template: "https://web.archive.org/web/{timestamp}id_/{url}"
+  # Annual snapshot sampling for the pages that matter most for dating.
+  priority_snapshot_paths: ["/", "/about", "/history", "/projects", "/land", "/restoration",
+                            "/water", "/agriculture", "/farm", "/documents", "/reports"]
+  timetravel_endpoint: "http://timetravel.mementoweb.org/timemap/link/"
+
+# --- Stage 5: academic databases -------------------------------------------
+# access: api = machine-readable endpoint; html = page scraping; manual = record
+# as unreachable-by-automation and log the negative consultation honestly.
+academic_databases:
+  - {id: openalex, name: OpenAlex, access: api, endpoint: "https://api.openalex.org/works", type: academic, needs_key: false}
+  - {id: crossref, name: Crossref, access: api, endpoint: "https://api.crossref.org/works", type: academic, needs_key: false}
+  - {id: semantic_scholar, name: Semantic Scholar, access: api, endpoint: "https://api.semanticscholar.org/graph/v1/paper/search", type: academic, needs_key: false}
+  - {id: core, name: CORE, access: api, endpoint: "https://api.core.ac.uk/v3/search/works", type: academic, needs_key: true, key_env: CORE_API_KEY}
+  - {id: base, name: BASE (Bielefeld), access: api, endpoint: "https://api.base-search.net/cgi-bin/BaseHttpSearchInterface.fcgi", type: academic, needs_key: true, key_env: BASE_API_KEY}
+  - {id: openaire, name: OpenAIRE, access: api, endpoint: "https://api.openaire.eu/search/publications", type: academic, needs_key: false}
+  - {id: doaj, name: DOAJ, access: api, endpoint: "https://doaj.org/api/search/articles", type: academic, needs_key: false}
+  - {id: datacite, name: DataCite, access: api, endpoint: "https://api.datacite.org/dois", type: academic, needs_key: false}
+  - {id: scielo, name: SciELO, access: html, endpoint: "https://search.scielo.org/", type: academic, needs_key: false}
+  - {id: redalyc, name: Redalyc, access: html, endpoint: "https://www.redalyc.org/busquedaArticuloFiltros.oa", type: academic, needs_key: false}
+  - {id: agris, name: AGRIS (FAO), access: html, endpoint: "https://agris.fao.org/search/en", type: academic, needs_key: false}
+  - {id: oatd, name: OATD, access: html, endpoint: "https://oatd.org/oatd/search", type: thesis portal, needs_key: false}
+  - {id: ndltd, name: NDLTD Global ETD Search, access: html, endpoint: "https://search.ndltd.org/search.php", type: thesis portal, needs_key: false}
+  - {id: dart_europe, name: DART-Europe, access: html, endpoint: "https://www.dart-europe.org/browse-results.php", type: thesis portal, needs_key: false}
+  - {id: google_scholar, name: Google Scholar, access: manual, type: academic, needs_key: false,
+     note: "Blocks automated access. Recorded as unreachable rather than as zero hits."}
+  - {id: researchgate, name: ResearchGate, access: manual, type: academic, needs_key: false,
+     note: "Blocks automated access."}
+  - {id: academia_edu, name: Academia.edu, access: manual, type: academic, needs_key: false}
+  - {id: jstor, name: JSTOR, access: manual, type: academic, needs_key: false}
+  - {id: proquest, name: ProQuest Dissertations, access: manual, type: thesis portal, needs_key: false}
+
+# National thesis / repository portals, selected by community country.
+national_thesis_portals:
+  France:      [{id: theses_fr, name: theses.fr, access: api, endpoint: "https://theses.fr/api/v1/theses/recherche/"},
+                {id: hal, name: HAL, access: api, endpoint: "https://api.archives-ouvertes.fr/search/"},
+                {id: dumas, name: DUMAS, access: html, endpoint: "https://dumas.ccsd.cnrs.fr/search/index/"}]
+  Netherlands: [{id: narcis_worldcat, name: NARCIS successor / OpenAIRE NL, access: api, endpoint: "https://api.openaire.eu/search/publications"},
+                {id: edepot_wur, name: WUR eDepot, access: html, endpoint: "https://library.wur.nl/WebQuery/wurpubs"}]
+  Portugal:    [{id: rcaap, name: RCAAP, access: html, endpoint: "https://www.rcaap.pt/results.jsp"}]
+  Spain:       [{id: teseo, name: TESEO, access: manual}, {id: dialnet, name: Dialnet, access: html, endpoint: "https://dialnet.unirioja.es/buscar/documentos"}]
+  Brazil:      [{id: bdtd, name: BDTD, access: html, endpoint: "https://bdtd.ibict.br/vufind/Search/Results"},
+                {id: teses_usp, name: Teses USP, access: html, endpoint: "https://www.teses.usp.br/index.php"}]
+  Sweden:      [{id: diva, name: DiVA, access: html, endpoint: "https://www.diva-portal.org/smash/resultList.jsf"}]
+  Germany:     [{id: dnb, name: Deutsche Nationalbibliothek, access: api, endpoint: "https://services.dnb.de/sru/dnb"}]
+  Italy:       [{id: iris, name: IRIS/OpenAIRE IT, access: api, endpoint: "https://api.openaire.eu/search/publications"}]
+  Denmark:     [{id: dk_openaire, name: OpenAIRE DK, access: api, endpoint: "https://api.openaire.eu/search/publications"}]
+  default:     [{id: openaire_country, name: OpenAIRE (country-scoped), access: api, endpoint: "https://api.openaire.eu/search/publications"}]
+
+# --- Stage 5.2: academic query construction --------------------------------
+academic_query_terms:
+  en: [ecovillage, "intentional community", permaculture, agroecology, "ecological restoration",
+       "land use", "sustainable community", reforestation, agroforestry, "land management"]
+  fr: ["écovillage", "écolieu", "communauté intentionnelle", permaculture, "agroécologie",
+       "restauration écologique", "habitat participatif", "oasis ressource"]
+  nl: [ecodorp, "intentionele gemeenschap", permacultuur, agro-ecologie, "ecologisch herstel",
+       "duurzame gemeenschap"]
+  de: [Ökodorf, Gemeinschaft, Permakultur, Agrarökologie, Renaturierung, Lebensgemeinschaft]
+  es: [ecoaldea, "comunidad intencional", permacultura, agroecología, "restauración ecológica"]
+  pt: [ecoaldeia, "comunidade intencional", permacultura, agroecologia, "restauração ecológica"]
+  it: [ecovillaggio, "comunità intenzionale", permacultura, agroecologia]
+  sv: [ekoby, permakultur, agroekologi]
+  da: [økosamfund, permakultur]
+  pl: [ekowioska, permakultura]
+
+# --- Stage 6: grey literature and funding databases ------------------------
+grey_databases:
+  - {id: cordis, name: CORDIS (EU research projects), access: api, type: grey - funding,
+     endpoint: "https://cordis.europa.eu/search/results", note: "Horizon Europe, H2020, FP7"}
+  - {id: life_programme, name: EU LIFE programme database, access: html, type: grey - funding,
+     endpoint: "https://webgate.ec.europa.eu/life/publicWebsite/search"}
+  - {id: erasmus_plus, name: Erasmus+ Project Results Platform, access: html, type: grey - funding,
+     endpoint: "https://erasmus-plus.ec.europa.eu/projects/search"}
+  - {id: keep_interreg, name: Keep.eu (Interreg projects), access: html, type: grey - funding,
+     endpoint: "https://keep.eu/search/"}
+  - {id: enrd_leader, name: European Network for Rural Development / LEADER, access: html,
+     type: grey - funding, endpoint: "https://ec.europa.eu/enrd/projects-practice_en.html"}
+  - {id: eu_funding_tenders, name: EU Funding & Tenders portal, access: html, type: grey - funding,
+     endpoint: "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities"}
+  - {id: openaire_projects, name: OpenAIRE projects, access: api, type: grey - funding,
+     endpoint: "https://api.openaire.eu/search/projects"}
+  - {id: opencorporates, name: OpenCorporates, access: api, type: registry,
+     endpoint: "https://api.opencorporates.com/v0.4/companies/search", needs_key: true, key_env: OPENCORPORATES_KEY}
+  - {id: fr_rna_associations, name: "France — Répertoire National des Associations", access: api,
+     type: registry, endpoint: "https://entreprise.data.gouv.fr/api/rna/v1/full_text/", countries: [France]}
+  - {id: fr_annuaire_entreprises, name: "France — Annuaire des Entreprises", access: api,
+     type: registry, endpoint: "https://recherche-entreprises.api.gouv.fr/search", countries: [France]}
+  - {id: nl_kvk, name: "Netherlands — KVK open data", access: html, type: registry,
+     endpoint: "https://www.kvk.nl/zoeken/", countries: [Netherlands]}
+  - {id: nl_ruimtelijke_plannen, name: "Netherlands — Ruimtelijkeplannen.nl (planning)", access: html,
+     type: grey - government, endpoint: "https://www.ruimtelijkeplannen.nl/", countries: [Netherlands]}
+  - {id: fr_geoportail_urbanisme, name: "France — Géoportail de l'urbanisme", access: html,
+     type: grey - government, endpoint: "https://www.geoportail-urbanisme.gouv.fr/", countries: [France]}
+  - {id: organic_certifiers, name: Organic certification public client lists, access: html,
+     type: registry, note: "Records first year of certification where shown"}
+  - {id: openstreetmap_nominatim, name: OpenStreetMap Nominatim, access: api, type: registry,
+     endpoint: "https://nominatim.openstreetmap.org/search", note: "Locality confirmation only. Never an area source."}
+
+grey_literature_types:
+  - masters or doctoral thesis
+  - conference paper or poster
+  - NGO or foundation report
+  - government or municipal report
+  - environmental impact assessment
+  - grant application
+  - grant award record
+  - grant final report
+  - project deliverable
+  - certification audit report
+  - network or federation report
+  - working paper or preprint
+  - consultancy or evaluation report
+  - sector newsletter or bulletin
+  - agricultural extension publication
+  - land trust or conservation easement document
+  - planning application or building permit
+
+grey_query_templates:
+  - '"{name}" filetype:pdf'
+  - '"{name}" rapport filetype:pdf'
+  - '"{name}" subvention'
+  - '"{name}" grant'
+  - '"{name}" permis'
+  - '"{name}" vergunning'
+  - '"{name}" bestemmingsplan'
+  - '"{name}" {country} projet financé'
+  - '"{entity}" subvention OR grant OR financement'
+  - '"{place}" "{name}" plan'
+
+filetype_search_extensions: [pdf, doc, docx, xls, xlsx, csv, ppt, pptx, odt, ods]
+
+# --- Search engines (Stage 2e, 5, 6, 7) -------------------------------------
+# All optional. Absence is recorded as an unreachable consultation, never as
+# zero results.
+search_engines:
+  - {id: duckduckgo_html, name: DuckDuckGo HTML, access: html, endpoint: "https://html.duckduckgo.com/html/", needs_key: false}
+  - {id: brave, name: Brave Search API, access: api, endpoint: "https://api.search.brave.com/res/v1/web/search", needs_key: true, key_env: BRAVE_API_KEY}
+  - {id: serpapi, name: SerpAPI, access: api, endpoint: "https://serpapi.com/search", needs_key: true, key_env: SERPAPI_KEY}
+  - {id: google_cse, name: Google Programmable Search, access: api, endpoint: "https://www.googleapis.com/customsearch/v1", needs_key: true, key_env: GOOGLE_CSE_KEY, extra_env: GOOGLE_CSE_CX}
+  - {id: bing, name: Bing Web Search, access: api, endpoint: "https://api.bing.microsoft.com/v7.0/search", needs_key: true, key_env: BING_API_KEY}
+  - {id: mojeek, name: Mojeek, access: html, endpoint: "https://www.mojeek.com/search", needs_key: false}
+  - {id: marginalia, name: Marginalia Search, access: html, endpoint: "https://search.marginalia.nu/search", needs_key: false}
+
+# --- Platform-specific public endpoints ------------------------------------
+platform_endpoints:
+  youtube_channel_paths: ["/videos", "/videos?sort=da", "/playlists", "/about", "/streams"]
+  youtube_oembed: "https://www.youtube.com/oembed"
+  vimeo_oembed: "https://vimeo.com/api/oembed.json"
+  facebook_public_paths: ["/about", "/photos", "/events", "/videos", "/posts"]
+  instagram_public_paths: ["/"]
+  linkedin_public_paths: ["/about/"]
+
+# --- Site plan / map discovery vocabulary (Stage 48 of the brief) ----------
+site_plan_terms:
+  en: ["site plan", "master plan", "masterplan", "land use map", "land-use plan", "zoning map",
+       "farm plan", "ecological plan", "restoration map", "permaculture design", "design plan",
+       "landscape plan", "water system", "drainage plan", "contour plan", "food forest map",
+       "plantation map", "base map", "keyline design", "zone map", "swale plan"]
+  fr: ["plan du site", "plan masse", "plan de masse", "plan d'aménagement", "carte des sols",
+       "plan de la ferme", "conception permaculturelle", "plan de restauration", "plan d'eau",
+       "plan de plantation", "zonage"]
+  nl: ["terreinplan", "inrichtingsplan", "masterplan", "bestemmingsplan", "landgebruikskaart",
+       "beplantingsplan", "waterplan", "ontwerpplan", "permacultuurontwerp"]
+  de: ["Lageplan", "Bebauungsplan", "Nutzungsplan", "Pflanzplan", "Wasserplan", "Permakulturdesign"]
+  es: ["plano del sitio", "plan maestro", "mapa de uso de suelo", "diseño en permacultura", "plano de plantación"]
+  pt: ["planta do local", "plano diretor", "mapa de uso do solo", "desenho de permacultura", "plano de plantio"]

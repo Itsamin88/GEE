@@ -1,0 +1,541 @@
+# ============================================================================
+# CANONICAL FIELD SCHEMA — Stage 1 documentary coding
+# ----------------------------------------------------------------------------
+# Authority, in order:
+#   1. Stage_1_Documentary_Coding_Workbook_v6.xlsx  (destination + vocabularies)
+#   2. WEB_SEARCH_FIELD_REGISTER_AND_CHATGPT_PROMPT_v2_4.md (field definitions)
+#   3. THE_SIMPLIFIED_PLAN_v3.8.docx (why the field exists)
+#
+# Every field carries governance metadata so a later version of this program
+# cannot silently change the study. See docs/RESEARCH_DECISIONS.md.
+#
+# route:
+#   documentary  - coded from published sources by this application
+#   researcher   - supplied by the researcher (polygon, coordinates, coder id)
+#   satellite    - Google Earth Engine pipeline output. NEVER coded here.
+#   derived      - calculated by a workbook formula. NEVER written by this app.
+# ============================================================================
+schema_version: "1.0.0"
+register_version: "2.4"
+workbook_version: "6.0"
+plan_version: "3.8"
+
+# --- Values that must never be written to a documentary field -------------
+not_found_token: "NOT FOUND"
+
+blocks:
+
+  A:
+    title: Identity and location
+    count: 5
+    sheet: O1_Community_Attributes
+    fields:
+      - name: community_name_official
+        column: B
+        datatype: text
+        route: documentary
+        description: The name the community uses for itself, in its own language, plus any English form.
+        evidence_requirement: at_least_one_source
+        provenance_required: true
+        editable_by_researcher: true
+      - name: alternative_names
+        column: C
+        datatype: text_semicolon_list
+        route: documentary
+        description: Former names, local names, transliterations, network variants. Each variant is a separate academic search string.
+        evidence_requirement: at_least_one_source
+        provenance_required: true
+        editable_by_researcher: true
+      - name: country
+        column: D
+        datatype: text
+        route: documentary
+        evidence_requirement: at_least_one_source
+        provenance_required: true
+        editable_by_researcher: true
+      - name: admin_region
+        column: E
+        datatype: text
+        route: documentary
+        description: Province, state, county.
+        evidence_requirement: at_least_one_source
+        provenance_required: true
+        editable_by_researcher: true
+      - name: latitude
+        column: F
+        datatype: float
+        route: researcher
+        description: Researcher-held coordinate. Never coded from the web; the crawler only compares against it.
+        writable_by_app: false
+      - name: longitude
+        column: G
+        datatype: float
+        route: researcher
+        writable_by_app: false
+      - name: coordinate_agreement
+        column: H
+        datatype: enum
+        route: documentary
+        allowed_values: [agrees, differs, no published location]
+        description: Do published sources place the community where the researcher's coordinates do? Qualifications go in the notes column, never in the value.
+        evidence_requirement: at_least_one_source
+        provenance_required: true
+        editable_by_researcher: true
+
+  B:
+    title: Eligibility (criteria E1-E5, E8)
+    count: 8
+    sheet: O1_Community_Attributes
+    fields:
+      - name: e1_network_listing
+        column: I
+        datatype: text_semicolon_list
+        route: documentary
+        description: Which networks or directories list it.
+      - name: e1_pathway
+        column: J
+        datatype: enum
+        route: documentary
+        allowed_values: ["network/directory listing", "independent self-identification", "both"]
+      - name: e1_self_identification
+        column: K
+        datatype: text
+        max_words: 25
+        route: documentary
+        description: A published phrase stating ecological aims. Quote it; do not paraphrase.
+        preserve_original_wording: true
+      - name: e2_settlement_type
+        column: L
+        datatype: enum
+        route: documentary
+        allowed_values: ["village-scale permanent residence", "retreat centre", campus, business, "single household", "urban co-housing", unclear]
+      - name: e2_evidence_note
+        column: M
+        datatype: text
+        route: documentary
+      - name: e3_population_value
+        column: N
+        datatype: integer
+        route: documentary
+        description: PERMANENT RESIDENTS ONLY. Not visitors, volunteers or students.
+      - name: e5_active_currently
+        column: O
+        datatype: enum
+        route: documentary
+        allowed_values: ["yes", probably, unclear, "no"]
+      - name: e8_setting_at_onset
+        column: P
+        datatype: enum
+        route: documentary
+        allowed_values: [rural, peri-urban, urban, unclear]
+
+  C:
+    title: Onset dating — THE PRIORITY BLOCK
+    count: 14
+    sheet: O3_Onset_Register
+    fields:
+      - name: date_formal_founding
+        column: C
+        datatype: year
+        route: documentary
+      - name: date_land_acquisition
+        column: D
+        datatype: year
+        route: documentary
+      - name: date_first_residence
+        column: E
+        datatype: year
+        route: documentary
+      - name: date_intervention_onset
+        column: F
+        datatype: year
+        route: documentary
+        priority: true
+        description: >-
+          Year the first deliberate action to alter vegetation, soil, water or land cover for
+          ecological purposes is documented. NOT the founding year.
+        evidence_requirement: dated_evidence_with_rank
+        provenance_required: true
+      - name: onset_lower_bound
+        column: G
+        datatype: year
+        route: documentary
+      - name: onset_upper_bound
+        column: H
+        datatype: year
+        route: documentary
+      - name: onset_band_width_years
+        column: I
+        datatype: integer
+        route: derived
+        writable_by_app: false
+        formula: "=IFERROR(H-G,\"\")"
+      - name: onset_evidence_rank
+        column: J
+        datatype: enum
+        route: documentary
+        allowed_values: ["1", "2", "3", "4", "5"]
+      - name: onset_evidence_description
+        column: K
+        datatype: text
+        route: documentary
+      - name: onset_conflicting_sources
+        column: L
+        datatype: text
+        route: documentary
+        description: Where sources disagree, what each says, or "none". Never silently resolved.
+      - name: resolution_rule
+        column: M
+        datatype: text
+        route: researcher
+        writable_by_app: false
+        description: The researcher records the rule when they settle a conflict. The app proposes it in the review queue instead.
+      - name: onset_proxy_flag
+        column: N
+        datatype: enum
+        route: documentary
+        allowed_values: ["yes", "no"]
+      - name: onset_confidence_tier
+        column: O
+        datatype: enum
+        route: documentary
+        allowed_values: [A, B, C]
+      - name: onset_first_or_major
+        column: P
+        datatype: enum
+        route: documentary
+        allowed_values: ["first intervention", "major new project", unclear]
+      - name: cohort_candidate
+        column: Q
+        datatype: enum
+        route: documentary
+        allowed_values: ["core (2020-2021)", "extension (2019)", "no", uncertain]
+      - name: domain_onsets
+        column: R
+        datatype: text
+        route: documentary
+        description: 'Earliest year per domain, e.g. "water 1998; vegetation 1992".'
+
+  D:
+    title: Activity verification (criterion E5)
+    count: 7
+    sheet: O1_Community_Attributes
+    fields:
+      - name: v1_self_documentation
+        column: AF
+        datatype: enum
+        route: documentary
+        allowed_values: ["yes", "no"]
+      - name: v2_external_documentation
+        column: AG
+        datatype: enum
+        route: documentary
+        allowed_values: ["yes", "no"]
+      - name: v3_substantive_affiliation
+        column: AH
+        datatype: enum
+        route: documentary
+        allowed_values: ["yes", "no"]
+      - name: v4_visual_documentation
+        column: AI
+        datatype: enum
+        route: documentary
+        allowed_values: ["yes", "no"]
+      - name: v5_continuity_evidence
+        column: AJ
+        datatype: enum
+        route: documentary
+        allowed_values: ["yes", "no"]
+      - name: channel_count
+        column: AK
+        datatype: integer
+        route: derived
+        writable_by_app: false
+        formula: '=IF(COUNTA(AF:AJ)=0,"",COUNTIF(AF:AJ,"yes"))'
+        description: Counts INDEPENDENCE GROUPS via the yes/no channel flags, never addresses.
+      - name: activity_tier
+        column: AL
+        datatype: enum
+        route: documentary
+        allowed_values: [A, B, C, Fail]
+      - name: activity_tier_note
+        column: AM
+        datatype: text
+        route: documentary
+
+  E:
+    title: Size, land and tenure — managed_area_ha is a priority field
+    count: 15
+    sheet: O1_Community_Attributes
+    fields:
+      - name: population_value
+        column: Q
+        datatype: integer
+        route: documentary
+      - name: population_lower
+        column: R
+        datatype: integer
+        route: documentary
+      - name: population_upper
+        column: S
+        datatype: integer
+        route: documentary
+      - name: population_source_date
+        column: T
+        datatype: year
+        route: documentary
+        description: The year the figure refers to, not the year the page was published.
+      - name: polygon_area_ha
+        column: U
+        datatype: float
+        route: derived
+        writable_by_app: false
+        description: Reads itself from O10. NEVER supplied by this application or estimated from imagery.
+      - name: managed_area_ha
+        column: V
+        datatype: float
+        route: documentary
+        priority: true
+        description: >-
+          Land the community actively works ecologically, as STATED by a source. The independent
+          check on the researcher's drawn polygon. Never estimated from imagery or from a map view.
+        forbidden_derivations: [satellite_imagery, map_view, polygon, impression]
+      - name: managed_area_lower_ha
+        column: W
+        datatype: float
+        route: documentary
+      - name: managed_area_upper_ha
+        column: X
+        datatype: float
+        route: documentary
+      - name: managed_area_basis
+        column: Y
+        datatype: enum
+        route: documentary
+        allowed_values: [measured, stated, inferred, not found]
+      - name: managed_area_source_class
+        column: Z
+        datatype: enum
+        route: documentary
+        allowed_values: [S1, S2, S3, S4, S5, S6, S7, S8]
+      - name: total_holding_ha
+        column: AA
+        datatype: float
+        route: documentary
+        description: The whole landholding. NEVER substitute for managed_area_ha.
+      - name: area_type
+        column: AB
+        datatype: enum
+        route: documentary
+        allowed_values: ["actively managed", "total holding only", "both recorded", "not stated"]
+      - name: tenure_type
+        column: AC
+        datatype: enum
+        route: documentary
+        allowed_values: ["freehold collective", "freehold individual", leasehold, "commons or trust", informal, mixed, unknown]
+      - name: parcel_structure
+        column: AD
+        datatype: enum
+        route: documentary
+        allowed_values: [contiguous, non-contiguous, unknown]
+      - name: site_plan_published
+        column: AE
+        datatype: text
+        route: documentary
+        description: '"yes — URL" or "no". The URL must be one actually retrieved.'
+      - name: documentary_area_note
+        column: BK
+        datatype: text
+        route: documentary
+        description: Whether the figure is worked land or the whole holding, one parcel or several, and the year it refers to.
+
+  F:
+    title: Practice codes (13 codes + notes)
+    count: 14
+    sheet: O2_Practice_Matrix
+    evidence_sheet: O2b_Practice_Evidence
+    coding_levels: [evidenced, documented, claimed, explicitly absent, not mentioned]
+    coding_level_rules:
+      evidenced: Documented by an EXTERNAL (S1/S2/S6) or VISUAL source, with specificity.
+      documented: Described specifically by the community, with continuity across years.
+      claimed: Asserted without specificity or corroboration.
+      explicitly absent: The community STATES it does not do this. Requires an actual denial in a source.
+      not mentioned: No statement either way. NEVER read as absence of the practice.
+    default_level: not mentioned
+    fields:
+      - {name: pc01_rainwater, column: C, label: Rainwater harvesting, plan_alias: pc_rainwater, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc02_swales, column: D, label: "Swales, keyline earthworks, contour water works", plan_alias: pc_swales, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc03_irrigation, column: E, label: Irrigation used, plan_alias: pc_irrigation, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc04_no_till, column: F, label: No-till or minimum tillage, plan_alias: pc_no_till, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc05_mulching, column: G, label: Permanent ground cover and mulching, plan_alias: pc_mulching, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc06_cover_crop, column: H, label: Cover cropping or green manure, plan_alias: pc_cover_crop, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc07_tree_planting, column: I, label: Tree planting or reforestation, plan_alias: pc_tree_planting, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc08_agroforestry, column: J, label: Food forest or agroforestry, plan_alias: pc_agroforestry, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc09_polyculture, column: K, label: Perennial polyculture, plan_alias: pc_polyculture, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc10_hedgerows, column: L, label: Hedgerows and windbreaks, plan_alias: pc_hedgerows, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc11_small_parcel, column: M, label: Small-parcel diversified planting, plan_alias: pc_small_parcel, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc12_organic, column: N, label: Organic or no synthetic inputs, plan_alias: pc_organic, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: pc13_restoration, column: O, label: "Land restoration or rehabilitation, non-tree", plan_alias: pc_restoration, route: documentary, datatype: enum, allowed_values: [evidenced, documented, claimed, "explicitly absent", "not mentioned"]}
+      - {name: practice_evidence_notes, column: R, workbook_header: notes, datatype: text,
+         route: documentary,
+         description: "One line per CODED practice; full provenance goes to O2b."}
+
+  G:
+    title: Status, persistence and survivorship
+    count: 6
+    sheet: O1_Community_Attributes
+    fields:
+      - name: status_current
+        column: AN
+        datatype: enum
+        route: documentary
+        allowed_values: [active, dormant, transformed, relocated, dissolved, unknown]
+        description: unknown is NOT dissolved. Dissolution requires positive evidence.
+      - {name: status_evidence, column: AO, datatype: text, route: documentary}
+      - {name: first_listing_year, column: AP, datatype: year, route: documentary}
+      - {name: last_listing_year, column: AQ, datatype: year, route: documentary}
+      - {name: dissolution_year, column: AR, datatype: year_or_na, route: documentary}
+      - name: delisting_reason
+        column: AS
+        datatype: enum
+        route: documentary
+        allowed_values: [dissolution, relocation, "changed network", "administrative removal", "lost contact", unknown, n/a]
+
+  H:
+    title: Context and moderators
+    count: 7
+    sheet: O1_Community_Attributes
+    fields:
+      - name: movement_tradition
+        column: AT
+        datatype: enum
+        route: documentary
+        allowed_values: [permaculture, "ecovillage network", Camphill, kibbutz, "Buddhist or spiritual", Transition, agroecology, other, "none stated"]
+      - name: founding_decade
+        column: AU
+        datatype: integer
+        route: documentary
+        derived_from: date_formal_founding
+        description: Derived inside the app from C1, written as data because the workbook has no formula here.
+      - {name: education_volunteer_program, column: AV, datatype: enum, route: documentary, allowed_values: ["yes", "no", unclear]}
+      - {name: agricultural_orientation, column: AW, datatype: enum, route: documentary, allowed_values: [subsistence, market, mixed, "none stated"]}
+      - {name: external_funding_or_programme, column: AX, datatype: text, route: documentary,
+         description: "Mainly a Stage 6 output. 'none found' where nothing found."}
+      - {name: protected_area_status, column: AY, datatype: enum, route: documentary, allowed_values: [inside, adjacent, "no", unclear]}
+      - {name: notable_context, column: AZ, datatype: text, route: documentary}
+
+  I:
+    title: Source provenance
+    count: 12
+    sheet: O1_Community_Attributes
+    fields:
+      - {name: pages_opened_count, column: BA, datatype: integer, route: documentary,
+         description: "Distinct URLs actually opened, including those yielding nothing."}
+      - {name: documents_opened, column: BB, datatype: text, route: documentary, description: "Files opened, by title."}
+      - {name: source_classes_found, column: BC, datatype: text_semicolon_list, route: documentary}
+      - {name: search_languages, column: BD, datatype: text_semicolon_list, route: documentary}
+      - {name: negative_consultations, column: BE, datatype: text, route: documentary,
+         description: "Source classes and databases checked and found empty. Distinct from 'not searched'."}
+      - {name: academic_search_log, column: null, sheet: O7_Search_Log, route: documentary, unpacked_to_rows: true}
+      - {name: grey_literature_log, column: null, sheet: O7_Search_Log, route: documentary, unpacked_to_rows: true}
+      - {name: source_set_supplied, column: null, sheet: O11_Source_Set, route: documentary, unpacked_to_rows: true}
+      - {name: source_set_discovered, column: null, sheet: O11_Source_Set, route: documentary, unpacked_to_rows: true}
+      - {name: independence_groups, column: BL, datatype: integer, route: documentary}
+      - {name: stages_completed, column: BM, datatype: text, route: documentary}
+      - {name: crawl_truncated, column: BN, datatype: enum, route: documentary, allowed_values: ["yes", "no"]}
+
+# --- Researcher-owned columns the app must never write ---------------------
+# Columns the application must never write. Per decision DCR-D004 the coder_id
+# and coding_date columns ARE written, with an explicit machine identity, so a
+# blank does not imply a human read the sources; double_coded and
+# second_coder_id stay researcher-only because the reliability statistics in O4
+# must not be computed against a machine pass.
+researcher_only_columns:
+  O1_Community_Attributes: [F, G, U, BH, BI]
+  O3_Onset_Register: [M]
+  O10_Polygon_And_Area: [C, D, E, F, G, J, K, L, V, W, X, Y, Z]
+  R1_Codebook: [P]
+  O9_Claim_Signature_Map: [G, H]
+
+# Written by the application with an explicit machine identity (DCR-D004).
+machine_identity_columns:
+  O1_Community_Attributes: {coder_id: BF, coding_date: BG}
+  O2_Practice_Matrix: {coder_id: P, coding_date: Q}
+  O2b_Practice_Evidence: {coder_id: K}
+  O3_Onset_Register: {coder_id: T, coding_date: U}
+  O7_Search_Log: {coder_id: K}
+  O11_Source_Set: {coder_id: P}
+
+# --- Workbook formula columns the app must never overwrite -----------------
+formula_columns:
+  O1_Community_Attributes: [U, AK]
+  O3_Onset_Register: [I]
+  O10_Polygon_And_Area: [H, I, M, N, O, P, Q, R, S, T]
+  R1_Codebook: [L]
+  README: [C]
+  Cohort_Tracker: [B]
+
+# --- Quantities that must NEVER be searched for on the web -----------------
+# (Register A.0 / Reference_Codes rows 110-121). Presence of any of these as a
+# documentary claim is a hard validation failure.
+satellite_only_quantities:
+  - VM1..VM14
+  - PM1..PM3
+  - FC1..FC4
+  - contour_alignment
+  - VCI
+  - VCI-P
+  - VCI-S
+  - VCI-T
+  - VCI-C
+  - PCI
+  - MDS
+  - LCC
+  - built_fraction
+  - tree_cover_pct
+  - elevation_m
+  - slope_deg
+  - terrain_class
+  - water_dist_m
+  - koppen_group
+  - biome
+  - annual_rainfall_mm
+  - driest_month
+  - drought_year
+  - n_clear
+  - polygon_area_ha
+  - polygon_iou
+  - reference_circle
+  - control_distance_km
+  - size_class_documentary   # retired in register v2.3
+
+# A community's OWN published figure for one of these may be recorded as
+# Block H context with provenance, but never substituted for the pipeline value.
+context_exception_fields: [elevation_m, annual_rainfall_mm, total_holding_ha]
+
+source_classes:
+  S1: {label: Academic, detail: "peer-reviewed papers, theses and dissertations, conference papers, preprints", reliability: highest, external: true}
+  S2: {label: Institutional, detail: "government, NGO, certification, land registry, grant and funding records", reliability: high, external: true}
+  S3: {label: External network or directory profile, reliability: moderate-high, external: true, note: "frequently a copy of S4"}
+  S4: {label: Community current material, reliability: moderate, external: false}
+  S5: {label: Archived community material, reliability: moderate, external: false, note: "high for dating"}
+  S6: {label: Journalism and documentary media, reliability: variable, external: true}
+  S7: {label: Social media and member accounts, reliability: low, external: false}
+  S8: {label: Direct communication, reliability: moderate-high, external: false}
+
+onset_evidence_ranks:
+  1: {evidence: "Dated independent record — permit, grant award or report, project report, registry entry, academic paper or thesis", band_years: 1}
+  2: {evidence: "Dated archived snapshot describing work as already under way", band_years: 3, firm_upper_bound: true}
+  3: {evidence: "The community's own dated retrospective statement", band_years: 5}
+  4: {evidence: "Undated community statement, onset inferred from context", band_years: 8}
+  5: {evidence: "Directory founding year used as a proxy", band_years: 10, not_an_onset: true, forces_proxy_flag: true}
+
+activity_tiers:
+  A: ">=3 channels including >=1 external channel"
+  B: "2 channels, at least one of which is V4 or V5"
+  C: "2 community-originated channels, no visual or continuity support"
+  Fail: "<2 independent channels"
+
+cohort_windows:
+  core: [2020, 2021]
+  extension: [2019, 2019]

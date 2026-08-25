@@ -1,0 +1,199 @@
+# ============================================================================
+# RUNTIME CONFIGURATION — reproducibility record for every run.
+# Everything that could change what the crawler does lives here, so no hidden
+# default can alter the research process between runs. The effective config is
+# copied into each community's run_manifest.json.
+# ============================================================================
+app_version: "1.0.0"
+config_version: "1.0.0"
+
+paths:
+  output_root: "Research_Web_Crawler_Output"
+  database: "Research_Web_Crawler_Output/dcr.sqlite3"
+  workbook_template: "template/Stage_1_Documentary_Coding_Workbook_v6.xlsx"
+  research_inputs: "research_inputs"
+
+identity:
+  # Contact string sent in the User-Agent so site owners can reach the researcher.
+  # Overridable with DCR_CONTACT in .env
+  contact: "academic documentary research; set DCR_CONTACT in .env"
+  user_agent_template: "DocumentaryResearchCrawler/{version} (+academic research; {contact})"
+
+network:
+  timeout_connect_s: 15
+  timeout_read_s: 45
+  timeout_total_s: 120
+  max_concurrency_global: 8
+  max_concurrency_per_host: 2
+  # Politeness. crawl-delay in robots.txt overrides this upward, never downward.
+  default_delay_per_host_s: 1.5
+  max_delay_per_host_s: 30.0
+  max_redirects: 8
+  verify_tls: true
+  # A page larger than this is fetched only as a HEAD record.
+  max_page_bytes: 12000000
+  max_document_bytes: 120000000
+  max_image_bytes: 25000000
+
+retry:
+  max_attempts: 4
+  backoff_base_s: 2.0
+  backoff_factor: 2.0
+  backoff_jitter_s: 1.0
+  backoff_max_s: 60.0
+  # Status codes worth another attempt.
+  retryable_statuses: [408, 425, 429, 500, 502, 503, 504, 522, 524]
+  # Codes that are permanent: recorded once, never retried.
+  permanent_statuses: [400, 401, 402, 403, 404, 405, 410, 451]
+  # 429 handling: honour Retry-After up to this many seconds, then defer the host.
+  respect_retry_after_max_s: 300
+  # After this many consecutive connection failures a host is recorded as
+  # unreachable and no longer probed. A dead domain should cost a handful of
+  # requests, not the forty well-known paths.
+  host_failure_threshold: 5
+
+robots:
+  obey: true
+  # Robots is advisory for /robots.txt and /sitemap.xml themselves — those are
+  # published for crawlers by definition.
+  always_allowed_paths: ["/robots.txt", "/sitemap.xml", "/sitemap_index.xml"]
+  # When robots.txt is unreachable the crawler proceeds politely rather than
+  # treating an unreachable file as a blanket ban, and records the fact.
+  on_unreachable: proceed_and_record
+
+crawl:
+  # Adaptive budget. Each source starts at base_pages and earns more while it
+  # keeps yielding evidence; it is cut off when it stops.
+  base_pages_per_source: 40
+  max_pages_per_source: 400
+  max_pages_per_run: 4000
+  min_depth: 3
+  max_depth: 6
+  # A source earns extra budget when its recent pages yielded evidence.
+  yield_window: 10
+  yield_threshold: 0.15
+  budget_increment: 25
+  # Exhaustion: no new URLs and no evidence in this many consecutive pages.
+  exhaustion_window: 20
+  # Traps
+  max_query_params: 6
+  max_path_segments: 12
+  max_same_path_variants: 40
+  trap_patterns:
+    - "/calendar/"
+    - "/events/\\d{4}/\\d{2}/\\d{2}"
+    - "[?&](replytocom|share|print|add-to-cart|orderby|filter_)="
+    - "/page/\\d{3,}"
+    - "(/[^/]+)\\1{2,}"
+  # Blog/news archives: how far back through pagination to walk.
+  max_pagination_pages: 60
+  prefer_oldest_first: true
+
+archive:
+  enabled: true
+  cdx_limit: 5000
+  # Sample snapshots at roughly annual intervals across the whole record.
+  snapshot_interval_days: 365
+  max_snapshots_per_url: 20
+  max_snapshot_fetches_per_domain: 60
+  # Retrieve archived documents too, not only pages.
+  fetch_archived_documents: true
+
+academic:
+  enabled: true
+  max_results_per_database: 50
+  # Chase full text rather than settling for an abstract.
+  fetch_full_text: true
+  citation_chaining_rounds: 1
+  # Every academic record must be individually verified before it may support
+  # a claim; unverified records go to the review queue, never to the workbook.
+  require_verification: true
+  relevance_min_score: 0.35
+
+grey:
+  enabled: true
+  max_results_per_database: 50
+
+images:
+  enabled: true
+  min_width: 320
+  min_height: 240
+  min_bytes: 12000
+  max_images_per_source: 400
+  max_images_per_community: 1500
+  # Keep 'possible' images too; the researcher decides. Only 'decorative' is dropped.
+  keep_classes: [likely_relevant, possibly_relevant, uncertain]
+  extract_from_documents: true
+  min_embedded_image_pixels: 90000
+
+ocr:
+  enabled: auto        # auto | always | never
+  # OCR only when a PDF page yields less than this many characters of real text.
+  min_chars_per_page: 120
+  max_pages_per_document: 40
+  languages: ["eng", "fra", "nld", "deu", "spa", "por", "ita"]
+
+llm:
+  enabled: auto        # auto = use if ANTHROPIC_API_KEY present
+  model: "claude-sonnet-5"
+  max_chars_per_call: 24000
+  max_calls_per_community: 120
+  # The LLM never becomes the source: every field it proposes must carry an
+  # exact supporting passage that is verified to appear in the stored text.
+  require_verbatim_passage: true
+  temperature: 0
+  prompt_version: "1.0.0"
+
+browser:
+  enabled: auto        # auto = use Playwright if installed
+  # Only escalate to a browser when static HTML looks JS-rendered.
+  min_text_chars_for_static: 400
+  max_browser_pages_per_source: 40
+  timeout_s: 45
+  pool_size: 2
+
+independence:
+  # Near-duplicate detection for copied text (simhash Hamming distance over
+  # 64-bit fingerprints; <= threshold means "same underlying statement").
+  simhash_threshold: 8
+  shingle_size: 5
+  min_chars_for_comparison: 400
+  # A source whose text overlaps an earlier source above this ratio is grouped
+  # with it, unless independent reporting is demonstrated.
+  jaccard_threshold: 0.72
+  press_release_markers:
+    - "press release"
+    - "communiqué de presse"
+    - "persbericht"
+    - "pressemitteilung"
+    - "comunicado de prensa"
+    - "source:"
+    - "reproduced with permission"
+    - "originally published"
+
+quality:
+  # Minimum expectations before a community may be called COMPLETE.
+  min_pages_opened: 25
+  min_independence_groups_for_corroboration: 3
+  min_sources_per_priority_field: 1
+
+security:
+  # Downloaded files are never executed and never trusted by extension.
+  sniff_mime: true
+  max_archive_members: 500
+  max_archive_uncompressed_bytes: 500000000
+  max_archive_ratio: 120
+  allowed_document_extensions: [pdf, doc, docx, odt, rtf, xls, xlsx, ods, csv, tsv,
+                                ppt, pptx, odp, txt, xml, json, kml, kmz, geojson, gpx, zip]
+  allowed_image_extensions: [jpg, jpeg, png, gif, webp, tif, tiff, bmp, svg]
+
+logging:
+  console_level: INFO
+  file_level: DEBUG
+  jsonl: true
+
+run:
+  default_mode: FULL
+  checkpoint_every_n_events: 25
+  # A run that stops before the protocol finishes sets crawl_truncated = yes.
+  stages: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
