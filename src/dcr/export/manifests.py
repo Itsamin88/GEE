@@ -76,15 +76,19 @@ def export_all(db: Database, community_id: str, final_dir: Path) -> dict[str, in
 
     counts["image_manifest.csv"] = write_csv(
         final_dir / "image_manifest.csv",
-        ["image_id", "community_id", "source_id", "document_id", "filename", "local_path",
-         "original_url", "page_number", "source_title", "publication_date", "image_type",
+        ["image_id", "community_id", "candidate_id", "source_id", "document_id", "filename",
+         "original_filename", "local_path",
+         "original_url", "page_url", "archive_url", "page_number", "figure_number",
+         "extraction_method", "source_title", "publication_date", "image_type",
          "research_topic", "caption", "surrounding_text_summary", "evidence_subject",
          "possible_relevant_fields", "visual_evidence_allowed", "documentary_text_support",
          "image_date_if_known", "image_date_confidence", "OCR_text_if_used", "relevance_class",
          "relevance_reason", "confidence", "width", "height", "bytes", "sha256", "notes"],
         (
-            [r["image_id"], community_id, r["source_id"], r["document_id"], r["filename"],
-             r["local_path"], r["original_url"], r["page_number"], r["source_title"],
+            [r["image_id"], community_id, r["candidate_id"], r["source_id"], r["document_id"],
+             r["filename"], r["original_filename"],
+             r["local_path"], r["original_url"], r["page_url"], r["archive_url"],
+             r["page_number"], r["figure_number"], r["extraction_method"], r["source_title"],
              r["publication_date"], r["image_type"], r["research_topic"],
              (r["caption"] or "")[:1000], r["surrounding_summary"], r["evidence_subject"],
              r["possible_fields"], r["visual_evidence_allowed"], r["documentary_text_support"],
@@ -93,6 +97,54 @@ def export_all(db: Database, community_id: str, final_dir: Path) -> dict[str, in
              r["height"], r["bytes"], r["sha256"], r["notes"]]
             for r in db.query("SELECT * FROM images WHERE community_id=? ORDER BY image_id",
                               (community_id,))
+        ),
+    )
+
+    # Every candidate the crawl saw, downloaded or not. This is the audit trail
+    # behind the triage: a reader can see what was passed over and why, instead
+    # of having to trust that nothing was missed (brief §6, §10).
+    counts["image_candidates.csv"] = write_csv(
+        final_dir / "image_candidates.csv",
+        ["candidate_id", "image_id", "decision", "decision_reason", "retrieval_priority",
+         "priority_rank", "relevance_class", "relevance_score", "relevance_reason",
+         "image_type", "research_topic", "origin", "source_id", "document_id", "page_id",
+         "original_url", "page_url", "archive_url", "filename", "alt_text", "title_text",
+         "caption", "page_heading", "document_title", "page_number", "figure_number",
+         "extraction_method", "width", "height", "bytes", "mime_type", "publication_date",
+         "image_date", "source_class", "independence_group", "possible_relevant_fields",
+         "documentary_text_support", "sha256", "stage", "seen_utc"],
+        (
+            [r["candidate_id"], r["image_id"], r["decision"], r["decision_reason"],
+             r["priority"], r["priority_rank"], r["relevance_class"], r["relevance_score"],
+             r["relevance_reason"], r["image_type"], r["research_topic"], r["origin"],
+             r["source_id"], r["document_id"], r["page_id"], r["original_url"],
+             r["page_url"], r["archive_url"], r["filename"], (r["alt_text"] or "")[:500],
+             (r["title_text"] or "")[:500], (r["caption"] or "")[:1000], r["page_heading"],
+             r["document_title"], r["page_number"], r["figure_number"],
+             r["extraction_method"], r["width"], r["height"], r["bytes"], r["mime_type"],
+             r["publication_date"], r["image_date"], r["source_class"],
+             r["independence_group"], r["possible_fields"], r["documentary_text_support"],
+             r["sha256"], r["stage"], r["seen_utc"]]
+            for r in db.query(
+                "SELECT * FROM image_candidates WHERE community_id=? "
+                "ORDER BY CASE priority WHEN 'HIGH' THEN 0 WHEN 'MEDIUM' THEN 1 "
+                "WHEN 'LOW' THEN 2 ELSE 3 END, priority_rank DESC, candidate_id",
+                (community_id,))
+        ),
+    )
+
+    # The interruption record: every pause, outage and resume, in order.
+    counts["interruptions.csv"] = write_csv(
+        final_dir / "interruptions.csv",
+        ["ts_utc", "run_id", "event", "kind", "from_state", "to_state", "stage_no",
+         "source_id", "tasks_done", "tasks_total", "detail"],
+        (
+            [r["ts_utc"], r["run_id"], r["event"], r["kind"], r["from_state"],
+             r["to_state"], r["stage_no"], r["source_id"], r["tasks_done"],
+             r["tasks_total"], r["detail"]]
+            for r in db.query(
+                "SELECT * FROM pause_events WHERE community_id=? AND event != 'checkpoint' "
+                "ORDER BY event_id", (community_id,))
         ),
     )
 

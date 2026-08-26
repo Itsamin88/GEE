@@ -48,6 +48,11 @@ SUPPLEMENTARY_SHEETS: dict[str, str] = {
     "X3_Image_Evidence":
         "The image manifest. Every saved image, why it was kept, what it may support, and what "
         "documentary text would license a claim from it.",
+    "X3b_Image_Triage":
+        "Every image the crawl SAW, downloaded or not, with the metadata read before deciding "
+        "and the reason for the decision. A gallery caption often carries a date no text on the "
+        "page gives, so a skipped candidate is still research material — and the ledger is what "
+        "makes the triage auditable rather than something to be taken on trust.",
     "X4_Document_Register":
         "Every file retrieved, its hash, parser status and the sources it was reached from. A "
         "document downloaded but not parsed is visible here rather than counted as read.",
@@ -483,6 +488,7 @@ class WorkbookExporter:
             "X1_Evidence_Register": self._sheet_evidence,
             "X2_Claim_Register": self._sheet_claims,
             "X3_Image_Evidence": self._sheet_images,
+            "X3b_Image_Triage": self._sheet_image_triage,
             "X4_Document_Register": self._sheet_documents,
             "X5_Crawl_Audit": self._sheet_crawl,
             "X6_Failure_Log": self._sheet_failures,
@@ -557,24 +563,63 @@ class WorkbookExporter:
         return headers, rows
 
     def _sheet_images(self, community_id: str) -> tuple[list[str], list[list[Any]]]:
-        headers = ["image_id", "community_id", "source_id", "document_id", "filename",
-                   "local_path", "original_url", "page_number", "source_title",
-                   "publication_date", "image_type", "research_topic", "caption",
-                   "surrounding_text_summary", "evidence_subject", "possible_relevant_fields",
-                   "visual_evidence_allowed", "documentary_text_support", "image_date_if_known",
+        headers = ["image_id", "community_id", "candidate_id", "source_id", "document_id",
+                   "filename", "original_filename", "local_path", "original_url", "page_url",
+                   "archive_url", "page_number", "figure_number", "extraction_method",
+                   "source_title", "publication_date", "image_type", "research_topic",
+                   "caption", "surrounding_text_summary", "evidence_subject",
+                   "possible_relevant_fields", "visual_evidence_allowed",
+                   "documentary_text_support", "image_date_if_known",
                    "image_date_confidence", "OCR_text_if_used", "relevance_class",
-                   "relevance_reason", "confidence", "width", "height", "bytes", "sha256", "notes"]
+                   "retrieval_priority", "relevance_reason", "confidence", "width", "height",
+                   "bytes", "sha256", "retrieved_utc", "notes"]
         rows = [
-            [r["image_id"], community_id, r["source_id"], r["document_id"], r["filename"],
-             r["local_path"], r["original_url"], r["page_number"], r["source_title"],
+            [r["image_id"], community_id, r["candidate_id"], r["source_id"], r["document_id"],
+             r["filename"], r["original_filename"], r["local_path"], r["original_url"],
+             r["page_url"], r["archive_url"], r["page_number"], r["figure_number"],
+             r["extraction_method"], r["source_title"],
              r["publication_date"], r["image_type"], r["research_topic"],
              (r["caption"] or "")[:800], r["surrounding_summary"], r["evidence_subject"],
              r["possible_fields"], r["visual_evidence_allowed"], r["documentary_text_support"],
              r["image_date"], r["image_date_confidence"], (r["ocr_text"] or "")[:800],
-             r["relevance_class"], r["relevance_reason"], r["confidence"], r["width"],
-             r["height"], r["bytes"], r["sha256"], r["notes"]]
+             r["relevance_class"], r["priority"], r["relevance_reason"], r["confidence"],
+             r["width"], r["height"], r["bytes"], r["sha256"],
+             r["retrieval_utc"] or r["created_utc"], r["notes"]]
             for r in self.db.query(
                 "SELECT * FROM images WHERE community_id=? ORDER BY image_id", (community_id,))
+        ]
+        return headers, rows
+
+    def _sheet_image_triage(self, community_id: str) -> tuple[list[str], list[list[Any]]]:
+        """The triage ledger: what was seen, what was taken, and why (brief §6, §10)."""
+        headers = ["candidate_id", "image_id", "decision", "decision_reason",
+                   "retrieval_priority", "priority_rank", "relevance_class",
+                   "relevance_score", "relevance_reason", "image_type", "research_topic",
+                   "origin", "source_id", "document_id", "page_id", "original_url",
+                   "page_url", "archive_url", "filename", "alt_text", "title_text",
+                   "caption", "page_heading", "document_title", "page_number",
+                   "figure_number", "extraction_method", "width", "height", "bytes",
+                   "mime_type", "publication_date", "image_date", "source_class",
+                   "independence_group", "possible_relevant_fields",
+                   "documentary_text_support", "sha256", "stage", "seen_utc"]
+        rows = [
+            [r["candidate_id"], r["image_id"], r["decision"], r["decision_reason"],
+             r["priority"], r["priority_rank"], r["relevance_class"],
+             r["relevance_score"], r["relevance_reason"], r["image_type"],
+             r["research_topic"], r["origin"], r["source_id"], r["document_id"],
+             r["page_id"], r["original_url"], r["page_url"], r["archive_url"],
+             r["filename"], (r["alt_text"] or "")[:500], (r["title_text"] or "")[:500],
+             (r["caption"] or "")[:800], r["page_heading"], r["document_title"],
+             r["page_number"], r["figure_number"], r["extraction_method"],
+             r["width"], r["height"], r["bytes"], r["mime_type"],
+             r["publication_date"], r["image_date"], r["source_class"],
+             r["independence_group"], r["possible_fields"],
+             r["documentary_text_support"], r["sha256"], r["stage"], r["seen_utc"]]
+            for r in self.db.query(
+                "SELECT * FROM image_candidates WHERE community_id=? "
+                "ORDER BY CASE priority WHEN 'HIGH' THEN 0 WHEN 'MEDIUM' THEN 1 "
+                "WHEN 'LOW' THEN 2 ELSE 3 END, priority_rank DESC, candidate_id",
+                (community_id,))
         ]
         return headers, rows
 

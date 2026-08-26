@@ -220,19 +220,24 @@ class ConnectivityMonitor:
         return report
 
 
-def classify_failures(error_types: Iterable[str]) -> str:
+def classify_failures(error_types: Iterable[str], *, minimum: int = 3) -> str:
     """A first opinion on connectivity, drawn from failures already seen.
 
     Cheap: it costs no requests. Used to decide whether an active probe is
     worth making at all, never to declare the machine offline on its own —
     that decision always costs a real probe.
+
+    ``minimum`` is how many consecutive network-shaped failures count as a
+    suspicion. It comes from `run_control.failures_before_probe`, and must be
+    honoured rather than second-guessed here: a caller that lowers the
+    threshold means it.
     """
     types = [t for t in error_types if t]
     if not types:
         return UNKNOWN
     networkish = {"connection_error", "timeout", "dns_error", "host_unreachable"}
     hits = sum(1 for t in types if t in networkish)
-    if hits == len(types) and hits >= 3:
+    if hits == len(types) and hits >= max(1, minimum):
         return OFFLINE
     if hits:
         return PARTIAL

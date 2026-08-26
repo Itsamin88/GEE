@@ -112,7 +112,7 @@ class Supervisor:
         if len(self._recent_failures) < self.failure_threshold:
             return False
         recent = self._recent_failures[-self.failure_threshold:]
-        return classify_failures(recent) == OFFLINE
+        return classify_failures(recent, minimum=self.failure_threshold) == OFFLINE
 
     # -- the gate ----------------------------------------------------------
     async def gate(
