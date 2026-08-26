@@ -10,6 +10,8 @@ wording behind it.
 
 from __future__ import annotations
 
+import hashlib
+
 import re
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Sequence
@@ -67,6 +69,40 @@ class ClaimItem:
     verified_passage: bool = True
 
 
+
+def evidence_dedupe_key(
+    community_id: str,
+    *,
+    source_id: str | None = None,
+    document_id: str | None = None,
+    page_id: str | None = None,
+    image_id: str | None = None,
+    table_id: str | None = None,
+    evidence_type: str = "",
+    locator: str | None = None,
+    quote: str = "",
+) -> str:
+    """What makes two evidence rows the same piece of evidence.
+
+    One sentence, in one place, in one artefact. Character offsets are
+    deliberately NOT part of the key: the same passage is often recorded once
+    by a pass that knows where it sits and once by a pass that does not, and
+    those are one piece of evidence, not two.
+    """
+    parts = (community_id, source_id or "", document_id or "", page_id or "",
+             image_id or "", table_id or "", evidence_type or "", locator or "",
+             " ".join((quote or "").split()))
+    return hashlib.sha1("\u241f".join(parts).encode("utf-8")).hexdigest()
+
+
+def claim_dedupe_key(community_id: str, field_name: str, value: Any,
+                     evidence_id: str | None, extractor: str | None) -> str:
+    """The same value, from the same passage, by the same extractor, is one claim."""
+    parts = (community_id, field_name, str(value)[:4000],
+             evidence_id or "", extractor or "")
+    return hashlib.sha1("\u241f".join(parts).encode("utf-8")).hexdigest()
+
+
 class EvidenceRecorder:
     """Writes evidence and claims, enforcing the anti-fabrication rules."""
 
@@ -87,12 +123,34 @@ class EvidenceRecorder:
         return names
 
     # -- writing -----------------------------------------------------------
+    @staticmethod
+    def evidence_key(item: EvidenceItem, community_id: str) -> str:
+        return evidence_dedupe_key(
+            community_id, source_id=item.source_id, document_id=item.document_id,
+            page_id=item.page_id, image_id=item.image_id, table_id=item.table_id,
+            evidence_type=item.evidence_type, locator=item.locator, quote=item.quote)
+
     def add_evidence(self, item: EvidenceItem) -> str:
+        """Record one piece of evidence, once.
+
+        Reprocessing the same page must not double the record (brief §27): a
+        resumed run, a retried task and a second pass over a document all reach
+        the same passage again, and each time the answer must be the same row.
+        """
+        key = self.evidence_key(item, self.community_id)
+        existing = self.db.query_one(
+            "SELECT evidence_id, char_start, char_end, context FROM evidence "
+            "WHERE community_id = ? AND dedupe_key = ?", (self.community_id, key))
+        if existing is not None:
+            self._enrich_evidence(existing, item)
+            return existing["evidence_id"]
+
         evidence_id = self.db.next_id("evidence", "evidence_id", self.community_id, "E")
         self.db.insert(
             "evidence",
             {
                 "evidence_id": evidence_id,
+                "dedupe_key": key,
                 "community_id": self.community_id,
                 "source_id": item.source_id,
                 "document_id": item.document_id,
@@ -113,11 +171,26 @@ class EvidenceRecorder:
                 "char_end": item.char_end,
                 "created_utc": utcnow(),
             },
-            replace=True,
         )
         if item.source_id:
             self.db.bump("sources", "evidence_count", {"source_id": item.source_id})
         return evidence_id
+
+    def _enrich_evidence(self, existing: Any, item: EvidenceItem) -> None:
+        """Fill in what the first recording of this passage did not know.
+
+        A later pass may have found the character offsets the first one lacked.
+        Nothing already recorded is overwritten — only gaps are filled.
+        """
+        updates: dict[str, Any] = {}
+        if existing["char_start"] is None and item.char_start is not None:
+            updates["char_start"] = item.char_start
+            updates["char_end"] = item.char_end
+        if not existing["context"] and item.context:
+            updates["context"] = item.context[:8000]
+        if updates:
+            self.db.update("evidence", updates,
+                           {"evidence_id": existing["evidence_id"]})
 
     def add_claim(self, claim: ClaimItem, evidence_id: str, context: dict[str, Any]) -> str | None:
         """Record a claim. Returns None when the claim is refused."""
@@ -134,11 +207,22 @@ class EvidenceRecorder:
             self.rejected.append((field_name, "empty value"))
             return None
 
+        # The same value, drawn from the same passage by the same extractor, is
+        # one claim however many times the passage is read (brief §27).
+        key = claim_dedupe_key(self.community_id, field_name, claim.value,
+                               evidence_id, claim.extractor)
+        existing = self.db.query_one(
+            "SELECT claim_id FROM claims WHERE community_id = ? AND dedupe_key = ?",
+            (self.community_id, key))
+        if existing is not None:
+            return existing["claim_id"]
+
         claim_id = self.db.next_id("claims", "claim_id", self.community_id, "C")
         self.db.insert(
             "claims",
             {
                 "claim_id": claim_id,
+                "dedupe_key": key,
                 "community_id": self.community_id,
                 "field_name": field_name,
                 "value": str(claim.value)[:4000],
@@ -169,7 +253,6 @@ class EvidenceRecorder:
                 "verified_passage": int(claim.verified_passage),
                 "notes": claim.notes,
             },
-            replace=True,
         )
         return claim_id
 

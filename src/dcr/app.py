@@ -455,6 +455,19 @@ class Application:
         print("\n" + "=" * 78)
         print(f"  {report['community']}  —  {report['completion_status']}")
         print("=" * 78)
+        state = report.get("final_state", "COMPLETED")
+        if state in ("PAUSED_MANUAL", "PAUSED_NETWORK"):
+            print(f"  RUN STATE            {state}  —  THIS RUN DID NOT FINISH")
+            reason = (report.get("interruptions") or {}).get("pause_reason", "")
+            if reason:
+                print(f"                       {reason}")
+            print("  Resume it with:      dcr --name \"%s\" --mode RESUME"
+                  % report["community"])
+            print("-" * 78)
+        elif state == "CANCELLED":
+            print("  RUN STATE            CANCELLED by the researcher; "
+                  "what was found is kept")
+            print("-" * 78)
         print(f"  Sources supplied     {report['sources_supplied']}")
         print(f"  Sources discovered   {report['sources_discovered']}")
         print(f"  Independence groups  {report['independence_groups']}"
@@ -463,8 +476,14 @@ class Application:
               f"  ({report['archived_pages_opened']} archived)")
         print(f"  Documents            {report['documents_downloaded']}"
               f"  ({report['documents_parsed']} parsed)")
+        triage = report.get("image_triage") or {}
         print(f"  Images retained      {report['images_retained']}"
               f"  ({report['images_likely_relevant']} likely relevant)")
+        if triage.get("candidates_seen"):
+            print(f"  Image candidates     {triage['candidates_seen']} seen, "
+                  f"{triage['downloaded']} downloaded "
+                  f"({triage['download_rate']:.0%})"
+                  "   <- the rest were recorded, not fetched")
         print(f"  Evidence items       {report['evidence_items']}")
         print(f"  Academic databases   {report['academic_databases_searched']} searched, "
               f"{report['academic_records_verified']} records verified")
@@ -474,6 +493,17 @@ class Application:
         print(f"  Conflicts            {report['conflicts']} "
               f"({report['conflicts_unresolved']} unresolved)")
         print(f"  crawl_truncated      {report['crawl_truncated']}")
+        interruptions = report.get("interruptions") or {}
+        if interruptions.get("pauses_manual") or interruptions.get("pauses_network"):
+            print(f"  Interruptions        {interruptions.get('pauses_manual', 0)} manual, "
+                  f"{interruptions.get('pauses_network', 0)} network "
+                  f"({interruptions.get('offline_s', 0):.0f}s offline)")
+        timing = report.get("timing") or {}
+        if timing:
+            print(f"  Time                 {timing.get('active_s', 0):.0f}s active, "
+                  f"{timing.get('wall_clock_s', 0):.0f}s wall-clock"
+                  + (f" (estimated {timing.get('estimated_active_s', 0):.0f}s active)"
+                     if timing.get("estimated_active_s") else ""))
         failures = qc_report.failures
         warnings = qc_report.warnings
         print(f"  Quality checks       {len(qc_report.results) - len(failures) - len(warnings)}"

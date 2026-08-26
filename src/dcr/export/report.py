@@ -118,6 +118,15 @@ def build_report(
         },
         "crawl_truncated": "yes" if getattr(outcome, "truncated", False) else "no",
         "truncation_reasons": list(getattr(outcome, "truncation_reasons", [])),
+        # How the run ended, and every time it stopped on the way. Without this
+        # a reader cannot tell a stage that found nothing from a stage that was
+        # never allowed to run (brief §37).
+        "final_state": getattr(outcome, "final_state", "COMPLETED"),
+        "interruptions": _interruptions(db, community_id, outcome),
+        "queue": _queue_state(db, community_id),
+        "image_triage": _image_triage(db, community_id),
+        "timing": dict(getattr(outcome, "stats", {}).get("timing", {})),
+        "estimate": dict(getattr(outcome, "estimate", {}) or {}),
         "not_found_fields": sorted(f["field_name"] for f in not_found),
         "review_fields": sorted(f["field_name"] for f in review_needed),
         "quality_checks": [
@@ -131,6 +140,148 @@ def build_report(
     }
     return report
 
+
+def _interruptions(db: Database, community_id: str, outcome: Any) -> dict[str, Any]:
+    """Every pause, outage and cancellation, so none of them reads as absence."""
+    run_id = getattr(outcome, "run_id", None)
+    events = db.query(
+        "SELECT event, kind, from_state, to_state, stage_no, source_id, "
+        "tasks_done, tasks_total, detail, ts_utc FROM pause_events "
+        "WHERE community_id=? ORDER BY event_id", (community_id,))
+    interesting = [dict(row) for row in events
+                   if row["event"] not in ("checkpoint",)]
+    # Counted over every run for this community, not just the last one. The
+    # workbook is built from all the evidence gathered across runs, so a reader
+    # asking "was anything interrupted?" must be told about the run that was
+    # paused, not only about the run that finished (brief §37).
+    counted = {
+        "manual": sum(1 for e in interesting
+                      if e["event"] == "paused" and e["kind"] == "manual"),
+        "network": sum(1 for e in interesting
+                       if e["event"] == "paused" and e["kind"] == "network"),
+    }
+    return {
+        "final_state": getattr(outcome, "final_state", "COMPLETED"),
+        "pause_reason": getattr(outcome, "pause_reason", ""),
+        "pauses_manual": max(counted["manual"],
+                             int(getattr(outcome, "pauses_manual", 0) or 0)),
+        "pauses_network": max(counted["network"],
+                              int(getattr(outcome, "pauses_network", 0) or 0)),
+        "pauses_this_run": {
+            "manual": int(getattr(outcome, "pauses_manual", 0) or 0),
+            "network": int(getattr(outcome, "pauses_network", 0) or 0),
+        },
+        "offline_s": round(float(getattr(outcome, "offline_s", 0.0) or 0.0), 1),
+        "paused_manual_s": round(float(getattr(outcome, "paused_manual_s", 0.0) or 0.0), 1),
+        "connectivity_losses": sum(1 for e in interesting
+                                   if e["event"] == "connectivity_lost"),
+        "events": interesting[-40:],
+        "run_id": run_id,
+    }
+
+
+def _queue_state(db: Database, community_id: str) -> dict[str, int]:
+    """What was completed, what remains, what failed (brief §26, §37)."""
+    rows = db.query(
+        "SELECT status, COUNT(*) AS n FROM frontier WHERE community_id=? GROUP BY status",
+        (community_id,))
+    return {row["status"]: int(row["n"]) for row in rows}
+
+
+def _image_triage(db: Database, community_id: str) -> dict[str, Any]:
+    """What the image triage saw and what it decided (brief §5, §10)."""
+    rows = db.query(
+        "SELECT decision, COUNT(*) AS n FROM image_candidates WHERE community_id=? "
+        "GROUP BY decision", (community_id,))
+    decisions = {row["decision"]: int(row["n"]) for row in rows}
+    priorities = {
+        row["priority"]: int(row["n"]) for row in db.query(
+            "SELECT priority, COUNT(*) AS n FROM image_candidates WHERE community_id=? "
+            "GROUP BY priority", (community_id,))
+    }
+    seen = sum(decisions.values())
+    downloaded = decisions.get("downloaded", 0)
+    return {
+        "candidates_seen": seen,
+        "downloaded": downloaded,
+        "by_decision": decisions,
+        "by_priority": priorities,
+        "download_rate": round(downloaded / seen, 3) if seen else 0.0,
+    }
+
+def _add_interruptions(add: Any, report: Mapping[str, Any]) -> None:
+    """The honest account of every time the run stopped (brief §37)."""
+    interruptions = report.get("interruptions") or {}
+    queue = report.get("queue") or {}
+    state = interruptions.get("final_state", "COMPLETED")
+    stopped = (interruptions.get("pauses_manual", 0)
+               + interruptions.get("pauses_network", 0))
+    if not stopped and state == "COMPLETED":
+        return
+
+    add("## Interruptions")
+    add("")
+    if state in ("PAUSED_MANUAL", "PAUSED_NETWORK"):
+        add(f"> **This run did not finish.** It stopped in `{state}` and is waiting to be "
+            "resumed. Anything the protocol had not reached was NOT searched and NOT "
+            "found to be absent — the two are different, and the stage table below says "
+            "which is which.")
+        add("")
+    elif state == "CANCELLED":
+        add("> **This run was cancelled by the researcher.** What it had already found is "
+            "kept and exported; the rest was never attempted.")
+        add("")
+    if interruptions.get("pause_reason"):
+        add(f"- Reason given: {interruptions['pause_reason']}")
+    add(f"- Manual pauses: {interruptions.get('pauses_manual', 0)} "
+        f"({interruptions.get('paused_manual_s', 0)} s)")
+    add(f"- Network pauses: {interruptions.get('pauses_network', 0)} "
+        f"({interruptions.get('offline_s', 0)} s offline)")
+    if queue:
+        add(f"- Queue at the end: "
+            + ", ".join(f"{n} {status}" for status, n in sorted(queue.items())))
+    events = interruptions.get("events") or []
+    if events:
+        add("")
+        add("| When | Event | Kind | Where | Detail |")
+        add("| --- | --- | --- | --- | --- |")
+        for item in events[-20:]:
+            where = f"stage {item.get('stage_no')}" if item.get("stage_no") is not None else ""
+            if item.get("source_id"):
+                where += f" / {item['source_id']}"
+            add(f"| {item.get('ts_utc', '')} | {item.get('event', '')} | "
+                f"{item.get('kind', '')} | {where} | "
+                f"{_escape_cell(item.get('detail', ''))} |")
+    add("")
+
+
+def _add_image_triage(add: Any, report: Mapping[str, Any]) -> None:
+    """What the image triage saw, kept and passed over (brief §5)."""
+    triage = report.get("image_triage") or {}
+    if not triage.get("candidates_seen"):
+        return
+    add("## Image triage")
+    add("")
+    add(f"{triage['candidates_seen']} image candidate(s) were seen and "
+        f"{triage['downloaded']} downloaded "
+        f"({triage['download_rate']:.0%}). Every candidate is recorded in "
+        "`image_candidates` with its caption, alt text and file name, including "
+        "the ones passed over: a gallery caption often carries a date that no "
+        "text on the page gives.")
+    add("")
+    add("| Decision | Candidates |")
+    add("| --- | ---: |")
+    for decision, count in sorted(triage.get("by_decision", {}).items()):
+        add(f"| {decision} | {count} |")
+    add("")
+    add("A photograph never sets a practice code. Each kept image records what it "
+        "alone may evidence, and the sentence — if there is one — that would "
+        "license a claim.")
+    add("")
+
+
+def _escape_cell(text: Any) -> str:
+    return str(text or "").replace("|", "/").replace("\n", " ")[:160]
 
 def _independence_groups(db: Database, community_id: str, sources: Sequence[Any]) -> int:
     row = db.query_one(
@@ -155,12 +306,15 @@ def write_markdown(report: Mapping[str, Any], path: Path) -> Path:
     add(f"- **Generated**: {report['generated_utc']}  ")
     add(f"- **Completion status**: **{report['completion_status']}**  ")
     add(f"- **crawl_truncated**: **{report['crawl_truncated']}**")
+    add(f"- **How the run ended**: **{report.get('final_state', 'COMPLETED')}**")
     if report["truncation_reasons"]:
         add("")
         add("**Why the run is marked truncated**")
         for reason in report["truncation_reasons"]:
             add(f"- {reason}")
     add("")
+    _add_interruptions(add, report)
+    _add_image_triage(add, report)
     add("## What was retrieved")
     add("")
     add("| Measure | Count |")

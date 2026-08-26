@@ -36,6 +36,18 @@ ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # How a run ended, kept beside the run itself as well as in run_control.
     ("runs", "final_state", "TEXT"),
     ("runs", "resumed_from", "TEXT"),
+    # What makes two evidence rows, or two claims, the same one. Reprocessing a
+    # page after a pause must not double the record (brief SS27).
+    ("evidence", "dedupe_key", "TEXT"),
+    ("claims", "dedupe_key", "TEXT"),
+)
+
+#: Indexes for the columns above. Deliberately NOT unique: an existing database
+#: may already hold duplicates from before this rule, and refusing to open it
+#: would be worse than tidying it up in place.
+ADDED_INDEXES: tuple[tuple[str, str, str], ...] = (
+    ("idx_evidence_dedupe", "evidence", "community_id, dedupe_key"),
+    ("idx_claims_dedupe", "claims", "community_id, dedupe_key"),
 )
 
 
@@ -85,6 +97,12 @@ class Database:
             if not existing or column in existing:
                 continue
             self._conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
+        for name, table, columns in ADDED_INDEXES:
+            try:
+                self._conn.execute(
+                    f"CREATE INDEX IF NOT EXISTS {name} ON {table}({columns})")
+            except sqlite3.Error:
+                continue
 
     def close(self) -> None:
         """Commit and close. Safe to call twice: shutdown paths overlap."""

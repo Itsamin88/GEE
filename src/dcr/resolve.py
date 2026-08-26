@@ -15,6 +15,7 @@ from .db import Database, utcnow
 from .evidence.conflict import ClaimView, ReviewQueue, resolve_field
 from .evidence.extractors import haversine_km
 from .evidence.independence import IndependenceResolver
+from .evidence.model import claim_dedupe_key, evidence_dedupe_key
 from .evidence.onset import DateCandidate, resolve_onset
 from .evidence.practices import code_practices
 from .logging_setup import event, get_logger
@@ -286,13 +287,35 @@ class FieldResolver:
                     groups=[], residual="", counts=counts)
 
     def _store_practice_evidence(self, code: str, coding: Any) -> None:
-        """One O2b row per coded practice, with the supporting passage."""
+        """One O2b row per coded practice, with the supporting passage.
+
+        Reconciliation runs again on every resume, so this has to reach the
+        rows it wrote last time rather than making new ones (brief §27).
+        """
         for hit in coding.hits[:6]:
-            evidence_id = self.db.next_id("evidence", "evidence_id", self.community_id, "E")
+            key = evidence_dedupe_key(
+                self.community_id, source_id=hit.source_id, document_id=hit.document_id,
+                page_id=hit.page_id, evidence_type="passage", locator=hit.locator,
+                quote=hit.sentence[:4000])
+            existing = self.db.query_one(
+                "SELECT evidence_id FROM evidence WHERE community_id=? AND dedupe_key=?",
+                (self.community_id, key))
+            if existing is not None:
+                # Never re-insert a passage that is already stored. SQLite's
+                # INSERT OR REPLACE deletes the old row first, and
+                # claims.evidence_id is ON DELETE SET NULL — so "replacing" a
+                # passage silently cuts every claim already resting on it loose
+                # from the evidence that supports it.
+                self._store_practice_claim(code, coding, hit, existing["evidence_id"])
+                continue
+
+            evidence_id = self.db.next_id(
+                "evidence", "evidence_id", self.community_id, "E")
             self.db.insert(
                 "evidence",
                 {
                     "evidence_id": evidence_id,
+                    "dedupe_key": key,
                     "community_id": self.community_id,
                     "source_id": hit.source_id,
                     "document_id": hit.document_id,
@@ -304,37 +327,46 @@ class FieldResolver:
                     "publication_date": hit.publication_date,
                     "created_utc": utcnow(),
                 },
-                replace=True,
             )
-            claim_id = self.db.next_id("claims", "claim_id", self.community_id, "C")
-            self.db.insert(
-                "claims",
-                {
-                    "claim_id": claim_id,
-                    "community_id": self.community_id,
-                    "field_name": code,
-                    "value": coding.level,
-                    "value_type": "enum",
-                    "original_value": hit.matched_term,
-                    "exact_wording": hit.sentence[:4000],
-                    "source_id": hit.source_id,
-                    "document_id": hit.document_id,
-                    "evidence_id": evidence_id,
-                    "locator": hit.locator,
-                    "publication_date": hit.publication_date,
-                    "reference_year": hit.reference_year,
-                    "source_class": hit.source_class,
-                    "independence_group": hit.independence_group,
-                    "coding_level": coding.level,
-                    "confidence": 0.7 if hit.specific else 0.5,
-                    "conflict_status": "conflicting" if hit.denial else "none",
-                    "rationale": coding.rationale,
-                    "extractor": "rule:practices/1.0.0",
-                    "extracted_utc": utcnow(),
-                    "verified_passage": 1,
-                },
-                replace=True,
-            )
+            self._store_practice_claim(code, coding, hit, evidence_id)
+
+    def _store_practice_claim(self, code: str, coding: Any, hit: Any,
+                              evidence_id: str) -> None:
+        """The claim this passage supports, written once however often it is read."""
+        claim_key = claim_dedupe_key(self.community_id, code, coding.level,
+                                     evidence_id, "rule:practices/1.0.0")
+        if self.db.query_one(
+                "SELECT claim_id FROM claims WHERE community_id=? AND dedupe_key=?",
+                (self.community_id, claim_key)) is not None:
+            return
+        self.db.insert(
+            "claims",
+            {
+                "claim_id": self.db.next_id("claims", "claim_id", self.community_id, "C"),
+                "dedupe_key": claim_key,
+                "community_id": self.community_id,
+                "field_name": code,
+                "value": coding.level,
+                "value_type": "enum",
+                "original_value": hit.matched_term,
+                "exact_wording": hit.sentence[:4000],
+                "source_id": hit.source_id,
+                "document_id": hit.document_id,
+                "evidence_id": evidence_id,
+                "locator": hit.locator,
+                "publication_date": hit.publication_date,
+                "reference_year": hit.reference_year,
+                "source_class": hit.source_class,
+                "independence_group": hit.independence_group,
+                "coding_level": coding.level,
+                "confidence": 0.7 if hit.specific else 0.5,
+                "conflict_status": "conflicting" if hit.denial else "none",
+                "rationale": coding.rationale,
+                "extractor": "rule:practices/1.0.0",
+                "extracted_utc": utcnow(),
+                "verified_passage": 1,
+            },
+        )
 
     def _derive_area_band(self, counts: dict[str, int]) -> None:
         """Give the documentary area a band where the sources support one.

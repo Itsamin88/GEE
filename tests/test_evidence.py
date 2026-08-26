@@ -278,3 +278,131 @@ def test_review_queue_deduplicates():
     queue.add("conflict", "same", "detail", severity="blocking")
     queue.add("conflict", "same", "detail")
     assert len(queue) == 1 and len(queue.blocking) == 1
+
+
+# ---------------------------------------------------------------------------
+# Idempotent reprocessing (brief §27)
+#
+# A pause, a retry and a resumed run all reach the same passage again. Each
+# time, the answer must be the same row: duplicate evidence would inflate every
+# count in the completion report and fill the evidence manifest with the same
+# sentence over and over.
+# ---------------------------------------------------------------------------
+@pytest.fixture()
+def crawled(db, community):
+    """One source and two pages, so evidence has something real to point at."""
+    from dcr.db import utcnow
+
+    db.insert("sources", {
+        "source_id": "IC001-S001", "community_id": community,
+        "address_id": "IC001-01", "url": "https://example.org/",
+        "source_class": "S1", "supplied_or_discovered": "supplied",
+    })
+    for page_id, url in (("IC001-P0001", "https://example.org/histoire"),
+                         ("IC001-P0002", "https://example.org/about")):
+        db.insert("pages", {
+            "page_id": page_id, "community_id": community, "source_id": "IC001-S001",
+            "url": url, "normalized_url": url, "fetched_utc": utcnow(),
+        })
+    return community
+
+
+def _passage(**kwargs) -> EvidenceItem:
+    kwargs.setdefault("evidence_type", "passage")
+    kwargs.setdefault("quote", "En 2017 nous avons creuse des baissieres.")
+    kwargs.setdefault("source_id", "IC001-S001")
+    kwargs.setdefault("page_id", "IC001-P0001")
+    kwargs.setdefault("locator", "https://example.org/histoire")
+    return EvidenceItem(**kwargs)
+
+
+def test_the_same_passage_recorded_twice_is_one_row(db, crawled, community, schema):
+    recorder = EvidenceRecorder(db, community, schema)
+    first = recorder.add_evidence(_passage())
+    second = recorder.add_evidence(_passage())
+    assert first == second
+    rows = db.query("SELECT * FROM evidence WHERE community_id=?", (community,))
+    assert len(rows) == 1
+
+
+def test_whitespace_alone_does_not_make_a_second_piece_of_evidence(db, crawled, community, schema):
+    recorder = EvidenceRecorder(db, community, schema)
+    first = recorder.add_evidence(_passage(quote="Nous cultivons 4 hectares."))
+    second = recorder.add_evidence(_passage(quote="Nous  cultivons\n4 hectares."))
+    assert first == second
+
+
+def test_the_same_sentence_on_a_different_page_is_different_evidence(db, crawled, community, schema):
+    """Two sources saying the same thing is corroboration, not duplication."""
+    recorder = EvidenceRecorder(db, community, schema)
+    first = recorder.add_evidence(_passage(page_id="IC001-P0001"))
+    second = recorder.add_evidence(_passage(page_id="IC001-P0002",
+                                            locator="https://example.org/about"))
+    assert first != second
+
+
+def test_a_later_pass_fills_in_offsets_the_first_one_lacked(db, crawled, community, schema):
+    recorder = EvidenceRecorder(db, community, schema)
+    first = recorder.add_evidence(_passage())
+    recorder.add_evidence(_passage(char_start=153, char_end=201))
+    row = db.query_one("SELECT * FROM evidence WHERE evidence_id=?", (first,))
+    assert row["char_start"] == 153
+    assert row["char_end"] == 201
+
+
+def test_an_offset_already_recorded_is_not_overwritten(db, crawled, community, schema):
+    recorder = EvidenceRecorder(db, community, schema)
+    first = recorder.add_evidence(_passage(char_start=153, char_end=201))
+    recorder.add_evidence(_passage())            # a pass that does not know where it sits
+    row = db.query_one("SELECT * FROM evidence WHERE evidence_id=?", (first,))
+    assert row["char_start"] == 153
+
+
+def test_the_same_claim_from_the_same_passage_is_one_claim(db, crawled, community, schema):
+    recorder = EvidenceRecorder(db, community, schema)
+    evidence_id = recorder.add_evidence(_passage())
+    claim = ClaimItem(field_name="date_intervention_onset", value="2017",
+                      extractor="rule:onset/1.0.0")
+    first = recorder.add_claim(claim, evidence_id, {})
+    second = recorder.add_claim(claim, evidence_id, {})
+    assert first == second
+    rows = db.query("SELECT * FROM claims WHERE community_id=?", (community,))
+    assert len(rows) == 1
+
+
+def test_a_different_extractor_reaching_the_same_value_is_a_separate_claim(
+        db, crawled, community, schema):
+    """Two independent extractors agreeing is worth recording as two claims."""
+    recorder = EvidenceRecorder(db, community, schema)
+    evidence_id = recorder.add_evidence(_passage())
+    first = recorder.add_claim(
+        ClaimItem(field_name="date_intervention_onset", value="2017",
+                  extractor="rule:onset/1.0.0"), evidence_id, {})
+    second = recorder.add_claim(
+        ClaimItem(field_name="date_intervention_onset", value="2017",
+                  extractor="llm:semantic/1.0.0"), evidence_id, {})
+    assert first != second
+
+
+def test_reprocessing_never_orphans_a_claim_from_its_evidence(db, crawled, community, schema):
+    """Regression: INSERT OR REPLACE deletes the row before re-inserting it.
+
+    `claims.evidence_id` is ON DELETE SET NULL, so re-writing a passage that
+    already existed silently cut every claim resting on it loose from the
+    sentence that supported it — leaving a coded value with no traceable
+    evidence, which is the one thing this whole design exists to prevent.
+    """
+    recorder = EvidenceRecorder(db, community, schema)
+    evidence_id = recorder.add_evidence(_passage())
+    recorder.add_claim(ClaimItem(field_name="date_intervention_onset", value="2017",
+                                 extractor="rule:onset/1.0.0"), evidence_id, {})
+    # Whatever else runs afterwards, the link must survive.
+    recorder.add_evidence(_passage())
+    recorder.add_evidence(_passage(char_start=10, char_end=40))
+
+    claims = db.query("SELECT * FROM claims WHERE community_id=?", (community,))
+    assert claims
+    for claim in claims:
+        assert claim["evidence_id"], "a claim was cut loose from its evidence"
+        assert db.query_one("SELECT 1 FROM evidence WHERE evidence_id=?",
+                            (claim["evidence_id"],)) is not None
