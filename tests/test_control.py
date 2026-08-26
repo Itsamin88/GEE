@@ -286,3 +286,36 @@ def test_the_unfinished_run_can_describe_itself_to_the_researcher(db, community,
     assert "PAUSED_MANUAL" in description
     assert "Stage 3" in description
     assert "12/40" in description
+
+
+# ---------------------------------------------------------------------------
+# Where the crawl can be stopped
+# ---------------------------------------------------------------------------
+def test_every_long_stage_offers_a_pause_boundary():
+    """A pause must not have to wait out a whole academic sweep.
+
+    The crawler gates between batches, which covers stages 2, 3 and 7. Stages
+    4, 5, 6 and 8 spend their time in loops of their own — one archive domain,
+    one database, one portal at a time — so each of those loops has to offer a
+    boundary too, or PAUSE would appear to do nothing for minutes.
+    """
+    import inspect
+
+    from dcr import runner as runner_module
+
+    source = inspect.getsource(runner_module)
+    for stage_no in (4, 5, 6, 8):
+        assert f"stage_no={stage_no}, stage_name=STAGE_NAMES[{stage_no}]" in source, (
+            f"stage {stage_no} has no pause boundary inside its own loop")
+
+
+def test_the_crawler_gates_between_batches():
+    import inspect
+
+    from dcr.crawl import crawler as crawler_module
+
+    source = inspect.getsource(crawler_module.Crawler.run)
+    assert "await self.supervisor.gate(" in source
+    assert source.index("await self.supervisor.gate(") < source.index("next_batch"), (
+        "the gate must come before the next batch is claimed, or a pause would "
+        "leave URLs in_flight")

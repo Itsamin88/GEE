@@ -985,6 +985,11 @@ class CommunityRunner:
         unreachable: list[str] = []
         snapshots_fetched = 0
         for domain, source_id in list(domains.items())[:12]:
+            # Enumerating the archive for one domain is a long single request;
+            # between domains is the safe boundary (brief §24).
+            await self.supervisor.gate(stage_no=4, stage_name=STAGE_NAMES[4],
+                                       source_id=source_id, task_ref=domain,
+                                       task_detail=f"about to query the archive for {domain}")
             query_url = wayback_mod.build_cdx_query(
                 archive_cfg.get("cdx_endpoint", "http://web.archive.org/cdx/search/cdx"),
                 domain,
@@ -1087,6 +1092,10 @@ class CommunityRunner:
         unreachable = 0
         records: dict[str, academic_mod.AcademicRecord] = {}
         for database in databases:
+            await self.supervisor.gate(
+                stage_no=5, stage_name=STAGE_NAMES[5],
+                task_ref=str(database.get("id")),
+                task_detail=f"about to search {database.get('name', database.get('id'))}")
             outcome = await self._search_academic_database(database, queries[:8])
             searched += 1
             if outcome.result == "unreachable":
@@ -1359,6 +1368,9 @@ class CommunityRunner:
             db_id = str(database.get("id"))
             name = str(database.get("name", db_id))
             db_type = str(database.get("type", "grey - funding"))
+            await self.supervisor.gate(stage_no=6, stage_name=STAGE_NAMES[6],
+                                       task_ref=db_id,
+                                       task_detail=f"about to search {name}")
             api_key = self.settings.env.get(str(database.get("key_env", "")), "")
             searched += 1
 
@@ -1579,6 +1591,9 @@ class CommunityRunner:
 
         # National thesis portals are almost always local-language only.
         for database in self._national_portals():
+            await self.supervisor.gate(stage_no=8, stage_name=STAGE_NAMES[8],
+                                       task_ref=str(database.get("id")),
+                                       task_detail="about to search a national thesis portal")
             outcome = await self._search_academic_database(
                 database, [(f'"{n}"', lang) for n in list(self.names)[:2] for lang in local][:4])
             for record in outcome.records[:20]:
