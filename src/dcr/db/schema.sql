@@ -530,3 +530,165 @@ CREATE TABLE IF NOT EXISTS discovery_log (
     detail       TEXT,
     ts_utc       TEXT NOT NULL
 );
+
+-- ===========================================================================
+-- Run control: pause, resume, cancel, connectivity and checkpointing.
+--
+-- The state below is what makes an interruption survivable. It is written
+-- BEFORE the crawler stops, so a laptop that loses its network, or a
+-- researcher who presses PAUSE and shuts the machine down, can be resumed
+-- from the last safe boundary rather than restarted.
+--
+-- An interruption is never an absence of evidence: a run that stops in
+-- PAUSED_MANUAL or PAUSED_NETWORK is unfinished, and the completion report
+-- says so instead of writing NOT FOUND for pages that were never reached.
+-- ===========================================================================
+CREATE TABLE IF NOT EXISTS run_control (
+    run_id          TEXT PRIMARY KEY REFERENCES runs(run_id) ON DELETE CASCADE,
+    community_id    TEXT NOT NULL,
+    state           TEXT NOT NULL,   -- RUNNING | PAUSING | PAUSED_MANUAL | PAUSED_NETWORK
+                                     -- | RESUMING | COMPLETED | FAILED | CANCELLING | CANCELLED
+    pause_reason    TEXT,            -- free text: why this run is not running
+    requested_state TEXT,            -- what a researcher or the monitor has asked for
+    requested_by    TEXT,            -- researcher | network_monitor | scheduler
+    requested_utc   TEXT,
+    connectivity    TEXT,            -- FULL | PARTIAL | OFFLINE | UNKNOWN
+    connectivity_detail TEXT,
+    stage_no        INTEGER,         -- the stage in progress at the last checkpoint
+    stage_name      TEXT,
+    source_id       TEXT,            -- the source in progress at the last checkpoint
+    task_ref        TEXT,            -- the next incomplete task (a url_key, usually)
+    task_detail     TEXT,
+    tasks_total     INTEGER DEFAULT 0,
+    tasks_done      INTEGER DEFAULT 0,
+    checkpoint_utc  TEXT,
+    checkpoint_seq  INTEGER DEFAULT 0,
+    resumable       INTEGER DEFAULT 1,
+    updated_utc     TEXT NOT NULL
+);
+
+-- Every pause, resume, cancel and connectivity transition, in order. This is
+-- the audit trail the completion report draws on (brief §37): the reader can
+-- see that a stage was cut short by an outage rather than by absent sources.
+CREATE TABLE IF NOT EXISTS pause_events (
+    event_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id       TEXT NOT NULL,
+    community_id TEXT NOT NULL,
+    event        TEXT NOT NULL,      -- pause_requested | paused | resume_requested | resumed
+                                     -- | cancel_requested | cancelled | connectivity_lost
+                                     -- | connectivity_restored | checkpoint
+    kind         TEXT,               -- manual | network | crash | unknown
+    from_state   TEXT,
+    to_state     TEXT,
+    stage_no     INTEGER,
+    source_id    TEXT,
+    task_ref     TEXT,
+    tasks_done   INTEGER,
+    tasks_total  INTEGER,
+    detail       TEXT,
+    ts_utc       TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_pause_events_run ON pause_events(run_id, event_id);
+
+-- ===========================================================================
+-- Image candidates: the ledger of every image the crawl SAW.
+--
+-- Triage means most candidates are never downloaded. Their metadata is still
+-- research material — the register notes that gallery captions and file names
+-- often carry dates no text on the site provides — and keeping the ledger is
+-- what makes the decision auditable: a reader can see what was passed over and
+-- why, rather than having to trust that nothing was missed.
+-- ===========================================================================
+CREATE TABLE IF NOT EXISTS image_candidates (
+    candidate_id    TEXT PRIMARY KEY,   -- IC001-IMGC0001
+    community_id    TEXT NOT NULL REFERENCES communities(community_id) ON DELETE CASCADE,
+    run_id          TEXT,
+    source_id       TEXT,
+    document_id     TEXT,
+    page_id         TEXT,
+    image_id        TEXT,               -- set once downloaded and kept
+    url_key         TEXT,               -- sha1 of the normalised image URL
+    original_url    TEXT,
+    page_url        TEXT,
+    archive_url     TEXT,
+    origin          TEXT,               -- html | document | standalone
+    filename        TEXT,
+    alt_text        TEXT,
+    title_text      TEXT,
+    caption         TEXT,
+    surrounding_text TEXT,
+    page_heading    TEXT,
+    document_title  TEXT,
+    page_number     INTEGER,
+    figure_number   TEXT,
+    extraction_method TEXT,
+    width           INTEGER,
+    height          INTEGER,
+    bytes           INTEGER,
+    mime_type       TEXT,
+    publication_date TEXT,
+    image_date      TEXT,
+    source_class    TEXT,
+    independence_group TEXT,
+    image_type      TEXT,
+    research_topic  TEXT,
+    relevance_class TEXT,               -- likely_relevant | possibly_relevant | uncertain | decorative
+    priority        TEXT,               -- HIGH | MEDIUM | LOW | DUPLICATE
+    priority_rank   REAL,
+    relevance_score REAL,
+    relevance_reason TEXT,
+    possible_fields TEXT,
+    documentary_text_support TEXT,
+    decision        TEXT NOT NULL,      -- downloaded | skipped_low_priority | skipped_duplicate
+                                        -- | skipped_budget | skipped_too_small | fetch_failed
+                                        -- | skipped_paused
+    decision_reason TEXT,
+    sha256          TEXT,
+    stage           INTEGER,
+    seen_utc        TEXT NOT NULL,
+    decided_utc     TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_image_candidates_community
+    ON image_candidates(community_id, priority, priority_rank DESC);
+CREATE INDEX IF NOT EXISTS idx_image_candidates_urlkey
+    ON image_candidates(community_id, url_key);
+
+-- ===========================================================================
+-- Runtime estimation, and the run history that sharpens it.
+-- ===========================================================================
+CREATE TABLE IF NOT EXISTS run_estimates (
+    estimate_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id       TEXT,
+    community_id TEXT NOT NULL,
+    phase        TEXT NOT NULL,      -- initial | after_discovery | final
+    active_low_s  REAL,
+    active_high_s REAL,
+    wall_low_s    REAL,
+    wall_high_s   REAL,
+    unit_count   INTEGER,            -- the workload the estimate was built on
+    basis        TEXT,               -- JSON: the factors and their weights
+    reason       TEXT,               -- why this estimate differs from the previous one
+    calibrated   INTEGER DEFAULT 0,  -- 1 = history from previous runs was used
+    ts_utc       TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS run_history (
+    run_id          TEXT PRIMARY KEY,
+    community_id    TEXT NOT NULL,
+    mode            TEXT,
+    estimated_active_s REAL,
+    actual_active_s    REAL,
+    wall_clock_s       REAL,
+    offline_s          REAL DEFAULT 0,
+    paused_manual_s    REAL DEFAULT 0,
+    pages_processed INTEGER DEFAULT 0,
+    documents       INTEGER DEFAULT 0,
+    images_kept     INTEGER DEFAULT 0,
+    image_candidates INTEGER DEFAULT 0,
+    retries         INTEGER DEFAULT 0,
+    errors          INTEGER DEFAULT 0,
+    pauses_manual   INTEGER DEFAULT 0,
+    pauses_network  INTEGER DEFAULT 0,
+    final_state     TEXT,
+    ts_utc          TEXT NOT NULL
+);

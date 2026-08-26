@@ -15,7 +15,28 @@ from pathlib import Path
 from typing import Any, Iterable, Sequence
 
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
+
+
+# Columns added after schema 1.0.0. New tables arrive through
+# CREATE TABLE IF NOT EXISTS, but a database written by an earlier version
+# still needs these, and a researcher must never be asked to start again to
+# get them.
+ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    # Image provenance the triage ledger fills in (brief SS10, SS11).
+    ("images", "candidate_id", "TEXT"),
+    ("images", "page_url", "TEXT"),
+    ("images", "archive_url", "TEXT"),
+    ("images", "original_filename", "TEXT"),
+    ("images", "figure_number", "TEXT"),
+    ("images", "extraction_method", "TEXT"),
+    ("images", "evidence_id", "TEXT"),
+    ("images", "priority", "TEXT"),
+    ("images", "retrieval_utc", "TEXT"),
+    # How a run ended, kept beside the run itself as well as in run_control.
+    ("runs", "final_state", "TEXT"),
+    ("runs", "resumed_from", "TEXT"),
+)
 
 
 def utcnow() -> str:
@@ -40,11 +61,29 @@ class Database:
     def _init_schema(self) -> None:
         with self._lock:
             self._conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+            self._migrate()
             self._conn.execute(
                 "INSERT OR REPLACE INTO schema_meta(key, value) VALUES('schema_version', ?)",
                 (SCHEMA_VERSION,),
             )
             self._conn.commit()
+
+    def _migrate(self) -> None:
+        """Add columns introduced after schema 1.0.0 to an existing database.
+
+        Additive only: nothing is dropped, renamed or retyped, so an older
+        database keeps every row it already holds.
+        """
+        for table, column, decl in ADDED_COLUMNS:
+            try:
+                existing = {
+                    row[1] for row in self._conn.execute(f"PRAGMA table_info({table})")
+                }
+            except sqlite3.Error:
+                continue
+            if not existing or column in existing:
+                continue
+            self._conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
 
     def close(self) -> None:
         with self._lock:

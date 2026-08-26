@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable, Mapping
@@ -23,6 +24,8 @@ from ..extract.dispatch import Extraction, extract as extract_file
 from ..extract.html import ParsedPage, parse_html
 from ..ids import image_filename, safe_name
 from ..images.classify import classify_image, summarise_surrounding
+from ..images.triage import (DUPLICATE, HIGH, LOW, MEDIUM, ImageCandidate,
+                             TriageLedger, priority_of)
 from ..logging_setup import event, get_logger
 from ..net.browser import BrowserPool, looks_javascript_rendered
 from ..net.fetcher import FetchResult, Fetcher
@@ -44,6 +47,8 @@ class CrawlStats:
     documents: int = 0
     images_kept: int = 0
     images_rejected: int = 0
+    image_candidates: int = 0
+    image_duplicates_avoided: int = 0
     urls_discovered: int = 0
     external_candidates: int = 0
     blocked: int = 0
@@ -123,11 +128,18 @@ class Crawler:
                                             ["likely_relevant", "possibly_relevant", "uncertain"]))
         self.max_images_per_source = int(image_cfg.get("max_images_per_source", 400))
         self.max_images_per_community = int(image_cfg.get("max_images_per_community", 1500))
+        # Which priority bands are worth the bandwidth. LOW and DUPLICATE are
+        # recorded in the ledger with their metadata but never downloaded
+        # (brief SS5, SS7).
+        self.image_download_priorities = set(
+            image_cfg.get("download_priorities", [HIGH, MEDIUM]))
+        self.max_candidates_per_page = int(image_cfg.get("max_candidates_per_page", 120))
 
         self.stats = CrawlStats()
         self.sources: dict[str, SourceContext] = {}
         self.external_candidates: dict[str, dict[str, Any]] = {}
         self._image_hashes: set[str] = set()
+        self.triage = TriageLedger(db, community_id)
         self._document_hashes: dict[str, str] = {}
         self._browser_renders: dict[str, int] = {}
         self._announced_exhausted: set[str] = set()
@@ -663,175 +675,303 @@ class Crawler:
             )
 
     # -- images ------------------------------------------------------------
+    # Triage, not hoarding: classify every candidate from the metadata the page
+    # already gave us, order them, and spend bandwidth only on the ones worth
+    # keeping. Everything seen is recorded either way (brief SS5-SS7).
+    def _candidates_from_page(self, parsed: ParsedPage, page_id: str, item: Any,
+                              context: SourceContext | None, stage: int) -> list[ImageCandidate]:
+        heading = parsed.headings[0][1] if parsed.headings else parsed.title
+        archive_url = item.normalized_url if _is_archive_url(item.normalized_url) else None
+        candidates: list[ImageCandidate] = []
+        for ref in parsed.images[: self.max_candidates_per_page]:
+            absolute = normalize(ref.url, item.normalized_url) or ref.url
+            candidates.append(ImageCandidate(
+                original_url=absolute,
+                page_url=item.normalized_url,
+                source_id=context.source_id if context else None,
+                page_id=page_id,
+                archive_url=archive_url,
+                origin="html",
+                alt_text=ref.alt,
+                title_text=ref.title,
+                caption=ref.caption,
+                surrounding_text=ref.surrounding,
+                page_heading=heading,
+                width=ref.width,
+                height=ref.height,
+                publication_date=parsed.published_date,
+                source_class=context.source_class if context else "",
+                independence_group=context.independence_group if context else None,
+                stage=stage,
+                extraction_method="html:img",
+            ))
+        return candidates
+
     async def _harvest_page_images(self, parsed: ParsedPage, page_id: str, item: Any,
                                    context: SourceContext | None, stage: int) -> None:
         if self.stats.images_kept >= self.max_images_per_community:
             return
-        source_id = context.source_id if context else None
+        candidates = self._candidates_from_page(parsed, page_id, item, context, stage)
+        if not candidates:
+            return
+        triaged = self.triage.triage(
+            candidates, lexicon=self.lexicon,
+            min_width=self.image_min_width, min_height=self.image_min_height,
+        )
+        self.stats.image_candidates += len(triaged)
         kept_for_source = 0
-        for ref in parsed.images[: self.max_images_per_source]:
+        for candidate in triaged:
             if self.stats.images_kept >= self.max_images_per_community:
-                return
+                self.triage.record(candidate, decision="skipped_budget",
+                                   reason="the community image budget was already spent")
+                continue
             if kept_for_source >= self.max_images_per_source:
-                return
-            classification = classify_image(
-                url=ref.url, alt=ref.alt, title=ref.title, caption=ref.caption,
-                surrounding=ref.surrounding, page_title=parsed.title,
-                width=ref.width, height=ref.height, lexicon=self.lexicon,
-                min_width=self.image_min_width, min_height=self.image_min_height,
-            )
-            if classification.relevance_class not in self.image_keep:
-                self.stats.images_rejected += 1
+                self.triage.record(candidate, decision="skipped_budget",
+                                   reason="this source's image budget was already spent")
                 continue
-
-            result = await self.fetcher.fetch(
-                ref.url, kind="image", community_id=self.community_id,
-                source_id=source_id, stage=stage,
-            )
-            if not result.ok or not result.content:
-                self.stats.images_rejected += 1
+            if candidate.priority == DUPLICATE:
+                self.stats.image_duplicates_avoided += 1
+                self.triage.record(candidate, decision="skipped_duplicate",
+                                   reason=candidate.decision_reason or
+                                   "already triaged for this community")
                 continue
-            if len(result.content) < self.image_min_bytes and classification.relevance_class != "likely_relevant":
+            if candidate.priority not in self.image_download_priorities:
                 self.stats.images_rejected += 1
+                self.triage.record(
+                    candidate, decision="skipped_low_priority",
+                    reason=f"{candidate.priority} priority: "
+                           f"{candidate.classification.reason}")
                 continue
+            if await self._download_candidate(candidate, stage):
+                kept_for_source += 1
 
-            width, height = _image_dimensions(result.content)
-            if width and height:
-                # Re-classify now that the true dimensions are known: a tiny
-                # image dressed up in a promising filename is still decoration.
-                classification = classify_image(
-                    url=ref.url, alt=ref.alt, title=ref.title, caption=ref.caption,
-                    surrounding=ref.surrounding, page_title=parsed.title,
-                    width=width, height=height, bytes_len=len(result.content),
-                    lexicon=self.lexicon, min_width=self.image_min_width,
-                    min_height=self.image_min_height,
-                )
-                if classification.relevance_class not in self.image_keep:
-                    self.stats.images_rejected += 1
-                    continue
+    async def _download_candidate(self, candidate: ImageCandidate, stage: int) -> bool:
+        """Fetch one triaged candidate and keep it, recording either outcome."""
+        result = await self.fetcher.fetch(
+            candidate.original_url, kind="image", community_id=self.community_id,
+            source_id=candidate.source_id, stage=stage,
+        )
+        if not result.ok or not result.content:
+            self.stats.images_rejected += 1
+            self.triage.record(
+                candidate, decision="fetch_failed",
+                reason=result.error_detail or result.error_type or "the image did not download")
+            return False
 
-            self._persist_image(
-                data=result.content,
-                classification=classification,
-                source_id=source_id,
-                page_id=page_id,
-                document_id=None,
-                original_url=ref.url,
-                caption=ref.caption,
-                alt=ref.alt,
-                surrounding=ref.surrounding,
-                source_title=parsed.title,
-                publication_date=parsed.published_date,
-                page_number=None,
-                extension=result.extension or "jpg",
-                width=width,
-                height=height,
+        candidate.bytes = len(result.content)
+        candidate.mime_type = result.mime or ""
+        width, height = _image_dimensions(result.content)
+        if width and height:
+            candidate.width, candidate.height = width, height
+            # Re-classify now the true size is known: a tiny image dressed up in
+            # a promising filename is still decoration.
+            candidate.classification = classify_image(
+                url=candidate.original_url, alt=candidate.alt_text,
+                title=candidate.title_text, caption=candidate.caption,
+                surrounding=candidate.surrounding_text, page_title=candidate.page_heading,
+                document_title=candidate.document_title,
+                width=width, height=height, bytes_len=candidate.bytes,
+                lexicon=self.lexicon, min_width=self.image_min_width,
+                min_height=self.image_min_height,
             )
-            kept_for_source += 1
+            candidate.priority = priority_of(candidate.classification)
+            if candidate.priority not in self.image_download_priorities:
+                self.stats.images_rejected += 1
+                self.triage.record(
+                    candidate, decision="skipped_too_small",
+                    reason=f"its real dimensions ({width}x{height}) drop it to "
+                           f"{candidate.priority}: {candidate.classification.reason}")
+                return False
+        if (candidate.bytes < self.image_min_bytes
+                and candidate.classification.relevance_class != "likely_relevant"):
+            self.stats.images_rejected += 1
+            self.triage.record(
+                candidate, decision="skipped_too_small",
+                reason=f"{candidate.bytes} bytes is below the {self.image_min_bytes}-byte "
+                       "floor and nothing in its description marks it as a plan or a map")
+            return False
+
+        image_id = self._persist_image(
+            data=result.content, candidate=candidate,
+            extension=result.extension or "jpg",
+        )
+        return image_id is not None
 
     async def _fetch_standalone_image(self, item: Any, context: SourceContext | None,
                                       stage: int) -> None:
+        """An image queued as a URL in its own right, with no page around it."""
         if not self.image_enabled:
             self.frontier.complete(item.url_key, "skipped", "image harvesting disabled")
             return
-        result = await self.fetcher.fetch(
-            item.normalized_url, kind="image", community_id=self.community_id,
-            source_id=item.source_id, stage=stage,
+        candidate = ImageCandidate(
+            original_url=item.normalized_url,
+            page_url=item.normalized_url,
+            source_id=item.source_id,
+            origin="standalone",
+            source_class=context.source_class if context else "",
+            independence_group=context.independence_group if context else None,
+            stage=stage,
+            extraction_method="url:direct",
         )
-        if not result.ok or not result.content:
-            self._after_failed_fetch(item, context, result, stage)
-            return
-        width, height = _image_dimensions(result.content)
-        classification = classify_image(
-            url=item.normalized_url, width=width, height=height,
-            bytes_len=len(result.content), lexicon=self.lexicon,
+        triaged = self.triage.triage(
+            [candidate], lexicon=self.lexicon,
             min_width=self.image_min_width, min_height=self.image_min_height,
         )
-        if classification.relevance_class in self.image_keep:
-            self._persist_image(
-                data=result.content, classification=classification,
-                source_id=item.source_id, page_id=None, document_id=None,
-                original_url=item.normalized_url, caption="", alt="", surrounding="",
-                source_title="", publication_date=None, page_number=None,
-                extension=result.extension or "jpg", width=width, height=height,
-            )
-        else:
+        candidate = triaged[0]
+        self.stats.image_candidates += 1
+        if candidate.priority == DUPLICATE:
+            self.stats.image_duplicates_avoided += 1
+            self.triage.record(candidate, decision="skipped_duplicate",
+                               reason=candidate.decision_reason)
+            self.frontier.complete(item.url_key, "done", "already triaged")
+            return
+        # A bare image URL carries no caption to judge it by, so its filename is
+        # all there is. Fetch it unless the filename itself marks it decorative:
+        # the alternative is discarding a linked site plan unseen.
+        if candidate.priority == LOW and candidate.classification.relevance_class == DECORATIVE:
             self.stats.images_rejected += 1
+            self.triage.record(candidate, decision="skipped_low_priority",
+                               reason=candidate.classification.reason)
+            self.frontier.complete(item.url_key, "done", "decorative")
+            return
+        ok = await self._download_candidate(candidate, stage)
+        if not ok and candidate.decision == "fetch_failed":
+            self._after_failed_fetch(item, context, _FailedImage(candidate), stage)
+            return
         self.frontier.complete(item.url_key, "done")
 
     def _store_document_images(self, document_id: str, extraction: Extraction,
                                context: SourceContext | None, title: str, url: str) -> None:
-        source_id = context.source_id if context else None
-        for image in extraction.images[:200]:
-            if self.stats.images_kept >= self.max_images_per_community:
-                return
-            classification = classify_image(
-                url=image.name, caption=image.nearby_text[:600],
-                surrounding=image.nearby_text, document_title=title,
-                width=image.width, height=image.height, bytes_len=len(image.data),
-                lexicon=self.lexicon, min_width=self.image_min_width,
-                min_height=self.image_min_height,
-            )
-            if classification.relevance_class not in self.image_keep:
-                self.stats.images_rejected += 1
-                continue
-            self._persist_image(
-                data=image.data, classification=classification, source_id=source_id,
-                page_id=None, document_id=document_id, original_url=url,
-                caption=image.nearby_text[:600], alt="", surrounding=image.nearby_text,
-                source_title=title, publication_date=None, page_number=image.page_number,
-                extension=image.extension, width=image.width, height=image.height,
-            )
+        """Figures, plans and photographs embedded in a PDF, deck or document.
 
-    def _persist_image(self, *, data: bytes, classification: Any, source_id: str | None,
-                       page_id: str | None, document_id: str | None, original_url: str,
-                       caption: str, alt: str, surrounding: str, source_title: str,
-                       publication_date: str | None, page_number: int | None,
-                       extension: str, width: int, height: int) -> str | None:
+        A figure in a report is among the best visual evidence there is: it was
+        published deliberately, it usually carries a number and a caption, and
+        the surrounding text says what it shows (brief SS11).
+        """
+        source_id = context.source_id if context else None
+        candidates: list[ImageCandidate] = []
+        for index, image in enumerate(extraction.images[:200], start=1):
+            candidates.append(ImageCandidate(
+                original_url=f"{url}#image{index}",
+                page_url=url,
+                source_id=source_id,
+                document_id=document_id,
+                origin="document",
+                filename=image.name,
+                caption=image.nearby_text[:600],
+                surrounding_text=image.nearby_text,
+                document_title=title,
+                page_number=image.page_number,
+                figure_number=_figure_number(image.nearby_text),
+                extraction_method=f"{extraction.parser or 'document'}:embedded",
+                width=image.width or None,
+                height=image.height or None,
+                bytes=len(image.data),
+                mime_type=extraction.mime,
+                source_class=context.source_class if context else "",
+                independence_group=context.independence_group if context else None,
+                data=image.data,
+            ))
+        if not candidates:
+            return
+        triaged = self.triage.triage(
+            candidates, lexicon=self.lexicon,
+            min_width=self.image_min_width, min_height=self.image_min_height,
+        )
+        self.stats.image_candidates += len(triaged)
+        for candidate in triaged:
+            if self.stats.images_kept >= self.max_images_per_community:
+                self.triage.record(candidate, decision="skipped_budget",
+                                   reason="the community image budget was already spent")
+                continue
+            if candidate.priority == DUPLICATE:
+                self.stats.image_duplicates_avoided += 1
+                self.triage.record(candidate, decision="skipped_duplicate",
+                                   reason=candidate.decision_reason)
+                continue
+            if candidate.priority not in self.image_download_priorities:
+                self.stats.images_rejected += 1
+                self.triage.record(
+                    candidate, decision="skipped_low_priority",
+                    reason=f"{candidate.priority} priority: "
+                           f"{candidate.classification.reason}")
+                continue
+            # Already extracted, so there is nothing to download: the cost was
+            # paid when the document was parsed.
+            extension = (candidate.filename.rsplit(".", 1)[-1]
+                         if "." in candidate.filename else "jpg")
+            self._persist_image(data=candidate.data or b"", candidate=candidate,
+                                extension=extension)
+
+    def _persist_image(self, *, data: bytes, candidate: ImageCandidate,
+                       extension: str) -> str | None:
+        """Save a kept image with provenance complete enough to audit (brief SS10)."""
+        classification = candidate.classification
         digest = self.storage.content_hash(data)
-        if (digest, source_id) in {(h, source_id) for h in self._image_hashes}:
+        duplicate_of = self.triage.is_duplicate_hash(digest)
+        if digest in self._image_hashes:
+            # The same bytes under a different address. Recorded, not saved
+            # again: one file, and a ledger row showing where else it appeared.
+            self.stats.image_duplicates_avoided += 1
+            self.triage.record(
+                candidate, decision="skipped_duplicate", sha256=digest,
+                reason=f"identical content is already stored"
+                       + (f" as {duplicate_of}" if duplicate_of else ""))
             return None
+
         image_id = self.db.next_id("images", "image_id", self.community_id, "IMG")
         filename = image_filename(
             image_id=image_id,
             topic=classification.research_topic or classification.image_type,
             year=classification.image_date,
-            source=source_id or "unsourced",
-            page_number=page_number,
+            source=candidate.source_id or "unsourced",
+            page_number=candidate.page_number,
             extension=extension,
         )
         try:
             path = self.storage.write_bytes(self.storage.images, filename, data)
         except ValueError as exc:
-            self._record_error(url=original_url, source_id=source_id, stage=None,
-                               error_type="unsafe_filename", detail=str(exc))
+            self._record_error(url=candidate.original_url, source_id=candidate.source_id,
+                               stage=candidate.stage, error_type="unsafe_filename",
+                               detail=str(exc))
+            self.triage.record(candidate, decision="fetch_failed", sha256=digest,
+                               reason=f"unsafe filename refused: {exc}")
             return None
 
+        candidate_id = self.triage.record(candidate, decision="downloaded",
+                                          image_id=image_id, sha256=digest,
+                                          reason="kept as research-relevant")
         self.db.insert(
             "images",
             {
                 "image_id": image_id,
                 "community_id": self.community_id,
-                "source_id": source_id,
-                "document_id": document_id,
-                "page_id": page_id,
+                "candidate_id": candidate_id,
+                "source_id": candidate.source_id,
+                "document_id": candidate.document_id,
+                "page_id": candidate.page_id,
                 "sha256": digest,
                 "filename": filename,
+                "original_filename": candidate.filename or None,
                 "local_path": self.storage.relative(path),
-                "original_url": original_url,
-                "page_number": page_number,
-                "width": width or None,
-                "height": height or None,
+                "original_url": candidate.original_url,
+                "page_url": candidate.page_url or None,
+                "archive_url": candidate.archive_url,
+                "page_number": candidate.page_number,
+                "figure_number": candidate.figure_number,
+                "extraction_method": candidate.extraction_method or None,
+                "width": candidate.width or None,
+                "height": candidate.height or None,
                 "bytes": len(data),
                 "format": extension,
-                "source_title": source_title[:400],
-                "publication_date": publication_date,
+                "source_title": (candidate.document_title or candidate.page_heading)[:400],
+                "publication_date": candidate.publication_date,
                 "image_type": classification.image_type,
                 "research_topic": classification.research_topic,
-                "caption": caption[:2000],
-                "alt_text": alt[:1000],
-                "surrounding_text": surrounding[:4000],
-                "surrounding_summary": summarise_surrounding(surrounding),
+                "caption": candidate.caption[:2000],
+                "alt_text": candidate.alt_text[:1000],
+                "surrounding_text": candidate.surrounding_text[:4000],
+                "surrounding_summary": summarise_surrounding(candidate.surrounding_text),
                 "evidence_subject": classification.research_topic or classification.image_type,
                 "possible_fields": "; ".join(classification.possible_fields),
                 "visual_evidence_allowed": classification.visual_evidence_allowed,
@@ -839,22 +979,24 @@ class Crawler:
                 "image_date": classification.image_date,
                 "image_date_confidence": classification.image_date_confidence,
                 "relevance_class": classification.relevance_class,
+                "priority": candidate.priority,
                 "relevance_score": classification.score,
                 "relevance_reason": classification.reason,
                 "confidence": classification.confidence,
                 "classifier": "rule:image_lexicon/1.0.0",
+                "retrieval_utc": utcnow(),
                 "created_utc": utcnow(),
             },
             replace=True,
         )
         self._image_hashes.add(digest)
         self.stats.images_kept += 1
-        if source_id:
-            self.db.bump("sources", "images_found", {"source_id": source_id})
+        if candidate.source_id:
+            self.db.bump("sources", "images_found", {"source_id": candidate.source_id})
         if classification.relevance_class == "likely_relevant":
             event(log, "IMG",
                   f"research-relevant {classification.image_type} kept: {filename}",
-                  image_id=image_id, url=original_url)
+                  image_id=image_id, url=candidate.original_url)
         return image_id
 
     # -- bookkeeping -------------------------------------------------------
@@ -899,6 +1041,45 @@ class Crawler:
             },
             replace=True,
         )
+
+
+_FIGURE = re.compile(
+    r"\b(?:fig(?:ure)?|afb(?:eelding)?|abb(?:ildung)?|fig\.?)\s*([0-9]+(?:\.[0-9]+)?[a-z]?)",
+    re.I)
+
+_ARCHIVE_HOSTS = ("web.archive.org", "archive.org", "archive.ph", "archive.today")
+
+
+def _figure_number(text: str) -> str | None:
+    """The figure number a caption states, where it states one."""
+    if not text:
+        return None
+    match = _FIGURE.search(text)
+    return match.group(1) if match else None
+
+
+def _is_archive_url(url: str) -> bool:
+    host = (urlsplit(url).hostname or "").lower()
+    return any(host == h or host.endswith("." + h) for h in _ARCHIVE_HOSTS)
+
+
+class _FailedImage:
+    """Adapts a failed image candidate to what _after_failed_fetch expects."""
+
+    def __init__(self, candidate: ImageCandidate):
+        self.url = candidate.original_url
+        self.ok = False
+        self.status = None
+        self.error_type = "image_fetch_failed"
+        self.error_detail = candidate.decision_reason
+        self.access_status = "unreachable"
+        self.mime = ""
+        self.headers: dict[str, str] = {}
+        self.content = b""
+        self.text = ""
+
+    def is_permanent_failure(self) -> bool:
+        return False
 
 
 def _image_dimensions(data: bytes) -> tuple[int, int]:
