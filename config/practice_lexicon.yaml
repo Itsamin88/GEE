@@ -382,8 +382,11 @@ quantities:
 image_relevance:
   # Strong: an image whose filename/alt/caption matches these is evidence-bearing.
   strong:
-    - 'site.?plan|master.?plan|masterplan|plattegrond|terreinplan|inrichtingsplan|
-       plan.?de.?masse|lageplan|plano|bebauungsplan|plan.?director'
+    # Keep each alternation on ONE line. YAML folds a wrapped quoted scalar
+    # into a space, which silently turns '|plan.?de.?masse' into
+    # '| plan.?de.?masse' and stops it matching a caption that begins with it.
+    - 'site.?plan|master.?plan|masterplan|plattegrond|terreinplan|inrichtingsplan'
+    - 'plan.?de.?masse|lageplan|plano|bebauungsplan|plan.?director'
     - 'land.?use|landgebruik|zonage|zoning|bestemmingsplan|uso.?de.?suelo'
     - 'permaculture.?design|design.?plan|ontwerp|conception'
     - 'restoration.?map|herstelkaart|carte.?de.?restauration'

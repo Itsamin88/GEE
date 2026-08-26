@@ -150,7 +150,8 @@ class RunControl:
         return self._pause_reason
 
     @property
-    def checkpoint(self) -> Checkpoint:
+    def last_checkpoint(self) -> Checkpoint:
+        """Where the run had got to when it was last written down."""
         return self._checkpoint
 
     @property

@@ -116,9 +116,9 @@ def classify_image(
 ) -> ImageClassification:
     """Decide whether an image is worth keeping, and say why."""
     patterns = dict((lexicon or {}).get("image_relevance", {}))
-    strong = [re.compile(p, re.I) for p in patterns.get("strong", [])]
-    moderate = [re.compile(p, re.I) for p in patterns.get("moderate", [])]
-    decorative = [re.compile(p, re.I) for p in patterns.get("decorative", [])]
+    strong = _compile(patterns.get("strong", []))
+    moderate = _compile(patterns.get("moderate", []))
+    decorative = _compile(patterns.get("decorative", []))
 
     filename = url.rsplit("/", 1)[-1]
     # Weight the fields by how much a match in each is worth: a caption that
@@ -173,6 +173,20 @@ def classify_image(
             confidence=0.75,
         )
 
+    if _is_icon(width, height):
+        # A strong keyword normally outweighs the size floor — a thumbnail of a
+        # site plan is still a site plan. An icon is different: nothing at
+        # icon size is a readable plan or map, whatever it is named, and
+        # "map-pin.png" with alt="map" would otherwise score as research
+        # material and be downloaded.
+        return ImageClassification(
+            relevance_class=DECORATIVE,
+            score=0.0,
+            reason=f"icon-sized ({width}x{height}); too small to be a readable "
+                   "plan, map or photograph whatever its description says",
+            confidence=0.85,
+        )
+
     if not _big_enough(width, height, bytes_len, min_width, min_height) and not strong_hits:
         return ImageClassification(
             relevance_class=DECORATIVE,
@@ -217,6 +231,37 @@ def classify_image(
         image_date_confidence=date_confidence,
         confidence=round(min(0.4 + score * 0.6, 0.95), 3),
     )
+
+
+#: Below this, on both sides, an image cannot carry documentary content: it is
+#: a logo, a bullet, a social icon or a map pin.
+ICON_MAX_EDGE = 96
+
+
+def _compile(patterns: Iterable[str]) -> list[re.Pattern[str]]:
+    """Compile lexicon patterns, tolerating a YAML scalar wrapped across lines.
+
+    A quoted YAML scalar that wraps folds its newline into a space, which turns
+    `...|plan.?de.?masse|...` into `...| plan.?de.?masse|...` and stops it
+    matching a caption that starts with those words. The lexicon keeps each
+    alternation on one line; this makes a slip there harmless rather than
+    silent.
+    """
+    compiled: list[re.Pattern[str]] = []
+    for pattern in patterns:
+        cleaned = re.sub(r"\s*\|\s*", "|", str(pattern).strip())
+        try:
+            compiled.append(re.compile(cleaned, re.I))
+        except re.error:
+            continue
+    return compiled
+
+
+def _is_icon(width: int | None, height: int | None) -> bool:
+    """Known to be too small to carry any documentary content."""
+    if not width or not height:
+        return False
+    return width <= ICON_MAX_EDGE and height <= ICON_MAX_EDGE
 
 
 def _big_enough(width: int | None, height: int | None, bytes_len: int | None,

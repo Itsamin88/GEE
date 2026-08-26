@@ -294,7 +294,7 @@ class Supervisor:
         return self._suspended
 
     def _where(self) -> str:
-        cp = self.control.checkpoint
+        cp = self.control.last_checkpoint
         parts = []
         if cp.stage_no is not None:
             parts.append(f"Stage {cp.stage_no}")

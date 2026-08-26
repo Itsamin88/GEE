@@ -50,6 +50,7 @@ class Database:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.RLock()
+        self._closed = False
         self._conn = sqlite3.connect(str(self.path), check_same_thread=False, timeout=30.0)
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA foreign_keys = ON")
@@ -86,9 +87,15 @@ class Database:
             self._conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
 
     def close(self) -> None:
+        """Commit and close. Safe to call twice: shutdown paths overlap."""
         with self._lock:
-            self._conn.commit()
-            self._conn.close()
+            if self._closed:
+                return
+            self._closed = True
+            try:
+                self._conn.commit()
+            finally:
+                self._conn.close()
 
     def __enter__(self) -> "Database":
         return self

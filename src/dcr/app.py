@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
+import time
 from dataclasses import asdict
 from datetime import date
 from pathlib import Path
@@ -16,11 +17,16 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from . import __version__
 from .config import Settings, detect_optional_features, load_settings
+from .control import (InterruptedRun, PAUSED_MANUAL, clear_requests,
+                      control_dir_for, find_interrupted_runs, read_status,
+                      request_cancel, request_pause, request_resume)
 from .db import Database
+from .estimate import Estimate, Estimator
 from .export import manifests, report as report_mod
 from .export.workbook import WorkbookExporter
 from .ids import safe_name
 from .logging_setup import event, get_logger, setup_logging
+from .net.connectivity import ConnectivityMonitor
 from .qc.checks import QualityControl, completion_status
 from .runner import CommunityInput, CommunityRunner, MODE_STAGES, RunOutcome
 from .storage import CommunityStorage
@@ -122,14 +128,81 @@ def _float_or_none(value: str) -> float | None:
 class Application:
     """Wires configuration, database, runner, exporter and quality control."""
 
-    def __init__(self, settings: Settings | None = None):
+    def __init__(self, settings: Settings | None = None, *, monitor: Any = None):
         self.settings = settings or load_settings()
         self.settings.output_root.mkdir(parents=True, exist_ok=True)
         self.db = Database(self.settings.database_path)
         self.features = detect_optional_features(self.settings)
+        self.estimator = Estimator(self.settings, self.db)
+        self._monitor = monitor
+        #: The estimates made for the run in progress, kept for the report.
+        self.estimates: list[Estimate] = []
+        self._probe_summary = ""
 
     def close(self) -> None:
         self.db.close()
+
+    # -- connectivity ------------------------------------------------------
+    @property
+    def monitor(self) -> ConnectivityMonitor:
+        """The connectivity monitor, built from configuration on first use."""
+        if self._monitor is None:
+            cfg = dict(self.settings.get("connectivity", default={}) or {})
+            self._monitor = ConnectivityMonitor(
+                probes=cfg.get("probes"),
+                timeout_s=float(cfg.get("timeout_s", 8.0)),
+                min_reachable=int(cfg.get("min_reachable", 1)),
+                check_interval_s=float(cfg.get("check_interval_s", 30.0)),
+                offline_retry_s=float(cfg.get("offline_retry_s", 15.0)),
+                offline_retry_max_s=float(cfg.get("offline_retry_max_s", 300.0)),
+                verify_tls=bool(self.settings.get("network", "verify_tls", default=True)),
+                user_agent=self.settings.user_agent,
+            )
+        return self._monitor
+
+    # -- unfinished runs ---------------------------------------------------
+    def interrupted_runs(self) -> list[InterruptedRun]:
+        """Runs that stopped without finishing, newest first (brief §21)."""
+        return find_interrupted_runs(self.db)
+
+    def offer_resume(self) -> InterruptedRun | None:
+        """Tell the researcher about a paused run and ask what to do with it.
+
+        A run the researcher deliberately paused is never restarted without
+        being asked, and never quietly continued as if it had not been paused.
+        """
+        runs = self.interrupted_runs()
+        if not runs:
+            return None
+        print("\n" + "=" * 78)
+        print("  UNFINISHED RUN FOUND")
+        print("=" * 78)
+        for index, run in enumerate(runs[:5], start=1):
+            print(f"  {index}. {run.describe()}")
+            if run.pause_reason:
+                print(f"     reason: {run.pause_reason}")
+            if run.pending_tasks:
+                print(f"     {run.pending_tasks} queued task(s) still waiting")
+        print("-" * 78)
+        print("  This run was not finished. Resuming continues from its last")
+        print("  checkpoint; starting a new run leaves it untouched and resumable.")
+        answer = prompt("\n  Resume it? (yes / no)", "yes").strip().lower()
+        if answer.startswith("y"):
+            return runs[0]
+        return None
+
+    # -- the researcher's controls ----------------------------------------
+    def pause(self, reason: str = "") -> None:
+        request_pause(self.settings.output_root, reason)
+
+    def resume(self, reason: str = "") -> None:
+        request_resume(self.settings.output_root, reason)
+
+    def cancel(self, reason: str = "") -> None:
+        request_cancel(self.settings.output_root, reason)
+
+    def status(self) -> dict[str, Any] | None:
+        return read_status(self.settings.output_root)
 
     # -- startup -----------------------------------------------------------
     def preflight(self) -> None:
@@ -150,7 +223,8 @@ class Application:
 
     # -- running -----------------------------------------------------------
     def run(self, community: CommunityInput, *, mode: str = "FULL",
-            target: str | None = None) -> dict[str, Any]:
+            target: str | None = None, estimate_first: bool = False,
+            on_status: Any = None) -> dict[str, Any]:
         storage_root = self.settings.output_root
         community_row = None
         if mode in ("EXPORT", "AUDIT", "RECONCILE", "RESUME", "RETRY_FAILED"):
@@ -170,7 +244,10 @@ class Application:
             return self._finalise(community, community_id, storage, outcome, mode,
                                   coder_id=community.coder_id)
 
-        runner = CommunityRunner(self.settings, self.db, run_mode=mode, target=target)
+        estimate = self.estimate_workload(community, mode=mode) if estimate_first else None
+        runner = CommunityRunner(self.settings, self.db, run_mode=mode, target=target,
+                                 monitor=self.monitor, on_status=self._on_status,
+                                 estimate=estimate)
         temporary_id = community_row["community_id"] if community_row else safe_name(community.name)
         storage = CommunityStorage.create(storage_root, temporary_id, community.name)
         setup_logging(storage.logs,
@@ -179,10 +256,127 @@ class Application:
                       jsonl=bool(self.settings.get("logging", "jsonl", default=True)))
         event(log, "RUN", f"{mode} run for {community.name!r}")
 
+        started = time.monotonic()
         outcome = asyncio.run(runner.run(community))
+        wall_clock_s = time.monotonic() - started
         storage = runner.storage
+        self._record_timings(outcome, estimate, wall_clock_s, mode)
         return self._finalise(community, outcome.community_id, storage, outcome, mode,
                               coder_id=community.coder_id)
+
+    def _record_timings(self, outcome: RunOutcome, estimate: Estimate | None,
+                        wall_clock_s: float, mode: str) -> None:
+        """Write down what it actually took, so the next estimate is better."""
+        for made in self.estimates:
+            self.estimator.record(made, run_id=outcome.run_id,
+                                  community_id=outcome.community_id)
+        # Active time is the clock minus the time nobody was working: a pause
+        # and an outage tell us nothing about how fast the machine is.
+        idle_s = (outcome.offline_s or 0.0) + (outcome.paused_manual_s or 0.0)
+        active_s = max(0.0, wall_clock_s - idle_s)
+        estimated_active = 0.0
+        if estimate is not None:
+            estimated_active = (estimate.active_low_s + estimate.active_high_s) / 2
+        stats = dict(outcome.stats)
+        self.estimator.record_actual(
+            run_id=outcome.run_id, community_id=outcome.community_id, mode=mode,
+            estimated_active_s=estimated_active, actual_active_s=active_s,
+            wall_clock_s=wall_clock_s, offline_s=outcome.offline_s,
+            paused_manual_s=outcome.paused_manual_s,
+            stats={**stats,
+                   "errors": int(self.db.scalar(
+                       "SELECT COUNT(*) FROM errors WHERE community_id=?",
+                       (outcome.community_id,)) or 0),
+                   "pauses_manual": outcome.pauses_manual,
+                   "pauses_network": outcome.pauses_network,
+                   "image_candidates": stats.get("image_candidates", 0)},
+            final_state=outcome.final_state,
+        )
+        outcome.estimate = estimate.as_dict() if estimate is not None else {}
+        outcome.stats["timing"] = {
+            "wall_clock_s": round(wall_clock_s, 1),
+            "active_s": round(active_s, 1),
+            "offline_s": round(outcome.offline_s, 1),
+            "paused_manual_s": round(outcome.paused_manual_s, 1),
+            "estimated_active_s": round(estimated_active, 1),
+        }
+
+    # -- estimation --------------------------------------------------------
+    def estimate_workload(self, community: CommunityInput, *,
+                          mode: str = "FULL") -> Estimate | None:
+        """Say how long this is likely to take, before the expensive part.
+
+        Two figures, in this order (brief §31, §32): one from the researcher's
+        input alone, then a revised one after a handful of cheap requests have
+        shown how big the sites actually are. The second is the useful one, and
+        the difference between them is explained rather than left to be noticed.
+        """
+        if not bool(self.settings.get("estimation", "enabled", default=True)):
+            return None
+        if mode in ("EXPORT", "AUDIT", "RECONCILE"):
+            return None       # these touch no network and take seconds
+
+        initial = self.estimator.initial(community, mode=mode)
+        self.estimates = [initial]
+        print("\n" + "-" * 78)
+        print("  ESTIMATED WORKLOAD  (an estimate, not a guarantee)")
+        print("-" * 78)
+        for line in initial.lines():
+            print(f"  {line}")
+        for note in initial.workload.notes[:4]:
+            print(f"    - {note}")
+
+        if not bool(self.settings.get("estimation", "probe_sources", default=True)):
+            print("-" * 78)
+            return initial
+        if not community.urls:
+            print("-" * 78)
+            return initial
+
+        print("\n  Looking briefly at each address to size the job "
+              "(robots, sitemaps, home page)...")
+        try:
+            updated = asyncio.run(self._probe_and_estimate(community, initial, mode))
+        except Exception as exc:                  # sizing must never stop research
+            log.warning("[ESTIMATE] discovery probe failed: %s", exc)
+            print(f"  Discovery probe failed ({exc}); the initial estimate stands.")
+            print("-" * 78)
+            return initial
+        if updated is None:
+            print("-" * 78)
+            return initial
+
+        self.estimates.append(updated)
+        print(f"\n  Initial estimate:  {initial.active_band} active")
+        print(f"  Updated estimate:  {updated.active_band} active "
+              f"({updated.wall_band} wall-clock)")
+        print(f"  Why it changed:    {updated.reason}")
+        for note in updated.workload.notes[:5]:
+            print(f"    - {note}")
+        print(f"\n  Discovery cost {self._probe_summary}")
+        print("-" * 78)
+        return updated
+
+    async def _probe_and_estimate(self, community: CommunityInput,
+                                  initial: Estimate, mode: str) -> Estimate | None:
+        from .discovery.probe import probe_workload
+        from .net.fetcher import Fetcher
+
+        fetcher = Fetcher(user_agent=self.settings.user_agent, config=self.settings.app)
+        try:
+            probe = await probe_workload(
+                community.urls, fetcher=fetcher, lexicon=self.settings.lexicon,
+                max_sources=int(self.settings.get(
+                    "estimation", "max_probe_sources", default=12) or 12),
+            )
+        finally:
+            await fetcher.aclose()
+        self._probe_summary = (f"{probe.requests_made} request(s) in "
+                               f"{probe.elapsed_s:.1f}s.")
+        return self.estimator.after_discovery(probe, initial, mode=mode)
+
+    def _on_status(self, line: str) -> None:
+        print(f"  {line}")
 
     # -- export and QC -----------------------------------------------------
     def _finalise(self, community: CommunityInput, community_id: str,
