@@ -313,3 +313,75 @@ decisions:
       the community row, the completion report and every manifest, and their site_id is prefixed TEST-
       so fixture output can never be mistaken for coded research data.
     affects: [runner, exporter, tests]
+
+  # ---------------------------------------------------------------------
+  # Added while implementing selective image extraction, pause/resume and
+  # runtime estimation. Each of these was an ambiguity the research
+  # documents do not settle, resolved deliberately rather than by default.
+  # ---------------------------------------------------------------------
+  - id: DCR-D028
+    issue: >-
+      The register requires research-relevant images to be preserved but says nothing about
+      what to do with the ones that are not. Downloading everything wastes hours; discarding
+      the rest silently loses the gallery captions and file names the register itself names
+      as a dating source ("Image captions and file names on gallery pages, which often carry
+      DATES that no text on the site provides").
+    resolution: >-
+      Every image candidate is recorded with its lightweight metadata — caption, alt text,
+      file name, surrounding text, page heading, declared dimensions — whether or not it is
+      downloaded. Only HIGH and MEDIUM retrieval bands are fetched. The ledger is exported as
+      X3b_Image_Triage and image_candidates.csv, so a reader can see what was passed over and
+      why instead of having to trust that nothing was missed.
+    affects: [images/triage, crawl/crawler, export/workbook, export/manifests]
+
+  - id: DCR-D029
+    issue: >-
+      Retrieval priority for an image could be confused with the strength of the evidence it
+      offers, in the same way the register warns about retrieval priority and onset evidence
+      rank (rule: they are separate concepts and never touch).
+    resolution: >-
+      The two are kept strictly apart. `priority` (HIGH/MEDIUM/LOW/DUPLICATE) decides only
+      what is fetched first. What an image may evidence stays in `visual_evidence_allowed`,
+      and what would license a documentary claim stays in `documentary_text_support`. A HIGH
+      priority never implies a coded value, and register rule 12 is unchanged: a photograph
+      is not a practice code.
+    affects: [images/triage, images/classify]
+
+  - id: DCR-D030
+    issue: >-
+      The research documents treat a stage as either done or not done. They do not describe a
+      run that stopped part way through because the laptop lost its network or the researcher
+      needed the machine — and a stage recorded as complete when it was never begun would put
+      NOT FOUND into the workbook for sources nobody looked at.
+    resolution: >-
+      An interruption is an operational state, never a research finding. A run stopped early
+      is recorded as PAUSED_MANUAL or PAUSED_NETWORK, is marked crawl_truncated, and every
+      stage it never reached records that it was never begun. The completion report carries
+      the full interruption account. Nothing an interrupted run failed to reach may be read
+      as searched-and-absent.
+    affects: [control, supervisor, runner, export/report]
+
+  - id: DCR-D031
+    issue: >-
+      A source unreachable during a network outage is indistinguishable, in the stored record,
+      from a source that is genuinely dead — and the crawler was recording the first as the
+      second.
+    resolution: >-
+      While the machine is offline the circuit breaker is suspended and per-host failures are
+      not counted, so an outage is never written down as a property of a live site. Circuits
+      opened during an outage are cleared when the connection returns and those hosts are
+      attempted again. A single refusing server, by contrast, remains an ordinary research
+      fact and is recorded as unreachable as before.
+    affects: [net/fetcher, net/connectivity, supervisor]
+
+  - id: DCR-D032
+    issue: >-
+      Evidence and claims were written afresh on every pass, so reprocessing a page — after a
+      pause, a retry, or a second reconciliation — recorded the same sentence again. Nothing
+      in the research documents licenses counting one sentence twice.
+    resolution: >-
+      Evidence and claims carry a dedupe key: one sentence, in one place, in one artefact.
+      The same sentence found on a DIFFERENT page remains separate evidence, because that is
+      corroboration and collapsing it would weaken the independence counts. Two different
+      extractors reaching the same value remain two claims, for the same reason.
+    affects: [evidence/model, resolve]

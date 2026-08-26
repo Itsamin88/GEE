@@ -68,17 +68,90 @@ src/dcr/
   logging_setup.py         console, file and JSONL logging
   db/                      SQLite schema and access layer
   net/                     fetcher (retry, robots, rate limits, circuit breaker),
-                           MIME sniffing, optional browser rendering
+                           MIME sniffing, optional browser rendering, connectivity
   crawl/                   URL normalisation and traps, frontier and adaptive budget,
                            platform profiles, the crawl engine
   discovery/               sitemaps and feeds, web archive, academic, grey, search engines
   extract/                 HTML, PDF, Office, spreadsheets, text, and the dispatcher
-  images/                  relevance classification
+  images/                  relevance classification, and the triage ledger
+  control.py               run state: pause, resume, cancel, checkpoints
+  supervisor.py            the one gate that decides whether the crawl continues
+  estimate.py              workload and runtime estimation
+  console.py               pause/resume/cancel typed at the running crawl
   evidence/                the evidence model, quantities, practices, onset, independence,
                            conflicts, the optional LLM layer
   export/                  workbook, manifests, completion report
   qc/                      the eighteen checks and the coverage matrix
 ```
+
+## Stopping, and starting again
+
+Three things stop a long crawl before the protocol finishes: the researcher asks, the
+network goes away, or the machine does. None of them is an absence of evidence, and the
+difference between them matters to the finished research — so each is a distinct state
+with its own recorded reason.
+
+```
+RUNNING ──pause requested──> PAUSING ──safe boundary──> PAUSED_MANUAL
+   │                                                          │
+   ├──connection lost──> PAUSED_NETWORK ──restored──> RESUMING ┘──> RUNNING
+   │
+   ├──cancel requested──> CANCELLING ──> CANCELLED
+   │
+   └──stages finished──> COMPLETED
+```
+
+**One gate.** `supervisor.gate()` is asked at every safe boundary — the crawler at each
+batch, the runner at each stage — whether the next piece of work may start. A safe
+boundary is a point where nothing is half-written: the previous task is committed and
+the next has not been claimed. Keeping the decision in one object is what stops manual
+pause and network pause drifting apart, and it is why a pause leaves nothing `in_flight`.
+
+**The state is in the database, the request is in a file.** The file (`control/*.request`
+under the output root) is what lets a second process reach a crawler busy inside an
+await — `dcr pause` in another terminal, or the button panel. The database is what lets
+the state survive the machine being switched off: a run paused on Friday is still paused
+on Monday, and the application offers to resume it rather than quietly starting a new
+crawl.
+
+**Offline is not the same as unreachable.** A single refusing server is an ordinary
+research fact, and that source's record says so. A machine that can reach nothing is an
+operational state. The monitor probes several unrelated operators to tell them apart,
+and while the machine is offline the fetcher's circuit breaker is suspended — otherwise
+an outage would be written down as a finding about every live site the crawl happened to
+be visiting, and the circuits opened during it would outlive it.
+
+**RUNNING never means finished.** A run left RUNNING is what a power cut looks like from
+the outside. It is offered for resume, and anything left `in_flight` in the frontier is
+re-queued.
+
+## Images: triage before download
+
+The pipeline is `discover -> metadata -> classify -> prioritise -> download -> provenance`.
+Candidates are classified from what the page already said about them — alt text, caption,
+surrounding text, file name, declared dimensions — and only HIGH and MEDIUM bands are
+fetched.
+
+Every candidate is recorded in `image_candidates`, including the ones passed over. That
+is partly auditability and partly research: the register notes that gallery captions and
+file names often carry dates no text on the site provides, so a skipped candidate's
+metadata is still worth keeping.
+
+**Priority is not evidence rank, and neither is a licence to code.** `priority`
+(HIGH/MEDIUM/LOW/DUPLICATE) decides what is fetched first. What an image may evidence is
+decided separately in `images/classify.py`, and a photograph never sets a practice code:
+each image records what it alone may support and, separately, the sentence that would
+license a claim — or `NOT FOUND`.
+
+## Estimating the work
+
+Before the expensive crawl, `estimate.py` builds a workload from the addresses supplied,
+then `discovery/probe.py` spends three or four requests per address — robots.txt, the
+sitemaps it names, one home page — and the estimate is rebuilt with a sentence saying
+what moved it. Active processing time and wall-clock duration are reported separately as
+bands; the difference is politeness delays, rate limits, retries and time spent paused.
+Recorded actuals from previous runs calibrate later estimates through a clamped median,
+so one pathological run cannot distort the model.
 
 ## Design decisions worth knowing
 
@@ -92,6 +165,14 @@ while its pages keep yielding evidence. When they stop, it is declared exhausted
 effort moves elsewhere. Speculative path probes that 404 do *not* count towards
 exhaustion — the protocol asks for forty guessed paths and most sites have few of them,
 so charging those 404s would abandon a site before its sitemap was read.
+
+**Reprocessing is idempotent.** A pause, a retry and a resumed run all reach the same
+passage again. Evidence and claims carry a `dedupe_key`, so each time the answer is the
+same row rather than another copy. The key is one sentence, in one place, in one
+artefact — character offsets are excluded, because the same passage is often recorded
+once by a pass that knows where it sits and once by a pass that does not. The same
+sentence found on a *different* page is still separate evidence: that is corroboration,
+and collapsing it would quietly weaken the independence counts.
 
 **Failure is data.** Every failure is caught, classified and written to `errors`. A run
 never aborts because one URL failed. A host that refuses five times in a row is recorded

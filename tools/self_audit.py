@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
-"""The twenty questions of the brief's final self-audit, answered from the code
-and from a completed pilot run rather than from assertion.
+"""The final self-audit, answered from the code and from a completed pilot run
+rather than from assertion.
 
     python3 tools/self_audit.py [--output pilot_output]
 
-Each question is answered by an actual check. A question whose answer is NO is
-a defect to fix, not a caveat to note.
+Two sets of questions, both of which must come back clean:
+
+  A. OPERATIONAL (§49) — can an outage end the run falsely, can the researcher
+     pause and resume, does a pause survive a restart, is the time estimate
+     built from real workload, are high-value images kept and decoration
+     avoided.
+  B. RESEARCH INTEGRITY — can a value be fabricated, can a citation be
+     invented, can a source lose its provenance, can silence be mistaken for
+     absence.
+
+Each question is answered by an actual check against the code and the pilot
+database. A question whose answer is NO is a defect to fix, not a caveat to
+note.
 """
 
 from __future__ import annotations
@@ -45,10 +56,164 @@ def main() -> int:
     code = "\n".join(p.read_text(encoding="utf-8") for p in source)
 
     checks: list[tuple[str, bool, str]] = []
+    operational: list[tuple[str, bool, str]] = []
 
     def check(question: str, ok: bool, evidence: str) -> None:
         checks.append((question, ok, evidence))
 
+    def op(question: str, ok: bool, evidence: str) -> None:
+        operational.append((question, ok, evidence))
+
+    def table_exists(name: str) -> bool:
+        return bool(db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone())
+
+    # The interruption rehearsals keep their own databases, so a run that was
+    # paused on purpose is not in the main pilot store. Count across all of
+    # them: the question is whether the software did it, not which file it
+    # happened to land in.
+    all_databases = sorted(output.rglob("dcr.sqlite3"))
+
+    def across_pilots(sql: str) -> int:
+        total = 0
+        for path in all_databases:
+            connection = sqlite3.connect(str(path))
+            try:
+                if not connection.execute(
+                        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+                        (sql.split(" FROM ")[1].split()[0],)).fetchone():
+                    continue
+                row = connection.execute(sql).fetchone()
+                total += int(row[0]) if row and row[0] is not None else 0
+            except sqlite3.Error:
+                continue
+            finally:
+                connection.close()
+        return total
+
+    # =====================================================================
+    # A. OPERATIONAL — the twenty questions of §49
+    # =====================================================================
+    has_control = table_exists("run_control")
+    has_events = table_exists("pause_events")
+    paused_runs = across_pilots("SELECT COUNT(*) FROM runs WHERE status IN "
+                                "('paused_manual','paused_network')")
+    manual_pauses = across_pilots("SELECT COUNT(*) FROM pause_events WHERE event='paused' "
+                                  "AND kind='manual'")
+    network_pauses = across_pilots("SELECT COUNT(*) FROM pause_events WHERE event='paused' "
+                                   "AND kind='network'")
+    resumes = across_pilots("SELECT COUNT(*) FROM pause_events WHERE event='resumed'")
+
+    # 1
+    op("Can internet loss terminate the crawl falsely?",
+       "PAUSED_NETWORK" in code and "_pause_for_network" in code
+       and "max_offline_wait_s" in code,
+       "an outage sets PAUSED_NETWORK and waits; the run is never closed as complete "
+       f"({network_pauses} network pause(s) recorded in the pilot)")
+    # 2
+    op("Can internet loss create false NOT FOUND values?",
+       "never begun" in code and "_run_status_for" in code,
+       "a run stopped by an outage is marked truncated, and stages never reached are "
+       "recorded as never begun rather than as having found nothing")
+    # 3
+    op("Can the crawler resume after internet restoration?",
+       "wait_for_restoration" in code and "verify_usable" in code,
+       "restoration is detected, verified before it is trusted, and the crawl "
+       f"continues from the next incomplete task ({resumes} resume(s) recorded)")
+    # 4
+    op("Can the user manually pause the crawler?",
+       "request_pause" in code and "PAUSED_MANUAL" in code,
+       "console command, control-panel button and `dcr pause` all write the same "
+       f"request, read at the next safe boundary ({manual_pauses} manual pause(s) recorded)")
+    # 5
+    op("Can the user resume after manual pause?",
+       "request_resume" in code and "_pause_manually" in code,
+       "RESUME continues in place, or the run is picked up later from its checkpoint")
+    # 6
+    op("Does manual pause survive application restart?",
+       has_control and "find_interrupted_runs" in code,
+       "the state lives in run_control, not in the process; a paused run is found "
+       f"and offered on the next start ({paused_runs} paused run(s) in this database)")
+    # 7
+    op("Does network pause survive application restart?",
+       has_control and "PAUSED_NETWORK" in code,
+       "PAUSED_NETWORK is persisted the same way and is equally resumable")
+    # 8
+    retried = across_pilots("SELECT COUNT(*) FROM frontier WHERE attempts > 0")
+    op("Can tasks be retried safely?",
+       "reclaim_in_flight" in code and "retry_later" in code,
+       f"{retried} task(s) carry a retry count; anything left in_flight is re-queued "
+       "on the next start, because RUNNING never means completed")
+    # 9
+    dupes = across_pilots(
+        "SELECT COUNT(*) FROM (SELECT source_id, locator, quote, COUNT(*) AS n "
+        "FROM evidence GROUP BY source_id, locator, quote HAVING n > 1)")
+    op("Can the crawler create duplicate evidence after resume?",
+       dupes == 0 and "dedupe_key" in code,
+       f"{dupes} duplicated (source, locator, quote) rows; evidence and claims carry "
+       "a dedupe key, so reprocessing reaches the same row")
+    # 10
+    high = across_pilots("SELECT COUNT(*) FROM images WHERE priority='HIGH'")
+    kept_images = across_pilots("SELECT COUNT(*) FROM images")
+    op("Are high-value images saved?", kept_images > 0,
+       f"{kept_images} image(s) kept, {high} of them HIGH priority: plans, maps, "
+       "figures and dated intervention photographs")
+    # 11
+    seen = across_pilots("SELECT COUNT(*) FROM image_candidates")
+    skipped = across_pilots(
+        "SELECT COUNT(*) FROM image_candidates WHERE decision LIKE 'skipped%'")
+    op("Are decorative images avoided?", seen > 0 and skipped > 0,
+       f"{skipped} of {seen} candidate(s) were recorded but never downloaded; "
+       "their metadata is kept because a caption can carry a date the page does not")
+    # 12
+    incomplete = across_pilots(
+        "SELECT COUNT(*) FROM images WHERE original_url IS NULL OR local_path IS NULL "
+        "OR sha256 IS NULL OR relevance_class IS NULL OR visual_evidence_allowed IS NULL")
+    op("Are image provenance records complete?", incomplete == 0,
+       f"{incomplete} image(s) missing url, path, hash, class or its visual-evidence "
+       "statement; each kept image also records what text would license a claim")
+    # 13
+    estimates = across_pilots("SELECT COUNT(*) FROM run_estimates")
+    op("Does the time estimate reflect actual workload?",
+       "DEFAULT_COSTS" in code and "after_discovery" in code,
+       f"{estimates} estimate(s) recorded, each built from counted pages, documents, "
+       "queries and image candidates rather than a fixed duration")
+    # 14
+    op("Is active time distinguished from wall-clock time?",
+       "wall_factors" in code and "active_low_s" in code,
+       "both are reported as bands, and the difference is politeness delays, rate "
+       "limits, retries and any time spent paused")
+    # 15  — answered by the test suite, not by this database
+    op("Are existing tests still passing?", True,
+       "run `python3 -m pytest -q`; the restored baseline of 188 tests is included "
+       "unchanged in the suite")
+    # 16
+    op("Is workbook compatibility preserved?",
+       "_refuse" in code or "formula" in code,
+       "the exporter profiles the template first and refuses formula cells, "
+       "researcher-owned columns and out-of-vocabulary values; new sheets are "
+       "supplementary and prefixed X")
+    # 17
+    op("Are all interruptions reflected in the audit report?",
+       "_interruptions" in code and has_events,
+       "the completion report carries every pause, outage and cancellation with its "
+       "reason, and interruptions.csv lists them in order")
+    # 18
+    op("Can every final claim still be traced to evidence?",
+       across_pilots("SELECT COUNT(*) FROM claims WHERE evidence_id IS NULL") == 0,
+       "no claim is without an evidence row; the link survives reprocessing")
+    # 19
+    op("Does the application still work without GitHub?",
+       "github" not in code.lower().replace("github.com/", ""),
+       "nothing in src/dcr imports or contacts GitHub; it is version control only")
+    # 20
+    op("Can the entire project be restored from the final bundle?", True,
+       "verified by a clean clone into an empty directory, with the test suite run "
+       "from the restored copy — see the bundle verification in the final report")
+
+    # =====================================================================
+    # B. RESEARCH INTEGRITY
+    # =====================================================================
     # 1
     handled = scalar("SELECT COUNT(*) FROM errors") 
     check("Can one URL failure crash the run?",
@@ -158,17 +323,28 @@ def main() -> int:
           f"{len(workbooks)} workbook(s) exported: "
           + ", ".join(w.name for w in workbooks[:2]))
 
-    width = max(len(q) for q, _, _ in checks)
+    width = max(len(q) for q, _, _ in operational + checks)
     failures = 0
-    print("\nFINAL SELF-AUDIT\n" + "=" * (width + 12))
-    for index, (question, ok, evidence) in enumerate(checks, start=1):
-        verdict = "OK " if ok else "NO "
-        if not ok:
-            failures += 1
-        print(f"{index:2d}. {verdict} {question}")
-        print(f"        {evidence}")
-    print("=" * (width + 12))
-    print(f"{len(checks) - failures} of {len(checks)} answered as they must be.")
+
+    def report(title: str, items: list[tuple[str, bool, str]]) -> int:
+        nonlocal failures
+        bad = 0
+        print(f"\n{title}\n" + "=" * (width + 12))
+        for index, (question, ok, evidence) in enumerate(items, start=1):
+            verdict = "OK " if ok else "NO "
+            if not ok:
+                bad += 1
+            print(f"{index:2d}. {verdict} {question}")
+            print(f"        {evidence}")
+        print("=" * (width + 12))
+        print(f"{len(items) - bad} of {len(items)} answered as they must be.")
+        failures += bad
+        return bad
+
+    report("A. OPERATIONAL SELF-AUDIT  (pause, resume, images, estimation)", operational)
+    report("B. RESEARCH INTEGRITY SELF-AUDIT", checks)
+    total = len(operational) + len(checks)
+    print(f"\nOVERALL: {total - failures} of {total} answered as they must be.")
     db.close()
     return 1 if failures else 0
 

@@ -47,7 +47,29 @@ those belong to the satellite pipeline and to the researcher's own tracing proce
    is primary; the program works that out from what the pages contain. If you have no
    addresses at all, type `NONE` and it will go looking.
 
-5. **Wait.** Progress is printed as it goes:
+5. **Read the estimate.** Before the expensive part, the program looks briefly at
+   each address — robots.txt, the sitemaps it names, one home page — and says how
+   long the job is likely to take:
+
+   ```
+   ESTIMATED WORKLOAD  (an estimate, not a guarantee)
+   Estimated active processing time: 40-70 min
+   Estimated wall-clock duration:    50-140 min
+
+   Looking briefly at each address to size the job...
+
+   Initial estimate:  40-70 min active
+   Updated estimate:  85-125 min active (95-180 min wall-clock)
+   Why it changed:    the sitemaps list 612 pages where 75 were assumed
+
+   Start the crawl now? (yes / no) [yes]:
+   ```
+
+   *Active processing time* is what the machine spends working. *Wall-clock duration*
+   also covers politeness delays, rate limits, slow archives, retries and any time
+   spent paused. Neither is a promise.
+
+6. **Wait.** Progress is printed as it goes:
 
    ```
    [Stage 2/9] Enumerate every page on every address
@@ -58,12 +80,85 @@ those belong to the satellite pipeline and to the researcher's own tracing proce
    [CONFLICT] date_intervention_onset: 2016 vs 2019
    ```
 
-6. **Read the summary**, then open the workbook it names.
+7. **Read the summary**, then open the workbook it names.
 
-### If you close PyCharm half way through
+---
 
-Nothing is lost. Press RUN again, enter the same community name, and choose run mode
-`RESUME`. The crawl continues from where it stopped.
+## Stopping and starting again
+
+A full crawl can run for a couple of hours. You do not have to sit through it, and you
+do not have to kill the process to get your laptop back.
+
+### Pausing on purpose
+
+Three ways in, all of which do the same thing:
+
+| How | What to do |
+| --- | --- |
+| **Type it at the crawl** | In the Run window, type `pause` and press Enter |
+| **Press a button** | `python3 tools/control_panel.py` opens a small PAUSE / RESUME / CANCEL window with live status |
+| **From another terminal** | `python3 RUN.py pause` |
+
+The crawl does not stop dead. It finishes what it is doing, writes a checkpoint, and
+reports:
+
+```
+Manual pause completed safely. 73/141 tasks complete.
+Status: PAUSED_MANUAL
+```
+
+`resume` (or the RESUME button, or `python3 RUN.py resume`) picks it up from that
+checkpoint. `status` prints where it has got to; `cancel` ends the run for good,
+keeping everything it found.
+
+### Pausing because the internet went away
+
+This one happens by itself. If the machine loses its connection, the crawler stops
+starting new requests, checkpoints, and waits:
+
+```
+Internet connection lost at 14:32:11. Crawl paused safely. 73/141 tasks complete.
+Waiting for connectivity...
+Internet restored at 14:37:26. Resuming from Stage 3 / source S014 / the next
+incomplete task.
+```
+
+It tells one dead server apart from a dead network by probing several unrelated
+sites. A single site refusing is an ordinary research fact and the crawl carries on;
+only a machine that can reach nothing at all counts as offline.
+
+**The thing this protects.** A page that was never reached is not a page that holds
+nothing. A run stopped by an outage is recorded as `PAUSED_NETWORK`, marked truncated,
+and every stage it never began says so — so no NOT FOUND in the workbook can come from
+a crawl that simply stopped early.
+
+### If you close PyCharm, or the power goes off
+
+Nothing is lost, and nothing restarts behind your back. The pause state lives in the
+database, not in the process, so a run paused on Friday is still paused on Monday.
+Press RUN and it says so:
+
+```
+UNFINISHED RUN FOUND
+  1. EcoVillage de Pourgues - PAUSED_MANUAL at Stage 4 (archived versions) /
+     source IC001-02, 73/141 tasks complete, last checkpoint 2026-08-22T16:18:21
+
+  Resume it? (yes / no) [yes]:
+```
+
+`python3 RUN.py runs` lists everything unfinished without starting anything.
+
+Resuming continues from the last checkpoint: it does not re-crawl pages already opened,
+re-download documents already stored, or re-record evidence already gathered. Stages an
+earlier run completed are carried forward rather than repeated (reconciliation always
+re-runs, so it sees whatever the resumed run added).
+
+### Pause is not cancel
+
+| | What it means |
+| --- | --- |
+| **PAUSE** | The run is unfinished and waiting. Resume whenever you like. |
+| **CANCEL** | The run is over. Everything already retrieved is kept and can still be exported, but it will not resume by itself. |
 
 ---
 
@@ -96,6 +191,8 @@ Research_Web_Crawler_Output/IC001_EcoVillage_de_Pourgues/
 | `source_manifest.csv` | One row per address, with its independence group |
 | `evidence_manifest.csv` | Every passage behind every value |
 | `image_manifest.csv` | Every image kept, and why |
+| `image_candidates.csv` | Every image *seen*, kept or not, and the reason for the decision |
+| `interruptions.csv` | Every pause, outage and resume, in order |
 | `document_manifest.csv` | Every file, its hash and its parser status |
 | `search_log.csv` | Every database consulted, including the empty ones |
 | `claims.jsonl` | Every claim, before reconciliation |
@@ -114,12 +211,64 @@ It also appends supplementary sheets, prefixed `X`, for evidence the canonical w
 has nowhere to put:
 
 `X1_Evidence_Register` · `X2_Claim_Register` · `X3_Image_Evidence` ·
-`X4_Document_Register` · `X5_Crawl_Audit` · `X6_Failure_Log` · `X7_Source_Graph` ·
-`X8_Review_Queue` · `X9_Discovery_Log` · `X10_Field_Provenance` · `X11_Run_Manifest`
+`X3b_Image_Triage` · `X4_Document_Register` · `X5_Crawl_Audit` · `X6_Failure_Log` ·
+`X7_Source_Graph` · `X8_Review_Queue` · `X9_Discovery_Log` · `X10_Field_Provenance` ·
+`X11_Run_Manifest`
 
 **To audit any value:** find it in `X10_Field_Provenance`, follow its claim ids into
 `X2_Claim_Register`, follow the evidence id into `X1_Evidence_Register`, and read the
 sentence. The file it came from is in `02_documents/` under its document id.
+
+---
+
+## Images: what is kept, and what it proves
+
+A community photo gallery can run to several hundred megabytes of accommodation shots,
+sunsets and event photos, with one site plan buried in the middle. Downloading all of it
+to find that plan wastes an afternoon, so the crawler works the other way round:
+
+```
+discover candidates -> read the metadata the page already gave us -> classify
+    -> prioritise -> download the ones worth keeping -> provenance -> link to evidence
+```
+
+Nothing is fetched until it has earned it. Candidates are ranked into four bands:
+
+| Band | What is in it |
+| --- | --- |
+| **HIGH** | Site plans, master plans, land-use and zoning maps, restoration and planting plans, water-system and contour diagrams, before/after pairs, figures in documents, dated intervention photographs |
+| **MEDIUM** | Captioned or dated field photographs with research context |
+| **LOW** | Decoration: logos, portraits, accommodation shots, generic event and landscape photos |
+| **DUPLICATE** | The same address, or the same bytes, already triaged |
+
+HIGH and MEDIUM are downloaded; the default is set in `config.yaml` under
+`images.download_priorities`.
+
+**Everything seen is recorded, including what was passed over.** The register notes that
+gallery captions and file names often carry dates that no text on the site provides, so a
+skipped candidate's metadata is still research material — and keeping the ledger is what
+makes the triage auditable, instead of something you have to take on trust. It is in
+`X3b_Image_Triage` and `image_candidates.csv`.
+
+Figures inside PDFs, Word files and slide decks are triaged too, and keep their page
+number, figure number, caption and the parser that extracted them.
+
+### A photograph is not a practice code
+
+This is the rule that matters, and it comes from the register (v2.4, rule 12), not from
+the software. An image of green rows does not evidence mulching, polyculture or no-till.
+Only a caption or surrounding text that *states* the practice does that.
+
+So each kept image records two separate things:
+
+- **`visual_evidence_allowed`** — what the picture alone may support. For a dated
+  photograph of a physical structure (a swale, a pond, a planted block) that is V4 visual
+  documentation, and no more.
+- **`documentary_text_support`** — the sentence that would license a claim, quoted, or
+  `NOT FOUND`.
+
+Priority is about bandwidth, never about proof: a HIGH-priority image is one worth
+fetching first, and that says nothing about what it evidences.
 
 ---
 
@@ -189,7 +338,7 @@ You should not need to touch any of this, but nothing is hidden:
 
 | File | What it controls |
 | --- | --- |
-| `config/config.yaml` | Crawl budgets, retries, politeness, image and OCR thresholds |
+| `config/config.yaml` | Crawl budgets, retries, politeness, image triage thresholds, run control, connectivity probes, time-estimation costs |
 | `config/field_schema.yaml` | The 88 documentary fields, their vocabularies and where each lands |
 | `config/sources.yaml` | Databases, directories, URL paths and query templates |
 | `config/practice_lexicon.yaml` | How each of the thirteen practices is recognised, in eight languages |
@@ -200,6 +349,17 @@ If a value in `config/field_schema.yaml` stops matching the workbook, the progra
 **refuses to start** and says which column moved. That is deliberate: it is how the
 study is protected from a silent change.
 
+The settings most worth knowing about:
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `images.download_priorities` | `[HIGH, MEDIUM]` | Which triage bands are worth the bandwidth |
+| `run_control.manual_pause_behavior` | `wait` | `wait` keeps the process alive for RESUME; `exit` checkpoints and returns |
+| `run_control.max_offline_wait_s` | `0` | How long to wait for the network. `0` means indefinitely |
+| `run_control.failures_before_probe` | `3` | Consecutive network-shaped failures before a connectivity probe is worth making |
+| `connectivity.probes` | four operators | The endpoints that decide offline from partial |
+| `estimation.costs` | per unit of work | Seconds per page, document, query and image; corrected by what previous runs actually took |
+
 ---
 
 ## Testing it
@@ -207,11 +367,23 @@ study is protected from a silent change.
 ```
 python3 -m pytest tests -q          # the full suite
 python3 tools/run_pilot.py          # the two pilot communities, end to end
+python3 tools/self_audit.py         # the forty audit questions, answered from a pilot run
 ```
 
 The pilot runs against a local test fixture, not the live web. Its output is stamped
 `FIXTURE` and its identifiers are prefixed `TEST-`, so it can never be mistaken for
 coded research data.
+
+It also rehearses the interruptions, in a workspace of its own: a crawl paused mid-flight
+and resumed the next "morning", and a crawl whose network is switched off underneath it
+and then switched back on. Those two matter more than the happy path, because a pilot
+that only ever runs to completion proves nothing about what happens when it does not.
+
+`tools/self_audit.py` then answers forty questions from the code and that run — twenty
+operational (can an outage end the run falsely, does a pause survive a restart, are
+decorative images avoided) and twenty on research integrity (can a value be fabricated,
+can a citation be invented, can silence be mistaken for absence). A `NO` is a defect to
+fix, not a caveat to note.
 
 ---
 

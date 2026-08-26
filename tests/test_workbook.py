@@ -177,3 +177,49 @@ def test_fixture_runs_are_marked_in_the_notes(tmp_path, db, settings, schema):
     workbook = load_workbook(tmp_path / "f.xlsx")
     assert "FIXTURE" in (workbook["O1_Community_Attributes"]["BJ3"].value or "")
     workbook.close()
+
+
+def test_every_formula_in_the_template_survives_the_export(exported, settings):
+    """A sweep of the whole template, not only the columns the schema lists.
+
+    The schema's `formula_columns` is a statement of intent; this compares the
+    exported workbook against the researcher's actual file, cell by cell, so a
+    formula nobody thought to declare is protected too (brief §43).
+    """
+    path, _ = exported
+    template = load_workbook(settings.workbook_template, data_only=False)
+    exported_book = load_workbook(path, data_only=False)
+    checked = overwritten = 0
+    try:
+        for name in template.sheetnames:
+            if name not in exported_book.sheetnames:
+                continue
+            source, target = template[name], exported_book[name]
+            for row in source.iter_rows(min_row=1, max_row=min(source.max_row, 60)):
+                for cell in row:
+                    if not (isinstance(cell.value, str) and cell.value.startswith("=")):
+                        continue
+                    checked += 1
+                    written = target[cell.coordinate].value
+                    if not (isinstance(written, str) and written.startswith("=")):
+                        overwritten += 1
+                        assert False, (
+                            f"{name}!{cell.coordinate} held a formula in the template "
+                            f"and now holds {written!r}")
+    finally:
+        template.close()
+        exported_book.close()
+    assert checked > 100, "the template should carry many formulas; found too few to trust"
+
+
+def test_the_image_triage_sheet_records_what_was_not_downloaded(exported):
+    """The ledger is the audit trail behind the triage (brief §5, §40)."""
+    path, _ = exported
+    workbook = load_workbook(path)
+    assert "X3b_Image_Triage" in workbook.sheetnames
+    sheet = workbook["X3b_Image_Triage"]
+    headers = [cell.value for cell in next(sheet.iter_rows(max_row=1))]
+    for column in ("candidate_id", "decision", "decision_reason", "retrieval_priority",
+                   "caption", "documentary_text_support", "original_url"):
+        assert column in headers, f"{column} missing from the triage ledger"
+    workbook.close()

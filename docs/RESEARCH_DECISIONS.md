@@ -144,8 +144,24 @@ defect rather than a fixture artefact.
 
 ---
 
+## Defects found while adding image triage, pause/resume and estimation
+
+Each was found by running the pipeline or by writing a test for it, and each was verified
+against the restored baseline before being called a defect rather than a regression.
+
+| Defect | Why it mattered | Fix |
+| --- | --- | --- |
+| A quoted YAML scalar in the image lexicon wrapped across two lines, and YAML folded the newline into a space, turning `\|plan.?de.?masse\|` into `\| plan.?de.?masse\|` | A French caption *beginning* "Plan de masse" scored nothing, so the site plan behind it was never downloaded — on a pilot community whose site is in French | Each alternation kept on one line; the compiler strips whitespace around `\|`; a test fails if a folded pattern reappears |
+| A strong keyword bypassed the size floor entirely | `map-pin.png` at 24×24 with alt="map" classified as likely_relevant and was downloaded as research material | Anything at icon size is decoration whatever it is called; a thumbnail of a real plan still is not |
+| `run_control.failures_before_probe` was configurable but `classify_failures` hard-coded a minimum of 3 | Lowering the threshold silently did nothing, and an outage was never detected | The threshold is passed through and honoured |
+| Evidence and claims were written afresh on every pass | One FULL run on the fixture produced 96 evidence rows with 18 duplicated (source, locator, quote) keys, some identical down to the character offset; every count in the completion report was inflated | A dedupe key on evidence and claims; 76 rows, none duplicated |
+| `INSERT OR REPLACE` deletes before re-inserting, and `claims.evidence_id` is `ON DELETE SET NULL` | Re-writing a passage that already existed cut every claim resting on it loose from its evidence, leaving a coded value with no traceable sentence — the one thing this design exists to prevent. Only reachable once evidence ids started being reused | Existing rows are never re-inserted; a regression test asserts every claim still resolves to a real evidence row |
+| `_finish_run` marked every run `complete`, including one that stopped early | An interrupted run was indistinguishable from a finished one, so its NOT FOUND values read as searched-and-absent | `runs.status` follows the control state; stages never begun say so |
+
+---
+
 ## The full list
 
-`config/decisions.yaml` carries all 27 decisions with their evidence, resolution, affected
+`config/decisions.yaml` carries all 32 decisions with their evidence, resolution, affected
 modules and parameters. Each is reproduced in `X11_Run_Manifest` in every exported
 workbook.
