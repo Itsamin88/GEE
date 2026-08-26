@@ -236,6 +236,19 @@ class Frontier:
              self.community_id, url_key),
         )
 
+    def pending_count(self) -> int:
+        """How much work is left. Used for progress and for the time estimate."""
+        return int(self.db.scalar(
+            "SELECT COUNT(*) FROM frontier WHERE community_id = ? "
+            "AND status IN ('queued', 'in_flight')", (self.community_id,)) or 0)
+
+    def counts_by_status(self) -> dict[str, int]:
+        """The queue broken down by state, for the completion report (brief §26)."""
+        rows = self.db.query(
+            "SELECT status, COUNT(*) AS n FROM frontier WHERE community_id = ? "
+            "GROUP BY status", (self.community_id,))
+        return {row["status"]: int(row["n"]) for row in rows}
+
     def reclaim_in_flight(self) -> int:
         """After an interrupted run, put anything left mid-flight back in the queue."""
         cursor = self.db.execute(

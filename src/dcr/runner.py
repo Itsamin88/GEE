@@ -55,7 +55,11 @@ from .language import guess_language, language_for_country
 from .logging_setup import event, get_logger
 from .net.browser import BrowserPool
 from .net.fetcher import Fetcher
+from .control import (COMPLETED as CONTROL_COMPLETED, FAILED as CONTROL_FAILED,
+                      CANCELLED as CONTROL_CANCELLED, RunCancelled, RunControl,
+                      control_dir_for)
 from .storage import CommunityStorage
+from .supervisor import NullSupervisor, RunPaused, Supervisor
 
 log = get_logger("run")
 
@@ -116,14 +120,39 @@ class RunOutcome:
     completion_status: str = "PARTIAL_TRUNCATED"
     stats: dict[str, Any] = field(default_factory=dict)
     review_items: int = 0
+    #: How the run ended: COMPLETED, PAUSED_MANUAL, PAUSED_NETWORK, CANCELLED
+    #: or FAILED. A paused run is unfinished, never complete (brief §13).
+    final_state: str = "COMPLETED"
+    pause_reason: str = ""
+    pauses_manual: int = 0
+    pauses_network: int = 0
+    offline_s: float = 0.0
+    paused_manual_s: float = 0.0
+    queue: dict[str, int] = field(default_factory=dict)
+    estimate: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def paused(self) -> bool:
+        return self.final_state in ("PAUSED_MANUAL", "PAUSED_NETWORK")
 
 
 class CommunityRunner:
     """Runs one community through the protocol, resumably."""
 
     def __init__(self, settings: Settings, db: Database, *, run_mode: str = "FULL",
-                 target: str | None = None):
+                 target: str | None = None, monitor: Any = None,
+                 on_status: Any = None, estimate: Any = None):
         self.settings = settings
+        #: Supplied by the application; a test may pass a simulated one.
+        self.monitor = monitor
+        self.on_status = on_status
+        #: The estimate made before the crawl, carried through so the
+        #: completion report can compare it with what actually happened.
+        self.estimate = estimate
+        self.control: Any = None
+        self.supervisor: Any = NullSupervisor()
+        self.final_state = CONTROL_COMPLETED
+        self.pause_reason = ""
         self.db = db
         self.run_mode = run_mode.upper()
         self.target = target
@@ -171,10 +200,26 @@ class CommunityRunner:
         self.run_id = run_id
         stages = MODE_STAGES.get(self.run_mode, MODE_STAGES["FULL"])
 
+        # Run control first: from here on, every stop has a recorded reason and
+        # a checkpoint behind it.
+        self.control = RunControl(
+            self.db, run_id=run_id, community_id=self.community_id,
+            control_dir=control_dir_for(self.settings.output_root),
+            poll_interval_s=float(self.settings.get(
+                "run_control", "poll_interval_s", default=1.0) or 1.0),
+        )
+        self.supervisor = Supervisor(
+            self.control, self.monitor,
+            config=dict(self.settings.get("run_control", default={}) or {}),
+            on_status=self.on_status,
+            on_resume=self._after_resume,
+        )
+
         fetcher = Fetcher(
             user_agent=self.settings.user_agent,
             config=self.settings.app,
             error_sink=self._error_sink,
+            supervisor=self.supervisor,
         )
         browser_cfg = dict(self.settings.get("browser", default={}) or {})
         browser = BrowserPool(
@@ -198,6 +243,7 @@ class CommunityRunner:
             community_id=self.community_id, config=self.settings.app,
             lexicon=self.settings.lexicon, browser=browser,
             on_page=self._on_page, on_document=self._on_document,
+            supervisor=self.supervisor,
         )
         self.crawler._platform_patterns = self.settings.sources.get("platform_patterns", {})
         self.crawler._archive_template = self.settings.sources.get("archive", {}).get(
@@ -206,14 +252,44 @@ class CommunityRunner:
         self.browser = browser
         self.llm = self._build_llm()
 
+        self.control.checkpoint(
+            tasks_total=self.frontier.pending_count(),
+            task_detail=f"{self.run_mode} run starting",
+        )
+        skip = self._stages_already_complete() if self.run_mode == "RESUME" else set()
         try:
             for number in stages:
+                if number in skip:
+                    stage = self.stages[number]
+                    stage.status = "complete"
+                    stage.detail = ("carried forward: this stage completed in an earlier "
+                                    "run and was not repeated")
+                    event(log, f"Stage {number}/9",
+                          f"{STAGE_NAMES[number].capitalize()} — already complete, skipped")
+                    continue
                 await self._run_stage(number)
+        except RunPaused as paused:
+            # Not a failure and not a completion: the run is unfinished on
+            # purpose, and everything retrieved so far is committed.
+            self.final_state = paused.state
+            self.pause_reason = paused.reason
+            self._mark_truncated(
+                f"the run was paused before the protocol finished ({paused.state}): "
+                f"{paused.reason}")
+        except RunCancelled as cancelled:
+            self.final_state = CONTROL_CANCELLED
+            self.pause_reason = str(cancelled)
+            self._mark_truncated(f"the run was cancelled by the researcher: {cancelled}")
         except asyncio.CancelledError:
+            self.final_state = CONTROL_FAILED
+            self.pause_reason = "the process was interrupted"
             self._mark_truncated("the run was interrupted before the protocol finished")
+            self.control.finish(CONTROL_FAILED, self.pause_reason)
             raise
         except Exception as exc:  # a bug must still produce a recorded run
             log.error("run failed: %s", exc, exc_info=True)
+            self.final_state = CONTROL_FAILED
+            self.pause_reason = str(exc)
             self._mark_truncated(f"the run stopped on an unexpected error: {exc}")
         finally:
             await fetcher.aclose()
@@ -222,29 +298,99 @@ class CommunityRunner:
         outcome = self._finish_run(run_id)
         return outcome
 
+    def _after_resume(self, kind: str) -> None:
+        """Undo the damage an outage did to the crawler's bookkeeping.
+
+        Hosts that "failed" while the machine had no network were never really
+        tested, so their circuits must not outlive the outage, and anything
+        left mid-flight goes back in the queue (brief §16.6, §25).
+        """
+        if kind == "network" and self.fetcher is not None:
+            cleared = self.fetcher.reset_host_failures()
+            if cleared:
+                event(log, "RESUME",
+                      f"{cleared} host(s) marked unreachable during the outage have been "
+                      "given another attempt")
+        if self.frontier is not None:
+            reclaimed = self.frontier.reclaim_in_flight()
+            if reclaimed:
+                event(log, "RESUME", f"{reclaimed} URLs were mid-flight and are re-queued")
+
+    def _stages_already_complete(self) -> set[int]:
+        """Stages a previous run finished, so a RESUME does not repeat them.
+
+        Stage 9 is never carried forward: reconciliation has to see everything
+        the resumed run added, or the workbook would be built from a stale view.
+        """
+        rows = self.db.query(
+            "SELECT s.stage_no FROM run_stages s JOIN runs r ON r.run_id = s.run_id "
+            "WHERE r.community_id = ? AND s.status = 'complete' AND s.run_id != ?",
+            (self.community_id, self.run_id))
+        return {int(r["stage_no"]) for r in rows} - {9}
+
     # =====================================================================
     # stage dispatch
     # =====================================================================
     async def _run_stage(self, number: int) -> None:
         stage = self.stages[number]
+        # A stage boundary is the coarsest safe boundary there is: nothing is
+        # part-written, so it is the cheapest place to stop.
+        await self.supervisor.gate(
+            stage_no=number, stage_name=STAGE_NAMES[number],
+            task_detail=f"about to begin stage {number}",
+            tasks_total=self._task_total(),
+        )
         stage.started = utcnow()
+        stage.status = "running"
+        self._persist_stage(stage)
         event(log, f"Stage {number}/9", STAGE_NAMES[number].capitalize())
         handler = getattr(self, f"_stage_{number}")
         try:
             await handler()
+        except (RunPaused, RunCancelled):
+            # The stage did not fail; it was stopped part-way. Recording it as
+            # `partial` is what stops the report claiming this stage found
+            # nothing, when in truth it was never allowed to finish.
+            stage.status = "partial" if stage.status in ("running", "not_reached") else stage.status
+            stage.detail = (stage.detail or "") + (
+                "; " if stage.detail else "") + "stopped part-way by a pause or cancel"
+            stage.finished = utcnow()
+            self._persist_stage(stage)
+            raise
         except Exception as exc:
             stage.status = "failed"
             stage.detail = f"{type(exc).__name__}: {exc}"
             log.error("stage %d failed: %s", number, exc, exc_info=True)
             self._mark_truncated(f"stage {number} ({STAGE_NAMES[number]}) failed: {exc}")
+        if stage.status == "running":
+            stage.status = "complete"
         stage.finished = utcnow()
+        self._persist_stage(stage)
+        self.control.checkpoint(
+            stage_no=number, stage_name=STAGE_NAMES[number],
+            task_detail=f"stage {number} finished as {stage.status}",
+            tasks_total=self._task_total(), record_event=True,
+        )
+
+    def _persist_stage(self, stage: StageStatus) -> None:
         self.db.upsert(
             "run_stages",
-            {"run_id": self.run_id, "stage_no": number, "stage_name": STAGE_NAMES[number],
-             "status": stage.status, "detail": stage.detail[:2000],
+            {"run_id": self.run_id, "stage_no": stage.number,
+             "stage_name": STAGE_NAMES[stage.number], "status": stage.status,
+             "detail": (stage.detail or "")[:2000],
              "started_utc": stage.started, "finished_utc": stage.finished},
             ["run_id", "stage_no"],
         )
+
+    def _task_total(self) -> int:
+        """Tasks done plus tasks still queued — the denominator the user sees."""
+        try:
+            done = int(self.db.scalar(
+                "SELECT COUNT(*) FROM frontier WHERE community_id = ? AND status = 'done'",
+                (self.community_id,)) or 0)
+            return done + self.frontier.pending_count()
+        except Exception:
+            return 0
 
     # ---------------------------------------------------------------------
     # Stage 0 — build the source set
@@ -1838,12 +1984,28 @@ class CommunityRunner:
         return run_id
 
     def _finish_run(self, run_id: str) -> RunOutcome:
+        paused = self.final_state in ("PAUSED_MANUAL", "PAUSED_NETWORK")
         for stage in self.stages.values():
             if stage.status == "not_reached" and stage.number in MODE_STAGES.get(
                     self.run_mode, []):
-                self._mark_truncated(f"stage {stage.number} ({stage.name}) was never reached")
+                if paused or self.final_state == CONTROL_CANCELLED:
+                    # The stage was not empty of evidence; it was never begun.
+                    # Saying so is the difference between an honest partial run
+                    # and a fabricated absence (brief §13, §37).
+                    stage.detail = (f"never begun: the run stopped in "
+                                    f"{self.final_state} before reaching this stage")
+                    self._persist_stage(stage)
+                    self._mark_truncated(
+                        f"stage {stage.number} ({stage.name}) was never reached because "
+                        f"the run stopped in {self.final_state}")
+                else:
+                    self._mark_truncated(
+                        f"stage {stage.number} ({stage.name}) was never reached")
 
         truncated = bool(self.truncation_reasons)
+        supervisor_stats = getattr(self.supervisor, "stats", None)
+        control = self.control
+        queue = self.frontier.counts_by_status() if self.frontier else {}
         outcome = RunOutcome(
             run_id=run_id,
             community_id=self.community_id,
@@ -1855,18 +2017,46 @@ class CommunityRunner:
                 "fetch": dict(self.fetcher.stats),
                 "browser_renders": self.browser.pages_rendered,
                 "llm_calls": getattr(self.llm, "calls", 0) if self.llm else 0,
+                "image_triage": self.crawler.triage.summary(),
+                "queue": queue,
             },
             review_items=len(self.review),
+            final_state=self.final_state,
+            pause_reason=self.pause_reason,
+            pauses_manual=getattr(control, "pauses_manual", 0),
+            pauses_network=getattr(control, "pauses_network", 0),
+            offline_s=getattr(supervisor_stats, "offline_s", 0.0),
+            paused_manual_s=getattr(supervisor_stats, "paused_manual_s", 0.0),
+            queue=queue,
         )
         self.db.update(
             "runs",
-            {"status": "complete", "truncated": int(truncated),
+            {"status": _RUN_STATUS[self.final_state],
+             "final_state": self.final_state,
+             "truncated": int(truncated),
              "truncation_reason": "; ".join(self.truncation_reasons)[:2000],
              "finished_utc": utcnow(),
              "manifest_json": json.dumps(outcome.stats, ensure_ascii=False)},
             {"run_id": run_id},
         )
+        if control is not None and self.final_state not in ("PAUSED_MANUAL",
+                                                            "PAUSED_NETWORK",
+                                                            CONTROL_CANCELLED):
+            # A paused run keeps its pause state so it can be found and
+            # resumed; only a run that truly ended is closed here.
+            control.finish(self.final_state, self.pause_reason)
         return outcome
+
+
+#: `runs.status` for each way a run can end. An interrupted run is never
+#: `complete`: that distinction is the point of the state machine (brief §22).
+_RUN_STATUS = {
+    "COMPLETED": "complete",
+    "PAUSED_MANUAL": "paused_manual",
+    "PAUSED_NETWORK": "paused_network",
+    "CANCELLED": "cancelled",
+    "FAILED": "failed",
+}
 
 
 def _cell_ref(table: Any, row_index: int, col_index: int) -> str:

@@ -125,6 +125,19 @@ images:
   keep_classes: [likely_relevant, possibly_relevant, uncertain]
   extract_from_documents: true
   min_embedded_image_pixels: 90000
+  # Triage: which retrieval bands are worth downloading. LOW and DUPLICATE
+  # candidates are still recorded in image_candidates with their caption, alt
+  # text and file name — a gallery caption often carries a date the page text
+  # does not — but their pixels are not fetched.
+  #   HIGH      site plans, maps, land-use and restoration diagrams, figures in
+  #             documents, before/after pairs, dated intervention photographs
+  #   MEDIUM    captioned or dated field photographs with research context
+  #   LOW       decoration: portraits, logos, accommodation and event photos
+  #   DUPLICATE the same address or the same bytes, already triaged
+  download_priorities: [HIGH, MEDIUM]
+  # Candidates considered per page before triage. A gallery page can carry
+  # hundreds; the ledger records what was and was not looked at.
+  max_candidates_per_page: 120
 
 ocr:
   enabled: auto        # auto | always | never
@@ -191,6 +204,80 @@ logging:
   console_level: INFO
   file_level: DEBUG
   jsonl: true
+
+# --------------------------------------------------------------------------
+# Run control: manual pause, network pause, and resuming
+# --------------------------------------------------------------------------
+run_control:
+  # How often a running crawl looks for a pause, resume or cancel request.
+  # Cheap: it stats three files in the output directory.
+  poll_interval_s: 1.0
+  # What a manual pause does to the process:
+  #   wait  keep the process alive and continue in place when RESUME arrives
+  #   exit  checkpoint and return, leaving the run PAUSED_MANUAL for later
+  manual_pause_behavior: wait
+  resume_poll_interval_s: 2.0
+  # How long to wait between connectivity rechecks while offline. The wait
+  # lengthens gently up to connectivity.offline_retry_max_s.
+  offline_wait_interval_s: 15.0
+  # How long to keep waiting for the network before giving up and leaving the
+  # run PAUSED_NETWORK. 0 means wait indefinitely — an outage is not a reason
+  # to declare the research finished.
+  max_offline_wait_s: 0
+  # Consecutive network-shaped failures before an actual connectivity probe is
+  # worth making. Below this, a failure is treated as one server's problem.
+  failures_before_probe: 3
+
+connectivity:
+  # Independent operators, so one provider's outage cannot be mistaken for the
+  # machine being offline. If NONE of them answer, the machine is offline.
+  probes:
+    - "https://www.cloudflare.com/cdn-cgi/trace"
+    - "https://www.google.com/generate_204"
+    - "https://duckduckgo.com/"
+    - "https://www.wikipedia.org/"
+  timeout_s: 8.0
+  # How many probes must answer for the machine to count as online.
+  min_reachable: 1
+  # Minimum gap between passive checks while everything is working.
+  check_interval_s: 30.0
+  offline_retry_s: 15.0
+  offline_retry_max_s: 300.0
+
+# --------------------------------------------------------------------------
+# Runtime estimation
+# --------------------------------------------------------------------------
+estimation:
+  enabled: true
+  # Lightweight discovery before the expensive crawl: robots.txt, the sitemaps
+  # it names, and one home page per address. Never a crawl (brief §35).
+  probe_sources: true
+  max_probe_sources: 12
+  # Seconds of active processing per unit of work. These are starting points,
+  # corrected by the recorded actuals of previous runs.
+  costs:
+    page_s: 1.6
+    document_s: 7.0
+    image_candidate_s: 0.05
+    image_download_s: 1.1
+    browser_page_s: 6.5
+    sitemap_s: 1.2
+    archive_query_s: 4.0
+    archive_snapshot_s: 3.2
+    academic_query_s: 5.0
+    academic_verify_s: 4.0
+    grey_query_s: 4.5
+    search_query_s: 3.5
+    source_overhead_s: 8.0
+    resolve_s: 25.0
+    export_s: 20.0
+  # The band around the central figure: an estimate is never a single number.
+  spread: [0.7, 1.45]
+  # Active time to wall-clock time. The high end allows for politeness delays,
+  # rate limiting, slow archives and retries.
+  wall_factors: [1.15, 2.1]
+  use_history: true
+  min_history_runs: 2
 
 run:
   default_mode: FULL

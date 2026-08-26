@@ -31,6 +31,7 @@ from ..net.browser import BrowserPool, looks_javascript_rendered
 from ..net.fetcher import FetchResult, Fetcher
 from ..net.mime import is_html
 from ..storage import CommunityStorage
+from ..supervisor import NullSupervisor
 from .frontier import Frontier, SourceBudget
 from .normalize import TrapDetector, classify_url, normalize, registrable_domain, same_site
 from .platform import detect_platform, is_website_like
@@ -93,6 +94,7 @@ class Crawler:
         browser: BrowserPool | None = None,
         on_page: Callable[[str, ParsedPage, dict[str, Any]], int] | None = None,
         on_document: Callable[[str, Extraction, dict[str, Any]], int] | None = None,
+        supervisor: Any = None,
     ):
         self.db = db
         self.storage = storage
@@ -104,6 +106,11 @@ class Crawler:
         self.browser = browser
         self.on_page = on_page
         self.on_document = on_document
+        # Asked at every safe boundary whether the crawl may continue.
+        # NullSupervisor always says yes, so callers that do not use run
+        # control behave exactly as before.
+        self.supervisor: Any = supervisor or NullSupervisor()
+        self._current_source_id: str | None = None
 
         crawl_cfg = dict(config.get("crawl", {}))
         self.max_depth = int(crawl_cfg.get("max_depth", 6))
@@ -204,6 +211,16 @@ class Crawler:
         opened = 0
         cap = page_limit if page_limit is not None else self.max_pages_per_run
         while opened < cap:
+            # A batch boundary is a safe boundary: the previous batch is
+            # committed and the next has not been claimed yet. Pausing here is
+            # what makes the resume exact, and what leaves nothing in_flight.
+            await self.supervisor.gate(
+                stage_no=stage,
+                source_id=self._current_source_id,
+                tasks_done=opened,
+                tasks_total=opened + self.frontier.pending_count(),
+                task_detail="about to claim the next batch of URLs",
+            )
             batch = self.frontier.next_batch(min(batch_size, cap - opened))
             if not batch:
                 break
@@ -221,6 +238,10 @@ class Crawler:
 
     async def _handle(self, item: Any, stage: int) -> None:
         context = self.source_for(item.source_id)
+        if item.source_id:
+            # Kept so a checkpoint can name the source being worked on, which
+            # is what a resume message needs to be useful to the researcher.
+            self._current_source_id = item.source_id
         # Stages 4-8 queue individually chosen, high-value targets: an archived
         # snapshot, a verified thesis, a grant record. They must not be refused
         # because the live site's page budget happens to be spent.

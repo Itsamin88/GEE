@@ -75,12 +75,16 @@ class Fetcher:
         user_agent: str,
         config: Mapping[str, Any],
         error_sink: Any = None,
+        supervisor: Any = None,
     ):
         net = config.get("network", {})
         self.retry_cfg = config.get("retry", {})
         self.robots_cfg = config.get("robots", {})
         self.user_agent = user_agent
         self.error_sink = error_sink
+        # Told about every result, so it can tell the difference between one
+        # dead server and a laptop with no network (brief §14).
+        self.supervisor = supervisor
         self.max_page_bytes = int(net.get("max_page_bytes", 12_000_000))
         self.max_document_bytes = int(net.get("max_document_bytes", 120_000_000))
         self.max_image_bytes = int(net.get("max_image_bytes", 25_000_000))
@@ -167,7 +171,23 @@ class Fetcher:
             return policy
 
     # -- fetching ----------------------------------------------------------
-    async def fetch(
+    async def fetch(self, url: str, **kwargs: Any) -> FetchResult:
+        """Fetch one URL, and tell the supervisor how it went.
+
+        Every network request in the program comes through here, so this is the
+        one place that has to notice the difference between "that server said
+        no" and "this machine is not on the internet".
+        """
+        result = await self._fetch(url, **kwargs)
+        supervisor = self.supervisor
+        if supervisor is not None:
+            if result.ok:
+                supervisor.note_success()
+            else:
+                supervisor.note_failure(result.error_type)
+        return result
+
+    async def _fetch(
         self,
         url: str,
         *,
@@ -376,6 +396,12 @@ class Fetcher:
 
     # -- helpers -----------------------------------------------------------
     def _note_host_failure(self, host: str, reason: str) -> None:
+        if self.offline:
+            # The machine has no network. Every host looks dead from here, and
+            # recording them as unreachable would turn an outage into a page of
+            # research findings (brief §13). The failure is not counted at all:
+            # when the connection returns, these hosts get a fair attempt.
+            return
         count = self._host_failures.get(host, 0) + 1
         self._host_failures[host] = count
         if count >= self.circuit_threshold and host not in self._open_circuits:
@@ -388,6 +414,32 @@ class Fetcher:
 
     def unreachable_hosts(self) -> dict[str, str]:
         return dict(self._open_circuits)
+
+    @property
+    def offline(self) -> bool:
+        """Is the machine, rather than one server, the thing that is unreachable?"""
+        supervisor = self.supervisor
+        if supervisor is None:
+            return False
+        control = getattr(supervisor, "control", None)
+        if control is None:
+            return False
+        return getattr(control, "connectivity", "") == "OFFLINE" or bool(
+            getattr(supervisor, "suspended", False))
+
+    def reset_host_failures(self, host: str | None = None) -> int:
+        """Give hosts another chance after the network comes back.
+
+        A circuit opened during an outage says nothing about the host, so it
+        must not outlive the outage (brief §16.6).
+        """
+        if host is not None:
+            self._host_failures.pop(host, None)
+            return int(self._open_circuits.pop(host, None) is not None)
+        cleared = len(self._open_circuits)
+        self._host_failures.clear()
+        self._open_circuits.clear()
+        return cleared
 
     def _backoff(self, attempt: int) -> float:
         base = float(self.retry_cfg.get("backoff_base_s", 2.0))
