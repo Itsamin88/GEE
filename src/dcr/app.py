@@ -23,6 +23,7 @@ from .control import (InterruptedRun, PAUSED_MANUAL, clear_requests,
 from .db import Database
 from .estimate import Estimate, Estimator
 from .export import manifests, report as report_mod
+from .export.finalise import finalise_workbook
 from .export.workbook import WorkbookExporter
 from .ids import safe_name
 from .logging_setup import event, get_logger, setup_logging
@@ -394,18 +395,34 @@ class Application:
             **self.settings.reproducibility_record(self.features),
         }
 
-        exporter = WorkbookExporter(
-            self.settings.workbook_template, self.settings.schema, self.db,
-            coder_id=coder_id or f"DCR/{__version__}",
-            decisions=self.settings.decisions,
-        )
         workbook_name = (
             f"{community_id}_{safe_name(community.name)}_Stage1_Documentary_Coding.xlsx"
         )
         workbook_path = storage.final / workbook_name
-        export_result = exporter.export(community_id, workbook_path, manifest=manifest)
-        event(log, "EXPORT", f"workbook written: {workbook_path.name} "
-                             f"({sum(export_result.rows_written.values())} rows)")
+
+        def build_exporter(*, aggressive: bool = False, core_only: bool = False):
+            return WorkbookExporter(
+                self.settings.workbook_template, self.settings.schema, self.db,
+                coder_id=coder_id or f"DCR/{__version__}",
+                decisions=self.settings.decisions,
+                aggressive_sanitize=aggressive, core_only=core_only,
+            )
+
+        finalisation = finalise_workbook(
+            exporter_factory=build_exporter, community_id=community_id,
+            destination=workbook_path, manifest=manifest,
+        )
+        export_result = finalisation.export or _EmptyExport(workbook_path)
+        if finalisation.ok:
+            event(log, "EXPORT",
+                  f"workbook written and reopened: {workbook_path.name} "
+                  f"({sum(export_result.rows_written.values())} rows, "
+                  f"{finalisation.verification.core_rows} coded rows verified)")
+        else:
+            log.error("[EXPORT] no usable workbook: %s", finalisation.failure_reason)
+        if finalisation.sanitisation.occurred:
+            event(log, "EXPORT", f"excel_sanitized=yes — "
+                                 f"{finalisation.sanitisation.summary()}")
         for refusal in export_result.refusals[:10]:
             log.warning("[EXPORT] %s", refusal)
 
@@ -427,6 +444,8 @@ class Application:
             blocking_review=blocking,
             pages_opened=pages,
             min_pages=int(self.settings.get("quality", "min_pages_opened", default=25)),
+            workbook_verified=finalisation.ok,
+            budget_exhausted=bool(getattr(outcome, "budget_exhausted", False)),
         )
         self.db.update("communities", {"completion_status": status},
                        {"community_id": community_id})
@@ -436,6 +455,8 @@ class Application:
             "rows_written": export_result.rows_written,
             "refusals": export_result.refusals,
             "manifests": manifest_counts,
+            "finalisation": finalisation.as_dict(),
+            "excel_sanitized": finalisation.sanitisation.as_dict()["excel_sanitized"],
         }
         report = report_mod.build_report(
             self.db, community_id, qc=qc_report, outcome=outcome, manifest=manifest,
@@ -518,6 +539,21 @@ class Application:
         print(f"  Report     {storage.final / 'completion_report.md'}")
         print(f"  Folder     {storage.root}")
         print("=" * 78 + "\n")
+
+
+class _EmptyExport:
+    """Stands in when no export attempt produced a workbook.
+
+    The run is still reported, with the failure recorded, rather than the
+    process dying and leaving the researcher nothing at all.
+    """
+
+    def __init__(self, path):
+        self.path = path
+        self.rows_written: dict[str, int] = {}
+        self.refusals: list[str] = []
+        self.warnings: list[str] = ["no workbook could be produced"]
+        self.omitted_sheets: dict[str, str] = {}
 
 
 class _StoredOutcome:

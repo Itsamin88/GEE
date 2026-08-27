@@ -450,8 +450,26 @@ class QualityControl:
 
 
 def completion_status(report: QcReport, *, truncated: bool, blocking_review: int,
-                      pages_opened: int, min_pages: int) -> str:
-    """Exactly one of the six statuses in brief §74."""
+                      pages_opened: int, min_pages: int,
+                      workbook_verified: bool = True,
+                      budget_exhausted: bool = False) -> str:
+    """Exactly one status, and never a flattering one.
+
+    Two distinctions this has to keep straight.
+
+    **Complete is not exhaustive.** A run held to a time budget may have done
+    every stage the protocol asks for, produced a verified workbook, and still
+    not have followed every source path to its end. That is
+    COMPLETE_WITH_TRUNCATION: a usable research record with its limits stated,
+    which is an honest and useful outcome. It is not COMPLETE, and it may never
+    be presented as an exhaustive search (brief §30).
+
+    **A workbook that cannot be reopened is not an output.** However much
+    evidence was gathered, if finalisation could not produce a verified file the
+    run failed technically and says so (brief §4).
+    """
+    if not workbook_verified:
+        return "FAILED_TECHNICALLY"
     if report.failures:
         critical = {1, 5, 6, 8, 9, 15, 17, 18}
         if any(r.number in critical for r in report.failures):
@@ -459,6 +477,9 @@ def completion_status(report: QcReport, *, truncated: bool, blocking_review: int
         return "REQUIRES_HUMAN_REVIEW"
     if blocking_review:
         return "REQUIRES_HUMAN_REVIEW"
+    if budget_exhausted:
+        # The stages ran and the record is usable; what stopped was the clock.
+        return "COMPLETE_WITH_TRUNCATION"
     if truncated:
         return "PARTIAL_TRUNCATED"
     if pages_opened < min_pages:

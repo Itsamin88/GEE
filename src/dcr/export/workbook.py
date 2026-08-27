@@ -24,6 +24,8 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from .. import __version__
 from ..db import Database
+from .sanitize import (Sanitisation, clean_cell, sanitise_row,
+                       sanitise_workbook, _sample as _sample_of)
 from ..logging_setup import event, get_logger
 from ..workbook_audit import EXAMPLE_ROW_MARKER, profile_workbook
 
@@ -90,13 +92,34 @@ class ExportResult:
     rows_written: dict[str, int] = field(default_factory=dict)
     refusals: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    #: What had to be cleaned to make the text storable in Excel. The raw text
+    #: is untouched in the database; only this workbook was cleaned.
+    sanitisation: Sanitisation = field(default_factory=Sanitisation)
+    #: Supplementary sheets deliberately left out because they could not be
+    #: written. The core workbook is never sacrificed for one of these.
+    omitted_sheets: dict[str, str] = field(default_factory=dict)
+
+    @property
+    def excel_sanitized(self) -> str:
+        return "yes" if self.sanitisation.occurred else "no"
 
 
 class WorkbookExporter:
     """Fills a copy of the canonical workbook without damaging it."""
 
     def __init__(self, template: Path, schema: Mapping[str, Any], db: Database,
-                 *, coder_id: str = "", decisions: Mapping[str, Any] | None = None):
+                 *, coder_id: str = "", decisions: Mapping[str, Any] | None = None,
+                 aggressive_sanitize: bool = False, core_only: bool = False):
+        #: The last rung of the retry ladder: write the coded research record
+        #: and skip the supplementary evidence sheets entirely. Their rows are
+        #: still in the database and in the CSV manifests.
+        self.core_only = bool(core_only)
+        #: Set only by the finalisation retry ladder, after a normal export has
+        #: already failed. It can alter legitimate text, so it is never first.
+        self.aggressive_sanitize = bool(aggressive_sanitize)
+        self.sanitisation = Sanitisation()
+        #: Supplementary sheets that could not be built, and why.
+        self.omitted_sheets: dict[str, str] = {}
         self.template = Path(template)
         self.schema = schema
         self.db = db
@@ -143,11 +166,22 @@ class WorkbookExporter:
 
         self._write_supplementary(workbook, community_id, manifest or {})
 
+        # The safety net. The writers above clean as they go, which is what
+        # makes the per-sheet counts meaningful; this does not care which code
+        # path wrote a cell, so a value arriving by a route nobody remembered
+        # still cannot take the run down after an hour of work.
+        sanitise_workbook(workbook, log=self.sanitisation,
+                          aggressive=self.aggressive_sanitize)
+
         destination.parent.mkdir(parents=True, exist_ok=True)
         workbook.save(destination)
         workbook.close()
         result.refusals = list(self.refusals)
         result.warnings = list(self.warnings)
+        result.sanitisation = self.sanitisation
+        result.omitted_sheets = dict(self.omitted_sheets)
+        if self.sanitisation.occurred:
+            result.warnings.append(f"excel_sanitized=yes: {self.sanitisation.summary()}")
         return result
 
     # -- guarded cell writing ---------------------------------------------
@@ -191,7 +225,12 @@ class WorkbookExporter:
             self.refusals.append(
                 f"refused to overwrite a formula at {sheet_name}!{column}{row}")
             return False
-        target.value = _coerce(value, datatype)
+        cleaned, removed, truncated = clean_cell(
+            _coerce(value, datatype), aggressive=self.aggressive_sanitize)
+        if removed or truncated:
+            self.sanitisation.note(sheet_name, removed, truncated=truncated,
+                                   sample=_sample_of(value))
+        target.value = cleaned
         return True
 
     def _clear_example_row(self, sheet: Worksheet) -> None:
@@ -497,11 +536,50 @@ class WorkbookExporter:
             "X9_Discovery_Log": self._sheet_discovery,
             "X10_Field_Provenance": self._sheet_field_provenance,
         }
+        if self.core_only:
+            for title in list(builders) + ["X11_Run_Manifest"]:
+                self.omitted_sheets[title] = (
+                    "omitted deliberately: an earlier export attempt failed, so the "
+                    "core workbook was written without the supplementary sheets")
+                self._add_omission_notice(workbook, title, self.omitted_sheets[title])
+            self.warnings.append(
+                "the supplementary evidence sheets were omitted so that the coded "
+                "workbook could be produced; every row is still in the database and "
+                "in the CSV manifests in 09_final/")
+            return
+
         for title, builder in builders.items():
-            headers, rows = builder(community_id)
-            self._add_sheet(workbook, title, headers, rows)
+            # A supplementary sheet is evidence ABOUT the run, not the coded
+            # research record. If one cannot be built, the workbook still ships
+            # without it and the omission is written into the audit sheet —
+            # losing the whole workbook to a malformed evidence row would be a
+            # far worse outcome than losing that row (brief §4, §48).
+            try:
+                headers, rows = builder(community_id)
+                self._add_sheet(workbook, title, headers, rows)
+            except Exception as exc:
+                reason = f"{type(exc).__name__}: {exc}"
+                log.error("supplementary sheet %s could not be built: %s", title, reason,
+                          exc_info=True)
+                self.omitted_sheets[title] = reason
+                self.warnings.append(
+                    f"{title} was omitted from the workbook ({reason}); the underlying "
+                    "rows are still in the database and in the CSV manifests")
+                self._add_omission_notice(workbook, title, reason)
         headers, rows = self._sheet_manifest(manifest)
         self._add_sheet(workbook, "X11_Run_Manifest", headers, rows)
+
+    def _add_omission_notice(self, workbook: Any, title: str, reason: str) -> None:
+        """Leave a sheet saying what is missing, rather than a silent absence."""
+        try:
+            self._add_sheet(
+                workbook, title,
+                ["sheet", "status", "reason", "where_the_data_still_is"],
+                [[title, "OMITTED", reason,
+                  "the database, and the CSV manifests in 09_final/"]],
+            )
+        except Exception:                     # even the notice must not throw
+            log.debug("could not write an omission notice for %s", title, exc_info=True)
 
     def _add_sheet(self, workbook: Any, title: str, headers: Sequence[str],
                    rows: Sequence[Sequence[Any]]) -> None:
@@ -519,8 +597,11 @@ class WorkbookExporter:
         note.value = SUPPLEMENTARY_SHEETS.get(title, "")
         note.font = Font(italic=True, color="555555")
         for row_index, row in enumerate(rows, start=2):
-            for col_index, value in enumerate(row, start=1):
-                sheet.cell(row=row_index, column=col_index).value = _coerce(value)
+            cleaned = sanitise_row([_coerce(v) for v in row], sheet=title,
+                                   log=self.sanitisation,
+                                   aggressive=self.aggressive_sanitize)
+            for col_index, value in enumerate(cleaned, start=1):
+                sheet.cell(row=row_index, column=col_index).value = value
         sheet.freeze_panes = "A2"
         sheet.auto_filter.ref = f"A1:{get_column_letter(len(headers))}1"
         for index, header in enumerate(headers, start=1):
