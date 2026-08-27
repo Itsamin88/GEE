@@ -40,6 +40,24 @@ ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # page after a pause must not double the record (brief SS27).
     ("evidence", "dedupe_key", "TEXT"),
     ("claims", "dedupe_key", "TEXT"),
+    # One conflict row now stands for one competing VALUE rather than one
+    # competing claim, so it has to say how much is standing behind it.
+    ("conflicts", "claims_a", "INTEGER"),
+    ("conflicts", "claims_b", "INTEGER"),
+    ("conflicts", "groups_a", "INTEGER"),
+    ("conflicts", "groups_b", "INTEGER"),
+    ("conflicts", "distinct_values", "INTEGER"),
+    ("conflicts", "summary", "TEXT"),
+    # The active-processing clock, persisted so a resumed run continues the
+    # same budget instead of starting a fresh thirty minutes.
+    ("run_control", "active_elapsed_s", "REAL"),
+    ("run_control", "wall_elapsed_s", "REAL"),
+    ("run_control", "offline_elapsed_s", "REAL"),
+    ("run_control", "paused_manual_elapsed_s", "REAL"),
+    ("run_control", "budget_s", "REAL"),
+    ("run_control", "budget_phase", "TEXT"),
+    ("runs", "budget_exhausted", "INTEGER"),
+    ("runs", "active_elapsed_s", "REAL"),
 )
 
 #: Indexes for the columns above. Deliberately NOT unique: an existing database

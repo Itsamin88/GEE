@@ -34,7 +34,12 @@ HIGH_VALUE_PATH_TERMS = {
     2.2: ("restoration", "restauration", "herstel", "renaturier", "reforest", "reboisement",
           "herbebossing", "regeneration", "regeneratie", "permaculture", "permacultuur",
           "agroforest", "voedselbos", "food-forest", "foret-jardin", "water", "eau",
-          "swale", "keyline"),
+          "swale", "keyline",
+          # Ecology and the water-retention vocabulary a research-rich site
+          # uses for exactly the pages this study needs (brief §19).
+          "ecolog", "ecologie", "okolog", "ökolog", "ecologia", "biodivers",
+          "rewilding", "retention", "aquifer", "watershed", "hydrolog",
+          "soil", "sol-vivant", "bodem", "boden", "erosion"),
     2.0: ("about", "a-propos", "apropos", "over-ons", "ueber-uns", "sobre", "chi-siamo",
           "who-we-are", "quienes", "quem-somos", "wie-zijn-wij"),
     1.8: ("project", "projet", "projecten", "projekte", "proyecto", "projeto",

@@ -74,6 +74,8 @@ class FieldResolver:
         self.schema = settings.schema
         self.conflict_counter = 0
         self._conflict_signatures: set[tuple[str, ...]] = set()
+        #: Fields already announced in the log, so one field prints one line.
+        self._conflict_fields_logged: set[str] = set()
 
     # -- entry -------------------------------------------------------------
     def resolve(
@@ -907,13 +909,21 @@ class FieldResolver:
                        "field_name", "value_a", "claim_a", "source_a", "group_a", "rank_a",
                        "date_a", "value_b", "claim_b", "source_b", "group_b", "rank_b", "date_b",
                        "rule_invoked", "resolution_type", "final_value", "residual_uncertainty",
-                       "human_review",
+                       "human_review", "claims_a", "claims_b", "groups_a", "groups_b",
+                       "distinct_values", "summary",
                    }}
         payload.update({"conflict_id": conflict_id, "community_id": self.community_id,
                         "created_utc": utcnow()})
         self.db.insert("conflicts", payload, replace=True)
-        event(log, "CONFLICT",
-              f"{conflict.get('field_name')}: {conflict.get('value_a')} vs {conflict.get('value_b')}")
+        # One line per FIELD, not per disagreeing value. A field with fourteen
+        # competing figures used to print fourteen near-identical lines, and a
+        # run could end with thousands of them scrolling past.
+        field_name = str(conflict.get("field_name") or "")
+        if field_name not in self._conflict_fields_logged:
+            self._conflict_fields_logged.add(field_name)
+            event(log, "CONFLICT",
+                  conflict.get("summary")
+                  or f"{field_name}: {conflict.get('value_a')} vs {conflict.get('value_b')}")
 
     def _store_review_queue(self) -> None:
         for index, item in enumerate(self.review.items, start=1):

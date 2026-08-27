@@ -55,11 +55,13 @@ from .language import guess_language, language_for_country
 from .logging_setup import event, get_logger
 from .net.browser import BrowserPool
 from .net.fetcher import Fetcher
+from .budget import TimeBudget, budget_from_settings
 from .control import (COMPLETED as CONTROL_COMPLETED, FAILED as CONTROL_FAILED,
                       CANCELLED as CONTROL_CANCELLED, RunCancelled, RunControl,
                       control_dir_for)
 from .storage import CommunityStorage
-from .supervisor import NullSupervisor, RunPaused, Supervisor
+from .supervisor import (BudgetExhausted, NullSupervisor, RunPaused,
+                         Supervisor)
 
 log = get_logger("run")
 
@@ -130,6 +132,11 @@ class RunOutcome:
     paused_manual_s: float = 0.0
     queue: dict[str, int] = field(default_factory=dict)
     estimate: dict[str, Any] = field(default_factory=dict)
+    #: True when the run stopped because the active budget was spent. The
+    #: result is a usable record with its limits stated, not a failure.
+    budget_exhausted: bool = False
+    budget: dict[str, Any] = field(default_factory=dict)
+    profile: dict[str, Any] = field(default_factory=dict)
 
     @property
     def paused(self) -> bool:
@@ -153,6 +160,8 @@ class CommunityRunner:
         self.supervisor: Any = NullSupervisor()
         self.final_state = CONTROL_COMPLETED
         self.pause_reason = ""
+        self.budget: TimeBudget | None = None
+        self.budget_exhausted = False
         self.db = db
         self.run_mode = run_mode.upper()
         self.target = target
@@ -179,6 +188,9 @@ class CommunityRunner:
         self.published_coordinates: list[tuple[float, float, str]] = []
         self.certifiers: set[str] = set()
         self._search_counter = 0
+        #: Archive URLs the index listed, versus the ones actually retrieved.
+        self.archive_discovered = 0
+        self.archive_fetched = 0
 
     # =====================================================================
     # entry point
@@ -208,11 +220,20 @@ class CommunityRunner:
             poll_interval_s=float(self.settings.get(
                 "run_control", "poll_interval_s", default=1.0) or 1.0),
         )
+        if bool(self.settings.get("budget", "enabled", default=True)):
+            carried = TimeBudget.carried_for(self.db, self.community_id)
+            self.budget = budget_from_settings(self.settings, carried_active_s=carried)
+            if carried > 0:
+                event(log, "BUDGET",
+                      f"{carried / 60:.1f} min of active time was already spent on this "
+                      f"community; this session continues the same "
+                      f"{self.budget.budget_s / 60:.0f}-minute budget")
         self.supervisor = Supervisor(
             self.control, self.monitor,
             config=dict(self.settings.get("run_control", default={}) or {}),
             on_status=self.on_status,
             on_resume=self._after_resume,
+            budget=self.budget,
         )
 
         fetcher = Fetcher(
@@ -268,6 +289,17 @@ class CommunityRunner:
                           f"{STAGE_NAMES[number].capitalize()} — already complete, skipped")
                     continue
                 await self._run_stage(number)
+        except BudgetExhausted as spent:
+            # Not a failure: the clock ran out. Everything gathered is
+            # committed, and finalisation happens next with the reserve that
+            # was held back exactly for it.
+            self.budget_exhausted = True
+            self.final_state = CONTROL_COMPLETED
+            self.pause_reason = spent.reason
+            self._mark_truncated(
+                f"the active-processing budget was reached before the protocol "
+                f"finished: {spent.reason}")
+            event(log, "BUDGET", spent.reason)
         except RunPaused as paused:
             # Not a failure and not a completion: the run is unfinished on
             # purpose, and everything retrieved so far is committed.
@@ -340,6 +372,8 @@ class CommunityRunner:
             task_detail=f"about to begin stage {number}",
             tasks_total=self._task_total(),
         )
+        if self.budget is not None:
+            self.budget.begin_stage(number)
         stage.started = utcnow()
         stage.status = "running"
         self._persist_stage(stage)
@@ -362,6 +396,18 @@ class CommunityRunner:
             stage.detail = f"{type(exc).__name__}: {exc}"
             log.error("stage %d failed: %s", number, exc, exc_info=True)
             self._mark_truncated(f"stage {number} ({STAGE_NAMES[number]}) failed: {exc}")
+        if self.budget is not None:
+            self.budget.end_stage()
+            self.budget.persist(self.db, self.run_id)
+            if stage.status == "running" and self.budget.stage_over_budget(number):
+                stage.status = "partial"
+                stage.detail = (stage.detail or "") + (
+                    "; " if stage.detail else "") + (
+                    f"stopped at this stage's share of the time budget "
+                    f"({self.budget.stage_ceiling_s(number) / 60:.1f} min)")
+                self._mark_truncated(
+                    f"stage {number} ({STAGE_NAMES[number]}) reached its share of the "
+                    "active-time budget and did not finish")
         if stage.status == "running":
             stage.status = "complete"
         stage.finished = utcnow()
@@ -812,6 +858,13 @@ class CommunityRunner:
             self._mark_truncated(f"stage 2 stopped with {pending} URLs still queued")
         else:
             stage.status = "complete"
+        self.archive_discovered = archive_discovered
+        self.archive_fetched = snapshots_fetched
+        if archive_discovered:
+            event(log, "ARCHIVE",
+                  f"{archive_discovered} archived URLs discovered, {snapshots_fetched} "
+                  f"queued for retrieval ({snapshots_fetched / archive_discovered:.1%}); "
+                  "the rest are recorded as discovered but not fetched")
             stage.detail = (f"{self.crawler.stats.pages_opened} pages opened; "
                             f"{len(exhausted)} sources exhausted")
         for context in self.crawler.sources.values():
@@ -984,6 +1037,8 @@ class CommunityRunner:
         reachable = 0
         unreachable: list[str] = []
         snapshots_fetched = 0
+        #: Discovered is not fetched, and the report must show both (brief §63).
+        archive_discovered = 0
         for domain, source_id in list(domains.items())[:12]:
             # Enumerating the archive for one domain is a long single request;
             # between domains is the safe boundary (brief §24).
@@ -1018,7 +1073,8 @@ class CommunityRunner:
                 unreachable.append(domain)
                 continue
             reachable += 1
-            event(log, "ARCHIVE", f"{len(parsed.entries)} archived URLs listed for {domain}")
+            event(log, "ARCHIVE",
+                  f"{len(parsed.entries)} archived URLs listed for {domain}")
             self.db.update(
                 "sources",
                 {"archive_checked": 1,
@@ -1027,12 +1083,31 @@ class CommunityRunner:
                      min((e.iso_date for e in parsed.entries), default=None))},
                 {"source_id": source_id},
             )
+            archive_discovered += len(parsed.entries)
+            # How many snapshots this domain can afford, not how many exist.
+            # The archive is the slowest thing the crawler touches, so the cap
+            # is whatever the stage's remaining share of the budget pays for
+            # (brief §19, §23).
+            configured = int(run_cfg.get("max_snapshot_fetches_per_domain", 40))
+            affordable = configured
+            if self.budget is not None:
+                per_snapshot_s = float(run_cfg.get("estimated_seconds_per_snapshot", 3.0))
+                remaining_domains = max(1, len(domains) - reachable + 1)
+                share = self.budget.stage_remaining_s(4) / remaining_domains
+                affordable = max(4, min(configured, int(share / max(0.5, per_snapshot_s))))
             chosen = wayback_mod.select_snapshots(
                 parsed.entries,
                 priority_paths=archive_cfg.get("priority_snapshot_paths", ["/"]),
                 max_per_url=int(run_cfg.get("max_snapshots_per_url", 20)),
-                max_total=int(run_cfg.get("max_snapshot_fetches_per_domain", 60)),
+                max_total=affordable,
+                max_low_relevance_share=float(
+                    run_cfg.get("low_relevance_snapshot_share", 0.25)),
             )
+            if affordable < configured:
+                event(log, "ARCHIVE",
+                      f"{domain}: {len(parsed.entries)} archived URLs listed; the time "
+                      f"budget affords {affordable} of them, chosen by path relevance "
+                      "and dating value")
             template = archive_cfg.get("snapshot_url_template",
                                        "https://web.archive.org/web/{timestamp}id_/{url}")
             for snapshot in chosen:
@@ -2033,6 +2108,8 @@ class CommunityRunner:
                 "browser_renders": self.browser.pages_rendered,
                 "llm_calls": getattr(self.llm, "calls", 0) if self.llm else 0,
                 "image_triage": self.crawler.triage.summary(),
+                "archive_urls_discovered": self.archive_discovered,
+                "archive_urls_fetched": self.archive_fetched,
                 "queue": queue,
             },
             review_items=len(self.review),
@@ -2043,11 +2120,16 @@ class CommunityRunner:
             offline_s=getattr(supervisor_stats, "offline_s", 0.0),
             paused_manual_s=getattr(supervisor_stats, "paused_manual_s", 0.0),
             queue=queue,
+            budget_exhausted=self.budget_exhausted,
+            budget=self.budget.snapshot().as_dict() if self.budget else {},
+            profile=self.budget.profile() if self.budget else {},
         )
         self.db.update(
             "runs",
             {"status": _RUN_STATUS[self.final_state],
              "final_state": self.final_state,
+             "budget_exhausted": int(self.budget_exhausted),
+             "active_elapsed_s": round(self.budget.active_s, 2) if self.budget else None,
              "truncated": int(truncated),
              "truncation_reason": "; ".join(self.truncation_reasons)[:2000],
              "finished_utc": utcnow(),

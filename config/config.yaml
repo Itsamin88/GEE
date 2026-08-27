@@ -95,7 +95,14 @@ archive:
   # Sample snapshots at roughly annual intervals across the whole record.
   snapshot_interval_days: 365
   max_snapshots_per_url: 20
-  max_snapshot_fetches_per_domain: 60
+  # A ceiling, further reduced by whatever stage 4's share of the time budget
+  # actually affords. The archive is the slowest thing the crawler touches.
+  max_snapshot_fetches_per_domain: 40
+  estimated_seconds_per_snapshot: 3.0
+  # At most this share of the archive budget may go to URLs whose own path says
+  # nothing (tags, pagination, baskets). Their earliest capture is worth
+  # sampling for dating coverage, not exhausting.
+  low_relevance_snapshot_share: 0.25
   # Retrieve archived documents too, not only pages.
   fetch_archived_documents: true
 
@@ -204,6 +211,39 @@ logging:
   console_level: INFO
   file_level: DEBUG
   jsonl: true
+
+# --------------------------------------------------------------------------
+# The active-processing budget
+#
+# A hard ceiling on ACTIVE work per community. Time spent paused by the
+# researcher, or waiting for the network, does not count: an outage must not be
+# able to eat the research budget.
+#
+# The reserve at the end is not optional. Reconciliation, the workbook, its
+# verification and the manifests are what make the run worth anything, so the
+# retrieval side is never allowed to spend the whole allowance.
+# --------------------------------------------------------------------------
+budget:
+  enabled: true
+  active_minutes: 30
+  # Kept back for reconciliation, export, reopening the workbook and manifests.
+  finalisation_reserve_minutes: 3
+  # Before the reserve: no NEW expensive work starts, but work already in
+  # flight is allowed to finish cleanly.
+  wind_down_minutes: 2
+  # Ceilings, not allocations. A stage that finishes early hands the rest back;
+  # a community with one excellent website never touches most of these.
+  stage_shares:
+    0: 0.04     # build the source set
+    1: 0.04     # confirm the sources belong to this community
+    2: 0.24     # enumerate pages
+    3: 0.20     # open the documents — the richest evidence per second
+    4: 0.16     # the archive, prioritised rather than enumerated
+    5: 0.14     # academic literature
+    6: 0.10     # grey literature
+    7: 0.04     # other web sources
+    8: 0.04     # local-language sweep
+    9: 0.00     # reconciliation is paid for out of the reserve
 
 # --------------------------------------------------------------------------
 # Run control: manual pause, network pause, and resuming

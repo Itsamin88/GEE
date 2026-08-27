@@ -131,13 +131,32 @@ def resolve_field(
             )
 
     # A genuine disagreement.
+    #
+    # One row per competing VALUE, not per competing claim. A community whose
+    # population is mentioned on two hundred pages with fourteen different
+    # figures is fourteen disagreements, not two hundred — and emitting the
+    # latter buries the real ones under near-identical repetitions of the same
+    # two numbers (brief §31, §32). Every individual claim is still in the
+    # claims table with its own wording and source; what is summarised here is
+    # the disagreement, not the evidence.
     ranked = sorted(claims, key=lambda c: (-(c.strength), -(c.confidence)))
     best = ranked[0]
-    runner_up = next((c for c in ranked[1:] if _key(c, numeric) != _key(best, numeric)), None)
+    best_key = _key(best, numeric)
+    by_value = _group_by_value(claims, numeric)
+    runner_up = next((c for c in ranked[1:] if _key(c, numeric) != best_key), None)
+
+    supporting_best = by_value.get(best_key, [best])
+    groups_a = len({c.independence_group for c in supporting_best if c.independence_group})
+    summary = (
+        f"{len(by_value)} distinct reported value(s) for {field_name} across "
+        f"{len(groups) or 1} independence group(s), from {len(claims)} claim(s)"
+    )
+
     conflicts: list[dict[str, Any]] = []
-    for other in ranked[1:]:
-        if _key(other, numeric) == _key(best, numeric):
+    for key, group_claims in by_value.items():
+        if key == best_key:
             continue
+        other = _strongest(group_claims)
         conflicts.append({
             "field_name": field_name,
             "value_a": best.value, "claim_a": best.claim_id, "source_a": best.source_id,
@@ -146,6 +165,15 @@ def resolve_field(
             "value_b": other.value, "claim_b": other.claim_id, "source_b": other.source_id,
             "group_b": other.independence_group, "rank_b": other.evidence_rank,
             "date_b": other.publication_date,
+            # How much stands behind each side, so a summarised row is not a
+            # thinner record than the pile of pairwise ones it replaces.
+            "claims_a": len(supporting_best),
+            "claims_b": len(group_claims),
+            "groups_a": groups_a,
+            "groups_b": len({c.independence_group for c in group_claims
+                             if c.independence_group}),
+            "distinct_values": len(by_value),
+            "summary": summary,
         })
 
     same_strength = runner_up is not None and runner_up.strength == best.strength
@@ -171,7 +199,7 @@ def resolve_field(
                 f"{best.source_class} ({best.source_id}) says {best.value!r}; "
                 f"{runner_up.source_class} ({runner_up.source_id}) says {runner_up.value!r}. "
                 "Equal source strength, different independence groups, and no protocol rule "
-                "covers this field — left for a human coder."
+                f"covers this field — left for a human coder. {summary}."
             ),
             claim_ids=[c.claim_id for c in claims],
             source_ids=source_ids,
@@ -234,6 +262,20 @@ def _key(claim: ClaimView, numeric: bool) -> str:
 
 def _distinct_values(claims: Sequence[ClaimView], *, numeric: bool) -> set[str]:
     return {_key(c, numeric) for c in claims}
+
+
+def _group_by_value(claims: Sequence[ClaimView],
+                    numeric: bool) -> dict[str, list[ClaimView]]:
+    """Claims collected under the normalised value each one asserts.
+
+    Two hundred claims of "about 200 residents" are one reported value. Keeping
+    them grouped is what stops the disagreement record scaling with how often a
+    community repeats itself.
+    """
+    grouped: dict[str, list[ClaimView]] = {}
+    for claim in claims:
+        grouped.setdefault(_key(claim, numeric), []).append(claim)
+    return grouped
 
 
 def _strongest(claims: Sequence[ClaimView]) -> ClaimView:

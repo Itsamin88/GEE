@@ -148,19 +148,53 @@ def _entry_from(record: dict[str, str]) -> ArchivedUrl | None:
     )
 
 
+#: Path fragments that mark an archived URL as worth the retrieval, in the
+#: languages the study covers. Reused from the live crawl's own vocabulary so
+#: the archive and the site are judged by the same standard.
+def _relevance_terms() -> dict[float, tuple[str, ...]]:
+    from ..crawl.frontier import HIGH_VALUE_PATH_TERMS
+
+    return HIGH_VALUE_PATH_TERMS
+
+
+def path_relevance(url: str) -> tuple[float, str]:
+    """How much a URL's own path suggests research content, and which term said so.
+
+    A domain's archive holds thousands of URLs and the great majority are
+    navigation, tags and pagination. Judging them by their path costs nothing
+    and is the difference between fetching the history page and fetching the
+    shopping basket (brief §19, §20).
+    """
+    path = (urlsplit(url).path or "/").lower()
+    for weight, terms in _relevance_terms().items():
+        for term in terms:
+            if term in path:
+                return float(weight), term
+    return 0.0, ""
+
+
 def select_snapshots(
     entries: Iterable[ArchivedUrl],
     *,
     priority_paths: Iterable[str],
     max_per_url: int = 20,
     max_total: int = 60,
+    onset_window: tuple[int, int] = (1990, 2016),
+    min_relevance: float = 0.0,
+    max_low_relevance_share: float = 0.25,
 ) -> list[ArchivedUrl]:
     """Choose which snapshots to actually retrieve.
 
+    Five thousand archived URLs is not five thousand pieces of evidence; it is
+    one site's navigation captured five thousand times. The existence of an
+    archive record has never meant it must be fetched (brief §19).
+
     Priorities, in order: the earliest snapshot of anything (it bounds the
-    dating); every snapshot of a page whose path matters for onset; then roughly
-    annual samples of everything else. Documents always win over pages, because
-    a deleted PDF is unrecoverable anywhere else.
+    dating); pages whose own path says they carry history, land, water,
+    restoration, projects or reports; then roughly annual samples. Documents
+    always win over pages, because a deleted PDF is unrecoverable anywhere else,
+    and snapshots inside the onset window are worth more than recent ones
+    because dating is what the archive is for.
     """
     by_url: dict[str, list[ArchivedUrl]] = {}
     for entry in entries:
@@ -168,41 +202,83 @@ def select_snapshots(
     for values in by_url.values():
         values.sort(key=lambda e: e.timestamp)
 
+    # "/" rstrips to "", and `path.startswith("")` is true of every path — so a
+    # priority list containing the site root silently promoted the whole
+    # archive, which is most of why five thousand URLs looked worth fetching.
+    # The root is matched exactly; everything else by prefix.
     wanted = {p.rstrip("/").lower() for p in priority_paths}
+    wants_root = "" in wanted
+    wanted.discard("")
     scored: list[tuple[float, ArchivedUrl]] = []
 
+    earliest_first, earliest_last = onset_window
     for url, snapshots in by_url.items():
         path = (urlsplit(url).path or "/").rstrip("/").lower() or "/"
-        is_priority = path in wanted or any(path.startswith(w) for w in wanted if w != "/")
+        is_priority = (
+            (wants_root and path == "/")
+            or path in wanted
+            or any(path.startswith(w) for w in wanted)
+        )
         is_document = snapshots[0].kind == "document"
+        relevance, _term = path_relevance(url)
+        # A URL whose path says nothing, is not a document, and is not on the
+        # named priority list contributes its earliest capture and nothing
+        # more. That single snapshot still bounds the dating; the other
+        # forty captures of the same navigation page do not.
+        interesting = is_priority or is_document or relevance >= max(0.1, min_relevance)
 
         chosen: list[ArchivedUrl] = [snapshots[0]]           # earliest, always
-        if len(snapshots) > 1:
-            chosen.append(snapshots[-1])                     # latest, always
-        if is_priority or is_document:
+        if interesting and len(snapshots) > 1:
+            chosen.append(snapshots[-1])                     # latest
+        if is_priority or is_document or relevance >= 2.0:
             # roughly annual sampling across the record
             seen_years: set[int] = {s.year for s in chosen if s.year}
             for snapshot in snapshots:
                 if snapshot.year and snapshot.year not in seen_years:
                     seen_years.add(snapshot.year)
                     chosen.append(snapshot)
-        for snapshot in chosen[:max_per_url]:
+        # The same document captured forty times is the same document. Two
+        # captures bound its history; the rest are near-identical bytes that
+        # the content hash would collapse anyway, after paying to fetch them.
+        per_url_cap = min(max_per_url, 4 if is_document else max_per_url)
+        for snapshot in chosen[:per_url_cap]:
+            if not interesting:
+                # Its earliest capture still bounds the dating, so it is kept —
+                # but it must not outrank the history page just because it is
+                # old. Navigation from 2004 is still navigation.
+                scored.append((0.5, snapshot))
+                continue
             score = 0.0
             score += 4.0 if is_document else 0.0
             score += 3.0 if is_priority else 0.0
+            score += relevance                    # what the path itself says
             score += 2.0 if snapshot is snapshots[0] else 0.0
-            # older material is worth more for dating
+            # Dating is what the archive is for: a capture from inside the
+            # onset window outweighs a recent one of the same page.
             if snapshot.year:
+                if earliest_first <= snapshot.year <= earliest_last:
+                    score += 2.5
                 score += max(0.0, (2015 - snapshot.year) * 0.15)
             scored.append((score, snapshot))
 
     scored.sort(key=lambda pair: pair[0], reverse=True)
+    # A site has far more navigation than content, so filling every remaining
+    # slot with one capture each of /tag/page/47/ would spend most of the
+    # archive budget on the least valuable thing in it. Their earliest captures
+    # are worth sampling, not exhausting: the objective is evidence per minute,
+    # not archive URLs fetched (brief §52).
+    low_relevance_cap = max(1, int(max_total * max_low_relevance_share))
     out: list[ArchivedUrl] = []
     seen: set[tuple[str, str]] = set()
-    for _, snapshot in scored:
+    low_taken = 0
+    for score, snapshot in scored:
         key = (snapshot.original, snapshot.timestamp)
         if key in seen:
             continue
+        if score <= 0.5:
+            if low_taken >= low_relevance_cap:
+                continue
+            low_taken += 1
         seen.add(key)
         out.append(snapshot)
         if len(out) >= max_total:

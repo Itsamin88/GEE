@@ -19,12 +19,27 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable, Mapping, Sequence
 
+from .budget import PHASE_FINALISATION, PHASE_OVER, PHASE_WIND_DOWN, TimeBudget
 from .control import (CANCELLED, PAUSED_MANUAL, PAUSED_NETWORK, RUNNING,
                       RunCancelled, RunControl)
 from .logging_setup import event, get_logger
 from .net.connectivity import FULL, OFFLINE, PARTIAL, ConnectivityMonitor, classify_failures
 
 log = get_logger("supervisor")
+
+
+class BudgetExhausted(Exception):
+    """Raised when the active-time budget is spent and finalisation must begin.
+
+    Not a failure. The run stops starting work, reconciles what it has and
+    exports; the result is COMPLETE_WITH_TRUNCATION with an honest account of
+    what was not reached (brief §28).
+    """
+
+    def __init__(self, reason: str = "", snapshot: Any = None):
+        super().__init__(reason or "the active-processing budget is spent")
+        self.reason = reason
+        self.snapshot = snapshot
 
 
 class RunPaused(Exception):
@@ -68,9 +83,13 @@ class Supervisor:
         on_status: Callable[[str], None] | None = None,
         on_resume: Callable[[str], None] | None = None,
         sleep: Callable[[float], Awaitable[None]] | None = None,
+        budget: TimeBudget | None = None,
     ):
         self.control = control
         self.monitor = monitor
+        #: The active-processing clock. Without one the gate behaves exactly as
+        #: it did before, which is what the pause/resume tests rely on.
+        self.budget = budget
         config = dict(config or {})
         #: `wait` keeps the process alive so RESUME continues in place;
         #: `exit` checkpoints and returns, leaving the run PAUSED_MANUAL for a
@@ -134,6 +153,7 @@ class Supervisor:
         and raises :class:`RunPaused` when a pause should end this process.
         """
         self.stats.gates += 1
+        self._enforce_budget(stage_no)
         self.control.checkpoint(
             stage_no=stage_no, stage_name=stage_name, source_id=source_id,
             task_ref=task_ref, task_detail=task_detail,
@@ -157,6 +177,46 @@ class Supervisor:
         if should_probe and self.monitor is not None:
             await self._check_network()
 
+    # -- the time budget ---------------------------------------------------
+    def _enforce_budget(self, stage_no: int | None) -> None:
+        """Stop the crawl in time to finalise, and say so once.
+
+        Called at every safe boundary. The reserve at the end is what makes the
+        difference between a run that produces a workbook and a run that spent
+        thirty minutes producing nothing (brief §7).
+        """
+        budget = self.budget
+        if budget is None:
+            return
+        phase = budget.phase
+        if phase == PHASE_WIND_DOWN and budget.announce(PHASE_WIND_DOWN):
+            self._status(
+                f"Status: WINDING DOWN   {budget.active_s / 60:.0f} min of "
+                f"{budget.budget_s / 60:.0f} used. No new expensive work will start; "
+                "work already in flight will finish.")
+        if budget.must_finalise:
+            if budget.announce(PHASE_FINALISATION):
+                self._status(
+                    f"Status: FINALISING   the active budget is spent "
+                    f"({budget.active_s / 60:.1f} min). Reconciling and exporting "
+                    "what has been gathered.")
+            raise BudgetExhausted(
+                f"the {budget.budget_s / 60:.0f}-minute active budget was reached "
+                f"at stage {stage_no}; the remaining time is reserved for "
+                "reconciliation and export",
+                snapshot=budget.snapshot(),
+            )
+
+    def affords(self, estimated_s: float) -> bool:
+        """May a task of this expected cost start?"""
+        if self.budget is None:
+            return True
+        return self.budget.affords(estimated_s)
+
+    @property
+    def winding_down(self) -> bool:
+        return self.budget is not None and not self.budget.may_start_expensive_work
+
     # -- manual pause ------------------------------------------------------
     async def _pause_manually(self, reason: str) -> None:
         detail = reason or "paused by the researcher"
@@ -166,6 +226,8 @@ class Supervisor:
         # pause still resumes from the right place.
         self.control.checkpoint(record_event=True)
         self.control.enter_paused("manual", detail)
+        if self.budget is not None:
+            self.budget.pause("manual")
         self.stats.manual_pauses += 1
         self._status(f"Status: PAUSED_MANUAL   {self.control.progress_line()}")
 
@@ -186,6 +248,8 @@ class Supervisor:
                 self.control.clear_request()
                 break
         waited = time.monotonic() - started
+        if self.budget is not None:
+            self.budget.resume()
         self.stats.paused_manual_s += waited
         self.control.enter_resuming("manual", f"paused for {waited:.0f}s")
         # A laptop that was closed for an hour may have lost its network in the
@@ -222,6 +286,8 @@ class Supervisor:
         self.control.begin_pause("network", reason)
         self.control.checkpoint(record_event=True)
         self.control.enter_paused("network", reason)
+        if self.budget is not None:
+            self.budget.pause("network")
         self.stats.network_pauses += 1
         self._suspended = True
         self._status(
@@ -250,6 +316,8 @@ class Supervisor:
             sleep=self._sleep,
         )
         waited = time.monotonic() - started
+        if self.budget is not None:
+            self.budget.resume()
         self.stats.offline_s += waited
 
         if cancelled:
@@ -321,9 +389,14 @@ class NullSupervisor:
 
     stats = SupervisorStats()
     suspended = False
+    winding_down = False
+    budget = None
 
     async def gate(self, **kwargs: Any) -> None:
         return None
+
+    def affords(self, estimated_s: float) -> bool:
+        return True
 
     def note_failure(self, error_type: str | None) -> None:
         return None
