@@ -27,6 +27,8 @@ characters went, and which sheet it was on.
 
 from __future__ import annotations
 
+import datetime as _datetime
+import decimal
 import re
 import unicodedata
 from dataclasses import dataclass, field
@@ -46,6 +48,13 @@ SURROGATES = re.compile(r"[\ud800-\udfff]")
 
 #: Excel's own hard limit on the characters in one cell.
 MAX_CELL_CHARS = 32767
+
+#: Excel's limit on a worksheet name, and the characters it forbids in one.
+#: A title is not a cell, so `sanitise_workbook`'s cell sweep never saw it — and
+#: an illegal one fails inside `save()`, after every sheet has been written,
+#: which is the same late failure the original bug had.
+MAX_SHEET_TITLE = 31
+ILLEGAL_SHEET_TITLE = re.compile(r"[\[\]:*?/\\]")
 
 #: What a cleaned character is replaced with. A space keeps word boundaries that
 #: a form feed or a stray control byte was standing in for; deleting outright
@@ -153,12 +162,44 @@ def clean_text(text: str, *, aggressive: bool = False) -> tuple[str, int]:
 def clean_cell(value: Any, *, aggressive: bool = False) -> tuple[Any, int, bool]:
     """Make one value safe to write. Returns (value, characters removed, truncated).
 
-    Non-text values pass through untouched: a number, a date or ``None`` cannot
-    carry an illegal character, and coercing them to text here would undo the
-    exporter's careful work of writing numbers as numbers.
+    Three kinds of value can kill an export, and only the first announces itself
+    at assignment. The other two get all the way into `save()` — after every
+    sheet has been written — which is precisely the failure mode that lost a
+    run's work in the first place (brief §11, §13).
+
+    **Text with characters XML cannot carry.** Raises `IllegalCharacterError`
+    the moment it is assigned to a cell.
+
+    **A timezone-aware datetime.** Assigns without complaint; raises
+    ``Excel does not support timezones in datetimes`` inside `save()`. A
+    retrieval timestamp is the obvious way one arrives. The moment is kept and
+    only the `tzinfo` is dropped, because the alternative — converting to UTC
+    and shifting the clock — would silently change a recorded date.
+
+    **A type Excel has no idea about.** A dict, a list, a Path from a code path
+    that expected a string: ``Cannot convert {...} to Excel``, again at
+    assignment. Turned into its text and cleaned like any other text.
+
+    Numbers pass through as numbers. Coercing them to text here would undo the
+    exporter's careful work of writing an area as a number a formula can use.
     """
     if value is None or isinstance(value, (int, float, bool)):
         return value, 0, False
+
+    if isinstance(value, decimal.Decimal):
+        # A managed area must stay a number: the workbook's own formulas read it.
+        try:
+            return float(value), 0, False
+        except (ValueError, ArithmeticError):
+            value = str(value)
+
+    if isinstance(value, (_datetime.datetime, _datetime.time)):
+        if value.tzinfo is not None:
+            return value.replace(tzinfo=None), 0, False
+        return value, 0, False
+    if isinstance(value, _datetime.date):
+        return value, 0, False
+
     if not isinstance(value, str):
         value = str(value)
 
@@ -168,6 +209,23 @@ def clean_cell(value: Any, *, aggressive: bool = False) -> tuple[Any, int, bool]
         cleaned = cleaned[: MAX_CELL_CHARS - 15] + " […truncated]"
         truncated = True
     return cleaned, removed, truncated
+
+
+def safe_sheet_title(title: Any, *, fallback: str = "Sheet") -> str:
+    """A worksheet name Excel will accept.
+
+    Control characters fail inside `save()`; the six characters Excel reserves
+    for cell references fail there too. Both are replaced rather than dropped
+    where a reader would otherwise lose a word boundary.
+    """
+    text = "" if title is None else str(title)
+    text, _ = clean_text(text)
+    text = text.replace(REPLACEMENT, "")
+    text = ILLEGAL_SHEET_TITLE.sub("-", text)
+    text = text.strip().strip("'")
+    if not text:
+        return fallback
+    return text[:MAX_SHEET_TITLE]
 
 
 def sanitise_row(row: Sequence[Any], *, sheet: str = "", log: Sanitisation | None = None,
@@ -187,29 +245,158 @@ def sanitise_row(row: Sequence[Any], *, sheet: str = "", log: Sanitisation | Non
 
 def sanitise_workbook(workbook: Any, *, log: Sanitisation | None = None,
                       aggressive: bool = False) -> Sanitisation:
-    """Sweep every cell of every sheet before saving.
+    """Sweep everything that can fail at save time, before saving.
 
-    The exporter cleans values as it writes them, which is what makes the
-    per-sheet counts meaningful. This is the safety net underneath that: it does
-    not care which code path wrote a cell, so a value that reaches the workbook
-    by a route nobody remembered still cannot take the run down. Formulas are
-    left exactly as they are.
+    The exporter writes through :class:`SafeSheet`, which is what makes the
+    per-sheet counts meaningful. This is the net underneath that, and it does
+    not care which code path produced a value — so something arriving by a route
+    nobody remembered still cannot take a run's work down at the last step.
+
+    Worksheet TITLES are swept as well as cells. A title is not a cell, so the
+    cell sweep never saw one, and an illegal character in a title fails inside
+    `save()` exactly as the original bug did.
     """
     result = log if log is not None else Sanitisation()
     for sheet in workbook.worksheets:
+        title = sheet.title
+        safe = safe_sheet_title(title)
+        if safe != title:
+            # Assigning through `.title` re-validates and would raise; the
+            # private attribute is the only way to repair a title that is
+            # already wrong.
+            try:
+                sheet.title = safe
+            except Exception:
+                sheet._WorkbookChild__title = safe          # noqa: SLF001
+            result.note(safe, len(title) - len(safe) if len(title) > len(safe) else 1,
+                        sample=f"sheet title {title!r} renamed to {safe!r}")
         for row in sheet.iter_rows():
             for cell in row:
                 value = cell.value
-                if not isinstance(value, str) or not value:
+                if value is None:
                     continue
-                if value.startswith("="):
-                    continue                    # a formula is not text to clean
+                if isinstance(value, str):
+                    if not value or value.startswith("="):
+                        continue          # a formula is not text to clean
+                elif isinstance(value, (int, float, bool)):
+                    continue
                 cleaned, removed, truncated = clean_cell(value, aggressive=aggressive)
-                if removed or truncated:
+                if cleaned is value:
+                    continue
+                if removed or truncated or cleaned != value:
                     cell.value = cleaned
                     result.note(sheet.title, removed, truncated=truncated,
-                                sample=_sample(value) if removed else "")
+                                sample=_sample(value) if isinstance(value, str) and removed
+                                else f"{type(value).__name__} made Excel-safe")
     return result
+
+
+class SafeCell:
+    """One cell that cannot be given a value Excel will refuse.
+
+    Everything the exporter writes goes through here, which is the point: the
+    original failure arrived through a writer that did not clean, and the only
+    reliable defence against that happening again is to make the unclean route
+    not exist.
+
+    Everything that is NOT a value — fonts, fills, alignment, number formats,
+    the coordinate — is forwarded straight to the real cell, so the exporter's
+    formatting works exactly as it did.
+    """
+
+    __slots__ = ("_cell", "_log", "_sheet", "_aggressive")
+
+    def __init__(self, cell: Any, log: Sanitisation | None, sheet: str,
+                 aggressive: bool):
+        object.__setattr__(self, "_cell", cell)
+        object.__setattr__(self, "_log", log)
+        object.__setattr__(self, "_sheet", sheet)
+        object.__setattr__(self, "_aggressive", aggressive)
+
+    def __getattr__(self, name: str) -> Any:
+        # Reached only for names not in __slots__, `value` among them.
+        return getattr(self._cell, name)
+
+    def __setattr__(self, name: str, new: Any) -> None:
+        if name == "value":
+            cleaned, removed, truncated = clean_cell(new, aggressive=self._aggressive)
+            if self._log is not None and (removed or truncated):
+                self._log.note(self._sheet, removed, truncated=truncated,
+                               sample=_sample(new) if isinstance(new, str) else "")
+            self._cell.value = cleaned
+            return
+        if name in SafeCell.__slots__:
+            object.__setattr__(self, name, new)
+            return
+        setattr(self._cell, name, new)
+
+
+class SafeSheet:
+    """A worksheet whose cells are always cleaned before they are written.
+
+    A thin proxy: anything not about writing a value is passed straight through
+    to the real worksheet, so the exporter uses it exactly as it used the
+    worksheet, and nothing about the template's formulas, validations or
+    dimensions changes.
+    """
+
+    __slots__ = ("_sheet", "_log", "_aggressive")
+
+    def __init__(self, sheet: Any, *, log: Sanitisation | None = None,
+                 aggressive: bool = False):
+        object.__setattr__(self, "_sheet", sheet)
+        object.__setattr__(self, "_log", log)
+        object.__setattr__(self, "_aggressive", aggressive)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        # Freeze panes, column widths, the title: everything that is not a cell
+        # value belongs to the real worksheet and is set there.
+        if name in SafeSheet.__slots__:
+            object.__setattr__(self, name, value)
+        elif name == "title":
+            self._sheet.title = safe_sheet_title(value)
+        else:
+            setattr(self._sheet, name, value)
+
+    @property
+    def raw(self) -> Any:
+        """The underlying worksheet, for the few reads that need it."""
+        return self._sheet
+
+    def cell(self, *args: Any, **kwargs: Any) -> SafeCell:
+        if "value" in kwargs:
+            cleaned, removed, truncated = clean_cell(kwargs["value"],
+                                                     aggressive=self._aggressive)
+            if self._log is not None and (removed or truncated):
+                self._log.note(self._sheet.title, removed, truncated=truncated,
+                               sample=_sample(kwargs["value"])
+                               if isinstance(kwargs["value"], str) else "")
+            kwargs["value"] = cleaned
+        return SafeCell(self._sheet.cell(*args, **kwargs), self._log,
+                        self._sheet.title, self._aggressive)
+
+    def __getitem__(self, key: Any) -> Any:
+        target = self._sheet[key]
+        if hasattr(target, "value"):
+            return SafeCell(target, self._log, self._sheet.title, self._aggressive)
+        return target
+
+    def __setitem__(self, key: Any, value: Any) -> None:
+        cleaned, removed, truncated = clean_cell(value, aggressive=self._aggressive)
+        if self._log is not None and (removed or truncated):
+            self._log.note(self._sheet.title, removed, truncated=truncated,
+                           sample=_sample(value) if isinstance(value, str) else "")
+        self._sheet[key] = cleaned
+
+    def append(self, row: Iterable[Any]) -> None:
+        self._sheet.append(sanitise_row(list(row), sheet=self._sheet.title,
+                                        log=self._log, aggressive=self._aggressive))
+
+    def iter_rows(self, *args: Any, **kwargs: Any) -> Any:
+        return self._sheet.iter_rows(*args, **kwargs)
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._sheet, name)
 
 
 def _sample(value: str) -> str:

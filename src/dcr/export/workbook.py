@@ -24,7 +24,8 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from .. import __version__
 from ..db import Database
-from .sanitize import (Sanitisation, clean_cell, sanitise_row,
+from .sanitize import (SafeSheet, Sanitisation, clean_cell, safe_sheet_title,
+                       sanitise_row,
                        sanitise_workbook, _sample as _sample_of)
 from ..logging_setup import event, get_logger
 from ..workbook_audit import EXAMPLE_ROW_MARKER, profile_workbook
@@ -130,6 +131,18 @@ class WorkbookExporter:
         self.warnings: list[str] = []
 
     # -- entry -------------------------------------------------------------
+    def sheet(self, workbook: Any, name: str) -> Any:
+        """The ONE way this exporter reaches a worksheet to write to it.
+
+        Wrapping every sheet means there is no route by which a value can reach
+        a cell without being made Excel-safe first. That matters more than the
+        cleaning itself: the reported failure did not happen because nobody had
+        thought about illegal characters — it happened because one writer did
+        not go through the code that had (brief §11).
+        """
+        return SafeSheet(workbook[name], log=self.sanitisation,
+                         aggressive=self.aggressive_sanitize)
+
     def export(self, community_id: str, destination: Path,
                manifest: Mapping[str, Any] | None = None) -> ExportResult:
         workbook = load_workbook(self.template, data_only=False)
@@ -146,7 +159,7 @@ class WorkbookExporter:
         for sheet_name in ("O1_Community_Attributes", "O2_Practice_Matrix", "O2b_Practice_Evidence",
                            "O3_Onset_Register", "O5_Disagreement_Log", "O6_Source_Index",
                            "O7_Search_Log", "O11_Source_Set", "O10_Polygon_And_Area"):
-            self._clear_example_row(workbook[sheet_name])
+            self._clear_example_row(self.sheet(workbook, sheet_name))
 
         result.rows_written["O1_Community_Attributes"] = self._write_o1(
             workbook, community_id, site_id, name, today)
@@ -260,7 +273,7 @@ class WorkbookExporter:
     # -- canonical sheets --------------------------------------------------
     def _write_o1(self, workbook: Any, community_id: str, site_id: str, name: str,
                   today: str) -> int:
-        sheet = workbook["O1_Community_Attributes"]
+        sheet = self.sheet(workbook, "O1_Community_Attributes")
         row = self._next_row(sheet)
         sheet.cell(row=row, column=1).value = site_id
 
@@ -292,7 +305,7 @@ class WorkbookExporter:
 
     def _write_o2(self, workbook: Any, community_id: str, site_id: str, name: str,
                   today: str) -> int:
-        sheet = workbook["O2_Practice_Matrix"]
+        sheet = self.sheet(workbook, "O2_Practice_Matrix")
         row = self._next_row(sheet)
         sheet.cell(row=row, column=1).value = site_id
         sheet.cell(row=row, column=2).value = name
@@ -314,7 +327,7 @@ class WorkbookExporter:
         return 1
 
     def _write_o2b(self, workbook: Any, community_id: str, site_id: str) -> int:
-        sheet = workbook["O2b_Practice_Evidence"]
+        sheet = self.sheet(workbook, "O2b_Practice_Evidence")
         rows = self.db.query(
             "SELECT c.*, e.quote, e.locator FROM claims c "
             "LEFT JOIN evidence e ON c.evidence_id = e.evidence_id "
@@ -347,7 +360,7 @@ class WorkbookExporter:
 
     def _write_o3(self, workbook: Any, community_id: str, site_id: str, name: str,
                   today: str) -> int:
-        sheet = workbook["O3_Onset_Register"]
+        sheet = self.sheet(workbook, "O3_Onset_Register")
         row = self._next_row(sheet)
         sheet.cell(row=row, column=1).value = site_id
         sheet.cell(row=row, column=2).value = name
@@ -372,7 +385,7 @@ class WorkbookExporter:
         return 1
 
     def _write_o5(self, workbook: Any, community_id: str, site_id: str, today: str) -> int:
-        sheet = workbook["O5_Disagreement_Log"]
+        sheet = self.sheet(workbook, "O5_Disagreement_Log")
         written = 0
         for record in self.db.query(
             "SELECT * FROM conflicts WHERE community_id = ? ORDER BY conflict_id", (community_id,)
@@ -402,7 +415,7 @@ class WorkbookExporter:
         return written
 
     def _write_o6(self, workbook: Any, community_id: str, site_id: str) -> int:
-        sheet = workbook["O6_Source_Index"]
+        sheet = self.sheet(workbook, "O6_Source_Index")
         written = 0
         for record in self.db.query(
             "SELECT * FROM sources WHERE community_id = ? ORDER BY source_id", (community_id,)
@@ -450,7 +463,7 @@ class WorkbookExporter:
         return written
 
     def _write_o7(self, workbook: Any, community_id: str, site_id: str) -> int:
-        sheet = workbook["O7_Search_Log"]
+        sheet = self.sheet(workbook, "O7_Search_Log")
         written = 0
         rows = self.db.query(
             "SELECT database_name, database_type, "
@@ -482,7 +495,7 @@ class WorkbookExporter:
         return written
 
     def _write_o11(self, workbook: Any, community_id: str, site_id: str) -> int:
-        sheet = workbook["O11_Source_Set"]
+        sheet = self.sheet(workbook, "O11_Source_Set")
         written = 0
         identity = self.schema.get("machine_identity_columns", {}).get("O11_Source_Set", {})
         for record in self.db.query(
@@ -514,7 +527,7 @@ class WorkbookExporter:
     def _write_o10_key(self, workbook: Any, community_id: str, site_id: str, name: str) -> int:
         """O10 gets only its identity columns. Everything else is the researcher's
         drawing or a formula reading O1 (decision DCR-D020)."""
-        sheet = workbook["O10_Polygon_And_Area"]
+        sheet = self.sheet(workbook, "O10_Polygon_And_Area")
         row = self._next_row(sheet)
         sheet.cell(row=row, column=1).value = site_id
         self._set(sheet, row, "B", name)
@@ -583,9 +596,11 @@ class WorkbookExporter:
 
     def _add_sheet(self, workbook: Any, title: str, headers: Sequence[str],
                    rows: Sequence[Sequence[Any]]) -> None:
+        title = safe_sheet_title(title)
         if title in workbook.sheetnames:
             del workbook[title]
-        sheet = workbook.create_sheet(title)
+        sheet = SafeSheet(workbook.create_sheet(title), log=self.sanitisation,
+                          aggressive=self.aggressive_sanitize)
         for index, header in enumerate(headers, start=1):
             cell = sheet.cell(row=1, column=index)
             cell.value = header

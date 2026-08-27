@@ -11,6 +11,8 @@ reproduce that exactly, and the other ways the same step can fail.
 
 from __future__ import annotations
 
+import os
+
 import pytest
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils.exceptions import IllegalCharacterError
@@ -329,3 +331,202 @@ def test_the_ladder_recovers_from_any_export_exception(tmp_path, error):
     result = finalise_workbook(exporter_factory=build, community_id="IC001",
                                destination=tmp_path / "wb.xlsx")
     assert result.ok
+
+
+# ===========================================================================
+# The three ways a value could still kill the export AFTER the ladder was
+# added — all of them the same shape as the original bug: not an error at
+# assignment, but a crash inside save() once every sheet has been written.
+# ===========================================================================
+def test_openpyxl_really_does_reject_these_too(tmp_path):
+    """The premise, again. These fail LATER than an illegal character does —
+    inside save(), after every sheet has been written, which is the shape of the
+    failure that lost a run's work."""
+    import datetime
+
+    late = Workbook()
+    late.active["A1"] = datetime.datetime(2019, 6, 1, tzinfo=datetime.timezone.utc)
+    with pytest.raises(Exception) as caught:
+        late.save(tmp_path / "tz-raw.xlsx")
+    assert "timezone" in str(caught.value).lower()
+
+    titled = Workbook()
+    with pytest.raises(Exception):
+        titled.active.title = "Evidence\x0bLog"
+        titled.save(tmp_path / "title-raw.xlsx")
+
+
+def test_a_timezone_aware_datetime_is_made_writable():
+    """A retrieval timestamp is the obvious way one gets in (brief §11)."""
+    import datetime
+
+    stamped = datetime.datetime(2019, 6, 1, 12, 30, tzinfo=datetime.timezone.utc)
+    cleaned, removed, _ = clean_cell(stamped)
+    assert isinstance(cleaned, datetime.datetime)
+    assert cleaned.tzinfo is None
+    assert cleaned.hour == 12, "the moment must be preserved, only the tzinfo dropped"
+    sheet = Workbook().active
+    sheet["A1"] = cleaned
+
+
+def test_a_timezone_aware_datetime_survives_being_saved(tmp_path):
+    import datetime
+
+    workbook = Workbook()
+    workbook.active["A1"] = datetime.datetime(2019, 6, 1, tzinfo=datetime.timezone.utc)
+    sanitise_workbook(workbook)
+    path = tmp_path / "tz.xlsx"
+    workbook.save(path)                                  # must not raise
+    assert load_workbook(path)["Sheet"]["A1"].value.year == 2019
+
+
+@pytest.mark.parametrize("title,expected", [
+    ("Evidence\x0bLog", "EvidenceLog"),
+    ("O6/Source:Index", "O6-Source-Index"),
+    ("[brackets]", "-brackets-"),
+    ("", "Sheet"),
+    ("x" * 60, "x" * 31),
+])
+def test_a_sheet_title_is_made_writable(title, expected):
+    from dcr.export.sanitize import safe_sheet_title
+
+    assert safe_sheet_title(title) == expected
+
+
+def test_a_broken_sheet_title_survives_being_saved(tmp_path):
+    workbook = Workbook()
+    # Set it the way openpyxl allows, bypassing its own validation.
+    workbook.active._WorkbookChild__title = "Evidence\x0bLog"
+    sanitise_workbook(workbook)
+    path = tmp_path / "title.xlsx"
+    workbook.save(path)                                  # must not raise
+    assert "\x0b" not in load_workbook(path).sheetnames[0]
+
+
+def test_a_value_of_an_unexpected_type_does_not_reach_a_cell():
+    """`Cannot convert {...} to Excel` is a crash like any other."""
+    cleaned, _, _ = clean_cell({"population": 12})
+    sheet = Workbook().active
+    sheet["A1"] = cleaned
+    assert isinstance(cleaned, str)
+
+
+def test_a_decimal_stays_a_number():
+    import decimal
+
+    cleaned, _, _ = clean_cell(decimal.Decimal("15.5"))
+    assert cleaned == pytest.approx(15.5)
+    assert not isinstance(cleaned, str), "an area must not become text"
+
+
+# ---------------------------------------------------------------------------
+# the chokepoint: no code path may write a cell without going through it
+# ---------------------------------------------------------------------------
+def test_a_writer_that_forgets_to_clean_cannot_break_the_workbook(tmp_path):
+    """The original bug arrived by a route nobody remembered (brief §11)."""
+    from dcr.export.sanitize import SafeSheet
+
+    workbook = Workbook()
+    sheet = SafeSheet(workbook.active)
+    sheet.cell(row=1, column=1).value = "planted\x0bin 2016"      # would raise raw
+    sheet.cell(row=1, column=2).value = 42
+    sheet["A3"] = "another\x00route"
+    sheet.append(["and\x0cone more", 7])
+    path = tmp_path / "safe.xlsx"
+    workbook.save(path)
+    reopened = load_workbook(path)["Sheet"]
+    assert reopened["A1"].value == "planted in 2016"
+    assert reopened["B1"].value == 42
+    assert "\x00" not in reopened["A3"].value
+    assert "\x0c" not in reopened["A4"].value
+
+
+def test_the_chokepoint_records_what_it_cleaned():
+    from dcr.export.sanitize import SafeSheet
+
+    log = Sanitisation()
+    sheet = SafeSheet(Workbook().active, log=log)
+    sheet.cell(row=1, column=1).value = "bad\x0bvalue"
+    assert log.cells == 1
+    assert log.by_sheet.get("Sheet") == 1
+
+
+def test_the_chokepoint_leaves_formulas_alone():
+    from dcr.export.sanitize import SafeSheet
+
+    sheet = SafeSheet(Workbook().active)
+    sheet.cell(row=1, column=1).value = "=SUM(B1:B9)"
+    assert sheet.cell(row=1, column=1).value == "=SUM(B1:B9)"
+
+
+def test_the_real_exporter_writes_through_the_chokepoint():
+    """A guard against the fix being quietly undone later."""
+    import inspect
+
+    from dcr.export import workbook as workbook_mod
+
+    source = inspect.getsource(workbook_mod)
+    assert "SafeSheet" in source, (
+        "the exporter no longer routes its writes through the sanitising "
+        "chokepoint; the original IllegalCharacterError can come back")
+
+
+def test_verification_actually_reads_the_workbook_back(tmp_path):
+    """"Verified" must mean read, not merely opened (brief §91)."""
+    from openpyxl import Workbook as NewWorkbook
+
+    workbook = NewWorkbook()
+    for name in ("O1_Community_Attributes", "O2_Practice_Matrix", "O3_Onset_Register",
+                 "O6_Source_Index", "O11_Source_Set"):
+        sheet = workbook.create_sheet(name)
+        sheet["A3"] = "IC001"
+        sheet["B3"] = "=1+1"
+    del workbook["Sheet"]
+    path = tmp_path / "read-back.xlsx"
+    workbook.save(path)
+
+    result = verify_workbook(path)
+    assert result.ok, result.problems
+    assert result.cells_read > 0
+    assert result.core_rows >= 2
+
+
+def test_a_workbook_carrying_illegal_characters_does_not_verify(tmp_path):
+    """The reopen is the thing that cannot be talked past.
+
+    A file can be written by something other than this exporter — a repaired
+    workbook, a template a colleague edited — and carry a character Excel cannot
+    store. Reopening it is what catches that, and it is why a community is never
+    marked COMPLETE before its workbook has been read back from disk (brief §12,
+    §91, §92).
+    """
+    from openpyxl import Workbook as NewWorkbook
+
+    workbook = NewWorkbook()
+    for name in ("O1_Community_Attributes", "O2_Practice_Matrix", "O3_Onset_Register",
+                 "O6_Source_Index", "O11_Source_Set"):
+        sheet = workbook.create_sheet(name)
+        sheet["A3"] = "IC001"
+        sheet["B3"] = "=1+1"
+    del workbook["Sheet"]
+    path = tmp_path / "sneaky.xlsx"
+    workbook.save(path)
+
+    # Rewrite the shared-strings part with a control character in it, which is
+    # what a file produced by another tool can perfectly well contain.
+    import re
+    import shutil
+    import zipfile
+
+    doctored = tmp_path / "doctored.xlsx"
+    with zipfile.ZipFile(path) as source, zipfile.ZipFile(doctored, "w") as target:
+        for item in source.infolist():
+            data = source.read(item.filename)
+            if item.filename.endswith("sheet1.xml") or "worksheets" in item.filename:
+                data = data.replace(b"IC001", b"IC0&#11;1")
+            target.writestr(item, data)
+
+    result = verify_workbook(doctored)
+    assert not result.ok, "an unreadable workbook was reported as verified"
+    assert any("could not be reopened" in problem or "cannot store" in problem
+               for problem in result.problems), result.problems

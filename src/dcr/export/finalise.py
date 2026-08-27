@@ -52,6 +52,9 @@ class VerificationResult:
     missing_sheets: list[str] = field(default_factory=list)
     core_rows: int = 0
     formulas_intact: bool = True
+    #: How much of the workbook was actually read back. Saying "verified" after
+    #: opening the file and reading nothing would be worthless.
+    cells_read: int = 0
     problems: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
@@ -62,6 +65,7 @@ class VerificationResult:
             "sheet_count": len(self.sheets),
             "missing_sheets": list(self.missing_sheets),
             "core_rows": self.core_rows,
+            "cells_read": self.cells_read,
             "formulas_intact": self.formulas_intact,
             "problems": list(self.problems),
         }
@@ -106,8 +110,12 @@ def verify_workbook(path: Path, *, required: Sequence[str] = REQUIRED_SHEETS,
                     expect_formulas: bool = True) -> VerificationResult:
     """Reopen the workbook we just wrote and check it is really usable.
 
-    Writing a file is not evidence that the file is good. This opens it again
-    from disk, the way the researcher will (brief §47).
+    Writing a file is not evidence that the file is good, and neither is
+    `save()` returning without an exception. This opens the file again from
+    disk, the way the researcher will, and reads it: the sheets, the coded rows,
+    the formulas, and every cell, so a value that would make Excel itself
+    complain is found here rather than by the researcher a week later
+    (brief §12, §91).
     """
     result = VerificationResult(path=path)
     if not path.exists():
@@ -155,6 +163,31 @@ def verify_workbook(path: Path, *, required: Sequence[str] = REQUIRED_SHEETS,
 
         if result.core_rows == 0:
             result.problems.append("no coded rows reached the core sheets")
+
+        # Read every cell. openpyxl writes some things it will not read back,
+        # and a workbook that cannot be fully read is not a research record
+        # however cleanly it saved (brief §91).
+        from .sanitize import find_illegal
+
+        offending: list[str] = []
+        for sheet in workbook.worksheets:
+            for row in sheet.iter_rows():
+                for cell in row:
+                    value = cell.value
+                    if isinstance(value, str) and find_illegal(value):
+                        offending.append(f"{sheet.title}!{cell.coordinate}")
+                        if len(offending) >= 5:
+                            break
+                if len(offending) >= 5:
+                    break
+            if len(offending) >= 5:
+                break
+        if offending:
+            result.problems.append(
+                "characters Excel cannot store survived into the saved workbook at "
+                + ", ".join(offending))
+        result.cells_read = sum(sheet.max_row * sheet.max_column
+                                for sheet in workbook.worksheets)
     finally:
         workbook.close()
 
@@ -183,6 +216,7 @@ def finalise_workbook(
         ("aggressive-sanitisation", dict(aggressive=True, core_only=False)),
         ("core-workbook-only", dict(aggressive=True, core_only=True)),
     ][:max(1, max_attempts)]
+    log_lines: list[str] = []
 
     last_error = ""
     for name, options in ladder:
