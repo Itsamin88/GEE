@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -62,6 +62,9 @@ class Settings:
     lexicon: dict[str, Any]
     decisions: dict[str, Any]
     env: dict[str, str] = field(default_factory=dict)
+    #: Set by the orchestrator so one worker writes to one community's own
+    #: database. None means the shared path from `paths.database`.
+    database_override: Path | None = None
 
     # ---- convenience accessors -------------------------------------------
     @property
@@ -70,7 +73,21 @@ class Settings:
 
     @property
     def database_path(self) -> Path:
+        """Where this run's evidence is stored.
+
+        One database per community is the default, and it is what makes the
+        isolation the brief asks for real: a corrupt or half-written database in
+        C007 cannot reach C001, and sixteen workers are not queueing behind one
+        SQLite writer lock (brief §8, §39). The override is set by the
+        orchestrator when it hands a community to a worker.
+        """
+        if self.database_override is not None:
+            return Path(self.database_override)
         return self._abs(self.app["paths"]["database"])
+
+    def with_database(self, path: Path) -> "Settings":
+        """The same configuration, pointed at one community's own database."""
+        return replace(self, database_override=Path(path))
 
     @property
     def workbook_template(self) -> Path:

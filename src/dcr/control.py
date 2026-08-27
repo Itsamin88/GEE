@@ -32,7 +32,7 @@ import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Mapping, Sequence
 
 from .db import Database, utcnow
 from .logging_setup import event, get_logger
@@ -115,12 +115,20 @@ class RunControl:
         community_id: str,
         control_dir: Path,
         poll_interval_s: float = 1.0,
+        shared_control_dirs: Sequence[Path] = (),
     ):
         self.db = db
         self.run_id = run_id
         self.community_id = community_id
         self.control_dir = Path(control_dir)
         self.control_dir.mkdir(parents=True, exist_ok=True)
+        #: Control directories that belong to the whole run rather than to this
+        #: community. PAUSE ALL writes one file at the run level and every
+        #: community sees it; PAUSE C007 writes a file only C007 looks at
+        #: (brief §33, §34, §35).
+        self.shared_control_dirs = [Path(d) for d in shared_control_dirs]
+        for directory in self.shared_control_dirs:
+            directory.mkdir(parents=True, exist_ok=True)
         self.poll_interval_s = max(0.05, float(poll_interval_s))
 
         self._state = RUNNING
@@ -185,16 +193,19 @@ class RunControl:
         for filename, state in ((CANCEL_FILE, CANCELLED),
                                 (PAUSE_FILE, PAUSED_MANUAL),
                                 (RESUME_FILE, RUNNING)):
-            path = self.control_dir / filename
-            if not path.exists():
-                continue
-            reason = ""
-            try:
-                reason = path.read_text(encoding="utf-8").strip()
-            except OSError:
-                pass
-            return ControlRequest(state=state, by="researcher", reason=reason,
-                                  ts_utc=utcnow())
+            for directory in (self.control_dir, *self.shared_control_dirs):
+                path = directory / filename
+                if not path.exists():
+                    continue
+                reason = ""
+                try:
+                    reason = path.read_text(encoding="utf-8").strip()
+                except OSError:
+                    pass
+                shared = directory != self.control_dir
+                return ControlRequest(
+                    state=state, by="researcher" if not shared else "run",
+                    reason=reason, ts_utc=utcnow())
         return None
 
     def _read_db_request(self) -> ControlRequest | None:
@@ -209,7 +220,13 @@ class RunControl:
         )
 
     def clear_request(self) -> None:
-        """Consume the request, so the same file does not pause the run twice."""
+        """Consume the request, so the same file does not pause the run twice.
+
+        Run-level request files are deliberately NOT removed: they are addressed
+        to every community, and the first one to see PAUSE ALL must not consume
+        it on behalf of the other fifteen. The scheduler clears them when the
+        researcher resumes.
+        """
         for filename in (PAUSE_FILE, RESUME_FILE, CANCEL_FILE):
             path = self.control_dir / filename
             try:

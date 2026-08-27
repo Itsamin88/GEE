@@ -102,6 +102,12 @@ class CommunityInput:
     mode: str = "SETTLEMENT"
     coder_id: str = ""
     fixture: bool = False
+    #: The site_id the run orchestrator has already allocated for this
+    #: community. With one database per community — which is what makes a
+    #: failure in C007 unable to touch C001 — each database would otherwise
+    #: number its single community IC001, and 212 workbooks would all claim
+    #: to be site IC001 (brief §8, §53).
+    assigned_id: str | None = None
 
 
 @dataclass
@@ -139,6 +145,13 @@ class RunOutcome:
     budget_exhausted: bool = False
     budget: dict[str, Any] = field(default_factory=dict)
     profile: dict[str, Any] = field(default_factory=dict)
+    #: What the crawl found, per unit of active time, and the shape of the
+    #: curve behind the stopping decision (brief §25, §93).
+    yield_summary: dict[str, Any] = field(default_factory=dict)
+    #: exhausted | ceiling | requested — why retrieval ended, if it did.
+    retrieval_stop_cause: str = ""
+    #: Archive tiers deliberately not retrieved, and why (brief §61).
+    archive_truncated: list[str] = field(default_factory=list)
 
     @property
     def paused(self) -> bool:
@@ -150,7 +163,8 @@ class CommunityRunner:
 
     def __init__(self, settings: Settings, db: Database, *, run_mode: str = "FULL",
                  target: str | None = None, monitor: Any = None,
-                 on_status: Any = None, estimate: Any = None):
+                 on_status: Any = None, estimate: Any = None,
+                 on_progress: Any = None, host_broker: Any = None):
         self.settings = settings
         #: Supplied by the application; a test may pass a simulated one.
         self.monitor = monitor
@@ -204,6 +218,11 @@ class CommunityRunner:
         #: Archive URLs the index listed, versus the ones actually retrieved.
         self.archive_discovered = 0
         self.archive_fetched = 0
+        #: Where the crawl reports stage changes to, when it is one worker of
+        #: many. None for a single run, and nothing below depends on it.
+        self.on_progress = on_progress
+        #: Run-wide per-host politeness, shared with the other communities.
+        self.host_broker = host_broker
 
     # =====================================================================
     # entry point
@@ -229,9 +248,13 @@ class CommunityRunner:
 
         # Run control first: from here on, every stop has a recorded reason and
         # a checkpoint behind it.
+        # This community's own control directory, so PAUSE C007 reaches C007
+        # and nothing else. The run-level directory is watched as well, which is
+        # what makes PAUSE ALL one file rather than two hundred (brief §34, §35).
         self.control = RunControl(
             self.db, run_id=run_id, community_id=self.community_id,
-            control_dir=control_dir_for(self.settings.output_root),
+            control_dir=control_dir_for(self.storage.root),
+            shared_control_dirs=[control_dir_for(self.settings.output_root)],
             poll_interval_s=float(self.settings.get(
                 "run_control", "poll_interval_s", default=1.0) or 1.0),
         )
@@ -267,6 +290,7 @@ class CommunityRunner:
             config=self.settings.app,
             error_sink=self._error_sink,
             supervisor=self.supervisor,
+            host_broker=self.host_broker,
         )
         browser_cfg = dict(self.settings.get("browser", default={}) or {})
         browser = BrowserPool(
@@ -417,6 +441,9 @@ class CommunityRunner:
         stage.status = "running"
         self._persist_stage(stage)
         event(log, f"Stage {number}/9", STAGE_NAMES[number].capitalize())
+        self._report_progress("stage", stage_no=number,
+                              stage_name=STAGE_NAMES[number],
+                              progress=number / 9.0)
         handler = getattr(self, f"_stage_{number}")
         try:
             await handler()
@@ -472,6 +499,19 @@ class CommunityRunner:
         )
 
     # -- measuring yield ---------------------------------------------------
+    def _report_progress(self, kind: str, **kwargs: Any) -> None:
+        """Tell the run orchestrator what this community is doing.
+
+        Best-effort by design: a crawl must never stop because a dashboard is
+        slow or a parent process has gone away (brief §51).
+        """
+        if self.on_progress is None:
+            return
+        try:
+            self.on_progress(kind, **kwargs)
+        except Exception:
+            pass
+
     def _yield_scopes(self) -> tuple[str, ...]:
         """Which accounts the work happening right now belongs to.
 
@@ -2206,8 +2246,11 @@ class CommunityRunner:
                            {"community_id": existing["community_id"]})
             return existing
 
-        count = int(self.db.scalar("SELECT COUNT(*) FROM communities") or 0)
-        identifier = make_community_id(count + 1, fixture=community.fixture)
+        if community.assigned_id:
+            identifier = community.assigned_id
+        else:
+            count = int(self.db.scalar("SELECT COUNT(*) FROM communities") or 0)
+            identifier = make_community_id(count + 1, fixture=community.fixture)
         self.db.insert(
             "communities",
             {
@@ -2303,12 +2346,18 @@ class CommunityRunner:
             budget=self.budget.snapshot().as_dict() if self.budget else {},
             profile={**(self.budget.profile() if self.budget else {}),
                      "activities": profiling.current().report()},
+            yield_summary={**self.meter.snapshot(),
+                           "curve": self.meter.curve()},
+            retrieval_stop_cause=self.retrieval_stop_cause,
+            archive_truncated=list(self.archive_truncated),
         )
         self.db.update(
             "runs",
             {"status": _RUN_STATUS[self.final_state],
              "final_state": self.final_state,
              "budget_exhausted": int(self.budget_exhausted),
+             "retrieval_stop_cause": self.retrieval_stop_cause or None,
+             "yield_units": round(self.meter.scope("run").units, 2),
              "active_elapsed_s": round(self.budget.active_s, 2) if self.budget else None,
              "truncated": int(truncated),
              "truncation_reason": "; ".join(self.truncation_reasons)[:2000],

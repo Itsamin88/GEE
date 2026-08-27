@@ -138,6 +138,12 @@ class Application:
         self._monitor = monitor
         #: The estimates made for the run in progress, kept for the report.
         self.estimates: list[Estimate] = []
+        #: Set by the run orchestrator when this Application is one worker of
+        #: many: a callback the engine reports stage changes through, and the
+        #: run-wide host politeness broker. Both are None for a single run, and
+        #: everything downstream is written to work without them.
+        self.on_progress: Any = None
+        self.host_broker: Any = None
         self._probe_summary = ""
 
     def close(self) -> None:
@@ -248,7 +254,8 @@ class Application:
         estimate = self.estimate_workload(community, mode=mode) if estimate_first else None
         runner = CommunityRunner(self.settings, self.db, run_mode=mode, target=target,
                                  monitor=self.monitor, on_status=self._on_status,
-                                 estimate=estimate)
+                                 estimate=estimate, on_progress=self.on_progress,
+                                 host_broker=self.host_broker)
         temporary_id = community_row["community_id"] if community_row else safe_name(community.name)
         storage = CommunityStorage.create(storage_root, temporary_id, community.name)
         setup_logging(storage.logs,
@@ -468,8 +475,44 @@ class Application:
         report_mod.write_run_readme(report, storage.root / "README_run.md")
 
         self._print_summary(report, qc_report, workbook_path, storage)
-        return {"report": report, "qc": qc_report, "workbook": workbook_path,
-                "status": status, "output_dir": storage.root}
+        return {
+            "report": report, "qc": qc_report, "workbook": workbook_path,
+            "status": status, "output_dir": storage.root,
+            # The flat view the run orchestrator stores in the queue. Built here
+            # rather than dug out of the report by the caller, so one change to
+            # the report cannot silently empty the multi-community summary.
+            "completion_status": status,
+            "community_id": community_id,
+            "run_id": getattr(outcome, "run_id", ""),
+            "crawl_truncated": bool(getattr(outcome, "truncated", False)),
+            "review_items": blocking,
+            "finalisation": finalisation.as_dict(),
+            "workbook_path": str(workbook_path),
+            "workbook_verified": bool(finalisation.ok),
+            "yield": dict(getattr(outcome, "yield_summary", {}) or {}),
+            "stats": {
+                **dict(getattr(outcome, "stats", {}) or {}),
+                "pages": pages,
+                "conflicts": int(self.db.scalar(
+                    "SELECT COUNT(*) FROM conflicts WHERE community_id=?",
+                    (community_id,)) or 0),
+                "evidence": int(self.db.scalar(
+                    "SELECT COUNT(*) FROM evidence WHERE community_id=?",
+                    (community_id,)) or 0),
+                "claims": int(self.db.scalar(
+                    "SELECT COUNT(*) FROM claims WHERE community_id=?",
+                    (community_id,)) or 0),
+                "sources": int(self.db.scalar(
+                    "SELECT COUNT(*) FROM sources WHERE community_id=?",
+                    (community_id,)) or 0),
+                "documents": int(self.db.scalar(
+                    "SELECT COUNT(*) FROM documents WHERE community_id=?",
+                    (community_id,)) or 0),
+                "images": int(self.db.scalar(
+                    "SELECT COUNT(*) FROM images WHERE community_id=?",
+                    (community_id,)) or 0),
+            },
+        }
 
     def _print_summary(self, report: Mapping[str, Any], qc_report: Any,
                        workbook_path: Path, storage: CommunityStorage) -> None:

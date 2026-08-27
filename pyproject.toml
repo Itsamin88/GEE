@@ -28,6 +28,10 @@ where = ["src"]
 testpaths = ["tests"]
 pythonpath = ["src", "tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+    "slow: spawns real worker processes; minutes rather than milliseconds",
+    "benchmark: measures throughput and is only meaningful on a quiet machine",
+]
 
 [tool.ruff]
 line-length = 100

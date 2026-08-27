@@ -78,6 +78,7 @@ class Fetcher:
         config: Mapping[str, Any],
         error_sink: Any = None,
         supervisor: Any = None,
+        host_broker: Any = None,
     ):
         net = config.get("network", {})
         self.retry_cfg = config.get("retry", {})
@@ -87,6 +88,13 @@ class Fetcher:
         # Told about every result, so it can tell the difference between one
         # dead server and a laptop with no network (brief §14).
         self.supervisor = supervisor
+        #: Per-host politeness ACROSS communities. Only consulted for the
+        #: handful of hosts every community reaches — the web archive, the
+        #: academic indexes, the search endpoints — because paying an
+        #: inter-process round trip for a host nobody else is touching would be
+        #: pure overhead. None when this is a single-community run, and every
+        #: path below works without it (brief §4, §40).
+        self.host_broker = host_broker
         self.max_page_bytes = int(net.get("max_page_bytes", 12_000_000))
         self.max_document_bytes = int(net.get("max_document_bytes", 120_000_000))
         self.max_image_bytes = int(net.get("max_image_bytes", 25_000_000))
@@ -251,154 +259,206 @@ class Fetcher:
         retryable = set(self.retry_cfg.get("retryable_statuses", []))
         permanent = set(self.retry_cfg.get("permanent_statuses", []))
 
-        for attempt in range(1, attempts_allowed + 1):
-            result.attempts = attempt
-            started = asyncio.get_event_loop().time()
-            try:
-                async with self.limiter.slot(host):
-                    self.stats["requests"] += 1
-                    request = self._client.build_request(
-                        method, url, headers=dict(headers or {})
-                    )
-                    response = await self._client.send(request, stream=True)
-                    try:
-                        result.status = response.status_code
-                        result.final_url = str(response.url)
-                        result.headers = {k.lower(): v for k, v in response.headers.items()}
-                        result.redirect_chain = [str(r.url) for r in response.history]
+        # A host every community reaches is spaced out across the whole run, not
+        # just within this community. Refused means the queue for that host is
+        # too long to be worth holding a worker for: the URL is deferred and
+        # this community gets on with its other work (brief §40).
+        if not await self._enter_shared_host(host):
+            result.error_type = "host_deferred"
+            result.error_detail = (
+                f"{host} is busy with other communities in this run; deferred "
+                "rather than queued behind them")
+            result.access_status = "deferred"
+            self._record_error(result, community_id, source_id, stage,
+                               unresolved=True, resolution="deferred")
+            return result
 
-                        declared_length = result.headers.get("content-length")
-                        if declared_length and declared_length.isdigit() and int(declared_length) > cap:
-                            result.error_type = "too_large"
-                            result.error_detail = f"{declared_length} bytes exceeds the {cap} byte cap"
-                            result.access_status = "too_large"
-                            await response.aclose()
-                            self._record_error(result, community_id, source_id, stage,
-                                               unresolved=False, resolution="skipped")
-                            return result
+        try:
+            for attempt in range(1, attempts_allowed + 1):
+              result.attempts = attempt
+              started = asyncio.get_event_loop().time()
+              try:
+                  async with self.limiter.slot(host):
+                      self.stats["requests"] += 1
+                      request = self._client.build_request(
+                          method, url, headers=dict(headers or {})
+                      )
+                      response = await self._client.send(request, stream=True)
+                      try:
+                          result.status = response.status_code
+                          result.final_url = str(response.url)
+                          result.headers = {k.lower(): v for k, v in response.headers.items()}
+                          result.redirect_chain = [str(r.url) for r in response.history]
 
-                        chunks: list[bytes] = []
-                        total = 0
-                        async for chunk in response.aiter_bytes():
-                            chunks.append(chunk)
-                            total += len(chunk)
-                            if total > cap:
-                                result.truncated = True
-                                break
-                        body = b"".join(chunks)[:cap]
-                    finally:
-                        await response.aclose()
+                          declared_length = result.headers.get("content-length")
+                          if declared_length and declared_length.isdigit() and int(declared_length) > cap:
+                              result.error_type = "too_large"
+                              result.error_detail = f"{declared_length} bytes exceeds the {cap} byte cap"
+                              result.access_status = "too_large"
+                              await response.aclose()
+                              self._record_error(result, community_id, source_id, stage,
+                                                 unresolved=False, resolution="skipped")
+                              return result
 
-                result.elapsed_s = asyncio.get_event_loop().time() - started
-                result.content = body
-                result.bytes_len = len(body)
-                self.stats["bytes"] += len(body)
+                          chunks: list[bytes] = []
+                          total = 0
+                          async for chunk in response.aiter_bytes():
+                              chunks.append(chunk)
+                              total += len(chunk)
+                              if total > cap:
+                                  result.truncated = True
+                                  break
+                          body = b"".join(chunks)[:cap]
+                      finally:
+                          await response.aclose()
 
-                if response.status_code == 429:
-                    count = self.limiter.note_429(host)
-                    delay = self._retry_after(result.headers) or self._backoff(attempt)
-                    cap_s = float(self.retry_cfg.get("respect_retry_after_max_s", 300))
-                    self.limiter.defer(host, min(delay, cap_s))
-                    if attempt >= attempts_allowed or count >= 3:
-                        result.error_type = "rate_limited"
-                        result.error_detail = f"429 after {attempt} attempts; host deferred"
-                        result.access_status = "blocked"
-                        self._record_error(result, community_id, source_id, stage)
-                        return result
-                    continue
+                  result.elapsed_s = asyncio.get_event_loop().time() - started
+                  result.content = body
+                  result.bytes_len = len(body)
+                  self.stats["bytes"] += len(body)
 
-                if response.status_code in permanent:
-                    result.error_type = f"http_{response.status_code}"
-                    result.error_detail = self._detect_wall(body, response.status_code)
-                    result.access_status = _STATUS_ACCESS.get(response.status_code, "blocked")
-                    self.stats["failed"] += 1
-                    self._record_error(result, community_id, source_id, stage,
-                                       unresolved=False, resolution="permanent")
-                    return result
+                  if response.status_code == 429:
+                      count = self.limiter.note_429(host)
+                      delay = self._retry_after(result.headers) or self._backoff(attempt)
+                      cap_s = float(self.retry_cfg.get("respect_retry_after_max_s", 300))
+                      self.limiter.defer(host, min(delay, cap_s))
+                      if attempt >= attempts_allowed or count >= 3:
+                          result.error_type = "rate_limited"
+                          result.error_detail = f"429 after {attempt} attempts; host deferred"
+                          result.access_status = "blocked"
+                          self._record_error(result, community_id, source_id, stage)
+                          return result
+                      continue
 
-                if response.status_code in retryable and attempt < attempts_allowed:
-                    await asyncio.sleep(self._backoff(attempt))
-                    continue
+                  if response.status_code in permanent:
+                      result.error_type = f"http_{response.status_code}"
+                      result.error_detail = self._detect_wall(body, response.status_code)
+                      result.access_status = _STATUS_ACCESS.get(response.status_code, "blocked")
+                      self.stats["failed"] += 1
+                      self._record_error(result, community_id, source_id, stage,
+                                         unresolved=False, resolution="permanent")
+                      return result
 
-                if response.status_code >= 400:
-                    result.error_type = f"http_{response.status_code}"
-                    result.error_detail = f"HTTP {response.status_code} after {attempt} attempts"
-                    result.access_status = "blocked" if response.status_code < 500 else "unreachable"
-                    self.stats["failed"] += 1
-                    self._record_error(result, community_id, source_id, stage)
-                    return result
+                  if response.status_code in retryable and attempt < attempts_allowed:
+                      await asyncio.sleep(self._backoff(attempt))
+                      continue
 
-                # Success.
-                self._host_failures.pop(host, None)
-                self.limiter.note_ok(host)
-                self.stats["ok"] += 1
-                result.ok = True
-                result.access_status = "ok"
-                mime, ext = sniff(body, result.headers.get("content-type"), url.rsplit("/", 1)[-1])
-                result.mime = mime
-                result.extension = ext
-                if mime.startswith("text/") or mime in {
-                    "application/xml", "application/json", "application/rss+xml",
-                    "application/atom+xml", "application/xhtml+xml", "image/svg+xml",
-                }:
-                    result.encoding = response.encoding or "utf-8"
-                    result.text = _decode(body, result.encoding)
-                return result
+                  if response.status_code >= 400:
+                      result.error_type = f"http_{response.status_code}"
+                      result.error_detail = f"HTTP {response.status_code} after {attempt} attempts"
+                      result.access_status = "blocked" if response.status_code < 500 else "unreachable"
+                      self.stats["failed"] += 1
+                      self._record_error(result, community_id, source_id, stage)
+                      return result
 
-            except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.WriteTimeout, httpx.PoolTimeout) as exc:
-                result.error_type = "timeout"
-                result.error_detail = f"{type(exc).__name__}: {exc}"
-            except httpx.TooManyRedirects as exc:
-                result.error_type = "redirect_loop"
-                result.error_detail = str(exc)
-                result.access_status = "dead"
-                self._record_error(result, community_id, source_id, stage,
-                                   unresolved=False, resolution="permanent")
-                return result
-            except httpx.ProxyError as exc:
-                self._note_host_failure(host, "the outbound proxy refused the connection")
-                # An outbound proxy refusing CONNECT is an environment policy
-                # decision, not a property of the target. Retrying cannot help
-                # and would hide the real cause behind four timeouts.
-                result.error_type = "proxy_denied"
-                result.error_detail = f"{type(exc).__name__}: {exc}"
-                result.access_status = "unreachable"
-                self._record_error(result, community_id, source_id, stage,
-                                   unresolved=True, resolution="permanent")
-                self.stats["failed"] += 1
-                return result
-            except (httpx.ConnectError, httpx.NetworkError) as exc:
-                text = str(exc).lower()
-                if any(marker in text for marker in (
-                    "name or service not known", "nodename nor servname",
-                    "temporary failure in name resolution", "getaddrinfo",
-                    "no address associated", "name does not resolve",
-                )):
-                    result.error_type = "dns_error"
-                    result.access_status = "dead"
-                else:
-                    result.error_type = "connection_error"
-                result.error_detail = f"{type(exc).__name__}: {exc}"
-                self._note_host_failure(host, f"{result.error_type}: {exc}")
-            except (httpx.ProtocolError, httpx.RemoteProtocolError) as exc:
-                result.error_type = "protocol_error"
-                result.error_detail = f"{type(exc).__name__}: {exc}"
-            except Exception as exc:  # anything else, including TLS problems
-                name = type(exc).__name__
-                result.error_type = ("tls_error" if "SSL" in name or "Certificate" in name
-                                     else "unknown_error")
-                result.error_detail = f"{name}: {exc}"
-                self._note_host_failure(host, f"{result.error_type}: {exc}")
+                  # Success.
+                  self._host_failures.pop(host, None)
+                  self.limiter.note_ok(host)
+                  self.stats["ok"] += 1
+                  result.ok = True
+                  result.access_status = "ok"
+                  mime, ext = sniff(body, result.headers.get("content-type"), url.rsplit("/", 1)[-1])
+                  result.mime = mime
+                  result.extension = ext
+                  if mime.startswith("text/") or mime in {
+                      "application/xml", "application/json", "application/rss+xml",
+                      "application/atom+xml", "application/xhtml+xml", "image/svg+xml",
+                  }:
+                      result.encoding = response.encoding or "utf-8"
+                      result.text = _decode(body, result.encoding)
+                  return result
 
-            if result.error_type == "dns_error" or attempt >= attempts_allowed:
-                break
-            await asyncio.sleep(self._backoff(attempt))
+              except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.WriteTimeout, httpx.PoolTimeout) as exc:
+                  result.error_type = "timeout"
+                  result.error_detail = f"{type(exc).__name__}: {exc}"
+              except httpx.TooManyRedirects as exc:
+                  result.error_type = "redirect_loop"
+                  result.error_detail = str(exc)
+                  result.access_status = "dead"
+                  self._record_error(result, community_id, source_id, stage,
+                                     unresolved=False, resolution="permanent")
+                  return result
+              except httpx.ProxyError as exc:
+                  self._note_host_failure(host, "the outbound proxy refused the connection")
+                  # An outbound proxy refusing CONNECT is an environment policy
+                  # decision, not a property of the target. Retrying cannot help
+                  # and would hide the real cause behind four timeouts.
+                  result.error_type = "proxy_denied"
+                  result.error_detail = f"{type(exc).__name__}: {exc}"
+                  result.access_status = "unreachable"
+                  self._record_error(result, community_id, source_id, stage,
+                                     unresolved=True, resolution="permanent")
+                  self.stats["failed"] += 1
+                  return result
+              except (httpx.ConnectError, httpx.NetworkError) as exc:
+                  text = str(exc).lower()
+                  if any(marker in text for marker in (
+                      "name or service not known", "nodename nor servname",
+                      "temporary failure in name resolution", "getaddrinfo",
+                      "no address associated", "name does not resolve",
+                  )):
+                      result.error_type = "dns_error"
+                      result.access_status = "dead"
+                  else:
+                      result.error_type = "connection_error"
+                  result.error_detail = f"{type(exc).__name__}: {exc}"
+                  self._note_host_failure(host, f"{result.error_type}: {exc}")
+              except (httpx.ProtocolError, httpx.RemoteProtocolError) as exc:
+                  result.error_type = "protocol_error"
+                  result.error_detail = f"{type(exc).__name__}: {exc}"
+              except Exception as exc:  # anything else, including TLS problems
+                  name = type(exc).__name__
+                  result.error_type = ("tls_error" if "SSL" in name or "Certificate" in name
+                                       else "unknown_error")
+                  result.error_detail = f"{name}: {exc}"
+                  self._note_host_failure(host, f"{result.error_type}: {exc}")
+
+              if result.error_type == "dns_error" or attempt >= attempts_allowed:
+                  break
+              await asyncio.sleep(self._backoff(attempt))
+        finally:
+            self._leave_shared_host(host, result)
 
         self.stats["failed"] += 1
         if result.access_status == "not_attempted":
             result.access_status = "unreachable"
         self._record_error(result, community_id, source_id, stage)
         return result
+
+    # -- run-wide host politeness ------------------------------------------
+    async def _enter_shared_host(self, host: str) -> bool:
+        """Ask the run for permission to touch a host every community wants.
+
+        The broker call is synchronous — it crosses a process boundary — so it
+        goes to a thread rather than blocking this community's event loop while
+        it waits. False means defer: the queue for that host is long enough that
+        holding a worker for it costs more than the request is worth.
+        """
+        broker = self.host_broker
+        if broker is None or not host:
+            return True
+        try:
+            if not broker.shared(host):
+                return True
+            return bool(await asyncio.to_thread(broker.acquire, host))
+        except Exception:
+            # A coordinator that has gone away must not stop the research: fall
+            # back to this community's own politeness, which is what a single
+            # run would have done anyway.
+            return True
+
+    def _leave_shared_host(self, host: str, result: Any) -> None:
+        broker = self.host_broker
+        if broker is None or not host:
+            return
+        try:
+            if not broker.shared(host):
+                return
+            broker.release(host, latency_s=getattr(result, "elapsed_s", 0.0) or 0.0,
+                           status=getattr(result, "status", None),
+                           error=getattr(result, "error_type", "") or "")
+        except Exception:
+            pass
 
     # -- helpers -----------------------------------------------------------
     def _note_host_failure(self, host: str, reason: str) -> None:
