@@ -564,10 +564,21 @@ class Application:
                   f"({interruptions.get('offline_s', 0):.0f}s offline)")
         budget = report.get("budget") or {}
         if budget:
-            print(f"  Active time          {budget.get('active_s', 0) / 60:.1f} min of "
-                  f"{budget.get('budget_s', 0) / 60:.0f} min budget"
-                  + ("   <- the clock stopped this run"
-                     if budget.get("budget_exhausted") else ""))
+            ceiling = budget.get("ceiling_s")
+            cause = report.get("retrieval_stop_cause") or ""
+            note = {
+                "exhausted": "   <- the community was worked out",
+                "ceiling": "   <- the configured ceiling stopped this run",
+                "requested": "   <- stopped on request",
+            }.get(cause, "")
+            print(f"  Active time          {budget.get('active_s', 0) / 60:.1f} min"
+                  + (f" of a {ceiling / 60:.0f} min ceiling" if ceiling else "")
+                  + note)
+        measured = report.get("yield") or {}
+        if measured.get("evidence_yield_per_min"):
+            print(f"  Evidence yield       "
+                  f"{measured['evidence_yield_per_min']:.1f} units/min "
+                  f"({measured.get('independent_yield_per_min', 0):.1f} independent)")
         activities = ((report.get("profile") or {}).get("activities") or {})
         shares = activities.get("by_activity_pct") or {}
         if shares:

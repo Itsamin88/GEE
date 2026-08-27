@@ -100,6 +100,12 @@ def run_job(payload: Mapping[str, Any], event_queue: Any = None,
     try:
         settings = load_settings(
             root=Path(payload["config_root"]) if payload.get("config_root") else None)
+        # Per-run configuration, decided once by the parent and applied
+        # identically in every worker. This is how an advanced user changes
+        # timeouts, budgets or concurrency for one run without editing the
+        # configuration files the reproducibility record hashes (brief §98) —
+        # and how a test points the whole pipeline at a local fixture web.
+        settings = _apply_overrides(settings, payload)
         output_dir = Path(payload["output_dir"])
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -187,6 +193,28 @@ def run_job(payload: Mapping[str, Any], event_queue: Any = None,
                 pass
 
 
+def _apply_overrides(settings: Any, payload: Mapping[str, Any]) -> Any:
+    """Merge the run's configuration overrides into a fresh Settings."""
+    import copy
+
+    app_overrides = payload.get("settings_overrides") or {}
+    source_overrides = payload.get("sources_overrides") or {}
+    if not app_overrides and not source_overrides:
+        return settings
+    settings.app = _deep_merge(copy.deepcopy(settings.app), app_overrides)
+    settings.sources = _deep_merge(copy.deepcopy(settings.sources), source_overrides)
+    return settings
+
+
+def _deep_merge(base: dict, overlay: Mapping[str, Any]) -> dict:
+    for key, value in overlay.items():
+        if isinstance(value, Mapping) and isinstance(base.get(key), dict):
+            base[key] = _deep_merge(base[key], value)
+        else:
+            base[key] = value
+    return base
+
+
 def _progress_bridge(sink: Any):
     """Turn the engine's stage callbacks into events for the scheduler."""
 
@@ -219,7 +247,6 @@ def _summarise(result: Mapping[str, Any]) -> dict[str, Any]:
     """Reduce a completion report to the handful of numbers the queue holds."""
     stats = dict(result.get("stats") or {})
     timing = dict(stats.get("timing") or {})
-    workbook = dict(result.get("workbook") or {})
     finalisation = dict(result.get("finalisation") or {})
     verification = dict(finalisation.get("verification") or {})
     return {
@@ -242,9 +269,13 @@ def _summarise(result: Mapping[str, Any]) -> dict[str, Any]:
         "wall_s": float(timing.get("wall_clock_s", 0.0) or 0.0),
         "offline_s": float(timing.get("offline_s", 0.0) or 0.0),
         "paused_s": float(timing.get("paused_manual_s", 0.0) or 0.0),
-        "workbook_path": str(workbook.get("path") or result.get("workbook_path") or ""),
-        "workbook_verified": bool(verification.get("reopened",
-                                                   workbook.get("verified", False))),
+        # `workbook` is a Path; `workbook_path` and `workbook_verified` are the
+        # flat facts the queue stores, and they come from the finalisation
+        # ladder rather than from whether a file happens to exist.
+        "workbook_path": str(result.get("workbook_path")
+                             or result.get("workbook") or ""),
+        "workbook_verified": bool(result.get("workbook_verified",
+                                             verification.get("reopened", False))),
         "output_dir": str(result.get("output_dir") or ""),
         "review_items": int(result.get("review_items", 0) or 0),
         "truncated": bool(result.get("crawl_truncated", False)),

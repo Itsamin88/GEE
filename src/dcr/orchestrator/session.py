@@ -167,6 +167,9 @@ class RunSession:
     plan: RunPlan | None = None
     scheduler: RunScheduler | None = None
     dashboard: Dashboard | None = None
+    #: Configuration overrides applied identically in every worker (brief §98).
+    settings_overrides: Mapping[str, Any] = field(default_factory=dict)
+    sources_overrides: Mapping[str, Any] = field(default_factory=dict)
     _broker_manager: Any = None
     _progress_written_at: float = 0.0
 
@@ -285,7 +288,11 @@ class RunSession:
             self.store, self.plan, output_root=self.output_root, pool=pool,
             governor=governor, config=config,
             on_update=self._on_update,
-            payload_extra={"config_root": str(self.settings.root)},
+            payload_extra={
+                "config_root": str(self.settings.root),
+                "settings_overrides": dict(self.settings_overrides),
+                "sources_overrides": dict(self.sources_overrides),
+            },
         )
 
         event(log, "RUN", f"{self.run_id}: {len(self.plan.jobs)} communities")

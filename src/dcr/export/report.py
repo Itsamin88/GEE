@@ -130,6 +130,11 @@ def build_report(
         # The clock: what the run was allowed, what it used, and whether the
         # ceiling — rather than the sources — is why it stopped (brief §29).
         "budget": dict(getattr(outcome, "budget", {}) or {}),
+        "retrieval_stop_cause": getattr(outcome, "retrieval_stop_cause", ""),
+        # What the crawl found per active minute, and the shape of the curve
+        # the stopping decision reacted to (brief §25, §93).
+        "yield": dict(getattr(outcome, "yield_summary", {}) or {}),
+        "archive_truncated": list(getattr(outcome, "archive_truncated", []) or []),
         "profile": dict(getattr(outcome, "profile", {}) or {}),
         "not_found_fields": sorted(f["field_name"] for f in not_found),
         "review_fields": sorted(f["field_name"] for f in review_needed),
@@ -268,15 +273,25 @@ def _add_budget(add: Any, report: Mapping[str, Any]) -> None:
     add("## Time")
     add("")
     if budget:
-        add(f"- Active processing: **{budget.get('active_s', 0) / 60:.1f} min** of a "
-            f"{budget.get('budget_s', 0) / 60:.0f}-minute budget")
+        ceiling = budget.get("ceiling_s")
+        add(f"- Active processing: **{budget.get('active_s', 0) / 60:.1f} min**"
+            + (f" of a {ceiling / 60:.0f}-minute safety ceiling" if ceiling else
+               " — no ceiling was set; the crawl ran while it was producing evidence"))
         add(f"- Wall clock: {budget.get('wall_clock_s', 0) / 60:.1f} min "
             f"(paused {budget.get('paused_manual_s', 0) / 60:.1f} min, offline "
-            f"{budget.get('offline_s', 0) / 60:.1f} min — neither counts against the budget)")
-        if budget.get("budget_exhausted"):
-            add("- **The budget, not the sources, is why this run stopped.** What it did "
-                "not reach is listed above; nothing here may be read as an exhaustive "
-                "search.")
+            f"{budget.get('offline_s', 0) / 60:.1f} min — neither counts as active time)")
+        cause = report.get("retrieval_stop_cause") or ""
+        reason = budget.get("stop_reason") or ""
+        if cause == "exhausted":
+            add(f"- Retrieval ended because the community was worked out: {reason}. "
+                "This is a complete search, not a truncated one.")
+        elif cause == "ceiling":
+            add("- **The configured safety ceiling, not the sources, is why this run "
+                "stopped.** What it did not reach is listed above; nothing here may be "
+                "read as an exhaustive search.")
+        elif cause == "requested":
+            add(f"- Retrieval was ended on request: {reason}. Nothing here may be read "
+                "as an exhaustive search.")
     activities = (profile.get("activities") or {})
     shares = activities.get("by_activity_pct") or {}
     if shares:
