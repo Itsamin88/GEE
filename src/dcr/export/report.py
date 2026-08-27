@@ -127,6 +127,10 @@ def build_report(
         "image_triage": _image_triage(db, community_id),
         "timing": dict(getattr(outcome, "stats", {}).get("timing", {})),
         "estimate": dict(getattr(outcome, "estimate", {}) or {}),
+        # The clock: what the run was allowed, what it used, and whether the
+        # ceiling — rather than the sources — is why it stopped (brief §29).
+        "budget": dict(getattr(outcome, "budget", {}) or {}),
+        "profile": dict(getattr(outcome, "profile", {}) or {}),
         "not_found_fields": sorted(f["field_name"] for f in not_found),
         "review_fields": sorted(f["field_name"] for f in review_needed),
         "quality_checks": [

@@ -58,6 +58,9 @@ ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     ("run_control", "budget_phase", "TEXT"),
     ("runs", "budget_exhausted", "INTEGER"),
     ("runs", "active_elapsed_s", "REAL"),
+    # How many pages linked the same image. A gallery photo on nine pages is
+    # one candidate seen nine times, not nine candidates.
+    ("image_candidates", "times_seen", "INTEGER"),
 )
 
 #: Indexes for the columns above. Deliberately NOT unique: an existing database

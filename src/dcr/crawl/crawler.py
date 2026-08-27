@@ -22,6 +22,8 @@ from ..db import Database, utcnow
 from ..discovery.wayback import parse_archive_url
 from ..extract.dispatch import Extraction, extract as extract_file
 from ..extract.html import ParsedPage, parse_html
+from ..extract.triage import (DUPLICATE as DOC_DUPLICATE, LOW as DOC_LOW,
+                              DocumentTriage, DocumentVerdict)
 from ..ids import image_filename, safe_name
 from ..images.classify import classify_image, summarise_surrounding
 from ..images.triage import (DUPLICATE, HIGH, LOW, MEDIUM, ImageCandidate,
@@ -46,6 +48,8 @@ class CrawlStats:
     pages_opened: int = 0
     pages_yielding: int = 0
     documents: int = 0
+    documents_skipped: int = 0
+    documents_mirrored: int = 0
     images_kept: int = 0
     images_rejected: int = 0
     image_candidates: int = 0
@@ -141,12 +145,27 @@ class Crawler:
         self.image_download_priorities = set(
             image_cfg.get("download_priorities", [HIGH, MEDIUM]))
         self.max_candidates_per_page = int(image_cfg.get("max_candidates_per_page", 120))
+        self.max_images_per_document = int(image_cfg.get("max_images_per_document", 12))
 
         self.stats = CrawlStats()
         self.sources: dict[str, SourceContext] = {}
         self.external_candidates: dict[str, dict[str, Any]] = {}
         self._image_hashes: set[str] = set()
         self.triage = TriageLedger(db, community_id)
+        self.doc_triage = DocumentTriage(
+            max_family_deep_extractions=int(
+                dict(config.get("documents", {})).get("max_per_family", 1)))
+        doc_cfg = dict(config.get("documents", {}))
+        #: Below this band a document is recorded as discovered but not opened
+        #: while the clock is tight. Its existence is still evidence.
+        self.skip_low_value_documents = bool(
+            doc_cfg.get("skip_low_value_when_pressed", True))
+        image_budget = dict(config.get("images", {}))
+        #: A global ceiling on image work, so the image subsystem cannot eat
+        #: the run (brief §18).
+        self.max_image_seconds = float(image_budget.get("max_processing_seconds", 240))
+        self.max_image_candidates = int(image_budget.get("max_candidates_per_run", 1500))
+        self._image_seconds = 0.0
         self._document_hashes: dict[str, str] = {}
         self._browser_renders: dict[str, int] = {}
         self._announced_exhausted: set[str] = set()
@@ -221,6 +240,12 @@ class Crawler:
                 tasks_total=opened + self.frontier.pending_count(),
                 task_detail="about to claim the next batch of URLs",
             )
+            if getattr(self.supervisor, "winding_down", False):
+                # The budget has entered its wind-down: no new batch starts, so
+                # the reserve for reconciliation and export stays intact.
+                log.info("[BUDGET] crawl stopping at a batch boundary; "
+                         "%d URL(s) remain queued", self.frontier.pending_count())
+                break
             batch = self.frontier.next_batch(min(batch_size, cap - opened))
             if not batch:
                 break
@@ -504,6 +529,24 @@ class Crawler:
 
     # -- documents ---------------------------------------------------------
     async def _fetch_document(self, item: Any, context: SourceContext | None, stage: int) -> None:
+        # What a document is can usually be told from its address before a byte
+        # of it is downloaded, and that judgement costs nothing (brief §10, §41).
+        verdict = self.doc_triage.judge(
+            url=item.normalized_url,
+            link_text=item.discovered_by or "",
+            source_class=context.source_class if context else "",
+        )
+        if (verdict.band == DOC_LOW and self.skip_low_value_documents
+                and not self.supervisor.affords(verdict.estimated_seconds)):
+            # Its existence is still recorded; only the download is skipped.
+            self.stats.documents_skipped += 1
+            self._log_discovery(stage, "document_triage", item.normalized_url,
+                                "out_of_scope",
+                                f"LOW priority ({verdict.reason}) and the time budget is "
+                                "spent; recorded as discovered but not opened")
+            self.frontier.complete(item.url_key, "skipped", verdict.reason)
+            return
+
         result = await self.fetcher.fetch(
             item.normalized_url, kind="document", community_id=self.community_id,
             source_id=item.source_id, stage=stage,
@@ -515,7 +558,8 @@ class Crawler:
         await self._store_document_bytes(item.normalized_url, result, context, stage,
                                          url_key=item.url_key,
                                          archive_timestamp=archived[0] if archived else None,
-                                         discovery_method=item.discovered_by or "link")
+                                         discovery_method=item.discovered_by or "link",
+                                         verdict=verdict)
 
     async def _store_document_bytes(
         self,
@@ -527,6 +571,7 @@ class Crawler:
         url_key: str | None = None,
         archive_timestamp: str | None = None,
         discovery_method: str = "link",
+        verdict: DocumentVerdict | None = None,
     ) -> str | None:
         data = result.content or b""
         if not data:
@@ -623,6 +668,22 @@ class Crawler:
               f"({extraction.parser_status}/{extraction.text_status}, {len(data)} bytes)",
               document_id=document_id, url=url)
 
+        if verdict is not None and not verdict.deep_extract:
+            # Stored, hashed and provenanced, but not read in full: it is a
+            # translation or reprint of something already read, or it is a
+            # flyer. The bytes are on disk and can be re-parsed offline at any
+            # time without re-fetching (brief §12, §13).
+            self.stats.documents_mirrored += 1
+            self.db.update("documents", {"notes": verdict.reason[:500]},
+                           {"document_id": document_id})
+            event(log, "DOC", f"{filename}: {verdict.reason}", document_id=document_id)
+            if url_key:
+                self.frontier.complete(url_key, "done")
+            return document_id
+
+        if verdict is not None:
+            self.doc_triage.note_deep_extraction(url, verdict)
+
         self._store_tables(document_id, extraction)
 
         evidence_count = 0
@@ -646,7 +707,8 @@ class Crawler:
                                    error_type="evidence_extraction_failed", detail=str(exc))
 
         if self.image_enabled and extraction.images:
-            self._store_document_images(document_id, extraction, context, str(title), url)
+            self._store_document_images(document_id, extraction, context, str(title), url,
+                                        verdict=verdict)
 
         # A zip's members are parsed as documents in their own right.
         for member_name, blob in extraction.contained_files[:50]:
@@ -728,9 +790,18 @@ class Crawler:
             ))
         return candidates
 
+    def _image_budget_spent(self) -> bool:
+        """Has image work had its share of the run? (brief §18)"""
+        return (self._image_seconds >= self.max_image_seconds
+                or self.stats.image_candidates >= self.max_image_candidates)
+
     async def _harvest_page_images(self, parsed: ParsedPage, page_id: str, item: Any,
                                    context: SourceContext | None, stage: int) -> None:
         if self.stats.images_kept >= self.max_images_per_community:
+            return
+        if self._image_budget_spent():
+            return
+        if not self.supervisor.affords(1.0):
             return
         candidates = self._candidates_from_page(parsed, page_id, item, context, stage)
         if not candidates:
@@ -768,6 +839,13 @@ class Crawler:
 
     async def _download_candidate(self, candidate: ImageCandidate, stage: int) -> bool:
         """Fetch one triaged candidate and keep it, recording either outcome."""
+        started = _now()
+        try:
+            return await self._download_candidate_inner(candidate, stage)
+        finally:
+            self._image_seconds += _now() - started
+
+    async def _download_candidate_inner(self, candidate: ImageCandidate, stage: int) -> bool:
         result = await self.fetcher.fetch(
             candidate.original_url, kind="image", community_id=self.community_id,
             source_id=candidate.source_id, stage=stage,
@@ -862,7 +940,8 @@ class Crawler:
         self.frontier.complete(item.url_key, "done")
 
     def _store_document_images(self, document_id: str, extraction: Extraction,
-                               context: SourceContext | None, title: str, url: str) -> None:
+                               context: SourceContext | None, title: str, url: str,
+                               verdict: DocumentVerdict | None = None) -> None:
         """Figures, plans and photographs embedded in a PDF, deck or document.
 
         A figure in a report is among the best visual evidence there is: it was
@@ -870,8 +949,16 @@ class Crawler:
         the surrounding text says what it shows (brief SS11).
         """
         source_id = context.source_id if context else None
+        # A ninety-page report can carry three hundred embedded images. Saving
+        # all of them is how the image subsystem eats the run; a research-rich
+        # document still gets enough to preserve its plans and figures
+        # (brief §17).
+        cap = verdict.max_images if verdict is not None else self.max_images_per_document
+        if cap <= 0:
+            return
+        inspect_limit = max(cap * 4, 40)
         candidates: list[ImageCandidate] = []
-        for index, image in enumerate(extraction.images[:200], start=1):
+        for index, image in enumerate(extraction.images[:inspect_limit], start=1):
             candidates.append(ImageCandidate(
                 original_url=f"{url}#image{index}",
                 page_url=url,
@@ -900,7 +987,14 @@ class Crawler:
             min_width=self.image_min_width, min_height=self.image_min_height,
         )
         self.stats.image_candidates += len(triaged)
+        kept_here = 0
         for candidate in triaged:
+            if kept_here >= cap:
+                self.triage.record(
+                    candidate, decision="skipped_budget",
+                    reason=f"this document's image allowance ({cap}) is spent; the "
+                           "highest-scoring figures were kept")
+                continue
             if self.stats.images_kept >= self.max_images_per_community:
                 self.triage.record(candidate, decision="skipped_budget",
                                    reason="the community image budget was already spent")
@@ -921,8 +1015,9 @@ class Crawler:
             # paid when the document was parsed.
             extension = (candidate.filename.rsplit(".", 1)[-1]
                          if "." in candidate.filename else "jpg")
-            self._persist_image(data=candidate.data or b"", candidate=candidate,
-                                extension=extension)
+            if self._persist_image(data=candidate.data or b"", candidate=candidate,
+                                   extension=extension):
+                kept_here += 1
 
     def _persist_image(self, *, data: bytes, candidate: ImageCandidate,
                        extension: str) -> str | None:
@@ -1062,6 +1157,12 @@ class Crawler:
             },
             replace=True,
         )
+
+
+def _now() -> float:
+    import time
+
+    return time.monotonic()
 
 
 _FIGURE = re.compile(

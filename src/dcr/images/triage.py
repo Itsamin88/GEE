@@ -173,6 +173,10 @@ class TriageLedger:
         self.run_id = run_id
         self._seen_urls: dict[str, str] = {}       # url_key -> candidate_id
         self._seen_hashes: dict[str, str] = {}     # sha256  -> candidate_id
+        #: url_key -> the decision already recorded for it.
+        self._decided: dict[str, str] = {}
+        #: url_key -> how many pages linked it.
+        self._times_seen: dict[str, int] = {}
         self.counts: dict[str, int] = {}
         self._load()
 
@@ -180,13 +184,14 @@ class TriageLedger:
         """Restore what earlier runs already decided, so a resume is idempotent."""
         try:
             rows = self.db.query(
-                "SELECT candidate_id, url_key, sha256 FROM image_candidates "
+                "SELECT candidate_id, url_key, sha256, decision FROM image_candidates "
                 "WHERE community_id = ?", (self.community_id,))
         except Exception:
             return
         for row in rows:
             if row["url_key"]:
                 self._seen_urls[row["url_key"]] = row["candidate_id"]
+                self._decided[row["url_key"]] = row["decision"] or ""
             if row["sha256"]:
                 self._seen_hashes[row["sha256"]] = row["candidate_id"]
 
@@ -240,7 +245,30 @@ class TriageLedger:
     def record(self, candidate: ImageCandidate, *, decision: str,
                reason: str = "", image_id: str | None = None,
                sha256: str | None = None) -> str:
-        """Write the candidate and its outcome to the ledger."""
+        """Write the candidate and its outcome to the ledger.
+
+        A candidate already decided is not re-decided. Meeting the same gallery
+        photo on a ninth page says something about the page, not about the
+        image: overwriting the first row's real reason ("LOW priority: nothing
+        in its description marks it as research-relevant") with the far less
+        informative "duplicate" would destroy exactly the audit trail this
+        ledger exists to keep.
+        """
+        self._times_seen[candidate.url_key] = self._times_seen.get(
+            candidate.url_key, 0) + 1
+        previous = self._decided.get(candidate.url_key)
+        if previous and decision == "skipped_duplicate":
+            candidate.candidate_id = self._seen_urls.get(candidate.url_key,
+                                                         candidate.candidate_id)
+            candidate.decision = previous
+            self.counts["seen_again"] = self.counts.get("seen_again", 0) + 1
+            try:
+                self.db.execute(
+                    "UPDATE image_candidates SET times_seen = ? WHERE candidate_id = ?",
+                    (self._times_seen[candidate.url_key], candidate.candidate_id))
+            except Exception:
+                pass
+            return candidate.candidate_id
         candidate.decision = decision
         if reason:
             candidate.decision_reason = reason
@@ -252,9 +280,11 @@ class TriageLedger:
         from .db_values import candidate_row          # local import keeps this file readable
 
         row = candidate_row(candidate, community_id=self.community_id, run_id=self.run_id,
-                            image_id=image_id, sha256=sha256)
+                            image_id=image_id, sha256=sha256,
+                            times_seen=self._times_seen.get(candidate.url_key, 1))
         self.db.insert("image_candidates", row, replace=True)
         self._seen_urls[candidate.url_key] = candidate.candidate_id
+        self._decided[candidate.url_key] = decision
         if sha256:
             self._seen_hashes.setdefault(sha256, candidate.candidate_id)
         self.counts[decision] = self.counts.get(decision, 0) + 1

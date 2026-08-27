@@ -145,6 +145,14 @@ images:
   # Candidates considered per page before triage. A gallery page can carry
   # hundreds; the ledger records what was and was not looked at.
   max_candidates_per_page: 120
+  # A ninety-page report can carry three hundred embedded images. This is the
+  # default allowance per document; a VERY_HIGH-priority document earns more
+  # and a low-value one earns none (see the document triage bands).
+  max_images_per_document: 12
+  # A global ceiling on image work, so the image subsystem cannot consume the
+  # run however many candidates a gallery offers.
+  max_processing_seconds: 240
+  max_candidates_per_run: 1500
 
 ocr:
   enabled: auto        # auto | always | never
@@ -211,6 +219,31 @@ logging:
   console_level: INFO
   file_level: DEBUG
   jsonl: true
+
+# --------------------------------------------------------------------------
+# Documents: what earns the expensive work
+#
+# Opening documents is where the best evidence is, and where the time goes.
+# Priority is judged from the address, file name and link text BEFORE anything
+# is downloaded, and decides how much attention the document earns:
+#
+#   VERY_HIGH  theses, papers, grant and project reports, annual reports, site
+#              and master plans, environmental and restoration reports,
+#              municipal records, land and water documents
+#   HIGH       substantial dated material from an academic or official source
+#   MEDIUM     newsletters, brochures, community reports, conference material
+#   LOW        event flyers, promotional material, forms, legal boilerplate
+#   DUPLICATE  a translation or reprint of something already read in full
+# --------------------------------------------------------------------------
+documents:
+  # How many documents of one family are read in full. A report published in
+  # three languages is one report; the others are kept as provenance mirrors,
+  # stored and hashed but not deeply parsed.
+  max_per_family: 1
+  # When the clock is tight, a LOW-priority document is recorded as discovered
+  # but not opened. Its existence is still evidence; its forty pages of event
+  # listings are not.
+  skip_low_value_when_pressed: true
 
 # --------------------------------------------------------------------------
 # The active-processing budget

@@ -340,6 +340,9 @@ SEARCH_RESULTS = {
 class FixtureServer:
     port: int = 0
     sites: dict[str, dict[str, Route]] = field(default_factory=build_sites)
+    #: Injectable so the stress fixture can serve an archive the size of the
+    #: one the reported run met, without touching the pilot fixtures.
+    archive_records: list = field(default_factory=lambda: list(ARCHIVE_RECORDS))
     request_log: list[str] = field(default_factory=list)
     _server: ThreadingHTTPServer | None = None
     _thread: threading.Thread | None = None
@@ -420,8 +423,9 @@ class FixtureServer:
     def _archive(self, path: str, query: dict[str, list[str]]) -> Route | None:
         if path.startswith("/cdx"):
             target = (query.get("url") or [""])[0].rstrip("*")
-            rows = [ARCHIVE_RECORDS[0]] + [
-                r for r in ARCHIVE_RECORDS[1:] if target and target in r[0]
+            records = self.archive_records or ARCHIVE_RECORDS
+            rows = [records[0]] + [
+                r for r in records[1:] if target and target in r[0]
             ]
             if len(rows) == 1:
                 return _json([])

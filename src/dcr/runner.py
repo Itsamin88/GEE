@@ -858,13 +858,6 @@ class CommunityRunner:
             self._mark_truncated(f"stage 2 stopped with {pending} URLs still queued")
         else:
             stage.status = "complete"
-        self.archive_discovered = archive_discovered
-        self.archive_fetched = snapshots_fetched
-        if archive_discovered:
-            event(log, "ARCHIVE",
-                  f"{archive_discovered} archived URLs discovered, {snapshots_fetched} "
-                  f"queued for retrieval ({snapshots_fetched / archive_discovered:.1%}); "
-                  "the rest are recorded as discovered but not fetched")
             stage.detail = (f"{self.crawler.stats.pages_opened} pages opened; "
                             f"{len(exhausted)} sources exhausted")
         for context in self.crawler.sources.values():
@@ -1136,7 +1129,19 @@ class CommunityRunner:
                 "the web archive was unreachable for " + ", ".join(unreachable))
         else:
             stage.status = "complete"
-            stage.detail = f"{reachable} domains listed, {snapshots_fetched} snapshots queued"
+        # Discovered is not fetched, and both belong in the record: the archive
+        # is sampled by relevance, never enumerated (brief §19, §63).
+        self.archive_discovered = archive_discovered
+        self.archive_fetched = snapshots_fetched
+        if archive_discovered:
+            event(log, "ARCHIVE",
+                  f"{archive_discovered} archived URLs discovered, {snapshots_fetched} "
+                  f"queued for retrieval "
+                  f"({snapshots_fetched / archive_discovered:.1%}); the rest are "
+                  "recorded as discovered but not fetched")
+        if stage.status == "complete":
+            stage.detail = (f"{reachable} domain(s) listed; {archive_discovered} archived "
+                            f"URLs discovered, {snapshots_fetched} queued for retrieval")
 
     # ---------------------------------------------------------------------
     # Stage 5 — academic literature

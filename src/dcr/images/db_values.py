@@ -13,7 +13,8 @@ from ..db import utcnow
 
 
 def candidate_row(candidate: Any, *, community_id: str, run_id: str | None,
-                  image_id: str | None = None, sha256: str | None = None) -> dict[str, Any]:
+                  image_id: str | None = None, sha256: str | None = None,
+                  times_seen: int = 1) -> dict[str, Any]:
     """Every field of §6 and §10 that is known without opening the image."""
     classification = candidate.classification
     return {
@@ -61,6 +62,7 @@ def candidate_row(candidate: Any, *, community_id: str, run_id: str | None,
         "decision_reason": _trim(candidate.decision_reason, 1000),
         "sha256": sha256,
         "stage": candidate.stage,
+        "times_seen": times_seen,
         "seen_utc": utcnow(),
         "decided_utc": utcnow(),
     }
