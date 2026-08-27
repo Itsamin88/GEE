@@ -365,6 +365,7 @@ class TextMiner:
             )
             if mention.kind == "managed":
                 claims.append(ClaimItem(
+                    semantic_role=mention.role, role_reason=mention.role_reason,
                     field_name="managed_area_ha", value=f"{mention.value_ha:g}",
                     value_type="float", original_value=mention.original,
                     normalized_value=f"{mention.value_ha:g}",
@@ -412,6 +413,8 @@ class TextMiner:
                     ))
             elif mention.kind == "total_holding":
                 claims.append(ClaimItem(
+                    semantic_role=mention.role or "total_holding",
+                    role_reason=mention.role_reason,
                     field_name="total_holding_ha", value=f"{mention.value_ha:g}",
                     value_type="float", original_value=mention.original,
                     normalized_value=f"{mention.value_ha:g}",
@@ -433,6 +436,7 @@ class TextMiner:
                 continue
             claims = [
                 ClaimItem(
+                    semantic_role=mention.role, role_reason=mention.role_reason,
                     field_name="population_value", value=str(mention.value), value_type="integer",
                     original_value=mention.original, exact_wording=mention.sentence[:600],
                     reference_year=mention.reference_year, confidence=0.6,
@@ -441,6 +445,7 @@ class TextMiner:
                 ),
                 # The workbook holds the same quantity twice (decision DCR-D003).
                 ClaimItem(
+                    semantic_role=mention.role, role_reason=mention.role_reason,
                     field_name="e3_population_value", value=str(mention.value),
                     value_type="integer", original_value=mention.original,
                     exact_wording=mention.sentence[:600], reference_year=mention.reference_year,

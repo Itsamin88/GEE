@@ -12,6 +12,8 @@ import re
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping
 
+from . import roles
+
 # "4 ha", "4,5 hectares", "about 15 hectares", "1 200 m²", "10 acres"
 _NUMBER = r"(?:\d{1,3}(?:[   .,]\d{3})*(?:[.,]\d+)?|\d+(?:[.,]\d+)?)"
 _APPROX = r"(?:about|around|roughly|approx\.?|approximately|some|nearly|over|more than|under|less than|" \
@@ -35,6 +37,13 @@ class AreaMention:
     kind: str = "unclassified"        # managed | total_holding | unclassified
     kind_reason: str = ""
     reference_year: int | None = None
+    #: The full semantic role — cultivated, restoration, forest, leased,
+    #: project as well as managed and total_holding. `kind` is the two-way view
+    #: the workbook's two area columns need; this is what the conflict resolver
+    #: partitions on, so a restoration figure is never compared with a
+    #: cultivated one (brief §23).
+    role: str = "unclassified"
+    role_reason: str = ""
 
 
 @dataclass
@@ -49,6 +58,10 @@ class PopulationMention:
     kind: str = "unclassified"        # permanent | visitors | unclassified
     kind_reason: str = ""
     reference_year: int | None = None
+    #: resident | visitor | guest | volunteer | event_attendance | employee |
+    #: member. Only `resident` may reach the population field (brief §22).
+    role: str = "unclassified"
+    role_reason: str = ""
 
 
 def _to_float(text: str) -> float | None:
@@ -111,6 +124,20 @@ def find_areas(text: str, units: Mapping[str, float], sentence_spans: Iterable[t
         if high:
             mention.value_ha = round(low * factor, 4)
         mention.kind, mention.kind_reason = classify_area(sentence, markers or {})
+        # The finer role, from the sentence, positioned at the figure itself.
+        verdict = roles.classify_area(
+            sentence, position=max(0, match.start() - s_start))
+        mention.role, mention.role_reason = verdict.role, verdict.reason
+        if mention.kind == "unclassified" and verdict.role in ("managed", "cultivated",
+                                                               "restoration", "forest",
+                                                               "project"):
+            # The workbook has two area columns; everything worked is managed
+            # land for its purposes, and the finer role is kept beside it.
+            mention.kind = "managed"
+            mention.kind_reason = verdict.reason
+        elif mention.kind == "unclassified" and verdict.role == "total_holding":
+            mention.kind = "total_holding"
+            mention.kind_reason = verdict.reason
         mentions.append(mention)
     return mentions
 
@@ -203,8 +230,11 @@ def find_populations(text: str, sentence_spans: Iterable[tuple[int, int, str]],
             kind, reason = "permanent", (
                 f"counted as {noun!r} with no visitor or volunteer marker in the sentence"
             )
+        verdict = roles.classify_population(sentence, position=max(0, position - start))
         mentions.append(
             PopulationMention(
+                role=verdict.role,
+                role_reason=verdict.reason,
                 value=value,
                 original=text[max(0, position - 2): position + 40].strip(),
                 sentence=sentence,

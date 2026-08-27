@@ -189,6 +189,8 @@ class CommunityRunner:
         self._last_charged_active_s = 0.0
         #: Archive tiers deliberately not retrieved, and why.
         self.archive_truncated: list[str] = []
+        #: What grouping translations and re-issues saved (brief §20).
+        self.document_families: dict[str, int] = {}
         self.db = db
         self.run_mode = run_mode.upper()
         self.target = target
@@ -1169,9 +1171,101 @@ class CommunityRunner:
         await self.crawler.run(stage=3)
         documents = int(self.db.scalar(
             "SELECT COUNT(*) FROM documents WHERE community_id = ?", (self.community_id,)) or 0)
+        grouped = self._reconcile_document_families()
         stage.status = "complete"
-        stage.detail = f"{documents} documents stored ({queued} queued by file-type search)"
+        stage.detail = (f"{documents} documents stored ({queued} queued by file-type "
+                        f"search)"
+                        + (f"; {grouped['grouped']} of them are translations or "
+                           f"re-issues of {grouped['families']} underlying documents"
+                           if grouped.get("grouped") else ""))
         event(log, "DOCS", f"{documents} documents stored")
+
+    def _reconcile_document_families(self) -> dict[str, int]:
+        """Group translations and re-issues, now that the files are in hand.
+
+        The download-time triage in `extract/triage.py` decides what to parse
+        from a filename alone, which is all it has. This runs afterwards, with
+        the page counts, byte sizes and content hashes that only exist once the
+        documents have been retrieved, and it is where two things are settled
+        that the earlier pass cannot settle:
+
+        **One independence group per family.** Three translations of one report
+        are one source. Left ungrouped they would corroborate each other, which
+        would breach the rule the whole protocol rests on (brief §28).
+
+        **A record of what was grouped, and how confidently.** A family formed
+        on weak evidence goes to the review queue rather than being acted on
+        silently (brief §80, §81).
+        """
+        from .evidence import families as families_mod
+
+        try:
+            rows = self.db.query(
+                "SELECT d.document_id, d.filename, d.title, d.sha256, d.bytes, "
+                "       d.page_count, d.language, "
+                "       (SELECT original_url FROM document_sources s "
+                "         WHERE s.document_id = d.document_id LIMIT 1) AS url, "
+                "       (SELECT source_id FROM document_sources s "
+                "         WHERE s.document_id = d.document_id LIMIT 1) AS source_id "
+                "FROM documents d WHERE d.community_id = ?", (self.community_id,))
+        except Exception as exc:
+            log.debug("could not read documents for family grouping: %s", exc)
+            return {}
+        if len(rows) < 2:
+            return {}
+
+        refs = [
+            families_mod.DocumentRef(
+                document_id=row["document_id"],
+                url=row["url"] or "",
+                filename=row["filename"] or "",
+                title=row["title"] or "",
+                content_hash=row["sha256"] or "",
+                bytes_len=int(row["bytes"] or 0),
+                pages=row["page_count"],
+                language=row["language"] or "",
+                source_id=row["source_id"] or "",
+                discovered_index=index,
+            )
+            for index, row in enumerate(rows)
+        ]
+        groups = families_mod.group(refs, prefix=f"{self.community_id}-FAM")
+        for family in groups:
+            if family.size < 2:
+                continue
+            primary = family.primary()
+            for member in family.members:
+                role = "primary" if member.document_id == family.primary_id else "version"
+                try:
+                    self.db.update("documents",
+                                   {"family_id": family.family_id, "family_role": role},
+                                   {"document_id": member.document_id})
+                except Exception:
+                    pass
+            # Everything in the family shares the primary's independence group,
+            # so the copies cannot corroborate one another.
+            if primary is not None and primary.source_id:
+                group_id = self.db.scalar(
+                    "SELECT independence_group FROM sources WHERE source_id = ?",
+                    (primary.source_id,))
+                if group_id:
+                    for member in family.others():
+                        if member.source_id and member.source_id != primary.source_id:
+                            try:
+                                self.db.update(
+                                    "sources", {"independence_group": group_id},
+                                    {"source_id": member.source_id})
+                            except Exception:
+                                pass
+            event(log, "DOCS",
+                  f"{family.size} documents grouped as {family.family_id} "
+                  f"(primary {family.primary_id}); "
+                  f"{'; '.join(family.reasons[:2])}")
+        for case in families_mod.review_cases(groups):
+            self.review.add(**case)
+        numbers = families_mod.savings(groups)
+        self.document_families = numbers
+        return numbers
 
     # ---------------------------------------------------------------------
     # Stage 4 — archived versions
@@ -2332,6 +2426,7 @@ class CommunityRunner:
                 "image_triage": self.crawler.triage.summary(),
                 "archive_urls_discovered": self.archive_discovered,
                 "archive_urls_fetched": self.archive_fetched,
+                "document_families": dict(self.document_families),
                 "queue": queue,
             },
             review_items=len(self.review),

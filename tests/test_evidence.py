@@ -226,10 +226,20 @@ def test_domain_onsets_record_the_earliest_year_per_domain(schema):
 
 
 # -- conflicts --------------------------------------------------------------
-def _claim(cid, value, source_class, group, year=None):
+def _pop(cid, value, role, group="G1", source_class="S4",
+         field_name="e3_population_value"):
+    return ClaimView(claim_id=cid, field_name=field_name, value=str(value),
+                     source_id=cid, source_class=source_class,
+                     independence_group=group, semantic_role=role)
+
+
+def _claim(cid, value, source_class, group, year=None, role="managed"):
+    # Every claim on a role-bearing field carries its semantic role: what the
+    # figure is a figure OF. Without one it is not a candidate for the field at
+    # all, which is the point of `evidence/roles.py`.
     return ClaimView(claim_id=cid, field_name="managed_area_ha", value=str(value),
                      source_id=cid, source_class=source_class, independence_group=group,
-                     reference_year=year)
+                     reference_year=year, semantic_role=role)
 
 
 def test_agreement_across_groups_is_corroboration():
@@ -261,7 +271,10 @@ def test_a_stronger_class_wins_but_the_weaker_value_survives():
 
 def test_equal_strength_across_groups_goes_to_a_human():
     resolution = resolve_field("population_value",
-                               [_claim("C1", 28, "S1", "G2"), _claim("C2", 45, "S2", "G3")],
+                               [_pop("C1", 28, "resident", "G2", "S1",
+                                     field_name="population_value"),
+                                _pop("C2", 45, "resident", "G3", "S2",
+                                     field_name="population_value")],
                                numeric=True)
     assert resolution.status == "review_required"
     assert resolution.value is None
@@ -406,3 +419,174 @@ def test_reprocessing_never_orphans_a_claim_from_its_evidence(db, crawled, commu
         assert claim["evidence_id"], "a claim was cut loose from its evidence"
         assert db.query_one("SELECT 1 FROM evidence WHERE evidence_id=?",
                             (claim["evidence_id"],)) is not None
+
+
+# ===========================================================================
+# §21-§24 — claims about different things are not competing claims
+#
+# The previous run produced 5 569 conflicts. Emitting one row per distinct
+# VALUE rather than per PAIR removed the arithmetic half of that. This is the
+# other half: the values being compared were never the same kind of thing.
+# ===========================================================================
+from dcr.evidence import roles
+
+
+def test_visitors_and_residents_are_not_a_disagreement():
+    """The single most common false conflict in the reported run."""
+    resolution = resolve_field("e3_population_value", [
+        _pop("C1", 12, "resident", "G1"),
+        _pop("C2", 200, "visitor", "G2"),
+        _pop("C3", 60, "event_attendance", "G2"),
+        _pop("C4", 4, "employee", "G1"),
+    ], numeric=True)
+    assert resolution.value == "12", "the resident count must be the population"
+    assert resolution.conflicts == [], (
+        "four facts about four different groups of people were reported as "
+        "contradictions")
+    assert set(resolution.other_roles) == {"visitor", "event_attendance", "employee"}
+
+
+def test_the_other_counts_are_kept_not_discarded():
+    resolution = resolve_field("e3_population_value", [
+        _pop("C1", 12, "resident"), _pop("C2", 200, "visitor"),
+    ], numeric=True)
+    assert resolution.other_roles["visitor"] == ["C2"]
+
+
+def test_two_resident_counts_that_really_do_disagree_still_conflict():
+    resolution = resolve_field("e3_population_value", [
+        _pop("C1", 12, "resident", "G1", "S1"),
+        _pop("C2", 40, "resident", "G2", "S1"),
+    ], numeric=True)
+    assert resolution.status == "review_required"
+    assert resolution.conflicts, "a real disagreement was suppressed"
+
+
+def test_a_field_with_no_figure_of_the_right_kind_is_not_coded():
+    resolution = resolve_field("e3_population_value", [
+        _pop("C1", 200, "visitor"), _pop("C2", 60, "event_attendance"),
+    ], numeric=True)
+    assert resolution.value is None
+    assert resolution.status == "not_found"
+    assert "none of them is a 'resident' figure" in resolution.rationale
+
+
+def test_an_unclassifiable_figure_goes_to_a_human_not_to_a_cell():
+    """Guessing here is what puts a visitor count in the population column."""
+    resolution = resolve_field("e3_population_value", [
+        _pop("C1", 34, roles.UNCLASSIFIED),
+    ], numeric=True)
+    assert resolution.value is None
+    assert resolution.status == "review_required"
+    assert resolution.review["severity"] == "blocking"
+
+
+def test_the_whole_property_is_never_the_managed_area():
+    """Confusing these moves a community two size classes (brief §23)."""
+    resolution = resolve_field("managed_area_ha", [
+        _claim("C1", 4, "S4", "G1", role="managed"),
+        _claim("C2", 134, "S2", "G2", role="total_holding"),
+        _claim("C3", 22, "S1", "G3", role="restoration"),
+        _claim("C4", 8, "S4", "G1", role="leased"),
+    ], numeric=True)
+    assert resolution.value == "4"
+    assert resolution.conflicts == []
+    assert set(resolution.other_roles) == {"total_holding", "restoration", "leased"}
+
+
+def test_a_conflict_row_says_which_role_it_is_about():
+    resolution = resolve_field("managed_area_ha", [
+        _claim("C1", 4, "S1", "G1"), _claim("C2", 9, "S4", "G2"),
+    ], numeric=True)
+    assert resolution.conflicts
+    assert resolution.conflicts[0]["semantic_role"] == "managed"
+
+
+# ---------------------------------------------------------------------------
+# classification itself
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("sentence,expected", [
+    ("Twelve permanent residents live here all year.", "resident"),
+    ("We welcome around 200 visitors a year.", "visitor"),
+    ("Sixty people attended the summer gathering.", "event_attendance"),
+    ("We host 15 volunteers each season.", "volunteer"),
+    ("The association employs four staff.", "employee"),
+    ("We have 30 guests in the accommodation.", "guest"),
+    ("The cooperative has 45 members.", "member"),
+])
+def test_population_roles_are_read_from_the_sentence(sentence, expected):
+    assert roles.classify_population(sentence).role == expected
+
+
+@pytest.mark.parametrize("sentence,expected", [
+    ("We cultivate four hectares of market garden.", "cultivated"),
+    ("The property is 134 hectares in total.", "total_holding"),
+    ("22 hectares are under restoration.", "restoration"),
+    ("We actively manage 15 hectares.", "managed"),
+    ("The leased parcel is eight hectares.", "leased"),
+    ("The food forest covers three hectares.", "forest"),
+])
+def test_area_roles_are_read_from_the_sentence(sentence, expected):
+    assert roles.classify_area(sentence).role == expected
+
+
+@pytest.mark.parametrize("sentence,expected", [
+    ("The community was founded in 1985.", "founding"),
+    ("The land was bought in 1987.", "land_acquisition"),
+    ("The first residents moved in during 1988.", "first_residence"),
+    ("We first planted the terraces in 1992.", "intervention_onset"),
+    ("This article was published in 2019.", "publication"),
+    ("Archived snapshot captured on 2009-04-17.", "archive_snapshot"),
+])
+def test_date_roles_are_read_from_the_sentence(sentence, expected):
+    assert roles.classify_date(sentence).role == expected
+
+
+def test_a_publication_date_may_never_become_an_intervention_date():
+    """Named in §108 as something the final audit must confirm never happened."""
+    allowed, reason = roles.may_write("date_intervention_onset", "publication")
+    assert not allowed
+    assert "property of the source" in reason
+
+
+def test_the_nearer_marker_wins_when_a_sentence_carries_two():
+    sentence = "The 134-hectare property includes 4 hectares of market garden."
+    near_total = roles.classify_area(sentence, position=sentence.index("134"))
+    near_garden = roles.classify_area(sentence, position=sentence.index("4 hectares"))
+    assert near_total.role == "total_holding"
+    assert near_garden.role == "cultivated"
+
+
+def test_a_figure_is_qualified_by_what_follows_it():
+    """A quantity is described by what comes after it, in every language here:
+    "4 hectares of market garden", "4 hectares de maraîchage"."""
+    sentence = "The property covers 4 hectares of market garden."
+    verdict = roles.classify_area(sentence, position=sentence.index("4 hectares"))
+    assert verdict.role == "cultivated", (
+        "'property' came earlier in the sentence, but 'market garden' is what "
+        "the four hectares actually are")
+
+
+def test_two_markers_at_the_same_distance_are_ambiguous_not_guessed():
+    verdict = roles.classify_area("4 ha forest restored", position=0)
+    assert verdict.role == roles.UNCLASSIFIED
+    assert "a human should read it" in verdict.reason
+
+
+def test_a_sentence_with_no_marker_is_unclassified():
+    verdict = roles.classify_population("There are 40 of them.")
+    assert verdict.role == roles.UNCLASSIFIED
+    assert not verdict.resolved
+
+
+def test_a_field_with_no_role_is_left_alone():
+    allowed, _ = roles.may_write("e1_pathway", None)
+    assert allowed, "only role-bearing fields may be refused on role grounds"
+
+
+def test_a_marker_containing_regex_characters_does_not_explode():
+    """The vocabularies are literal phrases; one stray bracket must not become a
+    syntax error in the middle of a crawl."""
+    verdict = roles.classify("area", "we manage 4 ha (approx.)",
+                             vocabulary={"managed": ("manage", "(approx.)")})
+    assert verdict.role == "managed"

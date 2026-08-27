@@ -225,16 +225,20 @@ def document_family(url: str, *, link_text: str = "", title: str = "") -> str:
     grouping two different documents would lose evidence, while failing to group
     two translations only costs time.
     """
-    filename = (urlsplit(url).path or "").rsplit("/", 1)[-1]
-    stem = filename.rsplit(".", 1)[0] if "." in filename else filename
-    folded = _fold(stem)
-    folded = _LANGUAGE_MARKERS.sub("-", folded)
+    from ..evidence import families
+
+    # One vocabulary for "the same document, differently named", shared with
+    # `evidence/families.py`. Two mechanisms disagreeing about what a family is
+    # would be worse than either alone: this one decides BEFORE downloading,
+    # that one reconciles afterwards with the page counts and hashes that only
+    # exist once the files are in hand.
+    stem = families.normalised_stem(url) or _fold(link_text or title)[:60]
     # The YEAR IS KEPT. Stripping it would make the 2019 and 2020 annual
     # reports one family, and the second would be skipped as a translation of
     # the first — losing a whole year of evidence to save four seconds.
-    folded = re.sub(r"[^a-z0-9]+", "-", folded).strip("-")
-    folded = re.sub(r"-(v|version|rev|final|draft|copy)\d*$", "", folded)
-    return folded or _fold(link_text or title)[:60]
+    year = families.stated_year(url, title)
+    key = re.sub(r"[^a-z0-9]+", "-", _fold(stem)).strip("-")
+    return f"{key}-{year}" if (key and year) else key
 
 
 class DocumentTriage:

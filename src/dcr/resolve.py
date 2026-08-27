@@ -873,6 +873,13 @@ class FieldResolver:
             "AND status='coded'", (self.community_id, field_name))
         return row["value"] if row else None
 
+    @staticmethod
+    def _column(row: Any, name: str) -> Any:
+        try:
+            return row[name]
+        except (IndexError, KeyError):
+            return None
+
     def _claims_for(self, field_name: str) -> list[ClaimView]:
         rows = self.db.query(
             "SELECT * FROM claims WHERE community_id=? AND field_name=?",
@@ -889,6 +896,8 @@ class FieldResolver:
                 original_value=row["original_value"],
                 exact_wording=row["exact_wording"],
                 value_type=row["value_type"] or "text",
+                semantic_role=self._column(row, "semantic_role"),
+                role_reason=self._column(row, "role_reason"),
             )
             for row in rows
         ]

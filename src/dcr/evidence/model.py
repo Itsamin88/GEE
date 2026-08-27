@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from typing import Any, Iterable, Sequence
 
 from ..db import Database, utcnow
+from . import roles
 from ..logging_setup import get_logger
 
 log = get_logger("evidence")
@@ -67,6 +68,12 @@ class ClaimItem:
     locator: str | None = None
     notes: str | None = None
     verified_passage: bool = True
+    #: What the value is a value OF: `resident` rather than `visitor`, `managed`
+    #: rather than `total_holding`, `intervention_onset` rather than
+    #: `publication`. Claims with different roles are never compared, and only
+    #: the role a field is about may be written to it (brief §22, §23, §24).
+    semantic_role: str | None = None
+    role_reason: str | None = None
 
 
 
@@ -114,6 +121,9 @@ class EvidenceRecorder:
         self.forbidden = {str(q).lower() for q in schema.get("satellite_only_quantities", [])}
         self.known_fields = self._known_fields(schema)
         self.rejected: list[tuple[str, str]] = []
+        #: Claims kept as evidence but refused a field because their semantic
+        #: role is not the field's. Reported, never silently dropped.
+        self.role_refusals: list[tuple[str, str, str]] = []
         #: Everything that reaches the workbook passes through this class, which
         #: makes it the one honest place to measure research yield. `scopes` is
         #: a callable returning the scope names the current work belongs to, so
@@ -128,6 +138,24 @@ class EvidenceRecorder:
         #: agreeing again is the same source talking.
         self._field_groups: set[tuple[str, str]] = set()
         self._groups_seen: set[str] = set()
+
+    # -- what a value is a value OF ------------------------------------------
+    def _role_for(self, claim: Any, context: Mapping[str, Any]) -> tuple[str | None, str | None]:
+        """Classify the claim's semantic role from the sentence behind it."""
+        if claim.semantic_role:
+            return claim.semantic_role, claim.role_reason
+        expected = roles.role_for_field(claim.field_name)
+        if expected is None:
+            return None, None
+        family, _wanted = expected
+        sentence = (claim.exact_wording or context.get("sentence") or "")
+        if not sentence:
+            return roles.UNCLASSIFIED, "no sentence was recorded to classify from"
+        needle = str(claim.original_value or claim.value or "")
+        position = sentence.find(needle) if needle else None
+        verdict = roles.classify(family, sentence,
+                                 position=position if position and position >= 0 else None)
+        return verdict.role, verdict.reason
 
     # -- measuring what was found -------------------------------------------
     #: Which yield signal a field's name implies. Order matters: the first
@@ -268,6 +296,17 @@ class EvidenceRecorder:
         if existing is not None:
             return existing["claim_id"]
 
+        # What kind of thing is this? Determined from the sentence rather than
+        # asserted by the extractor, because the extractor found a number and
+        # the sentence is what says whether it counts residents or visitors.
+        role, role_reason = self._role_for(claim, context)
+        allowed, refusal = roles.may_write(field_name, role)
+        if not allowed:
+            # Not written to the field, but NOT discarded: it is a fact about
+            # something else, and the claim row keeps it with its role so the
+            # review queue and the evidence register can both see it.
+            self.role_refusals.append((field_name, role or roles.UNCLASSIFIED, refusal))
+
         claim_id = self.db.next_id("claims", "claim_id", self.community_id, "C")
         self.db.insert(
             "claims",
@@ -302,6 +341,8 @@ class EvidenceRecorder:
                 "prompt_version": claim.prompt_version,
                 "extracted_utc": utcnow(),
                 "verified_passage": int(claim.verified_passage),
+                "semantic_role": role,
+                "role_reason": role_reason,
                 "notes": claim.notes,
             },
         )

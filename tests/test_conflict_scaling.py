@@ -151,3 +151,100 @@ def test_growth_over_time_is_still_not_a_conflict():
     resolution = resolve_field("f", claims, numeric=True)
     assert resolution.method == "time_series"
     assert resolution.status == "coded"
+
+
+# ===========================================================================
+# The other half of the 5 569, and the harder one.
+#
+# One row per distinct VALUE fixed the arithmetic. It did not fix the fact that
+# the values being compared were never the same kind of thing: a visitor count,
+# a resident count and a summer-gathering headcount were three competing
+# populations, and a property area, a cultivated area and a restoration area
+# were three competing areas (brief §22, §23).
+# ===========================================================================
+from dcr.evidence import roles
+
+
+def mixed_population_claims(count: int) -> list[ClaimView]:
+    """What a rich community website actually gives you: four kinds of count."""
+    kinds = [
+        ("resident", [12, 14, 15]),
+        ("visitor", [200, 240, 300, 350, 400, 500]),
+        ("event_attendance", [60, 80, 120, 250]),
+        ("volunteer", [4, 6, 8, 15, 20]),
+        ("employee", [2, 3, 4]),
+        ("guest", [18, 24, 30, 40]),
+    ]
+    out: list[ClaimView] = []
+    for index in range(count):
+        role, values = kinds[index % len(kinds)]
+        out.append(ClaimView(
+            claim_id=f"C{index:04d}", field_name="e3_population_value",
+            value=str(values[index % len(values)]),
+            source_id=f"S{index % 12:02d}", source_class="S4",
+            independence_group=f"G{index % 6}", confidence=0.5,
+            semantic_role=role,
+        ))
+    return out
+
+
+def test_a_tamera_scale_population_field_produces_a_handful_of_rows():
+    """Two thousand claims, six kinds of count, twenty-five distinct figures."""
+    claims = mixed_population_claims(2000)
+    resolution = resolve_field("e3_population_value", claims, numeric=True)
+
+    distinct_resident = len({c.value for c in claims if c.semantic_role == "resident"})
+    assert len(resolution.conflicts) <= max(0, distinct_resident - 1), (
+        f"{len(resolution.conflicts)} conflict rows from {len(claims)} claims; only "
+        f"the {distinct_resident} resident figures are candidates for this field, "
+        "and the other five kinds of count are not disagreements at all")
+    assert len(resolution.conflicts) < 5
+
+
+def test_the_five_kinds_that_are_not_the_population_are_still_recorded():
+    resolution = resolve_field("e3_population_value", mixed_population_claims(600),
+                               numeric=True)
+    assert set(resolution.other_roles) == {
+        "visitor", "event_attendance", "volunteer", "employee", "guest"}
+    assert sum(len(ids) for ids in resolution.other_roles.values()) == 500
+
+
+def test_the_whole_reported_explosion_measured_end_to_end():
+    """The two fixes together, against the shape of the reported run.
+
+    Before: one row per PAIR of claims, and every kind of count competing.
+    After:  one row per distinct value, among claims of one kind only.
+    """
+    claims = mixed_population_claims(2000)
+    pairwise = len(claims) * (len(claims) - 1) // 2          # the old shape
+    resolution = resolve_field("e3_population_value", claims, numeric=True)
+    assert pairwise > 1_000_000
+    assert len(resolution.conflicts) < 5, (
+        f"{pairwise:,} pairwise rows became {len(resolution.conflicts)}")
+
+
+@pytest.mark.parametrize("field,roles_present,expected_max", [
+    ("managed_area_ha", ["managed", "total_holding", "cultivated", "restoration",
+                         "forest", "leased"], 3),
+    ("total_holding_ha", ["managed", "total_holding"], 3),
+])
+def test_area_roles_do_not_compete(field, roles_present, expected_max):
+    claims = [
+        ClaimView(claim_id=f"C{i:03d}", field_name=field, value=str(4 + (i % 3) * 10),
+                  source_id=f"S{i % 5}", source_class="S4",
+                  independence_group=f"G{i % 4}",
+                  semantic_role=roles_present[i % len(roles_present)])
+        for i in range(300)
+    ]
+    resolution = resolve_field(field, claims, numeric=True)
+    assert len(resolution.conflicts) <= expected_max
+
+
+def test_resolution_stays_fast_at_scale():
+    """The stopping rule and the role partition must both be O(claims)."""
+    import time
+
+    claims = mixed_population_claims(6000)
+    started = time.monotonic()
+    resolve_field("e3_population_value", claims, numeric=True)
+    assert time.monotonic() - started < 2.0

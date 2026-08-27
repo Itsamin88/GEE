@@ -16,6 +16,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Mapping, Sequence
 
+from . import roles
+
 # Class strength for resolving ordinary (non-onset) disagreements: an
 # independent record outranks a self-description.
 CLASS_STRENGTH = {"S1": 6, "S2": 6, "S8": 4, "S6": 3, "S5": 3, "S3": 2, "S4": 2, "S7": 1}
@@ -38,6 +40,10 @@ class ClaimView:
     original_value: str | None = None
     exact_wording: str | None = None
     value_type: str = "text"
+    #: What this value is a value OF (see `evidence/roles.py`). Claims with
+    #: different roles are never compared.
+    semantic_role: str | None = None
+    role_reason: str | None = None
 
     @property
     def strength(self) -> int:
@@ -65,6 +71,10 @@ class Resolution:
     conflicts: list[dict[str, Any]] = field(default_factory=list)
     review: dict[str, str] | None = None
     series: list[tuple[int | None, str]] = field(default_factory=list)
+    #: Claims that bore on this field but are about something else — visitor
+    #: counts beside a resident count, the whole property beside the managed
+    #: land. Kept so the report can say what else the sources said.
+    other_roles: dict[str, list[str]] = field(default_factory=dict)
 
 
 def resolve_field(
@@ -74,13 +84,66 @@ def resolve_field(
     numeric: bool = False,
     growth_gap_years: int = 3,
     prefer: str = "strongest",
+    respect_roles: bool = True,
 ) -> Resolution:
-    """Resolve one field from all the claims that bear on it."""
+    """Resolve one field from all the claims that bear on it.
+
+    **Claims about different things are not competing claims.** Before anything
+    is compared, the claims are partitioned by semantic role, and only those
+    carrying the role the field is actually about are considered. "200 visitors
+    a year", "12 permanent residents" and "60 people at the summer gathering"
+    are three facts, not three candidate populations, and reporting them as a
+    disagreement is most of what made the previous run produce five and a half
+    thousand conflicts (brief §21, §22, §23, §24).
+
+    The claims set aside are not discarded: they are recorded on the resolution
+    as `other_roles`, so the report can say what else the sources said and a
+    coder can see it.
+    """
     if not claims:
         return Resolution(
             field_name=field_name, value=None, status="not_found",
             method="no claim", rationale="no retrieved source states a value for this field",
         )
+
+    other_roles: dict[str, list[str]] = {}
+    if respect_roles:
+        expected = roles.role_for_field(field_name)
+        if expected is not None:
+            _family, wanted = expected
+            considered = [c for c in claims if c.semantic_role == wanted]
+            for claim in claims:
+                if claim.semantic_role != wanted:
+                    other_roles.setdefault(
+                        claim.semantic_role or roles.UNCLASSIFIED, []
+                    ).append(claim.claim_id)
+            if not considered:
+                unresolved = len(other_roles.get(roles.UNCLASSIFIED, ()))
+                described = ", ".join(
+                    f"{len(ids)} {role}" for role, ids in sorted(other_roles.items()))
+                return Resolution(
+                    field_name=field_name, value=None,
+                    status="review_required" if unresolved else "not_found",
+                    method="no claim of the right kind",
+                    rationale=(
+                        f"{len(claims)} figure(s) were found but none of them is a "
+                        f"{wanted!r} figure ({described}). "
+                        + ("Some could not be classified from their sentences and need "
+                           "a human reading." if unresolved else
+                           "They are recorded as their own facts rather than "
+                           "substituted for this field.")),
+                    source_ids=sorted({c.source_id for c in claims if c.source_id}),
+                    other_roles=other_roles,
+                    review={
+                        "category": "semantic_role",
+                        "subject": f"No {wanted} figure for {field_name}",
+                        "detail": (
+                            f"{described}. Substituting one of these would put the "
+                            "wrong kind of number in the workbook."),
+                        "severity": "blocking" if unresolved else "normal",
+                    } if unresolved else None,
+                )
+            claims = considered
 
     groups = sorted({c.independence_group for c in claims if c.independence_group})
     source_ids = sorted({c.source_id for c in claims if c.source_id})
@@ -102,6 +165,7 @@ def resolve_field(
             claim_ids=[c.claim_id for c in supporting],
             source_ids=source_ids,
             groups=groups,
+            other_roles=other_roles,
         )
 
     # Values differ. First: did the value CHANGE rather than conflict?
@@ -128,6 +192,7 @@ def resolve_field(
                 groups=groups,
                 residual_uncertainty=f"earlier figures retained: {history}",
                 series=[(c.year, c.original_value or c.value) for c in claims],
+                other_roles=other_roles,
             )
 
     # A genuine disagreement.
@@ -173,6 +238,7 @@ def resolve_field(
             "groups_b": len({c.independence_group for c in group_claims
                              if c.independence_group}),
             "distinct_values": len(by_value),
+            "semantic_role": best.semantic_role,
             "summary": summary,
         })
 
@@ -217,6 +283,7 @@ def resolve_field(
                 ),
                 "severity": "blocking",
             },
+            other_roles=other_roles,
         )
 
     for conflict in conflicts:
@@ -248,6 +315,7 @@ def resolve_field(
             f"{c.value} ({c.source_class}, {c.source_id})" for c in ranked[1:4]
         ),
         conflicts=conflicts,
+        other_roles=other_roles,
     )
 
 
