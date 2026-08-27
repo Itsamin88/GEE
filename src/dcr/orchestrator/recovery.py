@@ -55,7 +55,7 @@ from typing import Any, Iterable, Mapping, Sequence
 from ..logging_setup import event, get_logger
 from .store import (CANCELLED, COMPLETED, FAILED, PAUSED_MANUAL, PAUSED_NETWORK,
                     PAUSING, QUEUED, RESUMING, RUNNING, RUN_CANCELLED,
-                    RUN_COMPLETED, JobRow, RunStore)
+                    RUN_COMPLETED, RUN_RUNNING, JobRow, RunStore)
 
 log = get_logger("orchestrator.recovery")
 
@@ -207,6 +207,18 @@ def plan_resume(store: RunStore, run_id: str, *, retry_failed: bool = False,
     return plan
 
 
+def _reopen(store: RunStore, run_id: str, why: str) -> None:
+    """Work is outstanding again, so the run is not finished any more.
+
+    Without this the run stays COMPLETED while communities sit in the queue,
+    `find_interrupted` does not return it, and the next launch offers to start
+    something new instead of carrying on — after the software has just told the
+    researcher to run it again.
+    """
+    if store.run_status(run_id) in (RUN_COMPLETED, ""):
+        store.set_run_status(run_id, RUN_RUNNING, notes=why)
+
+
 def apply_resume(store: RunStore, plan: RecoveryPlan) -> int:
     """Put the plan into effect. Returns how many communities were requeued."""
     moved = 0
@@ -225,6 +237,8 @@ def apply_resume(store: RunStore, plan: RecoveryPlan) -> int:
         })
         moved += 1
     if moved:
+        _reopen(store, plan.run_id,
+                f"{moved} community(ies) requeued after an interruption")
         store.add_event(plan.run_id, "resumed",
                         detail=f"{moved} community(ies) requeued after an interruption")
         event(log, "RESUME", f"{moved} community(ies) requeued")
@@ -244,6 +258,7 @@ def resume_community(store: RunStore, job_id: str, *, mode: str = "RESUME") -> b
     })
     row = store.query_one("SELECT run_id FROM jobs WHERE job_id = ?", (job_id,))
     if row is not None:
+        _reopen(store, str(row["run_id"]), f"{mode} requested for {job_id}")
         store.add_event(str(row["run_id"]), "resumed", job_id=job_id,
                         detail=f"{mode} requested for this community alone")
     return True
@@ -276,6 +291,7 @@ def queue_offline_pass(store: RunStore, run_id: str, mode: str, *,
         })
         queued.append(job.job_id)
     if queued:
+        _reopen(store, run_id, f"{mode} queued for {len(queued)} community(ies)")
         store.add_event(run_id, "started",
                         detail=f"{mode} queued for {len(queued)} community(ies), "
                                "offline")
@@ -314,6 +330,7 @@ def repair(store: RunStore, run_id: str) -> dict[str, int]:
             "detail": "left RUNNING by an interrupted session; marked retryable",
         })
     if stale:
+        _reopen(store, run_id, f"{len(stale)} stale RUNNING row(s) requeued")
         event(log, "REPAIR",
               f"{len(stale)} community(ies) were left RUNNING by an interrupted "
               "session and are retryable")

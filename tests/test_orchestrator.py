@@ -839,3 +839,43 @@ def test_a_job_row_says_whether_its_workbook_verified(store, tmp_path):
     assert store.job(first.job_id).workbook_verified is True
     assert store.job(second.job_id).workbook_verified is False
     assert store.totals("R1")["workbooks"] == 1
+
+
+def test_putting_work_back_in_the_queue_reopens_the_run(store, tmp_path):
+    """`dcr export` tells the researcher to run the program again. If the run
+    is still marked COMPLETED, the next launch offers to start something new
+    instead of carrying on — which is not what they were just told."""
+    from dcr.orchestrator.recovery import (apply_resume, find_interrupted,
+                                           plan_resume, queue_offline_pass)
+    from dcr.orchestrator.store import RUN_COMPLETED
+
+    plan = queue_run(store, tmp_path, make_entries(2))
+    for job in plan.jobs:
+        directory = tmp_path / "out" / job.site_id
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / "research.sqlite3").write_bytes(b"")
+        store.update_job(job.job_id, {"state": COMPLETED,
+                                      "final_status": "COMPLETE",
+                                      "database_path": str(directory / "research.sqlite3")})
+    store.set_run_status("R1", RUN_COMPLETED)
+    assert not find_interrupted(store), "a finished run should not be offered"
+
+    queued = queue_offline_pass(store, "R1", "EXPORT")
+    assert len(queued) == 2
+    found = find_interrupted(store)
+    assert found and found[0].run_id == "R1", (
+        "EXPORT was queued but the next launch would not have found the run")
+    assert found[0].queued == 2
+
+
+def test_a_repaired_run_is_findable_again(store, tmp_path):
+    from dcr.orchestrator.recovery import find_interrupted, repair
+    from dcr.orchestrator.store import RUN_COMPLETED
+
+    plan = queue_run(store, tmp_path, make_entries(2))
+    store.update_job(plan.jobs[0].job_id, {"state": RUNNING, "worker": "w1"})
+    store.update_job(plan.jobs[1].job_id, {"state": COMPLETED,
+                                           "final_status": "COMPLETE"})
+    store.set_run_status("R1", RUN_COMPLETED)
+    assert repair(store, "R1")["requeued"] == 1
+    assert find_interrupted(store), "a repaired run must be offered on the next launch"
