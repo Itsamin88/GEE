@@ -519,6 +519,17 @@ class Application:
             print(f"  Interruptions        {interruptions.get('pauses_manual', 0)} manual, "
                   f"{interruptions.get('pauses_network', 0)} network "
                   f"({interruptions.get('offline_s', 0):.0f}s offline)")
+        budget = report.get("budget") or {}
+        if budget:
+            print(f"  Active time          {budget.get('active_s', 0) / 60:.1f} min of "
+                  f"{budget.get('budget_s', 0) / 60:.0f} min budget"
+                  + ("   <- the clock stopped this run"
+                     if budget.get("budget_exhausted") else ""))
+        activities = ((report.get("profile") or {}).get("activities") or {})
+        shares = activities.get("by_activity_pct") or {}
+        if shares:
+            top = ", ".join(f"{k} {v}%" for k, v in list(shares.items())[:4])
+            print(f"  Where time went      {top}")
         timing = report.get("timing") or {}
         if timing:
             print(f"  Time                 {timing.get('active_s', 0):.0f}s active, "

@@ -259,6 +259,42 @@ def _add_interruptions(add: Any, report: Mapping[str, Any]) -> None:
     add("")
 
 
+def _add_budget(add: Any, report: Mapping[str, Any]) -> None:
+    """The clock, and where its seconds went (brief §29, §49)."""
+    budget = report.get("budget") or {}
+    profile = report.get("profile") or {}
+    if not budget and not profile:
+        return
+    add("## Time")
+    add("")
+    if budget:
+        add(f"- Active processing: **{budget.get('active_s', 0) / 60:.1f} min** of a "
+            f"{budget.get('budget_s', 0) / 60:.0f}-minute budget")
+        add(f"- Wall clock: {budget.get('wall_clock_s', 0) / 60:.1f} min "
+            f"(paused {budget.get('paused_manual_s', 0) / 60:.1f} min, offline "
+            f"{budget.get('offline_s', 0) / 60:.1f} min — neither counts against the budget)")
+        if budget.get("budget_exhausted"):
+            add("- **The budget, not the sources, is why this run stopped.** What it did "
+                "not reach is listed above; nothing here may be read as an exhaustive "
+                "search.")
+    activities = (profile.get("activities") or {})
+    shares = activities.get("by_activity_pct") or {}
+    if shares:
+        add("")
+        add("| Activity | Share | Seconds | Calls |")
+        add("| --- | ---: | ---: | ---: |")
+        for activity, pct in list(shares.items())[:10]:
+            seconds = (activities.get("by_activity_s") or {}).get(activity, 0)
+            calls = (activities.get("calls") or {}).get(activity, 0)
+            add(f"| {activity} | {pct}% | {seconds:.1f} | {calls} |")
+        add("")
+        add("Measured time can exceed wall clock: requests run concurrently.")
+    stages = profile.get("by_stage_pct") or {}
+    if stages:
+        add("")
+        add("Per stage: " + ", ".join(f"{k} {v}%" for k, v in stages.items() if v))
+    add("")
+
 def _add_image_triage(add: Any, report: Mapping[str, Any]) -> None:
     """What the image triage saw, kept and passed over (brief §5)."""
     triage = report.get("image_triage") or {}
@@ -318,6 +354,7 @@ def write_markdown(report: Mapping[str, Any], path: Path) -> Path:
             add(f"- {reason}")
     add("")
     _add_interruptions(add, report)
+    _add_budget(add, report)
     _add_image_triage(add, report)
     add("## What was retrieved")
     add("")

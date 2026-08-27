@@ -7,10 +7,12 @@ expanded only within strict member, size and ratio limits (brief §61).
 from __future__ import annotations
 
 import io
+import time
 import zipfile
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from .. import profiling
 from ..ids import safe_name
 from ..logging_setup import get_logger
 from ..net.mime import sniff
@@ -66,7 +68,38 @@ class Extraction:
         return self.parser_status == "parsed"
 
 
+#: Which activity each file type's parsing is charged to in the profile.
+_PARSE_ACTIVITY = {
+    "pdf": "pdf_parse",
+    "docx": "office_parse", "doc": "office_parse", "pptx": "office_parse",
+    "ppt": "office_parse", "odt": "office_parse", "odp": "office_parse",
+    "rtf": "office_parse",
+    "xlsx": "table_extract", "xls": "table_extract", "ods": "table_extract",
+    "csv": "table_extract", "tsv": "table_extract",
+}
+
+
 def extract(
+    data: bytes,
+    *,
+    declared_mime: str | None = None,
+    filename: str | None = None,
+    config: Mapping[str, Any] | None = None,
+) -> Extraction:
+    """Parse one file, charging the time to the right line of the profile."""
+    started = time.monotonic()
+    extension = ""
+    try:
+        result = _extract(data, declared_mime=declared_mime, filename=filename,
+                          config=config)
+        extension = result.extension
+        return result
+    finally:
+        profiling.add(_PARSE_ACTIVITY.get(extension, "other"),
+                      time.monotonic() - started)
+
+
+def _extract(
     data: bytes,
     *,
     declared_mime: str | None = None,

@@ -322,6 +322,8 @@ class SourceBudget:
         # attempts, well beyond the number of speculative probes the protocol makes.
         self.dead_source_window = max(exhaustion_window * 4, 60)
         self.exhausted_reason: str | None = None
+        #: What this source produced that earned it extra effort.
+        self.high_value_finds: list[str] = []
 
     @property
     def exhausted(self) -> bool:
@@ -345,6 +347,21 @@ class SourceBudget:
             self.exhausted_reason = (
                 f"{self.failure_streak} consecutive requests failed; the source appears dead"
             )
+
+    def reward_high_value_find(self, what: str, *, pages: int = 20) -> None:
+        """A source that just produced a thesis or a site plan has earned more.
+
+        The register's best evidence is concentrated: a single dated project
+        report outweighs the rest of a website. A source that has just yielded
+        one is exactly where the next minute should be spent, so it gets a
+        larger allowance and any earlier exhaustion is lifted (brief §9).
+        """
+        self.limit = min(self.maximum, self.limit + pages)
+        self.barren_streak = 0
+        self.failure_streak = 0
+        if self.exhausted_reason and "dead" not in self.exhausted_reason:
+            self.exhausted_reason = None
+        self.high_value_finds.append(what)
 
     def record(self, *, yielded_evidence: bool, new_urls: int) -> None:
         self.spent += 1
@@ -381,4 +398,5 @@ class SourceBudget:
             "exhausted": self.exhausted,
             "reason": self.exhausted_reason,
             "recent_yield_rate": (sum(self.recent) / len(self.recent)) if self.recent else 0.0,
+            "high_value_finds": list(self.high_value_finds),
         }

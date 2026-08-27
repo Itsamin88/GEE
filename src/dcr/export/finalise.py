@@ -29,6 +29,7 @@ from typing import Any, Mapping, Sequence
 
 from openpyxl import load_workbook
 
+from .. import profiling
 from ..logging_setup import event, get_logger
 from .sanitize import Sanitisation
 
@@ -194,8 +195,9 @@ def finalise_workbook(
 
         try:
             exporter = exporter_factory(**options)
-            export_result = exporter.export(community_id, destination,
-                                            manifest=dict(manifest or {}))
+            with profiling.timing("export"):
+                export_result = exporter.export(community_id, destination,
+                                                manifest=dict(manifest or {}))
         except Exception as exc:
             last_error = f"{type(exc).__name__}: {exc}"
             log.error("export attempt %d (%s) failed: %s", outcome.attempts, name,

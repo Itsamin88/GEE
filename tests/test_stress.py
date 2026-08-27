@@ -268,3 +268,86 @@ def test_conflicts_did_not_explode(stress_run):
     conflicts = _count(db, "SELECT COUNT(*) FROM conflicts WHERE community_id=?", cid)
     claims = _count(db, "SELECT COUNT(*) FROM claims WHERE community_id=?", cid)
     assert conflicts < 200, f"{conflicts} conflicts from {claims} claims"
+
+
+# ---------------------------------------------------------------------------
+# the guarantee: running out of time still produces a workbook
+# ---------------------------------------------------------------------------
+@pytest.fixture(scope="module")
+def exhausted_run(tmp_path_factory):
+    """A budget so small the crawl cannot possibly finish the protocol."""
+    output = tmp_path_factory.mktemp("exhausted")
+    server = FixtureServer(archive_records=build_stress_archive())
+    server.sites.update(build_stress_site())
+    server.start()
+    try:
+        settings = fixture_settings(server.port, output, root=ROOT)
+        settings.app["budget"] = {
+            "enabled": True,
+            # Seconds, not minutes: the wind-down begins almost immediately.
+            "active_minutes": 0.08,
+            "finalisation_reserve_minutes": 0.02,
+            "wind_down_minutes": 0.01,
+        }
+        settings.app["estimation"] = {"enabled": False}
+        community = CommunityInput(
+            name="Exhausted Budget Community", urls=stress_urls(server.port),
+            country="Portugal", coder_id="STRESS", fixture=True,
+        )
+        app = Application(settings)
+        app.preflight()
+        result = app.run(community, mode="FULL")
+        db = Database(settings.database_path)
+        yield {"result": result, "db": db,
+               "community_id": result["report"]["community_id"]}
+        db.close()
+        app.close()
+    finally:
+        server.stop()
+
+
+def test_a_run_that_runs_out_of_time_still_produces_a_workbook(exhausted_run):
+    """The single most important guarantee in this repair (brief §28, §46)."""
+    path = Path(exhausted_run["result"]["workbook"])
+    assert path.exists(), "the budget expired and no workbook was written"
+    assert path.stat().st_size > 0
+    workbook = load_workbook(path)
+    try:
+        assert "O1_Community_Attributes" in workbook.sheetnames
+    finally:
+        workbook.close()
+
+
+def test_the_exhausted_run_verified_its_workbook(exhausted_run):
+    finalisation = exhausted_run["result"]["report"]["manifest"]["export"]["finalisation"]
+    assert finalisation["ok"], finalisation.get("failure_reason")
+    assert finalisation["verification"]["reopened"]
+
+
+def test_the_exhausted_run_says_the_clock_stopped_it(exhausted_run):
+    report = exhausted_run["result"]["report"]
+    budget = report.get("budget") or {}
+    assert budget.get("budget_exhausted") or report["crawl_truncated"] == "yes", (
+        "a run cut short by its budget must say so")
+    assert report["truncation_reasons"], "and must say why"
+
+
+def test_the_exhausted_run_is_never_called_complete(exhausted_run):
+    status = exhausted_run["result"]["report"]["completion_status"]
+    assert status != "COMPLETE", (
+        f"a run stopped by the clock reported {status!r}; COMPLETE would claim an "
+        "exhaustive search that never happened")
+
+
+def test_the_exhausted_run_still_wrote_its_manifests(exhausted_run):
+    """The audit package is part of the deliverable, not an optional extra."""
+    counts = exhausted_run["result"]["report"]["manifest"]["export"]["manifests"]
+    for name in ("source_manifest.csv", "evidence_manifest.csv",
+                 "document_manifest.csv", "image_manifest.csv"):
+        assert name in counts, f"{name} was not written"
+
+
+def test_the_completion_report_exists_after_exhaustion(exhausted_run):
+    output = Path(exhausted_run["result"]["output_dir"])
+    assert (output / "09_final" / "completion_report.md").exists()
+    assert (output / "09_final" / "completion_report.json").exists()

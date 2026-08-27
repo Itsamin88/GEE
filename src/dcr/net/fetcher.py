@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import random
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Mapping
@@ -17,6 +18,7 @@ from urllib.parse import urlsplit
 
 import httpx
 
+from .. import profiling
 from ..logging_setup import get_logger
 from .mime import sniff
 from .ratelimit import RateLimiter
@@ -178,7 +180,11 @@ class Fetcher:
         one place that has to notice the difference between "that server said
         no" and "this machine is not on the internet".
         """
-        result = await self._fetch(url, **kwargs)
+        started = time.monotonic()
+        try:
+            result = await self._fetch(url, **kwargs)
+        finally:
+            profiling.add("http", time.monotonic() - started)
         supervisor = self.supervisor
         if supervisor is not None:
             if result.ok:

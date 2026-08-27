@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Mapping
 from urllib.parse import urlsplit
 
+from .. import profiling
 from ..db import Database, utcnow
 from ..discovery.wayback import parse_archive_url
 from ..extract.dispatch import Extraction, extract as extract_file
@@ -683,6 +684,15 @@ class Crawler:
 
         if verdict is not None:
             self.doc_triage.note_deep_extraction(url, verdict)
+            # A source that has just produced a thesis or a restoration report
+            # is where the next minute is best spent (brief §9).
+            if context is not None and verdict.band in ("VERY_HIGH", "HIGH"):
+                context.budget.reward_high_value_find(
+                    f"{verdict.kind or 'document'}: {filename}")
+                event(log, "YIELD",
+                      f"{context.source_id} produced a {verdict.kind or 'document'} "
+                      f"and has earned a larger crawl allowance "
+                      f"(now {context.budget.limit} pages)")
 
         self._store_tables(document_id, extraction)
 
@@ -806,10 +816,11 @@ class Crawler:
         candidates = self._candidates_from_page(parsed, page_id, item, context, stage)
         if not candidates:
             return
-        triaged = self.triage.triage(
-            candidates, lexicon=self.lexicon,
-            min_width=self.image_min_width, min_height=self.image_min_height,
-        )
+        with profiling.timing("image_classify"):
+            triaged = self.triage.triage(
+                candidates, lexicon=self.lexicon,
+                min_width=self.image_min_width, min_height=self.image_min_height,
+            )
         self.stats.image_candidates += len(triaged)
         kept_for_source = 0
         for candidate in triaged:
@@ -843,7 +854,9 @@ class Crawler:
         try:
             return await self._download_candidate_inner(candidate, stage)
         finally:
-            self._image_seconds += _now() - started
+            spent = _now() - started
+            self._image_seconds += spent
+            profiling.add("image_download", spent)
 
     async def _download_candidate_inner(self, candidate: ImageCandidate, stage: int) -> bool:
         result = await self.fetcher.fetch(

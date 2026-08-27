@@ -55,6 +55,7 @@ from .language import guess_language, language_for_country
 from .logging_setup import event, get_logger
 from .net.browser import BrowserPool
 from .net.fetcher import Fetcher
+from . import profiling
 from .budget import TimeBudget, budget_from_settings
 from .control import (COMPLETED as CONTROL_COMPLETED, FAILED as CONTROL_FAILED,
                       CANCELLED as CONTROL_CANCELLED, RunCancelled, RunControl,
@@ -210,6 +211,7 @@ class CommunityRunner:
 
         run_id = self._start_run(community)
         self.run_id = run_id
+        profiling.reset()
         stages = MODE_STAGES.get(self.run_mode, MODE_STAGES["FULL"])
 
         # Run control first: from here on, every stop has a recorded reason and
@@ -1693,6 +1695,7 @@ class CommunityRunner:
     # Stage 9 — reconciliation
     # ---------------------------------------------------------------------
     async def _stage_9(self) -> None:
+        """Reconciliation. Timed as one block: it is paid for from the reserve."""
         from .resolve import FieldResolver
 
         stage = self.stages[9]
@@ -1792,7 +1795,8 @@ class CommunityRunner:
         return found
 
     def _mine_and_record(self, *, text: str, **kwargs: Any) -> int:
-        mined = self.miner.mine(text, **kwargs)
+        with profiling.timing("text_mining"):
+            mined = self.miner.mine(text, **kwargs)
         context = {
             "source_id": kwargs.get("source_id"),
             "document_id": kwargs.get("document_id"),
@@ -2127,7 +2131,8 @@ class CommunityRunner:
             queue=queue,
             budget_exhausted=self.budget_exhausted,
             budget=self.budget.snapshot().as_dict() if self.budget else {},
-            profile=self.budget.profile() if self.budget else {},
+            profile={**(self.budget.profile() if self.budget else {}),
+                     "activities": profiling.current().report()},
         )
         self.db.update(
             "runs",
