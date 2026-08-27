@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import re
 import threading
+import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable
@@ -344,6 +345,12 @@ class FixtureServer:
     #: one the reported run met, without touching the pilot fixtures.
     archive_records: list = field(default_factory=lambda: list(ARCHIVE_RECORDS))
     request_log: list[str] = field(default_factory=list)
+    #: Seconds to wait before answering, simulating a real server on the far
+    #: side of a network. Zero for the functional tests, which want speed; the
+    #: benchmark sets it, because waiting on the network is the ONLY thing
+    #: parallel communities exist to overlap, and a loopback fixture with no
+    #: latency measures the overhead of parallelism without any of its benefit.
+    latency_s: float = 0.0
     _server: ThreadingHTTPServer | None = None
     _thread: threading.Thread | None = None
 
@@ -374,6 +381,8 @@ class FixtureServer:
                 self.do_GET()
 
             def _respond(self, status: int, mime: str, body: bytes) -> None:
+                if fixture.latency_s:
+                    time.sleep(fixture.latency_s)
                 self.send_response(status)
                 self.send_header("Content-Type", mime)
                 self.send_header("Content-Length", str(len(body)))

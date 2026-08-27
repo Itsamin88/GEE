@@ -116,7 +116,7 @@ the program does not pretend otherwise:
 | --- | --- |
 | `COMPLETE` | Every stage finished and nothing was cut short |
 | `COMPLETE_WITH_TRUNCATION` | A usable research record, with what was not reached stated. The clock stopped it, not the sources |
-| `PARTIAL_TRUNCATED` | Cut short for another reason — blocks, failures, too few pages |
+| `COMPLETE_WITH_TRUNCATION` | Usable, with parts deliberately not reached — the report says which |
 | `REQUIRES_HUMAN_REVIEW` | Something needs a coder's judgement |
 | `FAILED_TECHNICALLY` | No verified workbook could be produced |
 
@@ -387,7 +387,7 @@ Every community ends in exactly one of:
 | --- | --- |
 | `COMPLETE` | Every stage finished and every check passed |
 | `COMPLETE_WITH_UNCERTAINTY` | Finished, with warnings worth reading |
-| `PARTIAL_TRUNCATED` | Stopped before the protocol finished — the report says where |
+| `COMPLETE_WITH_TRUNCATION` | Stopped before the protocol finished — the report says where |
 | `PARTIAL_BLOCKED` | Key sources refused automated reading |
 | `FAILED_TECHNICALLY` | A quality check that matters failed |
 | `REQUIRES_HUMAN_REVIEW` | Something needs your judgement before the record is usable |

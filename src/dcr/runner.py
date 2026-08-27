@@ -127,7 +127,7 @@ class RunOutcome:
     stages: dict[int, StageStatus] = field(default_factory=dict)
     truncated: bool = False
     truncation_reasons: list[str] = field(default_factory=list)
-    completion_status: str = "PARTIAL_TRUNCATED"
+    completion_status: str = "FAILED_TECHNICALLY"
     stats: dict[str, Any] = field(default_factory=dict)
     review_items: int = 0
     #: How the run ended: COMPLETED, PAUSED_MANUAL, PAUSED_NETWORK, CANCELLED

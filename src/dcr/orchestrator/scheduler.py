@@ -425,7 +425,11 @@ class RunScheduler:
     # =====================================================================
     def _sample_and_adapt(self) -> None:
         now = self._clock()
-        if now - self._last_sample_at < self.sample_every_s:
+        # Always take the first sample. Without it a run shorter than the
+        # sampling interval records nothing, and "how many workers did it
+        # actually use" becomes unanswerable for exactly the short runs a
+        # benchmark is made of.
+        if self._last_sample_at and now - self._last_sample_at < self.sample_every_s:
             return
         self._last_sample_at = now
         counts = self.store.counts(self.run_id)

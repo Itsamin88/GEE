@@ -683,3 +683,141 @@ def test_the_remaining_estimate_uses_real_durations_once_it_has_them(store, tmp_
     assert after_high < before_high, (
         "observed durations must replace the guess made from typed addresses")
     pool.close()
+
+
+# ---------------------------------------------------------------------------
+# §109 — parallelism cases the brief names explicitly
+# ---------------------------------------------------------------------------
+@pytest.mark.slow
+@pytest.mark.parametrize("workers", [8, 16])
+def test_the_named_worker_counts_run_a_queue_to_completion(store, tmp_path, workers):
+    """§109 asks for 8 and 16 by name. Both must simply work."""
+    plan = queue_run(store, tmp_path, make_entries(workers + 4))
+    run_scheduler(store, plan, tmp_path, target=fake_worker,
+                  payload_extra={"behaviour": "ok", "work_s": 0.05},
+                  workers=workers, max_ticks=3000, tick_s=0.02)
+    assert store.counts("R1")[COMPLETED] == workers + 4
+
+
+@pytest.mark.slow
+def test_one_very_large_community_does_not_hold_the_others(store, tmp_path):
+    """C001 with five thousand URLs must not stop C002 finishing (brief §5)."""
+    trace = tmp_path / "trace.tsv"
+    entries = [
+        {"name": "Enormous", "urls": [f"https://big-{n}.example" for n in range(9)]},
+        *make_entries(5, prefix="Small"),
+    ]
+    plan = build_plan(entries, run_id="R1", output_root=tmp_path / "out")
+    store.create_run("R1", mode="FULL", output_root=tmp_path / "out")
+    for job in plan.jobs:
+        store.add_job("R1", job.as_dict())
+
+    pool = WorkerPool(target=counting_worker, heartbeat_timeout_s=20.0,
+                      shutdown_grace_s=2.0)
+    scheduler = RunScheduler(
+        store, plan, output_root=tmp_path / "out", pool=pool,
+        governor=ResourceGovernor(minimum=1, maximum=2, start=2, settle_s=0.0),
+        config={"tick_seconds": 0.02, "sample_seconds": 1.0},
+        payload_extra={"work_s": 0.15, "trace_path": str(trace)},
+    )
+    huge = next(j for j in plan.jobs if j.name == "Enormous")
+    original = scheduler._dispatch
+
+    def dispatch(job):
+        scheduler._payload_extra = {
+            "work_s": 2.0 if job.job_id == huge.job_id else 0.15,
+            "trace_path": str(trace)}
+        original(job)
+
+    scheduler._dispatch = dispatch
+    scheduler.run(max_ticks=3000)
+
+    rows = [line.split("\t") for line in trace.read_text().splitlines() if line]
+    finished = {row[0]: float(row[2]) for row in rows}
+    assert len(finished) == 6, "not every community finished"
+    small_ids = [j.job_id for j in plan.jobs if j.job_id != huge.job_id]
+    # Every small community finished; most of them before the large one did.
+    assert all(job_id in finished for job_id in small_ids)
+    ahead = sum(1 for job_id in small_ids
+                if finished[job_id] < finished.get(huge.job_id, float("inf")))
+    assert ahead >= 3, (
+        f"only {ahead} of 5 small communities finished before the large one; "
+        "one enormous community is monopolising the run")
+
+
+@pytest.mark.slow
+def test_a_blocked_community_and_a_crash_in_the_same_run(store, tmp_path):
+    """§39's list, in one run: a crash, a block, and four that are fine."""
+    plan = queue_run(store, tmp_path, make_entries(6))
+    behaviours = {plan.jobs[0].job_id: "crash", plan.jobs[1].job_id: "blocked"}
+    pool = WorkerPool(target=fake_worker, heartbeat_timeout_s=10.0,
+                      shutdown_grace_s=2.0)
+    scheduler = RunScheduler(
+        store, plan, output_root=tmp_path / "out", pool=pool,
+        governor=ResourceGovernor(minimum=1, maximum=3, start=3, settle_s=0.0),
+        config={"tick_seconds": 0.02, "sample_seconds": 1.0, "max_attempts": 2},
+        payload_extra={"behaviour": "ok", "work_s": 0.05},
+    )
+    original = scheduler._dispatch
+
+    def dispatch(job):
+        scheduler._payload_extra = {
+            "behaviour": behaviours.get(job.job_id, "ok"), "work_s": 0.05}
+        original(job)
+
+    scheduler._dispatch = dispatch
+    scheduler.run(max_ticks=3000)
+
+    jobs = {job.job_id: job for job in store.jobs("R1")}
+    assert jobs[plan.jobs[0].job_id].final_status == "FAILED_TECHNICALLY"
+    assert jobs[plan.jobs[1].job_id].final_status == "PARTIAL_BLOCKED"
+    fine = [job for job_id, job in jobs.items() if job_id not in behaviours]
+    assert all(job.final_status == "COMPLETE" for job in fine), (
+        "a crash and a block took healthy communities with them")
+
+
+@pytest.mark.slow
+def test_adaptive_scaling_over_a_real_queue(store, tmp_path):
+    """The governor moves the count while the queue is running, and the
+    scheduler follows it."""
+    plan = queue_run(store, tmp_path, make_entries(12))
+    governor = ResourceGovernor(minimum=1, maximum=6, start=1, settle_s=0.0)
+    run_scheduler(store, plan, tmp_path, target=fake_worker,
+                  payload_extra={"behaviour": "ok", "work_s": 0.1},
+                  governor=governor, max_ticks=3000, tick_s=0.02)
+    assert store.counts("R1")[COMPLETED] == 12
+    samples = store.samples("R1")
+    targets = {int(row["target"]) for row in samples}
+    assert len(targets) > 1, (
+        f"the worker count never changed: {targets}. Adaptive concurrency that "
+        "never adapts is a constant with extra steps")
+
+
+def test_repeated_interruption_does_not_lose_work(store, tmp_path):
+    """Interrupt, resume, interrupt, resume. Nothing completed is re-run and
+    nothing outstanding is forgotten (brief §37, §109)."""
+    from dcr.orchestrator.recovery import apply_resume, plan_resume, repair
+
+    plan = queue_run(store, tmp_path, make_entries(8))
+    done: set[str] = set()
+    for cycle in range(3):
+        # Two communities complete, one is left mid-flight, and the machine dies.
+        remaining = [job for job in store.jobs("R1") if job.state == QUEUED]
+        for job in remaining[:2]:
+            store.update_job(job.job_id, {"state": COMPLETED,
+                                          "final_status": "COMPLETE",
+                                          "active_s": 30.0})
+            done.add(job.job_id)
+        if len(remaining) > 2:
+            store.update_job(remaining[2].job_id, {"state": RUNNING, "worker": "w1"})
+
+        repair(store, "R1")
+        recovery = plan_resume(store, "R1")
+        assert all(job_id in recovery.keep_complete for job_id in done), (
+            f"cycle {cycle}: a completed community was offered for re-running")
+        apply_resume(store, recovery)
+
+    counts = store.counts("R1")
+    assert counts[COMPLETED] == len(done)
+    assert counts[COMPLETED] + counts[QUEUED] == 8, (
+        "communities went missing across three interruptions")

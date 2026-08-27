@@ -285,10 +285,15 @@ def test_quality_checks_pass(pilot):
 
 
 def test_completion_status_is_one_of_the_six(pilot):
-    assert pilot["result"]["status"] in {
-        "COMPLETE", "COMPLETE_WITH_UNCERTAINTY", "PARTIAL_TRUNCATED",
-        "PARTIAL_BLOCKED", "FAILED_TECHNICALLY", "REQUIRES_HUMAN_REVIEW",
-    }
+    """The six §92 names, from the one place that defines them.
+
+    Repeating the list here is how it drifted: `PARTIAL_TRUNCATED` was produced
+    for years and is not one of the six.
+    """
+    from dcr.qc.checks import COMPLETION_STATUSES
+
+    assert pilot["result"]["status"] in set(COMPLETION_STATUSES)
+    assert len(COMPLETION_STATUSES) == 6
 
 
 def test_a_fixture_run_is_stamped_so_it_cannot_pass_as_research_data(pilot):

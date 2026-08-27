@@ -39,6 +39,12 @@ STRESS_BUDGET_MINUTES = 0.9
 STRESS_RESERVE_MINUTES = 0.2
 STRESS_WIND_DOWN_MINUTES = 0.1
 
+#: A ceiling scaled to a loopback fixture, so that it actually truncates the
+#: crawl the way the shipped thirty-minute one truncated the real Tamera run.
+#: The comparison in `capped_versus_governed` is meaningless against a cap that
+#: is never reached.
+CAP_THAT_BITES_MINUTES = 0.06
+
 
 def _hosts_resolve() -> bool:
     try:
@@ -351,3 +357,138 @@ def test_the_completion_report_exists_after_exhaustion(exhausted_run):
     output = Path(exhausted_run["result"]["output_dir"])
     assert (output / "09_final" / "completion_report.md").exists()
     assert (output / "09_final" / "completion_report.json").exists()
+
+
+# ===========================================================================
+# THE MEASUREMENT THIS REWRITE EXISTS FOR
+#
+# The same rich community, run twice: once with the old thirty-minute-shaped
+# cap, once with no cap at all and the yield governor deciding. If removing the
+# cap does not recover evidence, the whole change was pointless; if it does not
+# terminate, the change traded one failure for another.
+#
+# Both are asserted here, on real numbers, in one test (brief §1, §25, §94).
+# ===========================================================================
+@pytest.fixture(scope="module")
+def capped_versus_governed(tmp_path_factory):
+    """Run the stress community twice, and measure the difference."""
+    server = FixtureServer(archive_records=build_stress_archive())
+    server.sites.update(build_stress_site())
+    server.start()
+    results = {}
+    try:
+        for label, budget in (
+            # The shape of the old design: a fixed slice of active time, cut
+            # into per-stage shares, applied whatever the crawl was finding.
+            #
+            # The number is small because the fixture is on loopback and the
+            # whole site is served in seconds; a 30-minute cap would never bite
+            # here, and a cap that does not bite is not the behaviour being
+            # compared against. On the real Tamera site the shipped 30-minute
+            # cap bit in exactly this way — a fraction of the crawl done, the
+            # rest of the protocol never reached.
+            ("capped", {"enabled": True, "active_minutes": CAP_THAT_BITES_MINUTES,
+                        "finalisation_reserve_minutes": 0.02,
+                        "wind_down_minutes": 0.01}),
+            # The new one: no ceiling; the yield governor decides.
+            ("governed", {"enabled": True, "active_minutes": 0,
+                          "finalisation_reserve_minutes": STRESS_RESERVE_MINUTES,
+                          "wind_down_minutes": STRESS_WIND_DOWN_MINUTES}),
+        ):
+            output = tmp_path_factory.mktemp(f"compare-{label}")
+            settings = fixture_settings(server.port, output, root=ROOT)
+            settings.app["budget"] = budget
+            settings.app["estimation"] = {"enabled": False}
+            settings.app["crawl"]["max_pages_per_run"] = 4000
+            settings.app["crawl"]["base_pages_per_source"] = 400
+            settings.sources["archive"]["priority_snapshot_paths"] = ["/", "/history"]
+            community = CommunityInput(
+                name=f"Stress Comparison {label}", latitude=37.72, longitude=-8.45,
+                urls=stress_urls(server.port), country="Portugal",
+                coder_id="STRESS", fixture=True,
+            )
+            app = Application(settings)
+            app.preflight()
+            started = time.monotonic()
+            result = app.run(community, mode="FULL")
+            wall_s = time.monotonic() - started
+            db = Database(settings.database_path)
+            cid = result["report"]["community_id"]
+            results[label] = {
+                "result": result, "wall_s": wall_s,
+                "evidence": _count(db, "SELECT COUNT(*) FROM evidence "
+                                       "WHERE community_id=?", cid),
+                "claims": _count(db, "SELECT COUNT(*) FROM claims "
+                                     "WHERE community_id=?", cid),
+                "pages": _count(db, "SELECT COUNT(*) FROM pages WHERE community_id=?", cid),
+                "documents": _count(db, "SELECT COUNT(*) FROM documents "
+                                        "WHERE community_id=?", cid),
+                "fields": _count(db, "SELECT COUNT(*) FROM field_values "
+                                     "WHERE community_id=? AND status='coded'", cid),
+                "report": result["report"],
+            }
+            db.close()
+            app.close()
+        yield results
+    finally:
+        server.stop()
+
+
+def test_removing_the_cap_recovers_evidence(capped_versus_governed):
+    """The whole point. If this is not true, the rewrite was pointless."""
+    capped = capped_versus_governed["capped"]
+    governed = capped_versus_governed["governed"]
+    assert governed["evidence"] > capped["evidence"], (
+        f"the governed run found {governed['evidence']} evidence items and the "
+        f"capped run {capped['evidence']}: removing the cap recovered nothing")
+    assert governed["pages"] >= capped["pages"]
+    print(f"\n  capped:   {capped['pages']} pages, {capped['documents']} documents, "
+          f"{capped['evidence']} evidence, {capped['fields']} fields coded, "
+          f"{capped['wall_s']:.0f}s")
+    print(f"  governed: {governed['pages']} pages, {governed['documents']} documents, "
+          f"{governed['evidence']} evidence, {governed['fields']} fields coded, "
+          f"{governed['wall_s']:.0f}s")
+
+
+def test_the_governed_run_still_terminates(capped_versus_governed):
+    """Removing the cap must not mean running for ever (brief §62)."""
+    governed = capped_versus_governed["governed"]
+    assert governed["wall_s"] < 600, (
+        f"the governed run took {governed['wall_s']:.0f}s on a fixture site; "
+        "the yield governor is not stopping it")
+
+
+def test_the_governed_run_stopped_for_a_stated_reason(capped_versus_governed):
+    report = capped_versus_governed["governed"]["report"]
+    budget = report.get("budget") or {}
+    cause = report.get("retrieval_stop_cause") or ""
+    if cause:
+        assert cause in ("exhausted", "requested"), (
+            f"an unbounded run reported {cause!r}; only a ceiling can produce "
+            "'ceiling', and none was set")
+        assert budget.get("stop_reason"), "it stopped without saying why"
+
+
+def test_the_capped_run_is_reported_as_truncated(capped_versus_governed):
+    """A run the clock stopped may be COMPLETE_WITH_TRUNCATION, never COMPLETE."""
+    report = capped_versus_governed["capped"]["report"]
+    if (report.get("retrieval_stop_cause") or "") == "ceiling":
+        assert report["completion_status"] != "COMPLETE"
+        assert report["truncation_reasons"]
+
+
+def test_the_governed_run_reports_what_it_found_per_minute(capped_versus_governed):
+    """The number the whole stopping rule is based on (brief §25)."""
+    report = capped_versus_governed["governed"]["report"]
+    measured = report.get("yield") or {}
+    assert measured, "the report does not carry the yield account"
+    assert measured["evidence_yield_per_min"] > 0
+    assert measured["curve"], "no yield curve, so nobody can see the shape of the run"
+
+
+def test_both_runs_produced_a_verified_workbook(capped_versus_governed):
+    """Whichever way a run ends, it ends with a workbook that reopens."""
+    for label, run in capped_versus_governed.items():
+        finalisation = run["report"]["manifest"]["export"]["finalisation"]
+        assert finalisation["ok"], f"{label}: {finalisation.get('failure_reason')}"
+        assert finalisation["verification"]["reopened"], label

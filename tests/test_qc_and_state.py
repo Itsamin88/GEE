@@ -348,9 +348,9 @@ def test_the_coverage_matrix_reports_every_source_class(db, community, schema, t
 
 @pytest.mark.parametrize("truncated, blocking, pages, expected", [
     (False, 0, 40, "COMPLETE"),
-    (True, 0, 40, "PARTIAL_TRUNCATED"),
+    (True, 0, 40, "COMPLETE_WITH_TRUNCATION"),
     (False, 2, 40, "REQUIRES_HUMAN_REVIEW"),
-    (False, 0, 3, "PARTIAL_TRUNCATED"),
+    (False, 0, 3, "COMPLETE_WITH_TRUNCATION"),
 ])
 def test_completion_status_never_calls_a_partial_crawl_complete(truncated, blocking, pages,
                                                                 expected):
@@ -358,6 +358,78 @@ def test_completion_status_never_calls_a_partial_crawl_complete(truncated, block
 
     assert completion_status(QcReport(), truncated=truncated, blocking_review=blocking,
                              pages_opened=pages, min_pages=25) == expected
+
+
+def test_only_the_six_statuses_the_brief_names_are_ever_produced():
+    """§92 lists six. `PARTIAL_TRUNCATED`, which this used to produce, is not
+    one of them, and a status nobody defined is a status nobody can act on."""
+    from dcr.qc.checks import COMPLETION_STATUSES, QcReport
+
+    produced = set()
+    for truncated in (True, False):
+        for blocking in (0, 2):
+            for pages in (3, 40):
+                for cause in ("", "exhausted", "ceiling", "requested"):
+                    for blocked, reachable in ((0, 3), (3, 0), (1, 4)):
+                        produced.add(completion_status(
+                            QcReport(), truncated=truncated, blocking_review=blocking,
+                            pages_opened=pages, min_pages=25,
+                            retrieval_stop_cause=cause,
+                            blocked_sources=blocked, reachable_sources=reachable))
+    produced.add(completion_status(QcReport(), truncated=False, blocking_review=0,
+                                   pages_opened=40, min_pages=25,
+                                   workbook_verified=False))
+    assert produced <= set(COMPLETION_STATUSES), produced - set(COMPLETION_STATUSES)
+
+
+def test_a_community_that_was_worked_out_is_complete_not_truncated():
+    """The change the yield governor brings: a run that stopped because every
+    source went quiet followed the protocol to its end (brief §61)."""
+    from dcr.qc.checks import QcReport
+
+    assert completion_status(QcReport(), truncated=True, blocking_review=0,
+                             pages_opened=400, min_pages=25,
+                             retrieval_stop_cause="exhausted") == "COMPLETE"
+
+
+def test_a_ceiling_or_a_request_leaves_work_undone():
+    from dcr.qc.checks import QcReport
+
+    for cause in ("ceiling", "requested"):
+        assert completion_status(QcReport(), truncated=False, blocking_review=0,
+                                 pages_opened=400, min_pages=25,
+                                 retrieval_stop_cause=cause) == "COMPLETE_WITH_TRUNCATION"
+
+
+def test_refused_access_is_not_the_same_as_nothing_published():
+    """§60: BLOCKED says the evidence exists and could not be reached."""
+    from dcr.qc.checks import QcReport
+
+    assert completion_status(
+        QcReport(), truncated=True, blocking_review=0, pages_opened=40, min_pages=25,
+        blocked_sources=3, reachable_sources=0) == "PARTIAL_BLOCKED"
+
+
+def test_one_login_walled_page_does_not_make_a_community_blocked():
+    """A Facebook page behind a login beside a fully crawled website is an
+    ordinary result, not a blocked community."""
+    from dcr.qc.checks import QcReport
+
+    assert completion_status(
+        QcReport(), truncated=False, blocking_review=0, pages_opened=200, min_pages=25,
+        retrieval_stop_cause="exhausted",
+        blocked_sources=1, reachable_sources=4) == "COMPLETE"
+
+
+def test_an_unreachable_third_party_index_is_not_a_blocked_community():
+    """An academic database being down is an infrastructure gap, not a refusal
+    by this community, and must not change its status."""
+    from dcr.qc.checks import QcReport
+
+    assert completion_status(
+        QcReport(), truncated=True, blocking_review=0, pages_opened=200, min_pages=25,
+        retrieval_stop_cause="exhausted",
+        blocked_sources=0, reachable_sources=4) == "COMPLETE"
 
 
 def test_a_critical_check_failure_is_technical_failure():

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping
+from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from ..db import Database
 
@@ -452,21 +452,43 @@ class QualityControl:
 def completion_status(report: QcReport, *, truncated: bool, blocking_review: int,
                       pages_opened: int, min_pages: int,
                       workbook_verified: bool = True,
-                      budget_exhausted: bool = False) -> str:
-    """Exactly one status, and never a flattering one.
+                      budget_exhausted: bool = False,
+                      retrieval_stop_cause: str = "",
+                      blocked_sources: int = 0,
+                      reachable_sources: int = 0) -> str:
+    """Exactly one status, from the six the brief names, and never a flattering
+    one (brief §92).
 
-    Two distinctions this has to keep straight.
+        COMPLETE                    every stage ran, nothing outstanding
+        COMPLETE_WITH_UNCERTAINTY   quality warnings a coder should read
+        COMPLETE_WITH_TRUNCATION    usable, with parts deliberately not reached
+        PARTIAL_BLOCKED             sources refused access
+        REQUIRES_HUMAN_REVIEW       something a machine must not decide
+        FAILED_TECHNICALLY          no verified workbook
 
-    **Complete is not exhaustive.** A run held to a time budget may have done
-    every stage the protocol asks for, produced a verified workbook, and still
-    not have followed every source path to its end. That is
-    COMPLETE_WITH_TRUNCATION: a usable research record with its limits stated,
-    which is an honest and useful outcome. It is not COMPLETE, and it may never
-    be presented as an exhaustive search (brief §30).
+    Three distinctions this has to keep straight.
 
     **A workbook that cannot be reopened is not an output.** However much
     evidence was gathered, if finalisation could not produce a verified file the
-    run failed technically and says so (brief §4).
+    run failed technically and says so (brief §4, §92).
+
+    **Complete is not exhaustive — but exhausted is not truncated either.**
+    This is the change the yield governor brings. A run that stopped because
+    every source had gone quiet followed the protocol to its end on the
+    evidence, and is COMPLETE. A run stopped by a configured ceiling, or by the
+    researcher, left work undone and is COMPLETE_WITH_TRUNCATION: a usable
+    record with its limits stated, never presentable as an exhaustive search
+    (brief §30, §61).
+
+    **Refused is not absent.** A community whose OWN sources refused the crawler
+    is PARTIAL_BLOCKED, which says the evidence exists and could not be reached
+    — quite different from a community about which little is published (§60).
+
+    The signal for that is the source records, not the truncation text. An
+    earlier version matched words like "unreachable" in the truncation reasons,
+    which made every community PARTIAL_BLOCKED the moment a third-party academic
+    index was down — an infrastructure gap, not a refusal, and nothing to do
+    with whether this community's evidence could be reached.
     """
     if not workbook_verified:
         return "FAILED_TECHNICALLY"
@@ -477,13 +499,39 @@ def completion_status(report: QcReport, *, truncated: bool, blocking_review: int
         return "REQUIRES_HUMAN_REVIEW"
     if blocking_review:
         return "REQUIRES_HUMAN_REVIEW"
+
+    # Blocked only when the community's own addresses refused us, and only when
+    # that is most of them: one login-walled Facebook page beside a fully
+    # crawled website is an ordinary result, not a blocked community.
+    if blocked_sources and blocked_sources >= max(1, reachable_sources):
+        return "PARTIAL_BLOCKED"
+
+    if retrieval_stop_cause == "exhausted":
+        # The community was worked out: the protocol finished on the evidence
+        # rather than on a clock. That is a complete search.
+        return "COMPLETE_WITH_UNCERTAINTY" if report.warnings else "COMPLETE"
+    if retrieval_stop_cause in ("ceiling", "requested"):
+        return "COMPLETE_WITH_TRUNCATION"
     if budget_exhausted:
-        # The stages ran and the record is usable; what stopped was the clock.
         return "COMPLETE_WITH_TRUNCATION"
     if truncated:
-        return "PARTIAL_TRUNCATED"
+        return "COMPLETE_WITH_TRUNCATION"
     if pages_opened < min_pages:
-        return "PARTIAL_TRUNCATED"
+        # Too little was opened to call this a search of the community, but the
+        # workbook is real and its limits are stated.
+        return "COMPLETE_WITH_TRUNCATION"
     if report.warnings:
         return "COMPLETE_WITH_UNCERTAINTY"
     return "COMPLETE"
+
+
+#: The six statuses a community run may end with (brief §92). Nothing else may
+#: be written to `completion_status`.
+COMPLETION_STATUSES = (
+    "COMPLETE",
+    "COMPLETE_WITH_UNCERTAINTY",
+    "COMPLETE_WITH_TRUNCATION",
+    "PARTIAL_BLOCKED",
+    "REQUIRES_HUMAN_REVIEW",
+    "FAILED_TECHNICALLY",
+)

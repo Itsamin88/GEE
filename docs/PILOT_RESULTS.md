@@ -53,9 +53,9 @@ research evidence`. Nothing from a fixture run can be mistaken for coded researc
 | Fields coded | 66 (1 `NOT FOUND`) | 60 (2 `NOT FOUND`) |
 | Conflicts recorded | 12 | 1 |
 | Quality checks | 16 pass, 2 warn, 0 fail | 17 pass, 1 warn, 0 fail |
-| Completion status | `PARTIAL_TRUNCATED` | `PARTIAL_TRUNCATED` |
+| Completion status | `COMPLETE_WITH_TRUNCATION` | `COMPLETE_WITH_TRUNCATION` |
 
-`PARTIAL_TRUNCATED` is the correct status: the fixture deliberately makes some academic
+`COMPLETE_WITH_TRUNCATION` is the correct status: the fixture deliberately makes some academic
 and every grey-literature database unreachable, and the program refuses to call a run
 complete when a stage could not finish. `stages_completed` names which ones and why.
 

@@ -453,6 +453,14 @@ class Application:
             min_pages=int(self.settings.get("quality", "min_pages_opened", default=25)),
             workbook_verified=finalisation.ok,
             budget_exhausted=bool(getattr(outcome, "budget_exhausted", False)),
+            retrieval_stop_cause=str(getattr(outcome, "retrieval_stop_cause", "") or ""),
+            blocked_sources=int(self.db.scalar(
+                "SELECT COUNT(*) FROM sources WHERE community_id=? "
+                "AND (crawl_status='blocked' OR access_status IN "
+                "('blocked','login_required','forbidden'))", (community_id,)) or 0),
+            reachable_sources=int(self.db.scalar(
+                "SELECT COUNT(*) FROM sources WHERE community_id=? "
+                "AND crawl_status='crawled'", (community_id,)) or 0),
         )
         self.db.update("communities", {"completion_status": status},
                        {"community_id": community_id})
@@ -516,6 +524,12 @@ class Application:
 
     def _print_summary(self, report: Mapping[str, Any], qc_report: Any,
                        workbook_path: Path, storage: CommunityStorage) -> None:
+        # The completion summary is for a researcher reading one community's
+        # result. In a run of two hundred it is two hundred summaries scrolling
+        # past the dashboard, so the orchestrator turns it off and the
+        # per-community completion_report.md carries the same content.
+        if self.settings.get("logging", "quiet_summary", default=False):
+            return
         print("\n" + "=" * 78)
         print(f"  {report['community']}  —  {report['completion_status']}")
         print("=" * 78)
