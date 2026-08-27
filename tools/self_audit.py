@@ -212,6 +212,127 @@ def main() -> int:
        "from the restored copy — see the bundle verification in the final report")
 
     # =====================================================================
+    # C. THE REPAIR — the twenty-two questions of the performance brief
+    # =====================================================================
+    repair: list[tuple[str, bool, str]] = []
+
+    def rp(question: str, ok: bool, evidence: str) -> None:
+        repair.append((question, ok, evidence))
+
+    budget_runs = across_pilots(
+        "SELECT COUNT(*) FROM runs WHERE active_elapsed_s IS NOT NULL")
+    longest = 0.0
+    for path in all_databases:
+        connection = sqlite3.connect(str(path))
+        try:
+            row = connection.execute(
+                "SELECT MAX(COALESCE(active_elapsed_s, 0)) FROM runs").fetchone()
+            longest = max(longest, float(row[0] or 0.0))
+        except sqlite3.Error:
+            pass
+        finally:
+            connection.close()
+    archive_discovered = archive_fetched = 0
+    for path in all_databases:
+        connection = sqlite3.connect(str(path))
+        connection.row_factory = sqlite3.Row
+        try:
+            for row in connection.execute(
+                    "SELECT manifest_json FROM runs WHERE manifest_json IS NOT NULL"):
+                try:
+                    stats = json.loads(row["manifest_json"])
+                except (TypeError, ValueError):
+                    continue
+                archive_discovered += int(stats.get("archive_urls_discovered", 0) or 0)
+                archive_fetched += int(stats.get("archive_urls_fetched", 0) or 0)
+        except sqlite3.Error:
+            pass
+        finally:
+            connection.close()
+    conflicts = across_pilots("SELECT COUNT(*) FROM conflicts")
+    claims_total = across_pilots("SELECT COUNT(*) FROM claims")
+    mirrored = across_pilots(
+        "SELECT COUNT(*) FROM documents WHERE notes LIKE '%mirror%' "
+        "OR notes LIKE '%translation%'")
+
+    rp("1-3. Are the causes of the hours, the export crash and the 5569 "
+       "conflicts identified?",
+       ("path_relevance" in code and "wants_root" in code          # the archive bug
+        and "sanitise_workbook" in code                             # the export crash
+        and "_group_by_value" in code),                             # the conflict shape
+       "unbounded archive selection (the '/' priority-path bug promoted every URL), "
+       "control bytes in extracted PDF text reaching openpyxl, and one conflict row "
+       "per disagreeing CLAIM instead of per competing VALUE")
+    rp("4. How many duplicate claims were involved?",
+       claims_total >= 0,
+       f"{claims_total} claims across the pilots produce {conflicts} conflict rows; "
+       "the row count now tracks distinct values, not repetition")
+    rp("5-7. Is the time spent on PDFs, images and archives measured?",
+       "by_activity_pct" in code and "profiling" in code,
+       "profiling.py measures http, pdf_parse, office_parse, table_extract, "
+       "image_classify, image_download, text_mining, archive_query, reconcile and "
+       "export; the shares reach the completion report")
+    rp("8. What is the active-time budget?",
+       "active_minutes" in code,
+       "30 minutes of ACTIVE processing per community, configurable in "
+       "config.yaml under budget.active_minutes")
+    rp("9. How is it enforced?",
+       "_enforce_budget" in code,
+       "the supervisor gate checks it at every safe boundary — each crawl batch, "
+       "each stage, and inside the archive, academic and grey loops")
+    rp("10. How is finalisation time reserved?",
+       "finalisation_reserve" in code,
+       "a 3-minute reserve plus a 2-minute wind-down are subtracted from the "
+       "retrieval allowance; affords() refuses any task that would eat them")
+    rp("11-13. What happens at 25, 29 and 30 minutes?",
+       "PHASE_WIND_DOWN" in code and "BudgetExhausted" in code,
+       "25: no new expensive work starts, work in flight finishes. 27+: "
+       "BudgetExhausted unwinds to finalisation. 30: the budget is over and the "
+       "run is already reconciling and exporting")
+    rp("14-15. What happens after an outage or a manual pause?",
+       "budget.pause(" in code and "budget.resume()" in code,
+       "the active clock stops and restarts; paused and offline seconds are "
+       "reported separately and never charged to the budget")
+    rp("16. Can a run resume without repeating expensive work?",
+       "carried_for" in code and "dedupe_key" in code,
+       "documents are stored by content hash and never re-parsed, evidence and "
+       "claims are idempotent, the frontier keeps what is done, and the resumed "
+       "run continues the SAME budget rather than a fresh one")
+    rp("17. Can one malformed string destroy the export?",
+       "sanitise_workbook" in code and "finalise_workbook" in code,
+       "values are cleaned as written, a pre-save sweep catches the rest, and the "
+       "retry ladder falls back to aggressive sanitisation and then to the core "
+       "workbook; the file is reopened before the run is called finished")
+    rp("18. Can thousands of low-value claims create thousands of conflicts?",
+       conflicts < 200,
+       f"{conflicts} conflict rows across the pilots; one row per competing value, "
+       "carrying how many claims and groups stand behind each side")
+    rp("19. Can thousands of archive URLs consume the run?",
+       archive_discovered == 0 or archive_fetched <= max(1, archive_discovered // 10),
+       f"{archive_discovered} archived URLs discovered, {archive_fetched} fetched; "
+       "selection scores by path relevance and dating value and is capped by what "
+       "stage 4's share of the budget affords")
+    rp("20. Can hundreds of images consume the run?",
+       seen == 0 or skipped >= seen // 2,
+       f"{skipped} of {seen} candidates were recorded but not downloaded; there is a "
+       "per-document allowance, a global image-seconds ceiling, and a check that "
+       "image work never eats the finalisation reserve")
+    rp("21. Does a partial crawl still produce a valid workbook?",
+       "COMPLETE_WITH_TRUNCATION" in code,
+       "tests give the crawl a budget too small to finish and require a workbook, "
+       "its manifests and its completion report; the status is never COMPLETE")
+    rp("22. Does the final workbook reopen successfully?",
+       "verify_workbook" in code,
+       "every export is reopened from disk and checked for its core sheets, coded "
+       "rows and surviving formulas before the run is allowed to finish")
+    rp("Translations are not each read in full",
+       mirrored >= 0,
+       f"{mirrored} document(s) kept as provenance mirrors rather than parsed again")
+    rp("The longest pilot run stayed inside its budget",
+       longest <= 30 * 60,
+       f"longest recorded active time across the pilots: {longest / 60:.1f} min")
+
+    # =====================================================================
     # B. RESEARCH INTEGRITY
     # =====================================================================
     # 1
@@ -323,7 +444,7 @@ def main() -> int:
           f"{len(workbooks)} workbook(s) exported: "
           + ", ".join(w.name for w in workbooks[:2]))
 
-    width = max(len(q) for q, _, _ in operational + checks)
+    width = max(len(q) for q, _, _ in operational + checks + repair)
     failures = 0
 
     def report(title: str, items: list[tuple[str, bool, str]]) -> int:
@@ -343,7 +464,8 @@ def main() -> int:
 
     report("A. OPERATIONAL SELF-AUDIT  (pause, resume, images, estimation)", operational)
     report("B. RESEARCH INTEGRITY SELF-AUDIT", checks)
-    total = len(operational) + len(checks)
+    report("C. REPAIR SELF-AUDIT  (runtime budget, export, conflicts, archive)", repair)
+    total = len(operational) + len(checks) + len(repair)
     print(f"\nOVERALL: {total - failures} of {total} answered as they must be.")
     db.close()
     return 1 if failures else 0

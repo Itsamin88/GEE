@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import shutil
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,9 @@ FIXTURE_HOSTS = (
     "pourgues.test", "ancien-pourgues.test", "annuaire.test",
     "theses.test", "facebook.test", "archive.test",
     "boekel.test", "oud-boekel.test",
+    # The Tamera-shaped stress case: hundreds of pages, thousands of archived
+    # URLs, one report in three languages, a gallery full of photographs.
+    "stress.test",
 )
 
 
@@ -70,7 +74,10 @@ def main() -> int:
     parser.add_argument("--output", default="pilot_output")
     parser.add_argument("--keep", action="store_true",
                         help="keep any existing output instead of starting clean")
-    parser.add_argument("--only", choices=["pourgues", "boekel"], help="run one pilot only")
+    parser.add_argument("--only", choices=["pourgues", "boekel", "stress"],
+                        help="run one pilot only")
+    parser.add_argument("--budget-minutes", type=float, default=None,
+                        help="override the active-processing budget for this run")
     args = parser.parse_args()
 
     output = (ROOT / args.output).resolve()
@@ -126,6 +133,10 @@ def main() -> int:
         # and then finish it. The research meaning of the pilots above is
         # untouched: this is a separate database, and its output is clearly
         # labelled as an interruption rehearsal.
+        if not args.only or args.only == "stress":
+            _pilot_stress(settings, output / "stress", server,
+                          budget_minutes=args.budget_minutes)
+
         scenarios = output / "interruption_scenarios"
         _pilot_manual_pause(settings, pilots[0][1], scenarios / "manual_pause")
         _pilot_network_outage(settings, pilots[0][1], scenarios / "network_outage", server)
@@ -134,6 +145,70 @@ def main() -> int:
         return 1 if failures else 0
     finally:
         server.stop()
+
+
+def _pilot_stress(settings: Any, output: Path, server: Any,
+                  *, budget_minutes: float | None = None) -> None:
+    """The community that broke the crawler, run against the repaired one.
+
+    Modelled on the reported Tamera run. What is being demonstrated is not that
+    it is fast, but that it is BOUNDED: the archive is sampled rather than
+    enumerated, translations are not each read in full, the gallery is triaged,
+    and a verified workbook exists at the end whatever the clock did.
+    """
+    import copy
+
+    from fixtures.stress import build_stress_archive, build_stress_site, stress_urls
+
+    print(f"\n{'=' * 78}\n  PILOT: stress case (Tamera-shaped)\n{'=' * 78}")
+    server.sites.update(build_stress_site())
+    server.archive_records = build_stress_archive()
+
+    clone = copy.copy(settings)
+    clone.app = copy.deepcopy(settings.app)
+    output.mkdir(parents=True, exist_ok=True)
+    clone.app["paths"]["output_root"] = str(output)
+    clone.app["paths"]["database"] = str(output / "dcr.sqlite3")
+    clone.app["budget"] = {
+        "enabled": True,
+        "active_minutes": budget_minutes if budget_minutes is not None else 2.0,
+        "finalisation_reserve_minutes": 0.4,
+        "wind_down_minutes": 0.2,
+    }
+    clone.app["estimation"] = {"enabled": False}
+    clone.app["crawl"]["base_pages_per_source"] = 400
+    clone.app["crawl"]["max_pages_per_run"] = 4000
+
+    community = CommunityInput(
+        name="Stress Case (Tamera-shaped)", latitude=37.72, longitude=-8.45,
+        urls=stress_urls(server.port), country="Portugal",
+        coder_id="PILOT", fixture=True,
+    )
+    app = Application(clone)
+    app.preflight()
+    started = time.monotonic()
+    result = app.run(community, mode="FULL")
+    wall = time.monotonic() - started
+    app.close()
+
+    report = result["report"]
+    budget = report.get("budget") or {}
+    stats = report.get("crawl_stats") or {}
+    triage = report.get("image_triage") or {}
+    finalisation = report["manifest"]["export"]["finalisation"]
+    print("\n  -- stress case result " + "-" * 54)
+    print(f"  active {budget.get('active_s', 0):.0f}s of "
+          f"{budget.get('budget_s', 0):.0f}s budget; wall {wall:.0f}s")
+    print(f"  pages {report['pages_opened']}   documents {report['documents_downloaded']}"
+          f"   evidence {report['evidence_items']}   conflicts {report['conflicts']}")
+    print(f"  archive: {stats.get('archive_urls_discovered', 0)} discovered, "
+          f"{stats.get('archive_urls_fetched', 0)} fetched")
+    print(f"  images: {triage.get('candidates_seen', 0)} candidates, "
+          f"{triage.get('downloaded', 0)} saved")
+    print(f"  workbook reopened: {finalisation['verification']['reopened']}   "
+          f"excel_sanitized: {finalisation['sanitisation']['excel_sanitized']}")
+    print(f"  status: {report['completion_status']}   "
+          f"truncated: {report['crawl_truncated']}")
 
 
 def _pilot_manual_pause(settings: Any, community: CommunityInput, output: Path) -> None:

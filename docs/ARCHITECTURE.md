@@ -75,12 +75,15 @@ src/dcr/
   extract/                 HTML, PDF, Office, spreadsheets, text, and the dispatcher
   images/                  relevance classification, and the triage ledger
   control.py               run state: pause, resume, cancel, checkpoints
+  budget.py                the active-processing clock and its reserve
+  profiling.py             where the seconds actually went
   supervisor.py            the one gate that decides whether the crawl continues
   estimate.py              workload and runtime estimation
   console.py               pause/resume/cancel typed at the running crawl
   evidence/                the evidence model, quantities, practices, onset, independence,
                            conflicts, the optional LLM layer
-  export/                  workbook, manifests, completion report
+  export/                  workbook, manifests, completion report,
+                           sanitisation and the finalisation retry ladder
   qc/                      the eighteen checks and the coverage matrix
 ```
 
@@ -152,6 +155,69 @@ what moved it. Active processing time and wall-clock duration are reported separ
 bands; the difference is politeness delays, rate limits, retries and time spent paused.
 Recorded actuals from previous runs calibrate later estimates through a clamped median,
 so one pathological run cannot distort the model.
+
+## The time budget, and why it reserves rather than stops
+
+A crawl that spends its whole allowance retrieving and then dies writing the
+spreadsheet has produced nothing, which is exactly what happened before this was
+added. So the budget is not a timeout:
+
+```
+|<---------------- active budget (default 30 min) ----------------->|
+|<----------- retrieval ----------->|<- wind-down ->|<- finalise -->|
+```
+
+`supervisor.gate()` enforces it at every safe boundary, and `affords()` refuses
+to begin any task whose expected cost would eat the reserve. Running out is a
+normal ending: the run reconciles what it has, exports, verifies, and reports
+COMPLETE_WITH_TRUNCATION.
+
+Time spent paused or offline does not count, and the clock is persisted, so a
+resumed run continues the same budget instead of starting a fresh one.
+
+## Finalisation cannot be skipped
+
+```
+crawl -> reconcile -> sanitise -> export -> reopen and verify -> manifests -> status
+```
+
+The workbook is reopened from disk and checked — core sheets present, coded rows
+present, formulas still formulas, not zero bytes — before the run is allowed to
+call itself finished. If that fails, a ladder runs: retry with aggressive
+sanitisation, then write the core workbook with the supplementary evidence
+sheets omitted and a notice in each saying where its rows still are. A
+supplementary sheet cannot take the workbook with it.
+
+Only the Excel representation is ever cleaned. The raw extracted text stays in
+the database and in `05_extracted_text/`, because the workbook is a report and
+the database is the record.
+
+## Spending minutes where the evidence is
+
+Efficiency here comes from prioritisation and deduplication, never from
+discarding provenance.
+
+| Decision | Where | What it does |
+| --- | --- | --- |
+| Source allowance | `crawl/frontier.SourceBudget` | Grows while a source yields, shrinks when it stops, and grows again when it produces a thesis or a report |
+| Document priority | `extract/triage.py` | Judged from the address before download; decides deep extraction and the image allowance |
+| Document families | `extract/triage.py` | One language of a report is read in full; the others are provenance mirrors |
+| Archive selection | `discovery/wayback.select_snapshots` | Scores by path relevance and dating value, caps documents at four captures, limits the navigation share, and takes what the stage's time affords |
+| Image triage | `images/triage.py` | Classified from page metadata before download, with a per-document allowance and a global ceiling |
+
+**The archive bug worth remembering.** `priority_paths` contains `"/"`, which
+`rstrip("/")` turns into `""`, and `path.startswith("")` is true of every path.
+Every one of five thousand archived URLs was therefore a "priority path", got
+annual sampling, and competed for retrieval slots. The root is now matched
+exactly.
+
+## Disagreement is summarised, evidence is not
+
+One conflict row per competing VALUE, not per competing claim. Fourteen figures
+across four hundred claims is thirteen disagreements, and each row carries how
+many claims and independence groups stand behind each side. The claims
+themselves keep their own wording and source in the `claims` table: what is
+summarised is the disagreement, never the evidence.
 
 ## Design decisions worth knowing
 

@@ -84,6 +84,70 @@ those belong to the satellite pipeline and to the researcher's own tracing proce
 
 ---
 
+## How long it takes, and what it does when time runs out
+
+A run has a **hard active-processing budget**, thirty minutes by default. It is
+not a timeout. A timeout would stop the work and leave you with nothing; this
+reserves the part you actually need:
+
+```
+|<---------------- 30 minutes of active processing ---------------->|
+|<------------ retrieval ------------>|<- wind-down ->|<- finalise ->|
+                                      25 min          27 min      30 min
+```
+
+- **At 25 minutes** no new expensive work starts. Anything already in flight
+  finishes cleanly.
+- **At 27 minutes** retrieval stops for good and the reserved time goes to
+  reconciliation, the workbook, its verification and the manifests.
+- **At 30 minutes** that work is already done.
+
+**Paused time is not spent time.** If you press PAUSE, or the network drops, the
+active clock stops. A three-hour outage costs the research budget nothing. And a
+resumed run continues *the same* thirty minutes rather than starting a fresh one,
+so an interrupted community cannot quietly consume hours across four sessions.
+
+### Complete is not exhaustive
+
+Within half an hour a rich site cannot be followed to the end of every path, and
+the program does not pretend otherwise:
+
+| Status | What it means |
+| --- | --- |
+| `COMPLETE` | Every stage finished and nothing was cut short |
+| `COMPLETE_WITH_TRUNCATION` | A usable research record, with what was not reached stated. The clock stopped it, not the sources |
+| `PARTIAL_TRUNCATED` | Cut short for another reason — blocks, failures, too few pages |
+| `REQUIRES_HUMAN_REVIEW` | Something needs a coder's judgement |
+| `FAILED_TECHNICALLY` | No verified workbook could be produced |
+
+A run stopped by its budget is never `COMPLETE`. The completion report says how
+much of the budget was used, what remained queued, and which stages never began.
+
+### Spending the time where the evidence is
+
+Rather than crawling every URL it can reach, the crawler spends its minutes on
+what yields evidence:
+
+- **Sources** earn more allowance while they keep yielding, and lose it when
+  they stop. A source that has just produced a thesis or a restoration report
+  earns *more*, because that is where the next minute belongs.
+- **Documents** are judged from their address before they are downloaded. A
+  thesis, grant report or site plan earns deep extraction; an event flyer or a
+  price list does not. A report published in three languages is read once, and
+  the other two are kept as provenance mirrors.
+- **The archive** is sampled, not enumerated. Five thousand archived URLs is one
+  site's navigation captured five thousand times; selection scores each by what
+  its path says and by how much its date is worth for onset, and takes what the
+  time affords.
+- **Images** are triaged before download, with an allowance per document that
+  scales with the document's value, and a ceiling on image work overall.
+
+`completion_report.md` ends with a measured breakdown — how many seconds went to
+HTTP, PDF parsing, image work, reconciliation and export — so a slow run can be
+diagnosed rather than guessed at.
+
+---
+
 ## Stopping and starting again
 
 A full crawl can run for a couple of hours. You do not have to sit through it, and you
@@ -338,7 +402,7 @@ You should not need to touch any of this, but nothing is hidden:
 
 | File | What it controls |
 | --- | --- |
-| `config/config.yaml` | Crawl budgets, retries, politeness, image triage thresholds, run control, connectivity probes, time-estimation costs |
+| `config/config.yaml` | The active-time budget and its per-stage shares, crawl budgets, retries, politeness, document and image triage, run control, connectivity probes, time-estimation costs |
 | `config/field_schema.yaml` | The 88 documentary fields, their vocabularies and where each lands |
 | `config/sources.yaml` | Databases, directories, URL paths and query templates |
 | `config/practice_lexicon.yaml` | How each of the thirteen practices is recognised, in eight languages |
@@ -359,6 +423,12 @@ The settings most worth knowing about:
 | `run_control.failures_before_probe` | `3` | Consecutive network-shaped failures before a connectivity probe is worth making |
 | `connectivity.probes` | four operators | The endpoints that decide offline from partial |
 | `estimation.costs` | per unit of work | Seconds per page, document, query and image; corrected by what previous runs actually took |
+| `budget.active_minutes` | `30` | The hard ceiling on active processing per community |
+| `budget.finalisation_reserve_minutes` | `3` | Held back for reconciliation, export and verification. Never borrowed |
+| `budget.stage_shares` | per stage | Ceilings, not allocations: a stage that finishes early hands the rest back |
+| `documents.max_per_family` | `1` | How many languages of one report are read in full |
+| `archive.max_snapshot_fetches_per_domain` | `40` | Further reduced by what stage 4's time actually affords |
+| `images.max_images_per_document` | `12` | Default per-document allowance; scales with the document's priority |
 
 ---
 

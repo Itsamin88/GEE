@@ -160,6 +160,23 @@ against the restored baseline before being called a defect rather than a regress
 
 ---
 
+## Defects found in the reported production run
+
+The run that prompted this repair took hours, produced 5569 conflicts, and died
+during export. Each cause was reproduced before being fixed.
+
+| Defect | Why it happened | Fix |
+| --- | --- | --- |
+| `IllegalCharacterError` killed the export after the evidence was gathered | Control bytes in extracted PDF text reach openpyxl, which refuses them. An unpaired surrogate is worse: it is accepted into the cell and kills `save()` after every sheet is written | Values cleaned for Excel as written, a pre-save sweep behind that, and a retry ladder ending in a core-only workbook. The raw text is untouched in the database; `excel_sanitized=yes` is recorded |
+| A run could spend hours on one community | Nothing bounded the total work | A hard active-processing budget that reserves finalisation time rather than merely stopping |
+| ~5000 archived URLs were treated as worth fetching | `priority_paths` contains `"/"`, which rstrips to `""`, and `path.startswith("")` is true of every path — so every archived URL was a priority path | The root is matched exactly; selection scores by path relevance and dating value and takes what the time affords |
+| 5569 conflicts from a handful of real disagreements | One conflict row per disagreeing CLAIM. 400 claims over 14 values gave 371 rows | One row per competing VALUE, carrying the claim and group counts behind each side |
+| The same report read three times | No notion of a document family | Same kind + same year + different language marker = a translation; one is read, the others are provenance mirrors |
+| A 90-page PDF contributed hundreds of images | No per-document allowance | An allowance that scales with the document's priority, plus a global ceiling on image work |
+| A gallery photo's real triage reason was lost | Meeting it again overwrote its first decision with "duplicate" | The first decision stands; a `times_seen` counter records the re-sightings |
+
+---
+
 ## The full list
 
 `config/decisions.yaml` carries all 32 decisions with their evidence, resolution, affected
