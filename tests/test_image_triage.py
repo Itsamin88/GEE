@@ -295,3 +295,65 @@ def test_a_folded_pattern_would_still_match_if_one_slipped_through(ledger):
                             caption="Plan de masse du site", width=1200, height=900,
                             lexicon=folded)
     assert result.relevance_class == LIKELY
+
+
+# ===========================================================================
+# §17 — the image allowance is earned, not fixed
+#
+# A single global cap treats a research report with forty figures and a tourist
+# gallery with four hundred photographs identically, so either the report loses
+# figures or the gallery is admitted. Neither is acceptable.
+# ===========================================================================
+class _FakeStats:
+    def __init__(self, kept: int, high_value: int):
+        self.images_kept = kept
+        self.images_high_value = high_value
+
+
+class _Allowance:
+    """The allowance rule, isolated from the crawler it lives on."""
+
+    def __init__(self, base=100, warmup=25, threshold=0.4, max_multiple=3.0,
+                 kept=0, high_value=0):
+        from dcr.crawl.crawler import Crawler
+
+        self.max_images_per_community = base
+        self.image_allowance_warmup = warmup
+        self.image_allowance_threshold = threshold
+        self.image_allowance_max_multiple = max_multiple
+        self.stats = _FakeStats(kept, high_value)
+        self._announced_image_allowance = True
+        self.image_allowance = Crawler.image_allowance.__get__(self)
+
+
+def test_the_allowance_is_not_judged_before_there_is_anything_to_judge():
+    assert _Allowance(kept=10, high_value=10).image_allowance() == 100
+
+
+def test_a_gallery_of_decoration_earns_nothing_extra():
+    """400 photographs, 20 of them evidence-bearing: the base allowance stands."""
+    assert _Allowance(kept=200, high_value=20).image_allowance() == 100
+
+
+def test_a_report_full_of_figures_earns_a_larger_allowance():
+    """Site plans, land-use figures and restoration maps: worth more room."""
+    rich = _Allowance(kept=50, high_value=45).image_allowance()
+    assert rich > 100
+    assert rich <= 300
+
+
+def test_the_allowance_rises_with_the_share_of_evidence_bearing_images():
+    poor = _Allowance(kept=100, high_value=45).image_allowance()
+    good = _Allowance(kept=100, high_value=70).image_allowance()
+    best = _Allowance(kept=100, high_value=98).image_allowance()
+    assert poor < good < best
+
+
+def test_adaptive_does_not_mean_unbounded():
+    """The ceiling is what stops four thousand captioned photographs becoming
+    four thousand downloads."""
+    assert _Allowance(kept=500, high_value=500).image_allowance() == 300
+
+
+def test_the_configured_multiple_is_what_bounds_it():
+    assert _Allowance(kept=80, high_value=80, max_multiple=1.5).image_allowance() == 150

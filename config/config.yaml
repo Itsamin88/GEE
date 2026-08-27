@@ -169,6 +169,23 @@ images:
   # run however many candidates a gallery offers.
   max_processing_seconds: 240
   max_candidates_per_run: 1500
+  # THE ALLOWANCE IS EARNED, NOT FIXED. One global cap would treat a research
+  # report with forty figures and a tourist gallery with four hundred
+  # photographs identically, so either the report loses figures or the gallery
+  # is admitted. Instead `max_images_per_community` above is a BASE, and a
+  # community whose retained images are mostly site plans, land-use figures,
+  # restoration maps and dated intervention photographs earns more of them.
+  #
+  # Not judged until this many images have been kept: below that the share of
+  # high-value ones means nothing.
+  adaptive_allowance_warmup: 25
+  # The share of retained images that must be evidence-bearing before the
+  # allowance rises at all.
+  adaptive_allowance_threshold: 0.4
+  # And the most it may rise to. "Adaptive" must not mean "unbounded": this is
+  # what stops a gallery of four thousand captioned photographs becoming four
+  # thousand downloads.
+  adaptive_allowance_max_multiple: 3.0
 
 ocr:
   enabled: auto        # auto | always | never

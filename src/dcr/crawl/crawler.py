@@ -52,6 +52,11 @@ class CrawlStats:
     documents_skipped: int = 0
     documents_mirrored: int = 0
     images_kept: int = 0
+    #: Of those kept, how many are the kinds that carry evidence: site plans,
+    #: land-use and restoration maps, water diagrams, dated intervention
+    #: photographs, figures embedded in research documents. The community's
+    #: image allowance is earned from this share (brief §17).
+    images_high_value: int = 0
     images_rejected: int = 0
     image_candidates: int = 0
     image_duplicates_avoided: int = 0
@@ -166,6 +171,16 @@ class Crawler:
         #: the run (brief §18).
         self.max_image_seconds = float(image_budget.get("max_processing_seconds", 240))
         self.max_image_candidates = int(image_budget.get("max_candidates_per_run", 1500))
+        #: The image allowance is earned rather than fixed (brief §17). It rises
+        #: only once enough images have been kept for the share of HIGH-priority
+        #: ones to mean anything.
+        self.image_allowance_warmup = int(
+            image_cfg.get("adaptive_allowance_warmup", 25))
+        self.image_allowance_threshold = float(
+            image_cfg.get("adaptive_allowance_threshold", 0.4))
+        self.image_allowance_max_multiple = float(
+            image_cfg.get("adaptive_allowance_max_multiple", 3.0))
+        self._announced_image_allowance = False
         self._image_seconds = 0.0
         self._document_hashes: dict[str, str] = {}
         self._browser_renders: dict[str, int] = {}
@@ -800,6 +815,54 @@ class Crawler:
             ))
         return candidates
 
+    # -- the image allowance, which is not a constant -----------------------
+    def image_allowance(self) -> int:
+        """How many images this community may keep, given what it is producing.
+
+        A single global cap treats a research report with forty figures and a
+        tourist gallery with four hundred photographs identically, so either the
+        report loses figures or the gallery is admitted. Neither is acceptable
+        (brief §17).
+
+        So the allowance is earned. It starts at the configured base and grows
+        with two things the crawl has actually observed:
+
+        **What the images themselves have been worth.** A community whose
+        retained images are mostly HIGH-priority — site plans, land-use figures,
+        restoration maps, dated intervention photographs — is one where images
+        are carrying evidence, and it earns more of them. One whose candidates
+        keep triaging as decoration does not.
+
+        **What the community as a whole is producing.** A rich source set
+        justifies a richer image record; a thin one does not.
+
+        The multiple is bounded, because "adaptive" must not mean "unbounded":
+        the ceiling is what stops a gallery of four thousand photographs from
+        becoming four thousand downloads however enthusiastically it is
+        captioned.
+        """
+        base = self.max_images_per_community
+        kept = max(0, self.stats.images_kept)
+        if kept < self.image_allowance_warmup:
+            return base
+        high_value = self.stats.images_high_value
+        share = high_value / kept if kept else 0.0
+        if share < self.image_allowance_threshold:
+            # Mostly decoration. The base allowance is already generous.
+            return base
+        # Between the threshold and 1.0, scale linearly to the maximum multiple.
+        span = max(1e-6, 1.0 - self.image_allowance_threshold)
+        reach = (share - self.image_allowance_threshold) / span
+        multiple = 1.0 + reach * (self.image_allowance_max_multiple - 1.0)
+        earned = int(base * multiple)
+        if earned > base and not self._announced_image_allowance:
+            self._announced_image_allowance = True
+            event(log, "IMG",
+                  f"{share:.0%} of the images kept so far are site plans, maps or "
+                  f"dated intervention photographs; this community's image "
+                  f"allowance rises from {base} to {earned}")
+        return earned
+
     def _image_budget_spent(self) -> bool:
         """Has image work had its share of the run? (brief §18)"""
         return (self._image_seconds >= self.max_image_seconds
@@ -807,7 +870,7 @@ class Crawler:
 
     async def _harvest_page_images(self, parsed: ParsedPage, page_id: str, item: Any,
                                    context: SourceContext | None, stage: int) -> None:
-        if self.stats.images_kept >= self.max_images_per_community:
+        if self.stats.images_kept >= self.image_allowance():
             return
         if self._image_budget_spent():
             return
@@ -824,9 +887,12 @@ class Crawler:
         self.stats.image_candidates += len(triaged)
         kept_for_source = 0
         for candidate in triaged:
-            if self.stats.images_kept >= self.max_images_per_community:
-                self.triage.record(candidate, decision="skipped_budget",
-                                   reason="the community image budget was already spent")
+            if self.stats.images_kept >= self.image_allowance():
+                self.triage.record(
+                    candidate, decision="skipped_budget",
+                    reason=f"this community's image allowance ({self.image_allowance()}) "
+                           "was already spent; the candidate is recorded with its "
+                           "caption and file name, which often carry a date")
                 continue
             if kept_for_source >= self.max_images_per_source:
                 self.triage.record(candidate, decision="skipped_budget",
@@ -1008,9 +1074,12 @@ class Crawler:
                     reason=f"this document's image allowance ({cap}) is spent; the "
                            "highest-scoring figures were kept")
                 continue
-            if self.stats.images_kept >= self.max_images_per_community:
-                self.triage.record(candidate, decision="skipped_budget",
-                                   reason="the community image budget was already spent")
+            if self.stats.images_kept >= self.image_allowance():
+                self.triage.record(
+                    candidate, decision="skipped_budget",
+                    reason=f"this community's image allowance ({self.image_allowance()}) "
+                           "was already spent; the candidate is recorded with its "
+                           "caption and file name, which often carry a date")
                 continue
             if candidate.priority == DUPLICATE:
                 self.stats.image_duplicates_avoided += 1
@@ -1120,6 +1189,9 @@ class Crawler:
         )
         self._image_hashes.add(digest)
         self.stats.images_kept += 1
+        if (candidate.priority == HIGH
+                or classification.relevance_class == "likely_relevant"):
+            self.stats.images_high_value += 1
         if candidate.source_id:
             self.db.bump("sources", "images_found", {"source_id": candidate.source_id})
         if classification.relevance_class == "likely_relevant":
