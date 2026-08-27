@@ -124,20 +124,12 @@ def find_areas(text: str, units: Mapping[str, float], sentence_spans: Iterable[t
         if high:
             mention.value_ha = round(low * factor, 4)
         mention.kind, mention.kind_reason = classify_area(sentence, markers or {})
-        # The finer role, from the sentence, positioned at the figure itself.
         verdict = roles.classify_area(
             sentence, position=max(0, match.start() - s_start))
-        mention.role, mention.role_reason = verdict.role, verdict.reason
-        if mention.kind == "unclassified" and verdict.role in ("managed", "cultivated",
-                                                               "restoration", "forest",
-                                                               "project"):
-            # The workbook has two area columns; everything worked is managed
-            # land for its purposes, and the finer role is kept beside it.
-            mention.kind = "managed"
-            mention.kind_reason = verdict.reason
-        elif mention.kind == "unclassified" and verdict.role == "total_holding":
-            mention.kind = "total_holding"
-            mention.kind_reason = verdict.reason
+        mention.role, mention.kind, mention.role_reason = _reconcile_area(
+            mention.kind, mention.kind_reason, verdict)
+        if mention.role == roles.UNCLASSIFIED:
+            mention.kind_reason = mention.role_reason
         mentions.append(mention)
     return mentions
 
@@ -231,10 +223,11 @@ def find_populations(text: str, sentence_spans: Iterable[tuple[int, int, str]],
                 f"counted as {noun!r} with no visitor or volunteer marker in the sentence"
             )
         verdict = roles.classify_population(sentence, position=max(0, position - start))
+        role, reason = _reconcile_population(kind, reason, verdict)
         mentions.append(
             PopulationMention(
-                role=verdict.role,
-                role_reason=verdict.reason,
+                role=role,
+                role_reason=reason,
                 value=value,
                 original=text[max(0, position - 2): position + 40].strip(),
                 sentence=sentence,
@@ -256,6 +249,77 @@ def find_populations(text: str, sentence_spans: Iterable[tuple[int, int, str]],
         add(match.group("count"), None, match.start(), False, "residents")
 
     return mentions
+
+
+#: Which of the finer area roles count as worked land for the workbook, whose
+#: two area columns are `managed_area_ha` and `total_holding_ha`.
+_WORKED_ROLES = ("managed", "cultivated", "restoration", "forest", "project")
+
+
+def _reconcile_area(kind: str, kind_reason: str,
+                    verdict: Any) -> tuple[str, str, str]:
+    """Settle the role from two vocabularies that see different things.
+
+    `classify_area` above reads the project's own curated markers from
+    `practice_lexicon.yaml` — regular expressions, multilingual, and tuned over
+    several versions to tell worked land from the whole holding. `roles.py`
+    reads a literal vocabulary that makes finer distinctions (cultivated,
+    restoration, forest, leased) but knows fewer languages.
+
+    Neither subsumes the other, so:
+
+    * where the finer classifier is sure and the lexicon is not, its answer
+      stands, and the workbook's two-way `kind` follows from it;
+    * where the lexicon is sure and the finer classifier is not — a French or
+      Dutch sentence the literal vocabulary has no words for — the lexicon's
+      answer stands;
+    * where they disagree about worked land versus the whole holding, neither
+      is used. That disagreement is exactly the error that moves a community two
+      size classes, and a coder settles it in a minute (brief §23).
+    """
+    role = verdict.role
+    if role == roles.UNCLASSIFIED:
+        if kind == "managed":
+            return "managed", kind, kind_reason
+        if kind == "total_holding":
+            return "total_holding", kind, kind_reason
+        return roles.UNCLASSIFIED, kind, verdict.reason
+
+    worked = role in _WORKED_ROLES
+    if kind == "managed" and not worked and role == "total_holding":
+        return (roles.UNCLASSIFIED, "unclassified",
+                f"the lexicon reads this as worked land ({kind_reason}) while the "
+                f"sentence's own wording reads it as the whole holding "
+                f"({verdict.reason}); a human should decide")
+    if kind == "total_holding" and worked:
+        return (roles.UNCLASSIFIED, "unclassified",
+                f"the lexicon reads this as the whole holding ({kind_reason}) while "
+                f"the sentence's own wording reads it as worked land "
+                f"({verdict.reason}); a human should decide")
+    if kind == "unclassified":
+        kind = "managed" if worked else ("total_holding" if role == "total_holding"
+                                         else "unclassified")
+    return role, kind, verdict.reason
+
+
+def _reconcile_population(kind: str, kind_reason: str,
+                          verdict: Any) -> tuple[str, str]:
+    """The same, for who is being counted.
+
+    `permanent` and `visitors` come from the lexicon's multilingual markers;
+    `resident`, `visitor`, `guest`, `volunteer`, `event_attendance`, `employee`
+    and `member` come from the finer literal vocabulary. Where the lexicon says
+    "not a permanent resident" and the finer one says `resident`, the lexicon
+    wins — it is the more cautious of the two, and coding a visitor count as a
+    population is the error the whole distinction exists to prevent (§22).
+    """
+    if kind == "visitors" and verdict.role in ("resident", roles.UNCLASSIFIED):
+        return "visitor", kind_reason
+    if verdict.role != roles.UNCLASSIFIED:
+        return verdict.role, verdict.reason
+    if kind == "permanent":
+        return "resident", kind_reason
+    return roles.UNCLASSIFIED, verdict.reason
 
 
 def _flatten(mapping: Any) -> list[str]:

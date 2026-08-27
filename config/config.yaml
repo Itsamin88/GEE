@@ -358,6 +358,72 @@ yield:
     duplicate: 0
 
 # --------------------------------------------------------------------------
+# Many communities at once
+#
+# The worker count is NOT set here. It is measured: the governor starts at
+# `start_workers`, grows while every worker is busy and the machine is idle,
+# cuts immediately under memory pressure, and lowers its own ceiling if a
+# higher count is observed to complete less per worker-minute than a lower one.
+# What you set here is the range it may move within.
+# --------------------------------------------------------------------------
+orchestrator:
+  workers:
+    min_workers: 1
+    max_workers: 16
+    # Where to begin. Starting at the maximum means the first minutes of every
+    # run are spent recovering from a bad guess.
+    start_workers: 8
+    # How long to let a change settle before judging it. A new worker's cost
+    # arrives immediately; its benefit arrives a minute later.
+    settle_seconds: 20
+    # Held back for the operating system and the researcher's own work.
+    memory_reserve_mb: 1200
+    # What one community worker is assumed to want. Used only to decide whether
+    # there is room for another; actual use is measured.
+    memory_per_worker_mb: 550
+
+  # How often the scheduler goes round, and how often it writes down what it
+  # decided. Both cheap: a few file stats and a queue drain.
+  tick_seconds: 1.0
+  sample_seconds: 15
+
+  # A crash is retried once. A community that crashes three times is a bug to
+  # look at, not work to redo.
+  max_attempts: 3
+
+  # A worker that has said nothing for this long is presumed hung and is
+  # terminated so its slot can go to another community. Generous: one very
+  # large PDF, or one very slow archive request, can legitimately take minutes.
+  heartbeat_timeout_minutes: 20
+  # How long CANCEL ALL lets running workers checkpoint before insisting.
+  shutdown_grace_seconds: 90
+
+  # Fairness. Priorities are on a 0-100 scale; waiting adds this many points a
+  # minute, up to a cap deliberately ABOVE the full range — so a community that
+  # has waited long enough outranks anything that arrived after it, however
+  # large. A cap below the range would be starvation with extra steps.
+  age_priority_per_minute: 1.0
+  age_priority_cap: 110
+
+  # One workload unit is roughly one minute of active work. Recalibrated from
+  # observed runs once there are five or more to learn from.
+  workload_unit_seconds: 60
+
+  hosts:
+    # Requests in flight, and the gap between them, for a host EVERY community
+    # reaches: the web archive, the academic indexes, the search endpoints.
+    # Community-specific hosts are not brokered at all — paying an
+    # inter-process round trip for a host nobody else is touching would be
+    # pure overhead.
+    shared_host_concurrency: 2
+    shared_host_delay_s: 1.5
+    # Longest a worker will wait for a shared host before deferring the URL and
+    # getting on with its other work.
+    max_lease_wait_s: 90
+    # Extra hosts to treat as shared, beyond the built-in list.
+    shared_hosts: []
+
+# --------------------------------------------------------------------------
 # Run control: manual pause, network pause, and resuming
 # --------------------------------------------------------------------------
 run_control:

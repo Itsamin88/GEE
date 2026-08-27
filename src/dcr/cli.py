@@ -30,7 +30,8 @@ from .control import (clear_requests, find_interrupted_runs, read_status,
 from .logging_setup import setup_logging
 from .runner import CommunityInput
 
-CONTROL_VERBS = ("pause", "resume", "cancel", "status", "runs", "clear-requests")
+CONTROL_VERBS = ("pause", "resume", "cancel", "status", "runs", "clear-requests",
+                 "retry-failed", "export", "reconcile", "audit")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -40,7 +41,21 @@ def build_parser() -> argparse.ArgumentParser:
         epilog="Control a running crawl with:  dcr pause | resume | cancel | status | runs",
     )
     parser.add_argument("command", nargs="?", choices=CONTROL_VERBS,
-                        help="Control a crawl that is already running. Omit to start one.")
+                        help="Control a run that is already going, or recover one. "
+                             "Omit to start a run.")
+    parser.add_argument("community", nargs="?",
+                        help="A community id (C007) for the control verbs that take "
+                             "one. Omit to act on the whole run.")
+    parser.add_argument("--communities", type=Path,
+                        help="A CSV or JSON file of communities to run, instead of "
+                             "typing them in.")
+    parser.add_argument("--workers", type=int,
+                        help="Most communities to research at once. The default "
+                             "adapts to the machine; this is an upper bound, not a "
+                             "target.")
+    parser.add_argument("--single", action="store_true",
+                        help="Research ONE community in this process, the way earlier "
+                             "versions did. Useful for debugging a single crawl.")
     parser.add_argument("--name", help="Community name. Omit for the interactive prompt.")
     parser.add_argument("--lat", type=float, help="Researcher latitude (optional).")
     parser.add_argument("--lon", type=float, help="Researcher longitude (optional).")
@@ -63,10 +78,23 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _control(command: str, root: Path | None, reason: str) -> int:
-    """The verbs that talk to a crawl already running in another process."""
+def _control(command: str, root: Path | None, reason: str,
+             community: str | None = None) -> int:
+    """The verbs that talk to a run already going in another process.
+
+    All of them work from a second terminal while the first is occupied by the
+    dashboard, and all of them work when nothing is running at all — a pause
+    left for a run that has not started yet is honoured when it does
+    (brief §18, §33, §35).
+    """
     settings = load_settings(root) if root else load_settings()
     output_root = settings.output_root
+
+    if community and command in ("pause", "resume", "cancel"):
+        return _control_one(settings, command, community, reason)
+    if command in ("retry-failed", "export", "reconcile", "audit"):
+        return _recover(settings, command, community, reason)
+
     if command == "pause":
         request_pause(output_root, reason or "paused by the researcher")
         print("PAUSE requested. The crawl stops at its next safe boundary, writes a")
@@ -90,35 +118,230 @@ def _control(command: str, root: Path | None, reason: str) -> int:
         print(format_status(read_status(output_root)))
         return 0
     if command == "runs":
-        from .db import Database
+        from .orchestrator.recovery import find_interrupted
+        from .orchestrator.store import RunStore
 
-        db = Database(settings.database_path)
+        store = RunStore(output_root / "run.sqlite3")
         try:
-            runs = find_interrupted_runs(db)
+            runs = find_interrupted(store)
             if not runs:
                 print("No unfinished runs.")
                 return 0
             print(f"{len(runs)} unfinished run(s):\n")
             for run in runs:
                 print(f"  {run.describe()}")
-                if run.pause_reason:
-                    print(f"      reason: {run.pause_reason}")
-                if run.pending_tasks:
-                    print(f"      {run.pending_tasks} queued task(s) waiting")
-            print("\nResume the most recent with:  dcr --name \"<community>\" --mode RESUME")
+            print("\nContinue the most recent by running the program again: it offers")
+            print("to resume before it offers to start anything new.")
         finally:
-            db.close()
+            store.close()
         return 0
     return 1
+
+
+def _control_one(settings: object, command: str, job_id: str, reason: str) -> int:
+    """Pause, resume or cancel ONE community without touching the others (§34)."""
+    from .control import request_cancel as cancel_one
+    from .control import request_pause as pause_one
+    from .control import request_resume as resume_one
+    from .orchestrator.store import RunStore
+
+    store = RunStore(settings.output_root / "run.sqlite3")
+    try:
+        job = store.job(job_id.upper())
+        if job is None:
+            print(f"No community {job_id!r} in this run. Try:  dcr status")
+            return 1
+        directory = Path(job.output_dir)
+        if command == "pause":
+            pause_one(directory, reason or f"{job.job_id} paused by the researcher")
+            print(f"PAUSE requested for {job.job_id} ({job.name}).")
+            print("It stops at its next safe boundary and its worker goes to the next")
+            print("community in the queue. Everything else keeps running.")
+        elif command == "resume":
+            resume_one(directory, reason or f"{job.job_id} resumed")
+            store.update_job(job.job_id, {"state": "QUEUED",
+                                          "detail": "resume requested"})
+            print(f"RESUME requested for {job.job_id}; it goes back in the queue.")
+        else:
+            cancel_one(directory, reason or f"{job.job_id} cancelled")
+            print(f"CANCEL requested for {job.job_id}. Everything it already found "
+                  "is kept.")
+        return 0
+    finally:
+        store.close()
+
+
+def _recover(settings: object, command: str, job_id: str | None, reason: str) -> int:
+    """The recovery verbs, none of which touches the network (§102, §103, §105)."""
+    from .orchestrator.recovery import (find_interrupted, plan_resume, apply_resume,
+                                        queue_offline_pass)
+    from .orchestrator.store import RunStore
+
+    store = RunStore(settings.output_root / "run.sqlite3")
+    try:
+        runs = find_interrupted(store, limit=1)
+        if not runs:
+            latest = store.latest_run()
+            if latest is None:
+                print("No run to recover. Start one by running the program.")
+                return 1
+            run_id = str(latest["run_id"])
+        else:
+            run_id = runs[0].run_id
+
+        if command == "retry-failed":
+            plan = plan_resume(store, run_id, retry_failed=True)
+            print(plan.describe())
+            moved = apply_resume(store, plan)
+            print(f"\n{moved} community(ies) requeued. Run the program to work them.")
+            return 0
+
+        mode = command.upper()
+        queued = queue_offline_pass(store, run_id, mode,
+                                    job_ids=[job_id.upper()] if job_id else None)
+        if not queued:
+            print(f"Nothing to {mode}: no community in {run_id} has stored evidence.")
+            return 1
+        print(f"{mode} queued for {len(queued)} community(ies), offline — no page")
+        print("will be fetched. Run the program to carry it out.")
+        return 0
+    finally:
+        store.close()
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command:
-        return _control(args.command, args.root, args.reason)
+        return _control(args.command, args.root, args.reason, args.community)
 
     setup_logging()
     settings = load_settings(args.root) if args.root else load_settings()
+    if args.single or args.name:
+        # One community, in this process. The multi-community path is the
+        # default; this exists for debugging a single crawl, and for the
+        # non-interactive `--name` form that scripts and the test suite use.
+        return _run_single(settings, args)
+    return _run_many(settings, args)
+
+
+def _run_many(settings, args) -> int:
+    """The default: however many communities the researcher has, in parallel."""
+    from .orchestrator import prompts
+    from .orchestrator.recovery import (apply_resume, find_interrupted, plan_resume,
+                                        queue_offline_pass, repair)
+    from .orchestrator.session import RunSession, read_community_file
+
+    print(prompts.BANNER)
+    session = RunSession(settings=settings)
+    try:
+        _preflight(settings)
+
+        # A run that did not finish is offered before anything new is started.
+        # Quietly starting a second run beside an unfinished one would leave the
+        # researcher with two half-finished cohorts (brief §100).
+        interrupted = find_interrupted(session.store)
+        if interrupted and not args.communities:
+            choice = prompts.offer_resume(interrupted)
+            if choice is not None:
+                run_id, action = choice
+                return _continue_run(session, run_id, action, args)
+
+        if args.communities:
+            entries = read_community_file(args.communities)
+            print(f"  {len(entries)} communities read from {args.communities}")
+        else:
+            entries = prompts.collect_communities(
+                output_root=settings.output_root, coder=args.coder)
+        if not entries:
+            print("  No communities entered. Nothing to do.")
+            return 0
+
+        plan = session.create(entries, mode=args.mode)
+        prompts.show_queue(plan)
+        if not args.no_estimate:
+            prompts.show_estimate(session.estimate_text(
+                workers_high=args.workers or 16))
+        if not args.yes and not prompts.confirm_start():
+            print("  Nothing was crawled. The queue is saved; run again to start it.")
+            return 0
+
+        summary = session.start(workers_max=args.workers)
+        prompts.show_summary(summary, settings.output_root)
+        return 0 if not summary["communities"]["failed"] else 2
+    except KeyboardInterrupt:
+        print("\n\nInterrupted. Everything retrieved so far is saved and the run is")
+        print("recorded as unfinished rather than complete. Run the program again")
+        print("and it will offer to resume.")
+        return 130
+    finally:
+        session.close()
+
+
+def _continue_run(session, run_id: str, action: str, args) -> int:
+    """Resume, retry or rebuild a run that did not finish (brief §100-§105)."""
+    from .orchestrator import prompts
+    from .orchestrator.plan import RunPlan
+    from .orchestrator.recovery import (apply_resume, plan_resume,
+                                        queue_offline_pass, repair)
+
+    session.run_id = run_id
+    repair(session.store, run_id)
+
+    if action in ("resume", "retry"):
+        plan = plan_resume(session.store, run_id, retry_failed=(action == "retry"))
+        prompts.show_recovery_plan(plan)
+        if not args.yes and not prompts.ask_yes("\n  Continue?", True):
+            return 0
+        apply_resume(session.store, plan)
+    else:
+        queued = queue_offline_pass(session.store, run_id, action.upper())
+        if not queued:
+            print(f"  Nothing to {action.upper()}: no community has stored evidence.")
+            return 1
+        print(f"  {action.upper()} queued for {len(queued)} community(ies). "
+              "No page will be fetched.")
+
+    # Rebuild the plan from the queue: the jobs are already in the database and
+    # the scheduler works from them, not from what was typed originally.
+    session.plan = RunPlan(run_id=run_id, mode=args.mode)
+    from .orchestrator.plan import CommunityJob
+
+    for job in session.store.jobs(run_id):
+        session.plan.jobs.append(CommunityJob(
+            job_id=job.job_id, site_id=job.site_id, name=job.name, urls=job.urls,
+            latitude=job.latitude, longitude=job.longitude, country=job.country,
+            coder_id=job.coder_id, mode=job.mode, fixture=job.fixture,
+            workload_units=job.workload_units, estimate_low_s=job.estimate_low_s,
+            estimate_high_s=job.estimate_high_s, priority=job.priority,
+            output_dir=job.output_dir, database_path=job.database_path,
+        ))
+    summary = session.start(workers_max=args.workers)
+    prompts.show_summary(summary, session.output_root)
+    return 0 if not summary["communities"]["failed"] else 2
+
+
+def _preflight(settings) -> None:
+    """Audit the workbook template and report the optional features, once."""
+    from .config import detect_optional_features
+    from .workbook_audit import audit
+
+    result = audit(settings.workbook_template, settings.schema)
+    result.raise_if_failed()
+    features = detect_optional_features(settings)
+    missing = [f for f in features if not f.available]
+    if missing:
+        print(f"  {len(features) - len(missing)} of {len(features)} optional features "
+              "available. Without the others the program still runs and records what")
+        print("  it could not do:")
+        for feature in missing[:6]:
+            print(f"    - {feature.name}: {feature.degrades_to}")
+        print()
+
+
+def _run_single(settings, args) -> int:
+    """One community, in this process — the shape earlier versions had."""
+    from .app import Application, collect_input
+
     app = Application(settings)
     console = None
     try:
