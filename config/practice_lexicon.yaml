@@ -1,0 +1,426 @@
+# ============================================================================
+# PRACTICE DETECTION LEXICON
+# ----------------------------------------------------------------------------
+# These patterns propose CANDIDATE practice evidence. They never assign a
+# coding level on their own: the level comes from who said it (source class),
+# how specific the statement is, and whether it recurs across years.
+#
+# `include` : regex fragments (case-insensitive, unicode) that mark the practice
+# `specific`: fragments that raise a statement from an aspiration to a
+#             specific action (a number, an area, a date, a named structure)
+# `deny`    : fragments that mark an explicit denial ("we do not plough")
+# `exclude` : fragments that would otherwise false-positive
+# ============================================================================
+version: "1.0.0"
+
+# Denial markers, applied per language, that turn a hit into `explicitly absent`
+# ONLY when they occur in the same sentence as the practice term.
+denial_markers:
+  en: ['\bwe do not\b', '\bwe don''t\b', '\bno longer\b', '\bnever\b', '\bwithout any\b',
+       '\bwe avoid\b', '\bis not used\b', '\bare not used\b', '\bwe have never\b', '\bnot practised\b',
+       '\bnot practiced\b', '\bno .{0,12} on this (site|land|farm)\b']
+  fr: ['\bnous ne\b', '\bn[''’]\w+ (pas|plus|jamais)\b', '\bne\s+\w+ons\s+(pas|plus|jamais)\b',
+       '\bpas de\b', '\bjamais\b', '\bsans aucun\b', '\bnous évitons\b',
+       '\bn''est pas utilis', '\bne pratiquons pas\b', '\baucun\b', '\bn[''’]utilisons\b']
+  nl: ['\bwij gebruiken geen\b', '\bgeen\b', '\bnooit\b', '\bzonder\b', '\bwordt niet gebruikt\b',
+       '\bwij doen niet aan\b']
+  de: ['\bwir verwenden kein', '\bkeine\b', '\bniemals\b', '\bohne\b', '\bwird nicht\b']
+  es: ['\bno usamos\b', '\bsin\b', '\bnunca\b', '\bno se utiliza\b', '\bno practicamos\b']
+  pt: ['\bnão usamos\b', '\bsem\b', '\bnunca\b', '\bnão é utilizado\b', '\bnão praticamos\b']
+  it: ['\bnon usiamo\b', '\bsenza\b', '\bmai\b', '\bnon viene utilizzat']
+
+# Fragments that make a statement SPECIFIC rather than aspirational.
+specificity_markers:
+  - '\b\d{4}\b'                                  # a year
+  - '\b\d+([.,]\d+)?\s*(ha|hectare|hectares|hectaren|hektar|hectáreas|hectares|acres?)\b'
+  - '\b\d+([.,]\d+)?\s*(m2|m²|km2|km²)\b'
+  - '\b\d{2,6}\s+(trees|arbres|bomen|Bäume|árboles|árvores|alberi)\b'
+  - '\b(planted|plantés|plantée|geplant|gepflanzt|plantado|piantati)\b'
+  - '\b(built|constructed|dug|excavated|creusé|construit|aangelegd|gegraven|angelegt|construido)\b'
+  - '\b(since|depuis|sinds|seit|desde|dal)\s+\d{4}\b'
+  - '\b(between|entre|tussen|zwischen)\s+\d{4}\s*(and|et|en|und|y|e)\s*\d{4}\b'
+
+practices:
+
+  pc01_rainwater:
+    label: Rainwater harvesting
+    definition: Deliberate capture and storage of precipitation or roof runoff for later use on the landholding.
+    include:
+      en: ['rainwater harvest', 'rain water harvest', 'rainwater collect', 'roof catchment', 'roof water',
+           'water catchment', 'rainwater tank', 'cistern', 'water butt', 'rainwater storage',
+           'harvest(ing)? rain']
+      fr: ['récupération d.eau de pluie', 'recuperation d.eau de pluie', 'eau de pluie', 'citerne',
+           'cuve de récupération', 'captage des eaux de pluie']
+      nl: ['regenwater', 'regenwateropvang', 'hemelwater', 'regenton', 'wateropvang', 'regenwatertank']
+      de: ['Regenwasser', 'Regenwassernutzung', 'Zisterne', 'Regenwassertank']
+      es: ['captación de agua de lluvia', 'agua de lluvia', 'aljibe', 'cisterna']
+      pt: ['captação de água da chuva', 'água da chuva', 'cisterna']
+      it: ['raccolta acqua piovana', 'acqua piovana', 'cisterna']
+    exclude: ['mains water tank', 'drinking water supply only', 'municipal water']
+
+  pc02_swales:
+    label: Swales, keyline earthworks, contour water works
+    definition: Contour-following ditches, berms, terraces or keyline ploughing built to slow, spread and infiltrate surface water.
+    include:
+      en: ['swale', 'swales', 'keyline', 'key line plough', 'contour ditch', 'contour bund',
+           'contour trench', 'infiltration ditch', 'earthworks?\b', 'terrac(e|es|ing)',
+           'berm', 'water retention landscape', 'gabion', 'check dam', 'contour planting']
+      fr: ['baissière', 'baissières', 'noue', 'noues', 'keyline', 'fossé.{0,12}niveau',
+           'terrasse', 'terrasses', 'banquette', 'retenue d.eau', 'ados']
+      nl: ['zwale', 'swale', 'infiltratiegreppel', 'greppel op hoogtelijn', 'keyline', 'terras',
+           'wadi', 'waterberging', 'aarden wal']
+      de: ['Sickergraben', 'Terrassierung', 'Keyline', 'Wasserrückhalt', 'Erdwall', 'Hügelbeet']
+      es: ['zanja de infiltración', 'curva de nivel', 'terraza', 'keyline', 'bancal']
+      pt: ['vala de infiltração', 'curva de nível', 'socalco', 'terraço', 'keyline']
+      it: ['fosso livellare', 'terrazzamento', 'keyline']
+    exclude: ['swale (surname)', 'road swale drainage only']
+
+  pc03_irrigation:
+    label: Irrigation used
+    definition: Application of water to crops beyond direct rainfall, with the source recorded where stated.
+    include:
+      en: ['irrigat', 'drip line', 'drip system', 'sprinkler', 'borehole', 'well water for',
+           'pump(ing)? water', 'water(ing)? system', 'flood irrigation']
+      fr: ['irrigation', 'irrigu', 'goutte à goutte', 'goutte-à-goutte', 'arrosage', 'asperseur', 'forage']
+      nl: ['irrigatie', 'beregening', 'druppelirrigatie', 'bewatering', 'waterput', 'pompput']
+      de: ['Bewässerung', 'Tröpfchenbewässerung', 'Beregnung', 'Brunnen']
+      es: ['riego', 'goteo', 'aspersión', 'pozo']
+      pt: ['irrigação', 'rega', 'gota a gota', 'furo de água']
+      it: ['irrigazione', 'goccia a goccia']
+
+  pc04_no_till:
+    label: No-till or minimum tillage
+    definition: Deliberate avoidance or minimisation of mechanical soil inversion.
+    include:
+      en: ['no.?till', 'no.?dig', 'zero tillage', 'minimum tillage', 'reduced tillage',
+           'without plough', 'without plowing', 'never plough', 'do not plough', 'unploughed',
+           'non.?inversion']
+      fr: ['sans labour', 'non.?labour', 'travail du sol r[ée]duit', 'semis direct',
+           'sans retournement', 'ne labour\w+ (plus|pas|jamais)', 'labour\w* abandonn',
+           'nous ne labourons']
+      nl: ['niet.?kerende grondbewerking', 'zonder ploegen', 'niet ploegen', 'no.?dig', 'geen grondbewerking']
+      de: ['pfluglos', 'ohne Pflug', 'Direktsaat', 'reduzierte Bodenbearbeitung']
+      es: ['sin labranza', 'siembra directa', 'labranza mínima']
+      pt: ['sem lavoura', 'plantio direto', 'mobilização mínima']
+      it: ['non lavorazione', 'semina su sodo']
+
+  pc05_mulching:
+    label: Permanent ground cover and mulching
+    definition: Maintenance of continuous organic or living cover over cultivated soil.
+    include:
+      en: ['mulch', 'mulching', 'ground cover', 'groundcover', 'permanent cover', 'straw cover',
+           'wood chip', 'woodchip', 'living mulch', 'sheet mulch', 'ramial', 'bare soil is never',
+           'soil is always covered', 'cover the soil']
+      fr: ['paillage', 'paillis', 'mulch', 'couverture du sol', 'sol couvert', 'BRF', 'bois raméal']
+      nl: ['mulch', 'mulchen', 'bodembedekking', 'houtsnippers', 'stro bedekking', 'bodem bedekt']
+      de: ['Mulch', 'Mulchen', 'Bodenbedeckung', 'Holzhäcksel', 'Bodendecker']
+      es: ['acolchado', 'mulch', 'cobertura del suelo', 'suelo cubierto']
+      pt: ['cobertura do solo', 'palha', 'mulching', 'acolchoamento']
+      it: ['pacciamatura', 'copertura del suolo']
+
+  pc06_cover_crop:
+    label: Cover cropping or green manure
+    definition: Sowing of non-harvest crops specifically to protect and build soil between production cycles.
+    include:
+      en: ['cover crop', 'green manure', 'catch crop', 'winter cover', 'nitrogen.fixing (crop|cover)',
+           'phacelia', 'vetch', 'clover ley', 'living root']
+      fr: ['engrais vert', 'couvert végétal', 'culture intermédiaire', 'phacélie', 'vesce', 'CIPAN']
+      nl: ['groenbemest', 'groenbemester', 'vanggewas', 'bodembedekker gewas', 'phacelia', 'wikke']
+      de: ['Gründüngung', 'Zwischenfrucht', 'Untersaat', 'Phazelie']
+      es: ['abono verde', 'cultivo de cobertura', 'cubierta vegetal']
+      pt: ['adubação verde', 'cultura de cobertura']
+      it: ['sovescio', 'colture di copertura']
+
+  pc07_tree_planting:
+    label: Tree planting or reforestation
+    definition: Deliberate establishment of trees on land previously without them.
+    include:
+      en: ['tree.?plant', 'planted \d+ trees', 'reforest', 'afforest', 'woodland creation',
+           'tree nursery', 'plant(ing|ed) (of )?\d+ ?(trees|saplings)', 'saplings? planted',
+           'new woodland', 'orchard (was )?plant', 'we planted .{0,30}trees']
+      fr: ['plantation d.arbres', 'reboisement', 'reforestation', 'boisement',
+           'plant\w*[^.]{0,40}arbres', 'arbres[^.]{0,40}plant\w*',
+           'plantation forestière', 'verger plant', 'plantation de haies vives']
+      nl: ['bomen[^.]{0,40}geplant', 'geplant[^.]{0,40}bomen', 'aanplant van bomen',
+           'herbebossing', 'bosaanplant', 'boomaanplant', 'nieuw[e]? bos',
+           'boomgaard[^.]{0,30}aangeplant', 'aangeplant[^.]{0,30}bomen']
+      de: ['Baumpflanzung', 'Aufforstung', 'Wiederaufforstung', 'Bäume gepflanzt', 'Streuobstwiese angelegt']
+      es: ['plantaci[óo]n de [áa]rboles', 'reforestaci[óo]n', 'forestaci[óo]n',
+           '[áa]rboles[^.]{0,40}plantad', 'plantad[^.]{0,40}[áa]rboles']
+      pt: ['planta[çc][ãa]o de [áa]rvores', 'refloresta[çc][ãa]o', 'reflorestamento',
+           '[áa]rvores[^.]{0,40}plantad', 'plantad[^.]{0,40}[áa]rvores']
+      it: ['piantumazione', 'rimboschimento', 'alberi piantati']
+    exclude: ['christmas tree sales', 'tree of life ceremony', 'family tree']
+
+  pc08_agroforestry:
+    label: Food forest or agroforestry
+    definition: Deliberate multi-storey systems combining trees with crops or livestock.
+    include:
+      en: ['food forest', 'forest garden', 'agroforest', 'agro.?forestry', 'silvopast',
+           'alley crop', 'multi.?storey|multi.?story (system|planting)', 'seven layers?',
+           'edible forest', 'syntropic']
+      fr: ['for[êe]t.?jardin', 'for[êe]t comestible', 'for[êe]t nourrici[èe]re', 'agroforesterie',
+           'agroforestier', 'sylvopastoral', 'culture en all[ée]es', 'jardin.?for[êe]t',
+           'jardin.?for[êe]t comestible']
+      nl: ['voedselbos', 'voedselbossen', 'bosgaard', 'agroforestry', 'agrobosbouw', 'boslandbouw',
+           'eetbaar bos', 'meerlaags']
+      de: ['Waldgarten', 'Agroforst', 'Agroforstwirtschaft', 'Waldweide', 'essbarer Wald']
+      es: ['bosque comestible', 'bosque de alimentos', 'agroforestería', 'silvopastoril', 'sintropico']
+      pt: ['floresta alimentar', 'agrofloresta', 'agroflorestal', 'sistema agroflorestal', 'sintrópic']
+      it: ['foresta commestibile', 'agroforestazione', 'agroselvicoltura']
+
+  pc09_polyculture:
+    label: Perennial polyculture
+    definition: Production systems built on mixed perennial species rather than annual monoculture.
+    include:
+      en: ['polyculture', 'poly.?crop', 'mixed perennial', 'perennial vegetable', 'guild planting',
+           'companion planting', 'species mix', 'intercrop', 'mixed cropping', 'diverse perennial']
+      fr: ['polyculture', 'vivaces? (mélangées|associées)', 'cultures associées', 'compagnonnage',
+           'légumes vivaces', 'mélange d.espèces']
+      nl: ['polycultuur', 'gemengde teelt', 'meerjarige groenten', 'gemengde aanplant', 'mengteelt']
+      de: ['Mischkultur', 'Polykultur', 'mehrjährige Gemüse', 'Pflanzengemeinschaft']
+      es: ['policultivo', 'cultivo asociado', 'perennes mixtas', 'hortalizas perennes']
+      pt: ['policultura', 'consórcio de culturas', 'hortaliças perenes']
+      it: ['policoltura', 'consociazione']
+
+  pc10_hedgerows:
+    label: Hedgerows and windbreaks
+    definition: Linear woody plantings along boundaries or across fields for shelter, boundary or habitat.
+    include:
+      en: ['hedgerow', 'hedge row', 'windbreak', 'wind break', 'shelterbelt', 'shelter belt',
+           'living fence', 'hedge (was )?plant', 'field boundary planting', 'native hedge']
+      fr: ['haie', 'haies', 'haie bocagère', 'brise.vent', 'bocage', 'haie vive']
+      nl: ['haag', 'hagen', 'houtwal', 'houtwallen', 'windsingel', 'heg', 'heggen', 'struweelhaag']
+      de: ['Hecke', 'Hecken', 'Windschutz', 'Windschutzhecke', 'Knick', 'Feldhecke']
+      es: ['seto', 'setos', 'cortavientos', 'seto vivo']
+      pt: ['sebe', 'sebes', 'quebra.vento']
+      it: ['siepe', 'siepi', 'frangivento']
+
+  pc11_small_parcel:
+    label: Small-parcel diversified planting
+    definition: Production organised in many small, differently planted parcels rather than large uniform blocks.
+    include:
+      en: ['market garden', 'small plots', 'raised beds', 'bed system', 'micro.?farm',
+           'small.?scale (intensive|market)', 'allotment', 'garden beds', 'small parcels',
+           'bio.?intensive', 'many small (fields|plots|beds)']
+      fr: ['maraîchage', 'maraîcher', 'petites parcelles', 'planches de culture', 'micro.?ferme',
+           'buttes de culture', 'jardins partagés']
+      nl: ['moestuin', 'tuinbouw', 'kleine percelen', 'bedden', 'verhoogde bedden', 'kleinschalig']
+      de: ['Marktgarten', 'kleine Parzellen', 'Hochbeete', 'Beete', 'kleinteilig']
+      es: ['huerta', 'huerto', 'parcelas pequeñas', 'bancales']
+      pt: ['horta', 'canteiros', 'parcelas pequenas']
+      it: ['orto', 'aiuole', 'piccoli appezzamenti']
+
+  pc12_organic:
+    label: Organic or no synthetic inputs
+    definition: Organic management, with any certifying body named.
+    include:
+      en: ['organic', 'certified organic', 'no synthetic', 'no chemical', 'without pesticides',
+           'without herbicides', 'biodynamic', 'demeter', 'agroecolog', 'chemical.?free',
+           'participatory guarantee', 'pesticide.?free']
+      fr: ['agriculture biologique', 'bio\b', 'certifié bio', 'sans pesticide', 'sans intrant',
+           'biodynamie', 'demeter', 'Ecocert', 'Nature & Progrès', 'agroécologie']
+      nl: ['biologisch', 'biologisch.dynamisch', 'demeter', 'skal', 'zonder bestrijdingsmiddelen',
+           'geen kunstmest', 'agro.?ecolog']
+      de: ['biologisch', 'Bio.?Betrieb', 'ökologischer Landbau', 'biodynamisch', 'Demeter',
+           'Bioland', 'Naturland', 'ohne Pestizide']
+      es: ['ecológico', 'orgánico', 'certificación ecológica', 'biodinámic', 'sin pesticidas']
+      pt: ['biológico', 'orgânico', 'modo de produção biológico', 'biodinâmic', 'sem pesticidas']
+      it: ['biologico', 'biodinamico', 'senza pesticidi']
+    certifier_names: [Demeter, Ecocert, Bioland, Naturland, Skal, "Nature & Progrès", "Soil Association",
+                      "Certisys", "Control Union", "SKAL Biocontrole", "Agriculture Biologique",
+                      "USDA Organic", "CCPB", "ICEA", "SOHISCERT", "Sativa", "Bio Suisse"]
+
+  pc13_restoration:
+    label: Land restoration or rehabilitation, non-tree
+    definition: >-
+      Grassland or pasture restoration, wetland creation, erosion or gully control, revegetation of
+      degraded ground. SEPARATE from pc07: pc07 is tree planting, pc13 is everything else.
+    include:
+      en: ['restoration', 'rehabilitat', 'regenerat(e|ing|ion) (the )?(land|soil|pasture|grassland)',
+           'wetland creation', 'pond (was )?(created|dug|built)', 'erosion control', 'gully control',
+           'gully repair', 'revegetat', 'meadow restoration', 'grassland restoration',
+           'wildflower meadow (sown|created)', 'reed bed', 'riparian restoration', 'desertification',
+           'bare (ground|soil) (was )?(revegetat|restor)', 'soil regeneration']
+      fr: ['restauration [ée]cologique', 'r[ée]habilitation', 'r[ée]g[ée]n[ée]ration des sols',
+           'cr[ée]ation d.une mare', 'mare cr[ée]{2}e', 'zone humide', 'prairie humide',
+           'lutte contre l.[ée]rosion', 'rev[ée]g[ée]talisation', 'prairie fleurie',
+           'restaur\w*\s+(de\s+)?(la\s+|le\s+|les\s+)?(prairie|zone|milieu|sol|terrain|berge)',
+           'ripisylve', 'renaturation']
+      nl: ['natuurherstel', 'herstel van', 'poel aangelegd', 'wetland', 'moeras aangelegd',
+           'erosiebestrijding', 'herbegroeiing', 'bloemrijk grasland', 'kruidenrijk grasland',
+           'bodemherstel', 'natuurontwikkeling']
+      de: ['Renaturierung', 'Wiederherstellung', 'Teich angelegt', 'Feuchtgebiet', 'Erosionsschutz',
+           'Wiesenrenaturierung', 'Bodenregeneration']
+      es: ['restauración ecológica', 'rehabilitación', 'humedal', 'control de erosión',
+           'revegetación', 'restauración de pastizal']
+      pt: ['restauração ecológica', 'reabilitação', 'zona húmida', 'controlo de erosão',
+           'revegetação', 'recuperação de solos']
+      it: ['ripristino', 'rinaturalizzazione', 'zona umida', 'controllo erosione']
+    exclude: ['building restoration', 'house restoration', 'restoration of the barn',
+              'restauration du bâtiment', 'restauration de la maison', 'restauratie van het gebouw',
+              'restaurant']
+
+# ============================================================================
+# ONSET / DATE EXTRACTION
+# ============================================================================
+onset:
+  # Sentences that describe a deliberate environmental action. A date in the same
+  # sentence is a candidate onset; a date elsewhere on the page is not.
+  action_verbs:
+    en: ['planted', 'sown', 'sowed', 'dug', 'excavated', 'built', 'constructed', 'created',
+         'established', 'restored', 'rehabilitated', 'reforested', 'terraced', 'mulched',
+         'began (planting|restoring|working|cultivating)', 'started (planting|restoring|the garden)']
+    fr: ['planté', 'plantée', 'plantées', 'semé', 'creusé', 'construit', 'créé', 'créée',
+         'établi', 'restauré', 'reboisé', 'aménagé', 'commencé']
+    nl: ['geplant', 'gezaaid', 'gegraven', 'aangelegd', 'gebouwd', 'gecreëerd', 'hersteld',
+         'begonnen', 'gestart', 'ingericht']
+    de: ['gepflanzt', 'gesät', 'gegraben', 'angelegt', 'gebaut', 'geschaffen', 'renaturiert', 'begonnen']
+    es: ['plantado', 'sembrado', 'excavado', 'construido', 'creado', 'restaurado', 'comenzado']
+    pt: ['plantado', 'semeado', 'escavado', 'construído', 'criado', 'restaurado', 'começou']
+    it: ['piantato', 'seminato', 'scavato', 'costruito', 'creato', 'ripristinato', 'iniziato']
+  founding_markers:
+    # Deliberately NOT a bare "since YYYY": on a community page that far more
+    # often dates an activity than the founding of the entity, and a wrong
+    # founding year propagates into founding_decade and the onset comparison.
+    en: ['founded in', 'established in', 'was founded', 'set up in', 'formed in', 'created in',
+         'the community (was )?(founded|started|began)', 'we (were )?founded']
+    fr: ['fond[ée]e? en', 'cr[ée]{2}e? en', 'n[ée]e? en \d{4}', 'association cr[ée]{2}e',
+         'le lieu a [ée]t[ée] cr[ée]{2}']
+    nl: ['opgericht in', 'gesticht in', 'opgericht \d{4}', 'ontstaan in']
+    de: ['gegr[üu]ndet (19|20)\d{2}', 'gegr[üu]ndet im Jahr', 'entstand (19|20)\d{2}']
+    es: ['fundada en', 'fundado en', 'creada en', 'creado en']
+    pt: ['fundada em', 'fundado em', 'criada em', 'criado em']
+    it: ['fondata nel', 'fondato nel']
+  land_acquisition_markers:
+    en: ['bought the land', 'purchased the (land|farm|property)', 'acquired the (land|site|farm)',
+         'leased the land', 'took over the farm', 'land was (bought|purchased|acquired)']
+    fr: ['acheté le terrain', 'acquisition du terrain', 'acheté la ferme', 'racheté', 'bail']
+    nl: ['grond gekocht', 'terrein gekocht', 'boerderij gekocht', 'aangekocht', 'in erfpacht']
+    de: ['Land gekauft', 'Hof gekauft', 'erworben', 'Pachtvertrag']
+    es: ['compró el terreno', 'adquirió la finca', 'arrendó']
+    pt: ['comprou o terreno', 'adquiriu a quinta', 'arrendou']
+  first_residence_markers:
+    en: ['moved in', 'moved onto the land', 'first residents', 'began living', 'first inhabitants',
+         'we settled', 'started living here']
+    fr: ['installé sur le lieu', 'premiers habitants', 'emménagé', 'nous nous sommes installés']
+    nl: ['ingetrokken', 'eerste bewoners', 'zijn we gaan wonen', 'gevestigd']
+    de: ['eingezogen', 'erste Bewohner', 'wir zogen']
+    es: ['primeros habitantes', 'nos instalamos', 'nos mudamos']
+    pt: ['primeiros habitantes', 'mudámo-nos', 'instalámo-nos']
+  # Domains for domain_onsets
+  domains:
+    water: [pc01_rainwater, pc02_swales, pc03_irrigation]
+    soil: [pc04_no_till, pc05_mulching, pc06_cover_crop, pc12_organic]
+    vegetation: [pc07_tree_planting, pc08_agroforestry, pc09_polyculture, pc10_hedgerows, pc11_small_parcel]
+    land_cover: [pc13_restoration]
+
+# ============================================================================
+# AREA / POPULATION EXTRACTION
+# ============================================================================
+quantities:
+  area_units:
+    ha: 1.0
+    hectare: 1.0
+    hectares: 1.0
+    hectaren: 1.0
+    hektar: 1.0
+    "hectáreas": 1.0
+    "hectárea": 1.0
+    acre: 0.404686
+    acres: 0.404686
+    "m2": 0.0001
+    "m²": 0.0001
+    "km2": 100.0
+    "km²": 100.0
+    arpent: 0.3419
+    bunder: 1.0
+    morgen: 0.25
+  managed_area_markers:
+    en: ['under cultivation', '(we|community|they|the group) (farm|work|cultivate|manage|tend)s?\b',
+         'cultivated area', 'managed land', 'in production', 'productive land', 'market garden',
+         'growing area', 'planted area', 'worked land', 'garden(s)? cover', 'actively managed',
+         'under management', 'in cultivation']
+    fr: ['en culture', 'cultiv[ée]', 'cultiv[ée]s', 'nous cultivons', 'surface cultivée',
+         'exploit[ée]', 'terrain cultivé', 'mara[iî]ch', 'zone de production', 'en production',
+         'surface en', 'travaill[ée]']
+    nl: ['in gebruik', 'wij bewerken', 'bewerkte grond', 'in productie', 'teeltoppervlak',
+         'wordt beheerd', 'moestuin van', 'aangelegd op', 'in cultuur', 'beheren wij',
+         'actief beheerd']
+    de: ['bewirtschaftet', 'Anbaufläche', 'in Kultur', 'Nutzfläche']
+    es: ['en cultivo', 'cultivamos', 'superficie cultivada', 'gestionamos']
+    pt: ['em cultivo', 'cultivamos', 'área cultivada', 'gerimos']
+  total_holding_markers:
+    en: ['total (of|land|area|holding)', 'the (estate|property|holding|land) (is|covers|extends)',
+         'we own', 'our land is', 'property of', 'site of', 'estate of', 'landholding',
+         'the whole (site|property|estate)']
+    fr: ['domaine de', 'propriété de', 'terrain de', 'au total', 'superficie totale', 'le lieu']
+    nl: ['totaal', 'landgoed van', 'terrein van', 'perceel van', 'in totaal', 'het terrein is']
+    de: ['insgesamt', 'Gesamtfläche', 'Grundstück von', 'Gelände von']
+    es: ['finca de', 'superficie total', 'en total', 'terreno de']
+    pt: ['quinta de', 'área total', 'no total', 'terreno de']
+  population_markers:
+    en: ['residents', 'inhabitants', 'people live', 'adults and', 'members live', 'permanent residents',
+         'we are \d+ ', 'community of \d+', 'population of']
+    fr: ['habitants', 'résidents', 'personnes vivent', 'nous sommes \d+', 'adultes et']
+    nl: ['bewoners', 'inwoners', 'mensen wonen', 'wij zijn met', 'volwassenen en']
+    de: ['Bewohner', 'Einwohner', 'Menschen leben', 'Erwachsene und']
+    es: ['habitantes', 'residentes', 'personas viven', 'adultos y']
+    pt: ['habitantes', 'residentes', 'pessoas vivem', 'adultos e']
+  visitor_markers:  # population figures that must NOT be coded as permanent residents
+    en: ['visitors', 'volunteers', 'guests', 'students', 'participants', 'wwoofers', 'interns',
+         'per year', 'annually', 'course participants', 'seasonal']
+    fr: ['visiteurs', 'bénévoles', 'stagiaires', 'participants', 'par an', 'saisonnier']
+    nl: ['bezoekers', 'vrijwilligers', 'gasten', 'deelnemers', 'per jaar', 'seizoen']
+    de: ['Besucher', 'Freiwillige', 'Gäste', 'Teilnehmer', 'pro Jahr']
+    es: ['visitantes', 'voluntarios', 'participantes', 'al año']
+    pt: ['visitantes', 'voluntários', 'participantes', 'por ano']
+
+# ============================================================================
+# IMAGE RELEVANCE VOCABULARY
+# ============================================================================
+image_relevance:
+  # Strong: an image whose filename/alt/caption matches these is evidence-bearing.
+  strong:
+    # Keep each alternation on ONE line. YAML folds a wrapped quoted scalar
+    # into a space, which silently turns '|plan.?de.?masse' into
+    # '| plan.?de.?masse' and stops it matching a caption that begins with it.
+    - 'site.?plan|master.?plan|masterplan|plattegrond|terreinplan|inrichtingsplan'
+    - 'plan.?de.?masse|lageplan|plano|bebauungsplan|plan.?director'
+    - 'land.?use|landgebruik|zonage|zoning|bestemmingsplan|uso.?de.?suelo'
+    - 'permaculture.?design|design.?plan|ontwerp|conception'
+    - 'restoration.?map|herstelkaart|carte.?de.?restauration'
+    - 'swale|keyline|terrace|terrass|baissiere|noue|greppel'
+    - 'food.?forest|voedselbos|foret.?jardin|waldgarten|agrofloresta'
+    - 'water.?(system|plan|map)|waterplan|wadi|plan.?d.?eau|drainage|ontwerpplan'
+    - 'contour|hoogtelijn|courbe.?de.?niveau'
+    - 'plantation|planting.?plan|beplantingsplan|plan.?de.?plantation|pflanzplan'
+    - 'before.?(and.?)?after|avant.?apres|voor.?en.?na|vorher.?nachher'
+    - 'aerial|luchtfoto|vue.?aerienne|luftbild|orthophoto'
+    - 'map\b|carte\b|kaart\b|karte\b|mapa\b|mappa\b'
+    - 'diagram|schema|schéma|schets|skizze'
+    - 'farm.?plan|ferme|boerderijplan'
+    - 'nursery|pepiniere|kwekerij'
+    - 'erosion|gully|ravine'
+    - 'pond|mare|vijver|teich|charca'
+    - 'wetland|zone.?humide|moeras|feuchtgebiet'
+  # Moderate: worth keeping if the surrounding text supports it.
+  moderate:
+    - 'garden|jardin|tuin|garten|huerta|horta'
+    - 'orchard|verger|boomgaard|obstgarten|pomar'
+    - 'field|champ|akker|feld|campo'
+    - 'tree|arbre|boom|baum|arbol|arvore'
+    - 'harvest|recolte|oogst|ernte|cosecha'
+    - 'soil|sol|bodem|boden|suelo|solo'
+    - 'compost'
+    - 'greenhouse|serre|kas|gewachshaus|invernadero'
+    - 'construction|chantier|bouw|obras'
+    - 'volunteer|benevole|vrijwilliger'
+  # Decorative: excluded unless a caption promotes them.
+  decorative:
+    - 'logo|icon|favicon|sprite|banner|header|footer|avatar|button|badge|arrow|bullet'
+    - 'placeholder|spacer|divider|background|bg.?image|pattern'
+    - 'facebook|instagram|twitter|youtube|linkedin|whatsapp|share|social'
+    - 'thumb(nail)?.?\d+x\d+|-\d{2,3}x\d{2,3}\.'
+    - 'portrait|headshot|team.?photo|profile.?pic'
+    - 'sponsor|partner.?logo|award.?badge'

@@ -1,0 +1,359 @@
+# ============================================================================
+# RUNTIME CONFIGURATION — reproducibility record for every run.
+# Everything that could change what the crawler does lives here, so no hidden
+# default can alter the research process between runs. The effective config is
+# copied into each community's run_manifest.json.
+# ============================================================================
+app_version: "1.0.0"
+config_version: "1.0.0"
+
+paths:
+  output_root: "Research_Web_Crawler_Output"
+  database: "Research_Web_Crawler_Output/dcr.sqlite3"
+  workbook_template: "template/Stage_1_Documentary_Coding_Workbook_v6.xlsx"
+  research_inputs: "research_inputs"
+
+identity:
+  # Contact string sent in the User-Agent so site owners can reach the researcher.
+  # Overridable with DCR_CONTACT in .env
+  contact: "academic documentary research; set DCR_CONTACT in .env"
+  user_agent_template: "DocumentaryResearchCrawler/{version} (+academic research; {contact})"
+
+network:
+  timeout_connect_s: 15
+  timeout_read_s: 45
+  timeout_total_s: 120
+  max_concurrency_global: 8
+  max_concurrency_per_host: 2
+  # Politeness. crawl-delay in robots.txt overrides this upward, never downward.
+  default_delay_per_host_s: 1.5
+  max_delay_per_host_s: 30.0
+  max_redirects: 8
+  verify_tls: true
+  # A page larger than this is fetched only as a HEAD record.
+  max_page_bytes: 12000000
+  max_document_bytes: 120000000
+  max_image_bytes: 25000000
+
+retry:
+  max_attempts: 4
+  backoff_base_s: 2.0
+  backoff_factor: 2.0
+  backoff_jitter_s: 1.0
+  backoff_max_s: 60.0
+  # Status codes worth another attempt.
+  retryable_statuses: [408, 425, 429, 500, 502, 503, 504, 522, 524]
+  # Codes that are permanent: recorded once, never retried.
+  permanent_statuses: [400, 401, 402, 403, 404, 405, 410, 451]
+  # 429 handling: honour Retry-After up to this many seconds, then defer the host.
+  respect_retry_after_max_s: 300
+  # After this many consecutive connection failures a host is recorded as
+  # unreachable and no longer probed. A dead domain should cost a handful of
+  # requests, not the forty well-known paths.
+  host_failure_threshold: 5
+
+robots:
+  obey: true
+  # Robots is advisory for /robots.txt and /sitemap.xml themselves — those are
+  # published for crawlers by definition.
+  always_allowed_paths: ["/robots.txt", "/sitemap.xml", "/sitemap_index.xml"]
+  # When robots.txt is unreachable the crawler proceeds politely rather than
+  # treating an unreachable file as a blanket ban, and records the fact.
+  on_unreachable: proceed_and_record
+
+crawl:
+  # Adaptive budget. Each source starts at base_pages and earns more while it
+  # keeps yielding evidence; it is cut off when it stops.
+  base_pages_per_source: 40
+  max_pages_per_source: 400
+  max_pages_per_run: 4000
+  min_depth: 3
+  max_depth: 6
+  # A source earns extra budget when its recent pages yielded evidence.
+  yield_window: 10
+  yield_threshold: 0.15
+  budget_increment: 25
+  # Exhaustion: no new URLs and no evidence in this many consecutive pages.
+  exhaustion_window: 20
+  # Traps
+  max_query_params: 6
+  max_path_segments: 12
+  max_same_path_variants: 40
+  trap_patterns:
+    - "/calendar/"
+    - "/events/\\d{4}/\\d{2}/\\d{2}"
+    - "[?&](replytocom|share|print|add-to-cart|orderby|filter_)="
+    - "/page/\\d{3,}"
+    - "(/[^/]+)\\1{2,}"
+  # Blog/news archives: how far back through pagination to walk.
+  max_pagination_pages: 60
+  prefer_oldest_first: true
+
+archive:
+  enabled: true
+  cdx_limit: 5000
+  # Sample snapshots at roughly annual intervals across the whole record.
+  snapshot_interval_days: 365
+  max_snapshots_per_url: 20
+  # A ceiling, further reduced by whatever stage 4's share of the time budget
+  # actually affords. The archive is the slowest thing the crawler touches.
+  max_snapshot_fetches_per_domain: 40
+  estimated_seconds_per_snapshot: 3.0
+  # At most this share of the archive budget may go to URLs whose own path says
+  # nothing (tags, pagination, baskets). Their earliest capture is worth
+  # sampling for dating coverage, not exhausting.
+  low_relevance_snapshot_share: 0.25
+  # Retrieve archived documents too, not only pages.
+  fetch_archived_documents: true
+
+academic:
+  enabled: true
+  max_results_per_database: 50
+  # Chase full text rather than settling for an abstract.
+  fetch_full_text: true
+  citation_chaining_rounds: 1
+  # Every academic record must be individually verified before it may support
+  # a claim; unverified records go to the review queue, never to the workbook.
+  require_verification: true
+  relevance_min_score: 0.35
+
+grey:
+  enabled: true
+  max_results_per_database: 50
+
+images:
+  enabled: true
+  min_width: 320
+  min_height: 240
+  min_bytes: 12000
+  max_images_per_source: 400
+  max_images_per_community: 1500
+  # Keep 'possible' images too; the researcher decides. Only 'decorative' is dropped.
+  keep_classes: [likely_relevant, possibly_relevant, uncertain]
+  extract_from_documents: true
+  min_embedded_image_pixels: 90000
+  # Triage: which retrieval bands are worth downloading. LOW and DUPLICATE
+  # candidates are still recorded in image_candidates with their caption, alt
+  # text and file name — a gallery caption often carries a date the page text
+  # does not — but their pixels are not fetched.
+  #   HIGH      site plans, maps, land-use and restoration diagrams, figures in
+  #             documents, before/after pairs, dated intervention photographs
+  #   MEDIUM    captioned or dated field photographs with research context
+  #   LOW       decoration: portraits, logos, accommodation and event photos
+  #   DUPLICATE the same address or the same bytes, already triaged
+  download_priorities: [HIGH, MEDIUM]
+  # Candidates considered per page before triage. A gallery page can carry
+  # hundreds; the ledger records what was and was not looked at.
+  max_candidates_per_page: 120
+  # A ninety-page report can carry three hundred embedded images. This is the
+  # default allowance per document; a VERY_HIGH-priority document earns more
+  # and a low-value one earns none (see the document triage bands).
+  max_images_per_document: 12
+  # A global ceiling on image work, so the image subsystem cannot consume the
+  # run however many candidates a gallery offers.
+  max_processing_seconds: 240
+  max_candidates_per_run: 1500
+
+ocr:
+  enabled: auto        # auto | always | never
+  # OCR only when a PDF page yields less than this many characters of real text.
+  min_chars_per_page: 120
+  max_pages_per_document: 40
+  languages: ["eng", "fra", "nld", "deu", "spa", "por", "ita"]
+
+llm:
+  enabled: auto        # auto = use if ANTHROPIC_API_KEY present
+  model: "claude-sonnet-5"
+  max_chars_per_call: 24000
+  max_calls_per_community: 120
+  # The LLM never becomes the source: every field it proposes must carry an
+  # exact supporting passage that is verified to appear in the stored text.
+  require_verbatim_passage: true
+  temperature: 0
+  prompt_version: "1.0.0"
+
+browser:
+  enabled: auto        # auto = use Playwright if installed
+  # Only escalate to a browser when static HTML looks JS-rendered.
+  min_text_chars_for_static: 400
+  max_browser_pages_per_source: 40
+  timeout_s: 45
+  pool_size: 2
+
+independence:
+  # Near-duplicate detection for copied text (simhash Hamming distance over
+  # 64-bit fingerprints; <= threshold means "same underlying statement").
+  simhash_threshold: 8
+  shingle_size: 5
+  min_chars_for_comparison: 400
+  # A source whose text overlaps an earlier source above this ratio is grouped
+  # with it, unless independent reporting is demonstrated.
+  jaccard_threshold: 0.72
+  press_release_markers:
+    - "press release"
+    - "communiqué de presse"
+    - "persbericht"
+    - "pressemitteilung"
+    - "comunicado de prensa"
+    - "source:"
+    - "reproduced with permission"
+    - "originally published"
+
+quality:
+  # Minimum expectations before a community may be called COMPLETE.
+  min_pages_opened: 25
+  min_independence_groups_for_corroboration: 3
+  min_sources_per_priority_field: 1
+
+security:
+  # Downloaded files are never executed and never trusted by extension.
+  sniff_mime: true
+  max_archive_members: 500
+  max_archive_uncompressed_bytes: 500000000
+  max_archive_ratio: 120
+  allowed_document_extensions: [pdf, doc, docx, odt, rtf, xls, xlsx, ods, csv, tsv,
+                                ppt, pptx, odp, txt, xml, json, kml, kmz, geojson, gpx, zip]
+  allowed_image_extensions: [jpg, jpeg, png, gif, webp, tif, tiff, bmp, svg]
+
+logging:
+  console_level: INFO
+  file_level: DEBUG
+  jsonl: true
+
+# --------------------------------------------------------------------------
+# Documents: what earns the expensive work
+#
+# Opening documents is where the best evidence is, and where the time goes.
+# Priority is judged from the address, file name and link text BEFORE anything
+# is downloaded, and decides how much attention the document earns:
+#
+#   VERY_HIGH  theses, papers, grant and project reports, annual reports, site
+#              and master plans, environmental and restoration reports,
+#              municipal records, land and water documents
+#   HIGH       substantial dated material from an academic or official source
+#   MEDIUM     newsletters, brochures, community reports, conference material
+#   LOW        event flyers, promotional material, forms, legal boilerplate
+#   DUPLICATE  a translation or reprint of something already read in full
+# --------------------------------------------------------------------------
+documents:
+  # How many documents of one family are read in full. A report published in
+  # three languages is one report; the others are kept as provenance mirrors,
+  # stored and hashed but not deeply parsed.
+  max_per_family: 1
+  # When the clock is tight, a LOW-priority document is recorded as discovered
+  # but not opened. Its existence is still evidence; its forty pages of event
+  # listings are not.
+  skip_low_value_when_pressed: true
+
+# --------------------------------------------------------------------------
+# The active-processing budget
+#
+# A hard ceiling on ACTIVE work per community. Time spent paused by the
+# researcher, or waiting for the network, does not count: an outage must not be
+# able to eat the research budget.
+#
+# The reserve at the end is not optional. Reconciliation, the workbook, its
+# verification and the manifests are what make the run worth anything, so the
+# retrieval side is never allowed to spend the whole allowance.
+# --------------------------------------------------------------------------
+budget:
+  enabled: true
+  active_minutes: 30
+  # Kept back for reconciliation, export, reopening the workbook and manifests.
+  finalisation_reserve_minutes: 3
+  # Before the reserve: no NEW expensive work starts, but work already in
+  # flight is allowed to finish cleanly.
+  wind_down_minutes: 2
+  # Ceilings, not allocations. A stage that finishes early hands the rest back;
+  # a community with one excellent website never touches most of these.
+  stage_shares:
+    0: 0.04     # build the source set
+    1: 0.04     # confirm the sources belong to this community
+    2: 0.24     # enumerate pages
+    3: 0.20     # open the documents — the richest evidence per second
+    4: 0.16     # the archive, prioritised rather than enumerated
+    5: 0.14     # academic literature
+    6: 0.10     # grey literature
+    7: 0.04     # other web sources
+    8: 0.04     # local-language sweep
+    9: 0.00     # reconciliation is paid for out of the reserve
+
+# --------------------------------------------------------------------------
+# Run control: manual pause, network pause, and resuming
+# --------------------------------------------------------------------------
+run_control:
+  # How often a running crawl looks for a pause, resume or cancel request.
+  # Cheap: it stats three files in the output directory.
+  poll_interval_s: 1.0
+  # What a manual pause does to the process:
+  #   wait  keep the process alive and continue in place when RESUME arrives
+  #   exit  checkpoint and return, leaving the run PAUSED_MANUAL for later
+  manual_pause_behavior: wait
+  resume_poll_interval_s: 2.0
+  # How long to wait between connectivity rechecks while offline. The wait
+  # lengthens gently up to connectivity.offline_retry_max_s.
+  offline_wait_interval_s: 15.0
+  # How long to keep waiting for the network before giving up and leaving the
+  # run PAUSED_NETWORK. 0 means wait indefinitely — an outage is not a reason
+  # to declare the research finished.
+  max_offline_wait_s: 0
+  # Consecutive network-shaped failures before an actual connectivity probe is
+  # worth making. Below this, a failure is treated as one server's problem.
+  failures_before_probe: 3
+
+connectivity:
+  # Independent operators, so one provider's outage cannot be mistaken for the
+  # machine being offline. If NONE of them answer, the machine is offline.
+  probes:
+    - "https://www.cloudflare.com/cdn-cgi/trace"
+    - "https://www.google.com/generate_204"
+    - "https://duckduckgo.com/"
+    - "https://www.wikipedia.org/"
+  timeout_s: 8.0
+  # How many probes must answer for the machine to count as online.
+  min_reachable: 1
+  # Minimum gap between passive checks while everything is working.
+  check_interval_s: 30.0
+  offline_retry_s: 15.0
+  offline_retry_max_s: 300.0
+
+# --------------------------------------------------------------------------
+# Runtime estimation
+# --------------------------------------------------------------------------
+estimation:
+  enabled: true
+  # Lightweight discovery before the expensive crawl: robots.txt, the sitemaps
+  # it names, and one home page per address. Never a crawl (brief §35).
+  probe_sources: true
+  max_probe_sources: 12
+  # Seconds of active processing per unit of work. These are starting points,
+  # corrected by the recorded actuals of previous runs.
+  costs:
+    page_s: 1.6
+    document_s: 7.0
+    image_candidate_s: 0.05
+    image_download_s: 1.1
+    browser_page_s: 6.5
+    sitemap_s: 1.2
+    archive_query_s: 4.0
+    archive_snapshot_s: 3.2
+    academic_query_s: 5.0
+    academic_verify_s: 4.0
+    grey_query_s: 4.5
+    search_query_s: 3.5
+    source_overhead_s: 8.0
+    resolve_s: 25.0
+    export_s: 20.0
+  # The band around the central figure: an estimate is never a single number.
+  spread: [0.7, 1.45]
+  # Active time to wall-clock time. The high end allows for politeness delays,
+  # rate limiting, slow archives and retries.
+  wall_factors: [1.15, 2.1]
+  use_history: true
+  min_history_runs: 2
+
+run:
+  default_mode: FULL
+  checkpoint_every_n_events: 25
+  # A run that stops before the protocol finishes sets crawl_truncated = yes.
+  stages: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]

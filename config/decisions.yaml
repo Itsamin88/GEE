@@ -1,0 +1,387 @@
+# ============================================================================
+# RESEARCH DECISION RECORD — machine-readable audit trail
+# ----------------------------------------------------------------------------
+# Every contradiction, ambiguity or gap found between the three research
+# documents, and how this application resolves it. Each entry is exported into
+# the community's run_manifest.json and mirrored as a human-readable row in the
+# workbook's R3_Decision_Log so the resolution travels with the data.
+#
+# authority order: workbook v6 > register v2.4 > plan v3.8
+#   The workbook is the destination and carries the live vocabularies;
+#   the register defines the fields; the plan explains why they exist.
+#   Where the plan pre-dates a workbook change, the workbook wins.
+# ============================================================================
+decision_record_version: "1.0.0"
+authority_order: [Stage_1_Documentary_Coding_Workbook_v6, WEB_SEARCH_FIELD_REGISTER_v2_4, THE_SIMPLIFIED_PLAN_v3_8]
+
+decisions:
+
+  - id: DCR-D001
+    issue: Practice code field names differ between the plan and the workbook.
+    evidence:
+      - "THE_SIMPLIFIED_PLAN_v3.8 §3.10 table 45 names them pc_rainwater, pc_swales, ... pc_restoration."
+      - "Stage_1_Documentary_Coding_Workbook_v6 O2_Practice_Matrix columns C-O are pc01_rainwater ... pc13_restoration."
+      - "Register v2.4 Block F uses the workbook's numbered form."
+    resolution: >-
+      Use the workbook's numbered names as canonical. The plan's unnumbered form is retained as
+      `plan_alias` in config/field_schema.yaml so a reader of the plan can still find the field.
+    affects: [config/field_schema.yaml, O2_Practice_Matrix, O2b_Practice_Evidence]
+    risk_if_wrong: A renamed column would not paste into the workbook.
+
+  - id: DCR-D002
+    issue: size_class_documentary and the SMALL/MEDIUM/LARGE measurement radii still appear in the plan.
+    evidence:
+      - "Plan v3.4 tables give SMALL/MEDIUM/LARGE classes with 100/150/200 m radii."
+      - "Plan v3.6 replaced the circle with a hand-drawn polygon; register v2.3 retired size_class_documentary."
+      - "Workbook v6 Reference_Codes replaces the size-class block with the reference-circle block, computed from the polygon."
+    resolution: >-
+      Never code a size class and never emit size_class_documentary. The reference circle is a
+      workbook formula driven by the researcher's polygon area. Both names are on the
+      satellite_only_quantities blocklist, so an attempt to write either is a hard validation failure.
+    affects: [config/field_schema.yaml, exporter, validator]
+
+  - id: DCR-D003
+    issue: The workbook holds the same quantity in two columns — e3_population_value (O1!N) and population_value (O1!Q).
+    evidence:
+      - "Register Block B6 maps e3_population_value to O1 column N; Block E1 maps population_value to O1 column Q."
+      - "Both are defined as permanent residents only."
+    resolution: >-
+      One claim, written to both columns, with the same source ids. The duplication is recorded in
+      the field change log so a later reader does not read two columns as two independent findings.
+    affects: [exporter]
+
+  - id: DCR-D004
+    issue: Who is the coder when the coding was done by software?
+    evidence:
+      - "O1!BF coder_id, O1!BG coding_date, O3!T, O3!U, O2!P, O2!Q, O2b!K, O6, O7, O11 all carry coder_id."
+      - "Workbook README treats coder_id as a human for the reliability machinery in O4/R2."
+    resolution: >-
+      The application writes coder_id as an explicit machine identity, `DCR/<app_version>` by default
+      or whatever the researcher supplies at run start, and coding_date as the export date. Leaving it
+      blank would falsely suggest a human read the sources. double_coded (O1!BH) and second_coder_id
+      (O1!BI) are never written by the application: the double-coding exercise is a human one and the
+      reliability statistics in O4 must not be computed against a machine pass.
+    affects: [exporter]
+    note: An automated pass is a first coding, not a second coder. It does not satisfy the >=20% double-coding subsample.
+
+  - id: DCR-D005
+    issue: coordinate_agreement cannot be assessed when the researcher supplies no coordinates.
+    evidence:
+      - "Dropdown at O1!H allows only: agrees / differs / no published location."
+      - "`no published location` describes the SOURCES, not the researcher's own coordinate holdings."
+    resolution: >-
+      When no researcher latitude/longitude is supplied, the field is left EMPTY and a review-queue
+      item is raised. Writing `no published location` would misreport a missing researcher input as a
+      documentary finding. When coordinates ARE supplied, agreement is computed against the published
+      location and `differs` is written whenever the separation exceeds 2 km, with the distance in notes.
+    affects: [evidence/extractors, exporter, review queue]
+    parameters: {agreement_radius_km: 2.0}
+
+  - id: DCR-D006
+    issue: Managed area's role changed between plan versions.
+    evidence:
+      - "Plan v3.4 (§3 variable register) says managed_area_ha assigns the size class that sets the measurement radius."
+      - "Plan v3.6/§7.1a and register v2.3+ make the drawn polygon the geometry and the documentary figure the CHECK."
+    resolution: >-
+      Documentary managed area is coded as a stated figure with a band and a basis, and never used to
+      derive geometry. The application never writes polygon_area_ha, never estimates area from imagery,
+      a map view or a site plan it has not read a figure off, and never derives the documentary figure
+      from the polygon.
+    affects: [evidence/area, exporter, validator]
+
+  - id: DCR-D007
+    issue: Equal-rank disagreement on a year has a stated rule; unequal-rank disagreement has one too, but neither is coded anywhere.
+    evidence:
+      - "Register 9.2: resolve by evidence rank, not recency; equal rank -> take the EARLIER year and let the gap become the bounds; record the disagreement whatever you do."
+    resolution: >-
+      Implemented deterministically in the conflict engine. Unequal rank: the better rank wins and the
+      loser is preserved in onset_conflicting_sources. Equal rank: earliest year becomes the point
+      value, min/max become onset_lower_bound/onset_upper_bound. Both paths always write
+      onset_conflicting_sources and an O5_Disagreement_Log row. Nothing is ever silently dropped.
+    affects: [evidence/conflict, evidence/onset, O5_Disagreement_Log]
+
+  - id: DCR-D008
+    issue: Register 9.4 distinguishes a value that CHANGED over time from a value that CONFLICTS.
+    evidence:
+      - '"A 2012 snapshot saying we farm 4 hectares and a 2024 page saying 15 hectares are not in conflict — the community grew."'
+    resolution: >-
+      Every quantitative claim carries the year the figure REFERS TO, separately from the publication
+      date and the retrieval date. Two claims whose reference years differ by more than three years and
+      whose values move monotonically are recorded as a time series, not as a conflict. The band
+      (lower/upper) is taken from claims sharing the most recent reference year; earlier figures are
+      kept in the evidence register and summarised in documentary_area_note.
+    affects: [evidence/conflict, evidence/area]
+    parameters: {growth_gap_years: 3}
+
+  - id: DCR-D009
+    issue: What makes crawl_truncated = yes for an automated crawler?
+    evidence:
+      - "Register I12: did the run stop before the protocol was finished?"
+      - "The register frames truncation as a model tool-budget limit, which does not apply here."
+    resolution: >-
+      crawl_truncated = yes when ANY of: a configured page/document budget was exhausted while a
+      frontier still held unvisited in-scope URLs; a stage was not completed; a supplied address ended
+      at `not attempted` or `partial`; an archive or academic endpoint was unreachable so its stage
+      could not be completed; or the run was interrupted and resumed without finishing. Each cause is
+      named in stages_completed, so the reason is recoverable rather than a bare yes.
+    affects: [runner, exporter]
+
+  - id: DCR-D010
+    issue: Directory listings are usually copies, but occasionally carry independent editorial content.
+    evidence:
+      - "Register: a directory listing whose text was submitted from the website is the SAME group."
+      - "Reference_Codes: `Self-submitted, so usually the SAME independence group as the website.`"
+    resolution: >-
+      A directory listing defaults to the community's own independence group. It is promoted to its own
+      group only when text-overlap analysis shows low similarity to the community's own material AND the
+      listing carries an editorial byline, a visit report, an assessment, or verification metadata. The
+      promotion decision and its similarity score are stored with the source so it can be audited.
+    affects: [evidence/independence]
+    parameters: {promotion_max_jaccard: 0.35}
+
+  - id: DCR-D011
+    issue: The register's stage list assumes a human-operated model; this application must map stages onto code.
+    resolution: >-
+      Stages 0-9 are implemented as named, checkpointed pipeline stages with their own status
+      (complete / partial / not_reached / blocked) recorded per run. stages_completed is generated
+      from those statuses, never asserted.
+    affects: [runner]
+
+  - id: DCR-D012
+    issue: Blocked social platforms.
+    evidence:
+      - "Register 2C/2D and rule 12: report BLOCKED, never describe what is probably there."
+      - "Reference_Codes crawl status vocabulary includes `blocked`."
+    resolution: >-
+      Facebook, Instagram and any platform that refuses automated reading are attempted once per run
+      over ordinary HTTP (and once via the browser layer if it is available), then recorded with
+      crawl_status = blocked and an error row naming the HTTP status or login wall. No claim may cite a
+      blocked source. Archived snapshots of the same address ARE attempted, because a page that refuses
+      today may have been archived when it did not.
+    affects: [crawl/platforms, discovery/wayback, validator]
+
+  - id: DCR-D013
+    issue: Academic records can be found without being verifiable, and a fabricated citation is the worst failure available.
+    evidence:
+      - "Register rule 11; workbook O6 verified_resolves is mandatory for every S1 and S2 source."
+    resolution: >-
+      An academic or institutional record may support a claim only after verified_resolves = yes, which
+      requires that the DOI or repository record was independently retrieved in this run and returned a
+      record whose title matches the one recorded. Unverified records are written to O6 with
+      verified_resolves = no and are barred from supporting any workbook value; they go to the review
+      queue instead. The application never constructs a DOI or a repository URL.
+    affects: [discovery/academic, evidence/claims, validator]
+
+  - id: DCR-D014
+    issue: founding_decade has no workbook formula but is defined as derived from date_formal_founding.
+    resolution: Computed in the application as floor(year/10)*10 and written as data, with the source ids of the founding-date claim.
+    affects: [exporter]
+
+  - id: DCR-D015
+    issue: An LLM extraction layer could become an unattributable source.
+    evidence:
+      - "Register rule 1, 2, 9; the brief's §65."
+    resolution: >-
+      The LLM layer may only classify and map text that is already stored locally, and every field it
+      proposes must carry an exact supporting passage that is then verified, character-for-character,
+      to occur in the stored extracted text of the cited document. A proposal whose passage does not
+      verify is discarded and logged. Model name, prompt version and timestamp are stored on every
+      LLM-derived claim. With no API key the pipeline runs deterministically and enlarges the review
+      queue instead of failing.
+    affects: [evidence/llm, validator]
+
+  - id: DCR-D016
+    issue: The register logs academic and grey searches (I6, I7) as prose; the workbook wants one O7 row per database.
+    evidence: ["Register A.3: I6 and I7 are unpacked into rows, one per database, including those that returned nothing."]
+    resolution: >-
+      Every consultation is a row: database, type, search strings, language, hits, full texts opened,
+      abstracts only, result, date. `unreachable` is a distinct result from `none found`; the
+      application never records an unreachable database as zero hits. O1!BE negative_consultations is
+      generated from those rows so the two can never diverge.
+    affects: [exporter, discovery/academic, discovery/grey]
+
+  - id: DCR-D017
+    issue: Which pages count towards pages_opened_count?
+    resolution: >-
+      Distinct normalised URLs for which a fetch was attempted AND a response body was received,
+      including those that yielded nothing. Redirect hops, robots-denied URLs and never-attempted
+      frontier entries are excluded from the count and recorded separately in the crawl audit.
+    affects: [exporter]
+
+  - id: DCR-D018
+    issue: A document mirrored on several sites is one file but several sources.
+    evidence: ["Brief §35."]
+    resolution: >-
+      Content is stored once under its sha256. The document record carries a one-to-many table of
+      (source_id, original_url, retrieval_date, discovery_stage) rows, so every mirror keeps its own
+      provenance and its own independence group while the bytes are stored once.
+    affects: [db/schema, extract/dispatch]
+
+  - id: DCR-D019
+    issue: Practice coding level cannot be read off a keyword match.
+    evidence: ["Register Block F; workbook Reference_Codes coding levels."]
+    resolution: >-
+      Level is assigned by rule from the evidence, never by the keyword alone.
+      evidenced = at least one hit in an external class (S1, S2, S6) or in dated visual documentation
+      WITH a specific statement; documented = community-class hit (S4, S5, S7) that is specific AND
+      recurs in sources at least two years apart; claimed = community-class hit without specificity or
+      continuity; explicitly absent = a denial marker in the same sentence as the practice term;
+      not mentioned = no hit. A photograph never sets a level on its own (register rule 12).
+    affects: [evidence/practices]
+
+  - id: DCR-D020
+    issue: The workbook's O10 documentary columns are formulas reading O1; writing them would break the link.
+    evidence: ["Workbook v6 O10!M:R are INDEX/MATCH formulas against O1; README: `Cells that fill themselves`."]
+    resolution: >-
+      The exporter writes the six documentary area fields to O1 only and never touches O10!C:R or any
+      other formula cell. A pre-write formula audit refuses to write into any cell whose template value
+      begins with `=`, and the run fails loudly rather than silently overwriting a formula.
+    affects: [export/workbook]
+
+  - id: DCR-D021
+    issue: The register never says what to do with a community's own published elevation or rainfall figure.
+    evidence: ["Register A.0 exception: record as context in Block H, never substitute for the pipeline value."]
+    resolution: >-
+      Such figures are stored as evidence and claims with field name prefixed `context_`, surfaced in
+      notable_context / notes with their provenance, and blocked from ever being written to a
+      satellite-route field. They never reach the workbook as a numeric context column because none
+      exists; they reach it as text with a source id.
+    affects: [evidence/extractors, exporter]
+
+  - id: DCR-D023
+    issue: Where should the first coded community row go, given the template's worked example?
+    evidence:
+      - "Workbook README: row 2 of most sheets is an italic worked example — DELETE IT before you begin."
+      - "O1!U, O3!I and O10!H:T carry formulas from row 3 down; row 2 holds the example's static values."
+      - "Cohort_Tracker counts O3_Onset_Register!Q3:Q500, i.e. it expects data from row 3."
+      - "README's progress counters read COUNTA(A2:A500)-1, subtracting the example row."
+    resolution: >-
+      Row 2 is EMPTIED, not deleted, and coded rows start at row 3. Deleting the row would shift
+      every formula in the sheet; writing into it would give the first community the example's
+      static polygon area, because row 2 is the one row where the formula columns hold constants.
+      Emptying it and starting at row 3 keeps every formula intact, matches Cohort_Tracker's own
+      range, and leaves the README's counters reading exactly as the README says they will.
+    affects: [export/workbook, workbook_audit]
+
+  - id: DCR-D024
+    issue: Values are stored as text in the database but some workbook columns are calculated on.
+    resolution: >-
+      The exporter converts a value to a number when the field schema types it as float, integer
+      or year, and leaves it as text otherwise. A managed area written as text is silently
+      excluded from every calculation in O4_Reliability_Report, which would understate the
+      reliability statistics rather than fail visibly. Text that cannot be converted — "NOT FOUND",
+      "n/a" — is written as it stands.
+    affects: [export/workbook]
+
+  - id: DCR-D025
+    issue: A dead or blocked host was costing dozens of slow probes and stalling the run.
+    resolution: >-
+      After five consecutive connection failures a host is recorded as unreachable for the rest of
+      the run and further requests to it are short-circuited without network I/O. The reason is
+      logged once and every skipped URL still gets an error row, so an unreachable host remains
+      visible as a recorded limitation rather than becoming a silent gap.
+    affects: [net/fetcher]
+    parameters: {host_failure_threshold: 5}
+
+  - id: DCR-D026
+    issue: Which discovered addresses may be adopted as belonging to this community?
+    evidence:
+      - "Register Stage 1: a wrong attribution contaminates every field that follows."
+      - "Register 0.2: follow social icons in the header and FOOTER — the community's own accounts."
+    resolution: >-
+      An address is adopted only when the community's name appears in the host or in the URL path,
+      or when the address is on a domain already established as the community's, or when it is a
+      PLATFORM PROFILE (social, directory, crowdfunding, hosting, former website) linked from the
+      navigation or footer of a confirmed page. A footer also carries funders, partners and the
+      web designer, so being linked from one is not on its own sufficient. Every rejection is
+      written to the discovery log with its reason, so a narrow search is distinguishable from a
+      thin result.
+    affects: [runner, crawl/crawler]
+
+  - id: DCR-D027
+    issue: Relative links inside an archived snapshot resolve against the archive's own host.
+    resolution: >-
+      When a page is recognised as an archive snapshot, its links are resolved against the ORIGINAL
+      URL and followed as snapshots of the same date. Resolving them against the archive host would
+      invent addresses like archive.org/about and attribute them to the community.
+    affects: [crawl/crawler]
+
+  - id: DCR-D022
+    issue: Nothing in the research documents governs how an automated run should treat the two pilot communities.
+    resolution: >-
+      They are software test cases only. Fixture-derived runs are stamped `provenance_mode: FIXTURE` on
+      the community row, the completion report and every manifest, and their site_id is prefixed TEST-
+      so fixture output can never be mistaken for coded research data.
+    affects: [runner, exporter, tests]
+
+  # ---------------------------------------------------------------------
+  # Added while implementing selective image extraction, pause/resume and
+  # runtime estimation. Each of these was an ambiguity the research
+  # documents do not settle, resolved deliberately rather than by default.
+  # ---------------------------------------------------------------------
+  - id: DCR-D028
+    issue: >-
+      The register requires research-relevant images to be preserved but says nothing about
+      what to do with the ones that are not. Downloading everything wastes hours; discarding
+      the rest silently loses the gallery captions and file names the register itself names
+      as a dating source ("Image captions and file names on gallery pages, which often carry
+      DATES that no text on the site provides").
+    resolution: >-
+      Every image candidate is recorded with its lightweight metadata — caption, alt text,
+      file name, surrounding text, page heading, declared dimensions — whether or not it is
+      downloaded. Only HIGH and MEDIUM retrieval bands are fetched. The ledger is exported as
+      X3b_Image_Triage and image_candidates.csv, so a reader can see what was passed over and
+      why instead of having to trust that nothing was missed.
+    affects: [images/triage, crawl/crawler, export/workbook, export/manifests]
+
+  - id: DCR-D029
+    issue: >-
+      Retrieval priority for an image could be confused with the strength of the evidence it
+      offers, in the same way the register warns about retrieval priority and onset evidence
+      rank (rule: they are separate concepts and never touch).
+    resolution: >-
+      The two are kept strictly apart. `priority` (HIGH/MEDIUM/LOW/DUPLICATE) decides only
+      what is fetched first. What an image may evidence stays in `visual_evidence_allowed`,
+      and what would license a documentary claim stays in `documentary_text_support`. A HIGH
+      priority never implies a coded value, and register rule 12 is unchanged: a photograph
+      is not a practice code.
+    affects: [images/triage, images/classify]
+
+  - id: DCR-D030
+    issue: >-
+      The research documents treat a stage as either done or not done. They do not describe a
+      run that stopped part way through because the laptop lost its network or the researcher
+      needed the machine — and a stage recorded as complete when it was never begun would put
+      NOT FOUND into the workbook for sources nobody looked at.
+    resolution: >-
+      An interruption is an operational state, never a research finding. A run stopped early
+      is recorded as PAUSED_MANUAL or PAUSED_NETWORK, is marked crawl_truncated, and every
+      stage it never reached records that it was never begun. The completion report carries
+      the full interruption account. Nothing an interrupted run failed to reach may be read
+      as searched-and-absent.
+    affects: [control, supervisor, runner, export/report]
+
+  - id: DCR-D031
+    issue: >-
+      A source unreachable during a network outage is indistinguishable, in the stored record,
+      from a source that is genuinely dead — and the crawler was recording the first as the
+      second.
+    resolution: >-
+      While the machine is offline the circuit breaker is suspended and per-host failures are
+      not counted, so an outage is never written down as a property of a live site. Circuits
+      opened during an outage are cleared when the connection returns and those hosts are
+      attempted again. A single refusing server, by contrast, remains an ordinary research
+      fact and is recorded as unreachable as before.
+    affects: [net/fetcher, net/connectivity, supervisor]
+
+  - id: DCR-D032
+    issue: >-
+      Evidence and claims were written afresh on every pass, so reprocessing a page — after a
+      pause, a retry, or a second reconciliation — recorded the same sentence again. Nothing
+      in the research documents licenses counting one sentence twice.
+    resolution: >-
+      Evidence and claims carry a dedupe key: one sentence, in one place, in one artefact.
+      The same sentence found on a DIFFERENT page remains separate evidence, because that is
+      corroboration and collapsing it would weaken the independence counts. Two different
+      extractors reaching the same value remain two claims, for the same reason.
+    affects: [evidence/model, resolve]
