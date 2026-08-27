@@ -306,3 +306,166 @@ def test_the_archive_was_not_hit_by_every_community_at_once(run):
     for host, row in hosts.items():
         if row["concurrency"]:
             assert row["concurrency"] <= 4, f"{host} was allowed {row['concurrency']}"
+
+
+# ===========================================================================
+# §108 — the final scientific audit, as tests rather than as a checklist
+#
+# Nine things the brief says the system must NOT have done. A checklist a
+# person ticks is a checklist that drifts; these fail the build.
+# ===========================================================================
+def _community_databases(run) -> list[tuple[str, str]]:
+    import sqlite3
+
+    out = []
+    for job in run["store"].jobs(run["summary"]["run_id"]):
+        if not job.output_dir:
+            continue
+        path = Path(job.output_dir) / "research.sqlite3"
+        if path.exists():
+            out.append((job.site_id, str(path)))
+    return out
+
+
+def _query(path: str, sql: str, params=()) -> list:
+    import sqlite3
+
+    connection = sqlite3.connect(path)
+    connection.row_factory = sqlite3.Row
+    try:
+        return list(connection.execute(sql, params))
+    finally:
+        connection.close()
+
+
+def test_audit_no_satellite_quantity_was_coded_documentarily(run):
+    """§89, §90: the crawler is documentary. Imagery proves nothing here."""
+    from dcr.config import load_settings
+
+    forbidden = {str(q).lower() for q in
+                 load_settings(ROOT).schema.get("satellite_only_quantities", [])}
+    assert forbidden, "the schema no longer lists the satellite-only quantities"
+    for site_id, path in _community_databases(run):
+        coded = {str(row["field_name"]).lower() for row in
+                 _query(path, "SELECT field_name FROM field_values "
+                              "WHERE status = 'coded'")}
+        assert not (coded & forbidden), (
+            f"{site_id} coded a satellite-only quantity documentarily: "
+            f"{coded & forbidden}")
+
+
+def test_audit_no_polygon_or_managed_area_was_inferred_from_imagery(run):
+    """§90: the researcher controls polygon tracing, separately."""
+    for site_id, path in _community_databases(run):
+        rows = _query(path, "SELECT field_name, method FROM field_values "
+                            "WHERE field_name LIKE 'polygon%' AND status = 'coded'")
+        assert not rows, f"{site_id} coded a polygon field: {[dict(r) for r in rows]}"
+
+
+def test_audit_no_publication_date_became_an_intervention_date(run):
+    """§24, §108. Enforced by the role vocabulary, checked here."""
+    from dcr.evidence import roles
+
+    for site_id, path in _community_databases(run):
+        rows = _query(path,
+                      "SELECT claim_id, field_name, semantic_role FROM claims "
+                      "WHERE field_name IN ('date_intervention_onset', "
+                      "'date_formal_founding', 'date_land_acquisition', "
+                      "'date_first_residence')")
+        for row in rows:
+            assert row["semantic_role"] not in roles.SOURCE_ROLES, (
+                f"{site_id}: claim {row['claim_id']} put a "
+                f"{row['semantic_role']} date into {row['field_name']}")
+
+
+def test_audit_no_visitor_count_reached_the_population_field(run):
+    """§22, §108."""
+    for site_id, path in _community_databases(run):
+        rows = _query(path,
+                      "SELECT claim_id, semantic_role FROM claims "
+                      "WHERE field_name IN ('e3_population_value', 'population_value')")
+        for row in rows:
+            if row["semantic_role"]:
+                assert row["semantic_role"] == "resident", (
+                    f"{site_id}: a {row['semantic_role']} count is standing in "
+                    f"the population field (claim {row['claim_id']})")
+
+
+def test_audit_property_area_is_not_managed_area(run):
+    """§23, §108. Confusing them moves a community two size classes."""
+    for site_id, path in _community_databases(run):
+        rows = _query(path, "SELECT claim_id, semantic_role FROM claims "
+                            "WHERE field_name = 'managed_area_ha'")
+        for row in rows:
+            if row["semantic_role"]:
+                assert row["semantic_role"] != "total_holding", (
+                    f"{site_id}: the whole holding was coded as managed area "
+                    f"(claim {row['claim_id']})")
+
+
+def test_audit_no_academic_source_was_fabricated(run):
+    """§29, §86, §108. An unverified record may be stored, never coded."""
+    for site_id, path in _community_databases(run):
+        tables = {row["name"] for row in
+                  _query(path, "SELECT name FROM sqlite_master WHERE type='table'")}
+        if "academic_records" not in tables:
+            continue
+        unverified = _query(
+            path, "SELECT record_id FROM academic_records "
+                  "WHERE COALESCE(verified_resolves, 0) = 0")
+        for row in unverified:
+            supported = _query(
+                path, "SELECT claim_id FROM claims WHERE source_id = ?",
+                (row["record_id"],))
+            assert not supported, (
+                f"{site_id}: unverified academic record {row['record_id']} "
+                "supports a claim")
+
+
+def test_audit_not_mentioned_was_never_turned_into_absent(run):
+    """§59, §108: silence is not absence."""
+    for site_id, path in _community_databases(run):
+        rows = _query(path, "SELECT field_name, value, rationale FROM field_values "
+                            "WHERE status = 'coded' AND field_name LIKE 'pc%'")
+        for row in rows:
+            if str(row["value"]).strip().lower() == "explicitly absent":
+                assert "not mentioned" not in str(row["rationale"] or "").lower(), (
+                    f"{site_id}: {row['field_name']} was coded absent from silence")
+
+
+def test_audit_copied_sources_are_not_counted_as_independent(run):
+    """§28, §108: ten copied pages are not ten independent sources."""
+    for site_id, path in _community_databases(run):
+        sources = _query(path, "SELECT source_id, independence_group FROM sources")
+        assert all(row["independence_group"] for row in sources), (
+            f"{site_id}: a source has no independence group, so corroboration "
+            "cannot be counted correctly")
+        groups = {row["independence_group"] for row in sources}
+        assert len(groups) <= len(sources)
+
+
+def test_audit_every_coded_value_traces_to_evidence_or_a_named_rule(run):
+    """§55, §58, §108: nothing reaches a cell without something behind it."""
+    rule_methods = {
+        "rule", "derived", "researcher_input", "crawl_audit", "run_state",
+        "search_log", "independence", "activity_rules", "practice_rules",
+        "onset_engine", "extraction", "image_evidence", "grey_literature",
+    }
+    for site_id, path in _community_databases(run):
+        rows = _query(path, "SELECT field_name, method, claim_ids, source_ids "
+                            "FROM field_values WHERE status = 'coded'")
+        orphans = [dict(r) for r in rows
+                   if not r["claim_ids"] and not r["source_ids"]
+                   and r["method"] not in rule_methods]
+        assert not orphans, f"{site_id}: {orphans[:3]}"
+
+
+def test_audit_the_raw_wording_survives_beside_every_normalised_value(run):
+    """§58: never destroy the original."""
+    for site_id, path in _community_databases(run):
+        rows = _query(path, "SELECT claim_id, value, original_value FROM claims "
+                            "WHERE value_type IN ('float', 'integer')")
+        for row in rows:
+            assert row["original_value"], (
+                f"{site_id}: claim {row['claim_id']} kept a number without the "
+                "wording it came from")

@@ -1,15 +1,28 @@
-# Deep Documentary Research Crawler
+# Parallel Documentary Research Crawler
 
-**Stage 1 documentary coding for an academic study of intentional sustainable communities.**
+**Stage 1 documentary coding for an academic study of intentional sustainable
+communities.**
 
 This program finds, retrieves, preserves and structures the documentary evidence that
-exists on the open web about one community, and writes it into a copy of
-`Stage_1_Documentary_Coding_Workbook_v6` with every value traceable to the sentence
+exists on the open web about a set of communities — one, twenty, two hundred and
+twelve — and writes each into its own copy of
+`Stage_1_Documentary_Coding_Workbook_v6`, with every value traceable to the sentence
 that supports it.
 
 It records **what published sources say**. It does not evaluate ecological performance,
 never infers a practice from a photograph, and never estimates an area or a polygon —
 those belong to the satellite pipeline and to the researcher's own tracing procedure.
+
+Two things distinguish this version from the one before it:
+
+**Communities are researched in parallel**, each in its own process with its own
+database, so a run of two hundred does not need anyone at the keyboard between
+them and a failure in one cannot reach the others.
+
+**Nothing stops at a clock.** A community runs while it is still producing
+evidence and stops when it stops producing. The previous version's thirty-minute
+cap is gone; on the stress fixture, removing it recovers **4.4× the evidence**
+(94 → 412 items) and still terminates.
 
 ---
 
@@ -28,157 +41,262 @@ those belong to the satellite pipeline and to the researcher's own tracing proce
 
 3. **Open `RUN.py` and press the green ▶ button.** (Or right-click the file → Run.)
 
-4. **Answer the questions.** They are:
+4. **Say how the communities are coming in.**
 
    ```
-   Community name .......... EcoVillage de Pourgues
-   Latitude ................ 43.0561        (optional — press Enter to skip)
-   Longitude ............... 1.8342         (optional)
-   Country ................. France         (optional, but it improves the search a lot)
-   URL 1 ................... https://www.pourgues.org
-   URL 2 ................... https://www.facebook.com/pourgues
-   URL 3 ................... https://ecovillage.org/projects/pourgues
-   URL 4 ................... (press Enter on an empty line to finish)
-   Run mode ................ FULL           (press Enter for the default)
+   How will you enter the communities?
+     1. type them in            — fine for a handful
+     2. read them from a file   — CSV or JSON, the usual way for a cohort
    ```
 
-   Paste **every** address you have — the current site, an old domain, Facebook,
-   Instagram, YouTube, a directory listing, an academic page. Do not try to decide which
-   is primary; the program works that out from what the pages contain. If you have no
-   addresses at all, type `NONE` and it will go looking.
+   Nobody types six hundred URLs at a prompt without a mistake, so for a cohort
+   use a file. An example is written for you the first time:
 
-5. **Read the estimate.** Before the expensive part, the program looks briefly at
-   each address — robots.txt, the sitemaps it names, one home page — and says how
-   long the job is likely to take:
+   ```csv
+   name,country,latitude,longitude,urls
+   Tamera,Portugal,37.7167,-8.5333,https://www.tamera.org; https://www.facebook.com/tamera
+   EcoVillage de Pourgues,France,43.0561,1.8342,https://www.pourgues.org
+   Findhorn,Scotland,,,https://www.findhorn.org; https://en.wikipedia.org/wiki/Findhorn_Ecovillage
+   ```
+
+   Only `name` is required. URLs may be one column separated by `;` or `|`, or
+   several columns called `url1`, `url2`, `url3` — whichever shape your
+   spreadsheet already is. Paste **every** address you have: the current site, an
+   old domain, Facebook, YouTube, a directory listing, an academic page. Do not
+   try to decide which is primary; the program works that out from what the pages
+   contain.
+
+   Typing them in asks the same questions one community at a time:
 
    ```
+   Number of communities: 3
+
+   --- Community 1 ------------------------------------------------
+     Name ...................... EcoVillage de Pourgues
+     Latitude .................. 43.0561      (optional)
+     Longitude ................. 1.8342       (optional)
+     Country ................... France       (optional, improves the search a lot)
+       URL 1 ................... https://www.pourgues.org
+       URL 2 ................... (Enter on an empty line to finish)
+   ```
+
+5. **Look at the queue and the estimate.**
+
+   ```
+   THE QUEUE
+   ID    Community                URLs  Estimated workload   Status
+   ----- ------------------------ ----  -------------------- --------
+   C001  Tamera                      2  42–160 min           QUEUED
+   C002  EcoVillage de Pourgues      1  16–63 min            QUEUED
+   C003  Findhorn                    2  19–74 min            QUEUED
+
    ESTIMATED WORKLOAD  (an estimate, not a guarantee)
-   Estimated active processing time: 40-70 min
-   Estimated wall-clock duration:    50-140 min
-
-   Looking briefly at each address to size the job...
-
-   Initial estimate:  40-70 min active
-   Updated estimate:  85-125 min active (95-180 min wall-clock)
-   Why it changed:    the sitemaps list 612 pages where 75 were assumed
-
-   Start the crawl now? (yes / no) [yes]:
+     Communities .................. 3
+     Total active processing ...... 01:17:00–04:57:00
+     Expected wall-clock .......... 00:42:00–01:52:00
+     Effective workers ............ 8–16 (≈8.2× a single worker, not 16×)
    ```
 
-   *Active processing time* is what the machine spends working. *Wall-clock duration*
-   also covers politeness delays, rate limits, slow archives, retries and any time
-   spent paused. Neither is a promise.
+   The largest and most promising communities are ordered first, so the run does
+   not end with one enormous community holding fifteen idle workers. Waiting
+   raises a community's priority, so the small ones are never left behind.
 
-6. **Wait.** Progress is printed as it goes:
+6. **Press START, and go and do something else.** The display stays in one
+   place and tells you where things are:
 
    ```
-   [Stage 2/9] Enumerate every page on every address
-   [SITEMAP] 42 URLs from https://www.pourgues.org/sitemap.xml
-   [DOC] PDF stored: rapport-annuel-2019.pdf (parsed/extracted, 1.2 MB)
-   [IMG] research-relevant site plan kept: IC001-IMG0007_site_plan_2016_IC001-S001.jpg
-   [BLOCKED] Facebook (IC001-S002) — HTTP 403: login wall
-   [CONFLICT] date_intervention_onset: 2016 vs 2019
+   ================================================================================
+     37 / 212 communities complete
+     [################............................................] 17%
+   --------------------------------------------------------------------------------
+     running 11   queued 164   paused 4   FAILED 1
+     runtime 03:24:18   remaining 01:45:00–03:10:00   workers 11 / 11 (max 16)
+     network CONNECTED   evidence 18,422   documents 912   images 337   workbooks 37
+   --------------------------------------------------------------------------------
+     ID    Community            Stage   Progress     Doing
+     C044  Sieben Linden        4/9     ####......   archived versions
+     C051  Cloughjordan         2/9     ##........   enumerate every page
+     ...
+   ================================================================================
    ```
 
-7. **Read the summary**, then open the workbook it names.
+   From a second terminal, at any point:
+
+   ```
+   dcr pause          stop everything at the next safe boundary
+   dcr resume         carry on
+   dcr cancel         end the run, keeping everything already found
+   dcr pause C007     pause ONE community; its worker goes to the next in the queue
+   dcr status         where the run has got to
+   ```
+
+7. **Read the summary**, then open the workbooks it names. Each community has its
+   own directory with its own workbook in `09_final/`; the run's own record —
+   `global_summary.md`, `community_status_table.csv`, `global_error_log.csv` — sits
+   beside them.
+
+To research a single community in one process, the way earlier versions did:
+`python RUN.py --single`, or `python RUN.py --name "Tamera" --url https://tamera.org`.
 
 ---
 
-## How long it takes, and what it does when time runs out
+## How many communities run at once
 
-A run has a **hard active-processing budget**, thirty minutes by default. It is
-not a timeout. A timeout would stop the work and leave you with nothing; this
-reserves the part you actually need:
+Between one and sixteen, and the number is **measured rather than configured**.
 
-```
-|<---------------- 30 minutes of active processing ---------------->|
-|<------------ retrieval ------------>|<- wind-down ->|<- finalise ->|
-                                      25 min          27 min      30 min
-```
+The governor starts at eight, adds a worker when every worker is busy and the
+machine is idle, and cuts immediately under memory pressure — a killed worker
+costs a community, while a slow run costs minutes. Above all it watches
+throughput per worker-minute: if a higher count completes less per worker-minute
+than a lower one, it lowers its own ceiling and does not go looking again.
 
-- **At 25 minutes** no new expensive work starts. Anything already in flight
-  finishes cleanly.
-- **At 27 minutes** retrieval stops for good and the reserved time goes to
-  reconciliation, the workbook, its verification and the manifests.
-- **At 30 minutes** that work is already done.
+On this machine (4 logical CPUs, 15.7 GB RAM), sixteen identical communities with
+150 ms of latency per request standing in for a real server:
 
-**Paused time is not spent time.** If you press PAUSE, or the network drops, the
-active clock stops. A three-hour outage costs the research budget nothing. And a
-resumed run continues *the same* thirty minutes rather than starting a fresh one,
-so an interrupted community cannot quietly consume hours across four sessions.
+| Workers | Wall-clock | Speed-up | Efficiency | Actually used |
+|--------:|-----------:|---------:|-----------:|--------------:|
+| 1 | 441.5 s | 1.00× | 100 % | 1 |
+| 4 | 142.5 s | 3.10× | 77 % | 4 |
+| 8 | 109.5 s | 4.03× | 50 % | 8 |
+| 16 | 103.9 s | 4.25× | 27 % | **9** |
 
-### Complete is not exhaustive
+**4.25×, not 16×.** Asked for sixteen workers on a four-core machine, the
+governor ran nine. Parallel speed-up is never linear, and the estimate you are
+shown before pressing START does not pretend otherwise.
 
-Within half an hour a rich site cannot be followed to the end of every path, and
-the program does not pretend otherwise:
+Measure your own machine with `python tools/benchmark.py`; it prints the two
+coefficients to paste into `config/config.yaml` so the estimate reflects your
+hardware.
+
+---
+
+## How long a community takes, and what decides it
+
+**Not a clock.** A community runs while it is still producing evidence, and
+stops when it stops producing.
+
+The version before this one had a thirty-minute active-processing cap divided
+into fixed per-stage shares, and it truncated each stage at its share whatever
+that stage was finding. A community whose archive was handing over a dated
+project report every forty seconds was cut off at four minutes by the same rule
+as one whose archive held nothing. That is why evidence was lost, and it is what
+this version removes.
+
+### What replaces it
+
+The crawler measures what the brief actually asks it to optimise — **useful
+independent evidence per active minute**. Every find is credited once, by
+identity, and weighted by what it does for the research:
+
+| What was found | Worth |
+| --- | ---: |
+| A workbook field covered for the first time | 10 |
+| Dated onset evidence | 9 |
+| An academic record that verified | 9 |
+| A source group derived from no other | 8 |
+| Land-area evidence with a resolved semantic role | 7 |
+| An existing field corroborated from a **new** independence group | 6 |
+| A grey-literature record | 6 |
+| A practice at documented or evidenced level | 5 |
+| A document nobody has seen before, by content hash | 4 |
+| A map, site plan or dated intervention photograph | 4 |
+| An ordinary supporting passage | 1 |
+| Anything already credited | 0 |
+
+A scope — the whole run, one stage, one source, one archived domain — is asked
+to stop when its recent rate has fallen **both** below an absolute floor **and**
+below a fraction of its own best sustained rate. Judging each scope against
+*itself* is what detects diminishing returns: a source that was producing 40
+units a minute and is now producing 3 has been worked out, even though 3 is not
+nothing.
+
+Nothing here can stop a source that is still producing. The weights and the
+floors are in `config/config.yaml`, so a methodologist can change what the
+crawler considers worth its time without touching Python.
+
+### What survives from the old clock
+
+**Active seconds are still counted**, because yield is evidence *per active
+minute* and something has to count minutes. Time paused by you, or waiting for
+the network, is not active time — a three-hour outage costs the research
+nothing.
+
+**A finalisation reserve is still held back.** That is not a cap on the
+research; it is the guarantee that the research reaches a workbook.
+
+**A safety ceiling is available and off by default.** Set
+`budget.active_minutes` if you must bound an unattended overnight run. A
+community stopped by it is reported `COMPLETE_WITH_TRUNCATION`, never
+`COMPLETE`.
+
+### Complete is not exhaustive — but exhausted is not truncated
 
 | Status | What it means |
 | --- | --- |
-| `COMPLETE` | Every stage finished and nothing was cut short |
-| `COMPLETE_WITH_TRUNCATION` | A usable research record, with what was not reached stated. The clock stopped it, not the sources |
-| `COMPLETE_WITH_TRUNCATION` | Usable, with parts deliberately not reached — the report says which |
-| `REQUIRES_HUMAN_REVIEW` | Something needs a coder's judgement |
+| `COMPLETE` | Every stage ran, and retrieval ended because the community was worked out |
+| `COMPLETE_WITH_UNCERTAINTY` | The same, with quality warnings a coder should read |
+| `COMPLETE_WITH_TRUNCATION` | Usable, with parts deliberately not reached — a ceiling, a request, or a source deprioritised for low yield. The report says which |
+| `PARTIAL_BLOCKED` | This community's own addresses refused the crawler. The evidence exists and could not be reached |
+| `REQUIRES_HUMAN_REVIEW` | Something a machine must not decide |
 | `FAILED_TECHNICALLY` | No verified workbook could be produced |
 
-A run stopped by its budget is never `COMPLETE`. The completion report says how
-much of the budget was used, what remained queued, and which stages never began.
+A run the yield governor stopped is `COMPLETE`, because the protocol finished on
+the evidence rather than on a clock. Only a ceiling or your own request leaves
+work undone.
 
 ### Spending the time where the evidence is
-
-Rather than crawling every URL it can reach, the crawler spends its minutes on
-what yields evidence:
 
 - **Sources** earn more allowance while they keep yielding, and lose it when
   they stop. A source that has just produced a thesis or a restoration report
   earns *more*, because that is where the next minute belongs.
 - **Documents** are judged from their address before they are downloaded. A
-  thesis, grant report or site plan earns deep extraction; an event flyer or a
-  price list does not. A report published in three languages is read once, and
-  the other two are kept as provenance mirrors.
-- **The archive** is sampled, not enumerated. Five thousand archived URLs is one
-  site's navigation captured five thousand times; selection scores each by what
-  its path says and by how much its date is worth for onset, and takes what the
-  time affords.
-- **Images** are triaged before download, with an allowance per document that
-  scales with the document's value, and a ceiling on image work overall.
+  thesis, grant report or site plan earns deep extraction; an event flyer does
+  not. A report published in three languages is read once; the other two share
+  its independence group, so they cannot corroborate it.
+- **The archive** is retrieved in three tiers. One request lists every URL a
+  domain ever had — five thousand of them — and enumeration is not retrieval.
+  Tier 1 is deleted documents and historically named pages and is fetched
+  whatever the yield has been; tiers 2 and 3 are entered only while the archive
+  is still repaying the time, and a tier not entered is recorded as
+  `TRUNCATED_LOW_YIELD` rather than passed off as exhaustive.
+- **Images** are triaged before download, and a community's allowance is
+  **earned**: one whose retained images are mostly site plans, land-use figures
+  and dated intervention photographs gets up to three times the base, while one
+  producing decoration keeps the base.
 
-`completion_report.md` ends with a measured breakdown — how many seconds went to
-HTTP, PDF parsing, image work, reconciliation and export — so a slow run can be
-diagnosed rather than guessed at.
+`completion_report.md` ends with a measured breakdown — where the seconds went,
+what the yield rate was, and the shape of the curve the stopping decision
+reacted to.
 
 ---
 
 ## Stopping and starting again
 
-A full crawl can run for a couple of hours. You do not have to sit through it, and you
-do not have to kill the process to get your laptop back.
+A run of two hundred communities lasts hours. You do not have to sit through it,
+and you do not have to kill the process to get your laptop back.
 
-### Pausing on purpose
+### Pausing the whole run, or just one community
 
-Three ways in, all of which do the same thing:
-
-| How | What to do |
+| How | What it does |
 | --- | --- |
-| **Type it at the crawl** | In the Run window, type `pause` and press Enter |
-| **Press a button** | `python3 tools/control_panel.py` opens a small PAUSE / RESUME / CANCEL window with live status |
-| **From another terminal** | `python3 RUN.py pause` |
+| `dcr pause` | Everything stops at its next safe boundary |
+| `dcr pause C007` | **One** community stops; its worker goes to the next in the queue |
+| `dcr resume` / `dcr resume C007` | Carries on from the checkpoint |
+| `dcr cancel` | Ends the run, keeping everything already found |
+| `dcr status` | Where the run has got to |
+| `python3 tools/control_panel.py` | The same, as buttons |
 
-The crawl does not stop dead. It finishes what it is doing, writes a checkpoint, and
-reports:
+Nothing stops dead. A community finishes what it is doing, writes a checkpoint,
+and reports where it stopped. Pausing one community is the useful case the
+previous version could not do: C007 is behaving oddly and you want to look at it,
+and the other fifteen workers should not be waiting while you do.
 
-```
-Manual pause completed safely. 73/141 tasks complete.
-Status: PAUSED_MANUAL
-```
-
-`resume` (or the RESUME button, or `python3 RUN.py resume`) picks it up from that
-checkpoint. `status` prints where it has got to; `cancel` ends the run for good,
-keeping everything it found.
+**Paused time is not active time**, so pausing costs the research nothing.
 
 ### Pausing because the internet went away
 
-This one happens by itself. If the machine loses its connection, the crawler stops
-starting new requests, checkpoints, and waits:
+This one happens by itself. If the machine loses its connection, every running
+community stops starting new requests, checkpoints, and waits:
 
 ```
 Internet connection lost at 14:32:11. Crawl paused safely. 73/141 tasks complete.
@@ -188,41 +306,79 @@ incomplete task.
 ```
 
 It tells one dead server apart from a dead network by probing several unrelated
-sites. A single site refusing is an ordinary research fact and the crawl carries on;
-only a machine that can reach nothing at all counts as offline.
+sites. A single site refusing is an ordinary research fact and the crawl carries
+on; only a machine that can reach nothing at all counts as offline.
 
-**The thing this protects.** A page that was never reached is not a page that holds
-nothing. A run stopped by an outage is recorded as `PAUSED_NETWORK`, marked truncated,
-and every stage it never began says so — so no NOT FOUND in the workbook can come from
-a crawl that simply stopped early.
+**The thing this protects.** A page that was never reached is not a page that
+holds nothing. A community stopped by an outage is recorded `PAUSED_NETWORK`,
+marked truncated, and every stage it never began says so — so no NOT FOUND in a
+workbook can come from a crawl that simply stopped early.
 
 ### If you close PyCharm, or the power goes off
 
-Nothing is lost, and nothing restarts behind your back. The pause state lives in the
-database, not in the process, so a run paused on Friday is still paused on Monday.
-Press RUN and it says so:
+Nothing is lost, and nothing restarts behind your back. The queue lives in a
+database, so a run interrupted on Friday is still there on Monday. Press RUN and
+it says so:
 
 ```
-UNFINISHED RUN FOUND
-  1. EcoVillage de Pourgues - PAUSED_MANUAL at Stage 4 (archived versions) /
-     source IC001-02, 73/141 tasks complete, last checkpoint 2026-08-22T16:18:21
+PREVIOUS RUN DETECTED
+  1. R20260827-141233 (2026-08-27T14:12:33): 212 communities, 37 completed,
+     11 active when it stopped, 160 queued, 4 paused
 
-  Resume it? (yes / no) [yes]:
+  What would you like to do?
+    1. RESUME ALL       continue where it stopped
+    2. RETRY FAILED     resume, and try the failed communities again
+    3. EXPORT           rebuild workbooks from stored evidence, no network
+    4. RECONCILE        redo reconciliation from stored evidence, no network
+    5. AUDIT            check evidence and workbooks offline
+    6. NEW RUN          leave it untouched and start something else
 ```
 
-`python3 RUN.py runs` lists everything unfinished without starting anything.
+and then says exactly what resuming would do, before doing it:
 
-Resuming continues from the last checkpoint: it does not re-crawl pages already opened,
-re-download documents already stored, or re-record evidence already gathered. Stages an
-earlier run completed are carried forward rather than repeated (reconciliation always
-re-runs, so it sees whatever the resumed run added).
+```
+  Resuming this run would:
+    11 community(ies) were active when the run stopped and will be requeued;
+       each resumes from its own last checkpoint rather than from the beginning
+    160 still queued
+    37 already complete and will NOT be re-run: their workbooks are written
+       and verified
+    4 paused by the researcher and will be LEFT paused; resuming one is a
+       separate choice
+```
+
+Three rules hold, and they are why recovery reads the queue rather than the
+filesystem — a half-written workbook looks exactly like a finished one from the
+outside:
+
+- **A community that was RUNNING when the power went is requeued.** Nothing was
+  watching it and its worker is gone. Its own crawl resumes from its checkpoint,
+  so this costs the tail of one stage, not the community.
+- **A community you PAUSED stays paused.** It was stopped on purpose, and
+  restarting it would be the software overruling your decision.
+- **A community that COMPLETED is never re-run.** Its workbook exists and has
+  been verified.
+
+### Recovery that touches no network
+
+The expensive part is the crawl. When it succeeded and only the cheap part
+failed, re-fetching the web to fix a spreadsheet would be absurd:
+
+```
+dcr export        rebuild the workbooks from stored evidence
+dcr reconcile     redo reconciliation from stored evidence
+dcr audit         check evidence, sources and workbooks offline
+dcr retry-failed  put the failed communities back in the queue
+```
+
+Each takes an optional community id — `dcr export C017` — to act on one.
 
 ### Pause is not cancel
 
 | | What it means |
 | --- | --- |
-| **PAUSE** | The run is unfinished and waiting. Resume whenever you like. |
-| **CANCEL** | The run is over. Everything already retrieved is kept and can still be exported, but it will not resume by itself. |
+| **PAUSE** | Unfinished and waiting. Resume whenever you like. |
+| **CANCEL** | Over. Everything retrieved is kept and can still be exported, but it will not resume by itself. |
 
 ---
 
@@ -361,9 +517,22 @@ not a plausible number. A database that could not be reached is recorded as
 `crawl_truncated = yes` and says exactly why. An absence of evidence and an absence of
 effort are recorded differently, because they mean opposite things.
 
-**It will preserve disagreement.** Where two sources differ, both are kept, the
-protocol's rule is applied where one exists, and where none does the case goes to
-`X8_Review_Queue` for you rather than being decided quietly.
+**It will preserve disagreement — and it will not manufacture it.** Where two
+sources differ, both are kept, the protocol's rule is applied where one exists,
+and where none does the case goes to `X8_Review_Queue` rather than being decided
+quietly.
+
+But claims about different things are not competing claims. "Around 200 visitors
+a year", "12 permanent residents" and "60 people came to the summer gathering"
+are three facts, not three candidate populations; "the property is 134 hectares"
+and "we cultivate 4 hectares" are two figures about two different things. Every
+claim carries a **semantic role**, read from the sentence rather than asserted by
+the extractor, and claims with different roles are never compared. Only the role
+a field is actually about may be written to it; a figure whose role cannot be
+determined goes to a coder rather than to a cell.
+
+A publication date, an event date and an archive snapshot date are properties of
+the **source**, and can never reach a field about the community.
 
 **It counts voices, not addresses.** A community's website, its Facebook page and a
 directory listing copied from it are **one** source, not three. The number that matters
@@ -385,14 +554,15 @@ Every community ends in exactly one of:
 
 | Status | Meaning |
 | --- | --- |
-| `COMPLETE` | Every stage finished and every check passed |
-| `COMPLETE_WITH_UNCERTAINTY` | Finished, with warnings worth reading |
-| `COMPLETE_WITH_TRUNCATION` | Stopped before the protocol finished — the report says where |
-| `PARTIAL_BLOCKED` | Key sources refused automated reading |
-| `FAILED_TECHNICALLY` | A quality check that matters failed |
+| `COMPLETE` | Every stage ran, every check passed, and retrieval ended because the community was worked out |
+| `COMPLETE_WITH_UNCERTAINTY` | The same, with warnings worth reading |
+| `COMPLETE_WITH_TRUNCATION` | Parts deliberately not reached — a safety ceiling, your own request, or a source deprioritised for low yield. The report says which |
+| `PARTIAL_BLOCKED` | This community's own addresses refused the crawler |
+| `FAILED_TECHNICALLY` | No verified workbook, or a quality check that matters failed |
 | `REQUIRES_HUMAN_REVIEW` | Something needs your judgement before the record is usable |
 
-A partial crawl is never labelled complete.
+A partial crawl is never labelled complete — and a crawl that finished because
+there was nothing left to find is never labelled partial.
 
 ---
 
