@@ -267,6 +267,11 @@ class JobRow:
     progress: float = 0.0
     final_status: str = ""
     workbook_path: str = ""
+    #: True only once the workbook has been written AND reopened from disk.
+    #: The column has always been recorded; leaving it off this view meant
+    #: anything reading a JobRow could see the path but not whether the file
+    #: behind it had verified (brief §12, §91, §92).
+    workbook_verified: bool = False
     output_dir: str = ""
     database_path: str = ""
     last_error: str = ""
@@ -305,6 +310,7 @@ class JobRow:
             progress=float(get("progress", 0.0)),
             final_status=get("final_status", ""),
             workbook_path=get("workbook_path", ""),
+            workbook_verified=bool(get("workbook_verified", 0)),
             output_dir=get("output_dir", ""), database_path=get("database_path", ""),
             last_error=get("last_error", ""), active_s=float(get("active_s", 0.0)),
             wall_s=float(get("wall_s", 0.0)),

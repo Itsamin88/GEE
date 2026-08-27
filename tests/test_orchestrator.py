@@ -821,3 +821,21 @@ def test_repeated_interruption_does_not_lose_work(store, tmp_path):
     assert counts[COMPLETED] == len(done)
     assert counts[COMPLETED] + counts[QUEUED] == 8, (
         "communities went missing across three interruptions")
+
+
+def test_a_job_row_says_whether_its_workbook_verified(store, tmp_path):
+    """The path and the verification are different facts (brief §12, §92).
+
+    A workbook that exists is not a workbook that reopens, and anything reading
+    the queue has to be able to tell them apart — otherwise "37 workbooks" in a
+    summary means "37 files", which is not the claim being made.
+    """
+    plan = queue_run(store, tmp_path, make_entries(2))
+    first, second = plan.jobs
+    store.update_job(first.job_id, {"workbook_path": "/tmp/a.xlsx",
+                                    "workbook_verified": 1})
+    store.update_job(second.job_id, {"workbook_path": "/tmp/b.xlsx",
+                                     "workbook_verified": 0})
+    assert store.job(first.job_id).workbook_verified is True
+    assert store.job(second.job_id).workbook_verified is False
+    assert store.totals("R1")["workbooks"] == 1
