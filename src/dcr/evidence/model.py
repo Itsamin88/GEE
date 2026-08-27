@@ -106,13 +106,64 @@ def claim_dedupe_key(community_id: str, field_name: str, value: Any,
 class EvidenceRecorder:
     """Writes evidence and claims, enforcing the anti-fabrication rules."""
 
-    def __init__(self, db: Database, community_id: str, schema: dict[str, Any]):
+    def __init__(self, db: Database, community_id: str, schema: dict[str, Any],
+                 *, meter: Any = None, scopes: Any = None):
         self.db = db
         self.community_id = community_id
         self.schema = schema
         self.forbidden = {str(q).lower() for q in schema.get("satellite_only_quantities", [])}
         self.known_fields = self._known_fields(schema)
         self.rejected: list[tuple[str, str]] = []
+        #: Everything that reaches the workbook passes through this class, which
+        #: makes it the one honest place to measure research yield. `scopes` is
+        #: a callable returning the scope names the current work belongs to, so
+        #: the recorder never has to know which stage or source is running.
+        self.meter = meter
+        self._scopes = scopes or (lambda: ("run",))
+        #: Fields that already have at least one claim, so the difference
+        #: between covering a field and repeating it can be credited correctly.
+        self._covered_fields: set[str] = set()
+        #: (field, independence group) pairs already seen: a second group
+        #: agreeing is corroboration and is worth a great deal; the same group
+        #: agreeing again is the same source talking.
+        self._field_groups: set[tuple[str, str]] = set()
+        self._groups_seen: set[str] = set()
+
+    # -- measuring what was found -------------------------------------------
+    #: Which yield signal a field's name implies. Order matters: the first
+    #: pattern that matches wins, so `date_intervention_onset` is onset
+    #: evidence rather than a generic date.
+    _FIELD_SIGNALS: tuple[tuple[str, str], ...] = (
+        ("onset", "onset_evidence"),
+        ("date_formal_founding", "onset_evidence"),
+        ("date_land_acquisition", "onset_evidence"),
+        ("date_first_residence", "onset_evidence"),
+        ("managed_area", "land_area"),
+        ("area_ha", "land_area"),
+        ("pc0", "practice"),
+        ("pc1", "practice"),
+        ("alternative_names", "alternative_name"),
+    )
+
+    def _signal_for(self, field_name: str, *, first_time: bool,
+                    new_group: bool) -> str:
+        lowered = field_name.lower()
+        for fragment, signal in self._FIELD_SIGNALS:
+            if fragment in lowered:
+                return signal
+        if first_time:
+            return "field_first"
+        if new_group:
+            return "field_corroborated"
+        return "passage"
+
+    def _credit(self, kind: str, key: str, detail: str = "") -> None:
+        if self.meter is None:
+            return
+        try:
+            self.meter.credit(kind, key=key, scopes=tuple(self._scopes()), detail=detail)
+        except Exception:                 # measurement must never stop a run
+            log.debug("yield crediting failed for %s/%s", kind, key, exc_info=True)
 
     @staticmethod
     def _known_fields(schema: dict[str, Any]) -> set[str]:
@@ -254,6 +305,28 @@ class EvidenceRecorder:
                 "notes": claim.notes,
             },
         )
+
+        # What this claim did for the research, credited once by identity.
+        group = str(context.get("independence_group") or "")
+        first_time = field_name not in self._covered_fields
+        new_group = bool(group) and (field_name, group) not in self._field_groups
+        self._covered_fields.add(field_name)
+        if group:
+            self._field_groups.add((field_name, group))
+            if group not in self._groups_seen:
+                self._groups_seen.add(group)
+                self._credit("independence_group", group,
+                             f"a source group not derived from any already seen")
+        signal = self._signal_for(field_name, first_time=first_time, new_group=new_group)
+        # A field's own signal (onset, land area, a practice) is credited the
+        # first time that field is covered and again when a genuinely
+        # independent group corroborates it. Repeating it from the same group
+        # is the same source talking and earns nothing.
+        identity = field_name if first_time else f"{field_name}@{group}"
+        if first_time or new_group:
+            self._credit(signal, identity, claim.rationale or "")
+        else:
+            self._credit("passage", f"{field_name}:{claim_id}")
         return claim_id
 
     def record(self, evidence: EvidenceItem, claims: Sequence[ClaimItem],

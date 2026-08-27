@@ -564,6 +564,10 @@ CREATE TABLE IF NOT EXISTS run_control (
     checkpoint_utc  TEXT,
     checkpoint_seq  INTEGER DEFAULT 0,
     resumable       INTEGER DEFAULT 1,
+    -- The yield account, so a resumed run continues one measurement of this
+    -- community rather than starting a fresh one.
+    yield_state     TEXT,            -- JSON: credited identity keys and per-scope totals
+    yield_units     REAL,
     updated_utc     TEXT NOT NULL
 );
 

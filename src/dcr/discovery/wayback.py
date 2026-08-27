@@ -19,6 +19,13 @@ from urllib.parse import quote, urlencode, urlsplit
 from ..crawl.normalize import classify_url, normalize
 
 
+#: Which tier a chosen snapshot belongs to. Tier 1 is retrieved unconditionally;
+#: tiers 2 and 3 only while the archive keeps repaying the time (brief SS15).
+TIER_HIGH_VALUE = 1
+TIER_STRATEGIC = 2
+TIER_ADDITIONAL = 3
+
+
 @dataclass
 class ArchivedUrl:
     original: str
@@ -27,6 +34,11 @@ class ArchivedUrl:
     status: str = ""
     digest: str = ""
     kind: str = "page"
+    #: Set by `select_snapshots`; see the tier constants above.
+    tier: int = TIER_ADDITIONAL
+    #: Why this snapshot was chosen, for the archive ledger.
+    reason: str = ""
+    score: float = 0.0
 
     @property
     def iso_date(self) -> str:
@@ -262,6 +274,7 @@ def select_snapshots(
             scored.append((score, snapshot))
 
     scored.sort(key=lambda pair: pair[0], reverse=True)
+    _assign_tiers(scored)
     # A site has far more navigation than content, so filling every remaining
     # slot with one capture each of /tag/page/47/ would spend most of the
     # archive budget on the least valuable thing in it. Their earliest captures
@@ -284,3 +297,55 @@ def select_snapshots(
         if len(out) >= max_total:
             break
     return out
+
+
+def _assign_tiers(scored: list[tuple[float, ArchivedUrl]]) -> None:
+    """Sort chosen snapshots into the three retrieval tiers (brief SS15).
+
+    The tier is a property of what the snapshot IS, not of how much time is
+    left, which is the distinction the previous design collapsed. A deleted
+    project PDF is tier 1 whether the run has four minutes or four hours; a
+    fortieth capture of the same navigation page is tier 3 in both cases.
+    """
+    for score, snapshot in scored:
+        snapshot.score = round(score, 2)
+        if score >= 6.0:
+            snapshot.tier = TIER_HIGH_VALUE
+            snapshot.reason = "document or named-priority page, or a strongly historical path"
+        elif score >= 2.5:
+            snapshot.tier = TIER_STRATEGIC
+            snapshot.reason = "strategic sample across the years of a relevant page"
+        else:
+            snapshot.tier = TIER_ADDITIONAL
+            snapshot.reason = "additional capture; retrieved only while the archive keeps yielding"
+
+
+def select_snapshots_by_tier(
+    entries: Iterable[ArchivedUrl],
+    *,
+    priority_paths: Iterable[str],
+    max_per_url: int = 20,
+    max_total: int = 60,
+    onset_window: tuple[int, int] = (1990, 2016),
+    max_low_relevance_share: float = 0.25,
+) -> dict[int, list[ArchivedUrl]]:
+    """The same selection, grouped by tier so retrieval can stop between them.
+
+    `max_total` bounds the whole selection so that enumerating an archive stays
+    cheap even when it holds five thousand URLs. It is not a retrieval budget:
+    what is actually fetched is decided tier by tier, and tier 1 is never
+    withheld to satisfy a clock (brief SS14, SS15).
+    """
+    chosen = select_snapshots(
+        entries,
+        priority_paths=priority_paths,
+        max_per_url=max_per_url,
+        max_total=max_total,
+        onset_window=onset_window,
+        max_low_relevance_share=max_low_relevance_share,
+    )
+    tiers: dict[int, list[ArchivedUrl]] = {
+        TIER_HIGH_VALUE: [], TIER_STRATEGIC: [], TIER_ADDITIONAL: []}
+    for snapshot in chosen:
+        tiers.setdefault(snapshot.tier, []).append(snapshot)
+    return tiers

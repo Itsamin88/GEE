@@ -95,8 +95,24 @@ archive:
   # Sample snapshots at roughly annual intervals across the whole record.
   snapshot_interval_days: 365
   max_snapshots_per_url: 20
-  # A ceiling, further reduced by whatever stage 4's share of the time budget
-  # actually affords. The archive is the slowest thing the crawler touches.
+  # ENUMERATION IS NOT RETRIEVAL. One CDX request lists every URL a domain
+  # ever had; fetching them all would cost hours. So the index is sorted into
+  # three tiers by what each snapshot IS, and each tier is retrieved only while
+  # the archive is still repaying the time.
+  #
+  #   tier 1  deleted documents, named priority pages, historical paths
+  #   tier 2  a strategic sample across the years of relevant pages
+  #   tier 3  everything else
+  #
+  # How much of a huge index is even considered. Not a retrieval budget.
+  max_snapshots_considered_per_domain: 400
+  # A sanity bound on one tier of one domain. Tier 1 is never withheld for
+  # time; this exists so a pathological index cannot queue ten thousand URLs.
+  max_snapshot_fetches_per_domain_per_tier: 120
+  # Yield units per active minute below which tier 2 is not entered. Tier 3 is
+  # held to twice this: by then the good material has already been taken.
+  tier_yield_floor_per_min: 2.5
+  # Retained for the estimator, which has to guess before anything is fetched.
   max_snapshot_fetches_per_domain: 40
   estimated_seconds_per_snapshot: 3.0
   # At most this share of the archive budget may go to URLs whose own path says
@@ -246,26 +262,39 @@ documents:
   skip_low_value_when_pressed: true
 
 # --------------------------------------------------------------------------
-# The active-processing budget
+# When a community stops
 #
-# A hard ceiling on ACTIVE work per community. Time spent paused by the
-# researcher, or waiting for the network, does not count: an outage must not be
-# able to eat the research budget.
+# NOT a clock. A community runs while it is still producing evidence and stops
+# when it stops producing — the rule is in the `yield` block below.
 #
-# The reserve at the end is not optional. Reconciliation, the workbook, its
-# verification and the manifests are what make the run worth anything, so the
-# retrieval side is never allowed to spend the whole allowance.
+# What lives here is the accounting the yield rate needs (active seconds, with
+# pause and outage time excluded), the reserve that guarantees a workbook, and
+# an OPTIONAL safety ceiling for an operator who must bound an unattended
+# overnight run.
 # --------------------------------------------------------------------------
 budget:
   enabled: true
-  active_minutes: 30
+  # 0 = NO research-runtime ceiling. This is the default and should stay the
+  # default: a fixed cap is what caused rich communities to lose evidence.
+  # Set a number of minutes only if you must bound an unattended run; a
+  # community stopped by it is reported COMPLETE_WITH_TRUNCATION, not COMPLETE.
+  active_minutes: 0
   # Kept back for reconciliation, export, reopening the workbook and manifests.
+  # This is a guarantee that the research REACHES a workbook, not a limit on
+  # the research, and it applies however the run ends.
   finalisation_reserve_minutes: 3
-  # Before the reserve: no NEW expensive work starts, but work already in
+  # Once retrieval ends: no NEW expensive work starts, but work already in
   # flight is allowed to finish cleanly.
   wind_down_minutes: 2
-  # Ceilings, not allocations. A stage that finishes early hands the rest back;
-  # a community with one excellent website never touches most of these.
+  # The retrieval time a "nominal" community is assumed to want. Used to turn
+  # the shares below into seconds, and by the estimator before any evidence
+  # exists. A productive stage runs well past its share.
+  nominal_retrieval_minutes: 40
+  # How far past its starting allocation one extension may carry a stage before
+  # the yield governor is consulted again.
+  max_stage_multiple: 8
+  # STARTING allocations, not ceilings. A stage that is yielding runs past its
+  # share; a stage that is not hands the rest back.
   stage_shares:
     0: 0.04     # build the source set
     1: 0.04     # confirm the sources belong to this community
@@ -277,6 +306,56 @@ budget:
     7: 0.04     # other web sources
     8: 0.04     # local-language sweep
     9: 0.00     # reconciliation is paid for out of the reserve
+
+# --------------------------------------------------------------------------
+# The stopping rule: evidence yield per active minute
+#
+# Everything that decides how long to keep working reads these numbers. A scope
+# — the run, a stage, a source, an archived domain — is stopped when its recent
+# yield has fallen BOTH below the absolute floor AND below `decay_fraction` of
+# its own best sustained rate. Judging each scope against itself is what stops a
+# rich source being held to a poor one's standard.
+# --------------------------------------------------------------------------
+yield:
+  # Units per active minute below which a scope is not paying for itself.
+  absolute_floor_per_min: 2.0
+  # A scope down to this fraction of its own best rate is in diminishing
+  # returns, however good that best rate was.
+  decay_fraction: 0.15
+  # "Recent" means the last this-many minutes of ACTIVE work.
+  window_minutes: 2.0
+  # No scope is judged before it has had this much work, so a source that spent
+  # its first seconds on a redirect is not mistaken for an exhausted one.
+  warmup_minutes: 0.75
+  warmup_attempts: 8
+  # How much recent active time "recent" means, per kind of account. Wider for
+  # the accounts whose quiet spells mean least: a whole community goes quiet for
+  # a minute every time it changes stage, and judging it on a source's window
+  # would end healthy runs at every stage boundary.
+  scope_window_minutes:
+    run: 10
+    "stage:": 5
+    "archive:": 3
+    "source:": 2
+  # What each kind of find is worth. The scale is arbitrary; only the ratios
+  # matter, and the floors above are in the same units. Change these to change
+  # what the crawler considers worth its time.
+  weights:
+    field_first: 10          # a workbook field covered for the first time
+    onset_evidence: 9        # dated onset evidence — the study's hardest field
+    academic_verified: 9     # an academic record that verified
+    independence_group: 8    # a source group derived from no other
+    land_area: 7             # area evidence with a resolved semantic role
+    field_corroborated: 6    # an existing field, from a NEW independence group
+    grey_record: 6           # grants, registers, planning documents
+    practice: 5              # a practice at documented or evidenced level
+    document_unique: 4       # a document nobody has seen before, by hash
+    map_image: 4             # a map, site plan or dated intervention photograph
+    alternative_name: 3
+    dated_item: 2
+    passage: 1               # an ordinary supporting passage
+    page: 0.25
+    duplicate: 0
 
 # --------------------------------------------------------------------------
 # Run control: manual pause, network pause, and resuming

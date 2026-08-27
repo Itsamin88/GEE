@@ -61,6 +61,22 @@ ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # How many pages linked the same image. A gallery photo on nine pages is
     # one candidate seen nine times, not nine candidates.
     ("image_candidates", "times_seen", "INTEGER"),
+    # The yield account: what the crawl found, weighted, and the identity keys
+    # behind it. A resumed run restores this so it cannot re-credit evidence it
+    # already has and conclude that an exhausted source is productive again.
+    ("run_control", "yield_state", "TEXT"),
+    ("run_control", "yield_units", "REAL"),
+    ("runs", "yield_units", "REAL"),
+    ("runs", "retrieval_stop_cause", "TEXT"),
+    # Semantic roles: what a number is a number OF. Without this, visitor counts
+    # and resident counts compete for one field and manufacture disagreements.
+    ("claims", "semantic_role", "TEXT"),
+    ("claims", "role_reason", "TEXT"),
+    ("conflicts", "semantic_role", "TEXT"),
+    # Document families: translations and re-issues of one report, grouped so
+    # the same document is deep-parsed once (brief SS20).
+    ("documents", "family_id", "TEXT"),
+    ("documents", "family_role", "TEXT"),
 )
 
 #: Indexes for the columns above. Deliberately NOT unique: an existing database
@@ -69,6 +85,7 @@ ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
 ADDED_INDEXES: tuple[tuple[str, str, str], ...] = (
     ("idx_evidence_dedupe", "evidence", "community_id, dedupe_key"),
     ("idx_claims_dedupe", "claims", "community_id, dedupe_key"),
+    ("idx_documents_family", "documents", "community_id, family_id"),
 )
 
 

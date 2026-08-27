@@ -56,12 +56,13 @@ from .logging_setup import event, get_logger
 from .net.browser import BrowserPool
 from .net.fetcher import Fetcher
 from . import profiling
-from .budget import TimeBudget, budget_from_settings
+from .budget import WorkBudget, budget_from_settings
+from .yieldmeter import YieldMeter, meter_from_settings
 from .control import (COMPLETED as CONTROL_COMPLETED, FAILED as CONTROL_FAILED,
                       CANCELLED as CONTROL_CANCELLED, RunCancelled, RunControl,
                       control_dir_for)
 from .storage import CommunityStorage
-from .supervisor import (BudgetExhausted, NullSupervisor, RunPaused,
+from .supervisor import (NullSupervisor, RetrievalFinished, RunPaused,
                          Supervisor)
 
 log = get_logger("run")
@@ -161,8 +162,19 @@ class CommunityRunner:
         self.supervisor: Any = NullSupervisor()
         self.final_state = CONTROL_COMPLETED
         self.pause_reason = ""
-        self.budget: TimeBudget | None = None
+        self.budget: WorkBudget | None = None
+        #: What the crawl is finding, measured. The stopping rule (brief §25).
+        self.meter: YieldMeter = meter_from_settings(self.settings)
         self.budget_exhausted = False
+        #: exhausted | ceiling | requested — why retrieval ended, if it did.
+        self.retrieval_stop_cause = ""
+        #: Which stage and source the work in flight belongs to, so yield can
+        #: be charged to the right accounts without threading them everywhere.
+        self._current_stage: int | None = None
+        self._current_source: str = ""
+        self._last_charged_active_s = 0.0
+        #: Archive tiers deliberately not retrieved, and why.
+        self.archive_truncated: list[str] = []
         self.db = db
         self.run_mode = run_mode.upper()
         self.target = target
@@ -203,7 +215,8 @@ class CommunityRunner:
         self.storage = CommunityStorage.create(
             self.settings.output_root, self.community_id, community.name
         )
-        self.recorder = EvidenceRecorder(self.db, self.community_id, self.settings.schema)
+        self.recorder = EvidenceRecorder(self.db, self.community_id, self.settings.schema,
+                                         meter=self.meter, scopes=self._yield_scopes)
         self.names = {community.name}
         self.languages = set()
         if community.country:
@@ -223,20 +236,31 @@ class CommunityRunner:
                 "run_control", "poll_interval_s", default=1.0) or 1.0),
         )
         if bool(self.settings.get("budget", "enabled", default=True)):
-            carried = TimeBudget.carried_for(self.db, self.community_id)
+            carried = WorkBudget.carried_for(self.db, self.community_id)
             self.budget = budget_from_settings(self.settings, carried_active_s=carried)
             if carried > 0:
                 event(log, "BUDGET",
                       f"{carried / 60:.1f} min of active time was already spent on this "
-                      f"community; this session continues the same "
-                      f"{self.budget.budget_s / 60:.0f}-minute budget")
+                      "community; this session continues the same account of it")
+            if self.budget.bounded:
+                event(log, "BUDGET",
+                      f"a safety ceiling of {self.budget.ceiling_s / 60:.0f} min of active "
+                      "work is set in configuration; retrieval will be truncated there "
+                      "if the community is still yielding")
+        # Anything credited in an earlier session must not be credited again:
+        # otherwise a resumed crawl re-counts every document it already has and
+        # concludes that an exhausted source has come back to life.
+        self.meter.restore(self._stored_yield_state())
         self.supervisor = Supervisor(
             self.control, self.monitor,
             config=dict(self.settings.get("run_control", default={}) or {}),
             on_status=self.on_status,
             on_resume=self._after_resume,
             budget=self.budget,
+            meter=self.meter,
+            on_gate=self._charge_active_time,
         )
+        self.supervisor.bind_scopes(self._yield_scopes)
 
         fetcher = Fetcher(
             user_agent=self.settings.user_agent,
@@ -291,17 +315,27 @@ class CommunityRunner:
                           f"{STAGE_NAMES[number].capitalize()} — already complete, skipped")
                     continue
                 await self._run_stage(number)
-        except BudgetExhausted as spent:
-            # Not a failure: the clock ran out. Everything gathered is
-            # committed, and finalisation happens next with the reserve that
-            # was held back exactly for it.
+        except RetrievalFinished as finished:
+            # Not a failure. Everything gathered is committed, and finalisation
+            # happens next with the reserve held back exactly for it.
+            #
+            # Whether it is a TRUNCATION depends on why retrieval ended. A run
+            # the yield governor stopped found everything there was to find and
+            # is complete; only a ceiling or a researcher's request leaves work
+            # undone (brief §61, §92).
             self.budget_exhausted = True
+            self.retrieval_stop_cause = finished.cause
             self.final_state = CONTROL_COMPLETED
-            self.pause_reason = spent.reason
-            self._mark_truncated(
-                f"the active-processing budget was reached before the protocol "
-                f"finished: {spent.reason}")
-            event(log, "BUDGET", spent.reason)
+            self.pause_reason = finished.reason
+            if finished.truncated:
+                self._mark_truncated(
+                    "retrieval ended before the protocol finished: "
+                    f"{finished.reason}")
+            else:
+                event(log, "YIELD",
+                      "the protocol finished on the evidence rather than on a clock: "
+                      f"{finished.reason}")
+            event(log, "BUDGET", finished.reason)
         except RunPaused as paused:
             # Not a failure and not a completion: the run is unfinished on
             # purpose, and everything retrieved so far is committed.
@@ -374,6 +408,9 @@ class CommunityRunner:
             task_detail=f"about to begin stage {number}",
             tasks_total=self._task_total(),
         )
+        self._charge_active_time()
+        self._current_stage = number
+        self._current_source = ""
         if self.budget is not None:
             self.budget.begin_stage(number)
         stage.started = utcnow()
@@ -398,18 +435,22 @@ class CommunityRunner:
             stage.detail = f"{type(exc).__name__}: {exc}"
             log.error("stage %d failed: %s", number, exc, exc_info=True)
             self._mark_truncated(f"stage {number} ({STAGE_NAMES[number]}) failed: {exc}")
+        self._charge_active_time()
+        self._current_stage = None
+        self._current_source = ""
         if self.budget is not None:
             self.budget.end_stage()
             self.budget.persist(self.db, self.run_id)
+            self._persist_yield()
             if stage.status == "running" and self.budget.stage_over_budget(number):
+                # Only reachable when an operator opted into a safety ceiling.
                 stage.status = "partial"
                 stage.detail = (stage.detail or "") + (
                     "; " if stage.detail else "") + (
-                    f"stopped at this stage's share of the time budget "
-                    f"({self.budget.stage_ceiling_s(number) / 60:.1f} min)")
+                    "stopped at the safety ceiling set in configuration")
                 self._mark_truncated(
-                    f"stage {number} ({STAGE_NAMES[number]}) reached its share of the "
-                    "active-time budget and did not finish")
+                    f"stage {number} ({STAGE_NAMES[number]}) reached the configured "
+                    "safety ceiling and did not finish")
         if stage.status == "running":
             stage.status = "complete"
         stage.finished = utcnow()
@@ -429,6 +470,87 @@ class CommunityRunner:
              "started_utc": stage.started, "finished_utc": stage.finished},
             ["run_id", "stage_no"],
         )
+
+    # -- measuring yield ---------------------------------------------------
+    def _yield_scopes(self) -> tuple[str, ...]:
+        """Which accounts the work happening right now belongs to.
+
+        Nested views of one crawl, not competing budgets: a document opened
+        while stage 3 works on source IC001-S002 is charged to the run, to the
+        stage and to the source, and each can be judged on its own.
+        """
+        scopes = ["run"]
+        if self._current_stage is not None:
+            scopes.append(f"stage:{self._current_stage}")
+        if self._current_source:
+            scopes.append(f"source:{self._current_source}")
+        return tuple(scopes)
+
+    def _archive_tier_verdict(self, scope: str, tier: int, domain: str) -> Any:
+        """Is the archive still worth another tier of retrieval?
+
+        Tier 1 is never asked: a deleted document is unrecoverable anywhere
+        else, so it is fetched whatever the yield has been. Tiers 2 and 3 are
+        judged on what tier 1 actually produced for this domain, which is the
+        marginal-yield rule the brief asks for in §15 — "only continue deeper
+        when the marginal research yield justifies the cost".
+        """
+        from .yieldmeter import Verdict
+
+        state = self.meter.scope(scope)
+        if state.attempts == 0:
+            # Nothing has been tried here yet, so there is no evidence either
+            # way; the tier goes ahead and will be judged next time.
+            return Verdict(True, "the archive has not been sampled yet", warming_up=True)
+        floor = float(self.settings.get(
+            "archive", "tier_yield_floor_per_min", default=2.5) or 2.5)
+        # Tier 3 is held to a higher standard than tier 2: by then the good
+        # material has already been taken.
+        if tier >= 3:
+            floor *= 2.0
+        return self.meter.verdict(scope, absolute_floor=floor,
+                                  warmup_s=20.0, warmup_attempts=5)
+
+    def _charge_active_time(self) -> None:
+        """Give the yield meter the seconds since it was last told.
+
+        Called at every safe boundary. The clock excludes pause and outage time
+        already, so what arrives here is genuinely active work (brief §32).
+        """
+        if self.budget is None:
+            return
+        now = self.budget.active_s
+        delta = now - self._last_charged_active_s
+        if delta <= 0:
+            return
+        self._last_charged_active_s = now
+        self.meter.spend(delta, self._yield_scopes())
+
+    def _stored_yield_state(self) -> dict[str, Any] | None:
+        """The yield account this community carried out of an earlier session."""
+        try:
+            row = self.db.query_one(
+                "SELECT yield_state FROM run_control WHERE community_id = ? "
+                "AND yield_state IS NOT NULL ORDER BY updated_utc DESC LIMIT 1",
+                (self.community_id,))
+        except Exception:
+            return None
+        if not row or not row["yield_state"]:
+            return None
+        try:
+            return json.loads(row["yield_state"])
+        except (TypeError, ValueError):
+            return None
+
+    def _persist_yield(self) -> None:
+        try:
+            self.db.update("run_control",
+                           {"yield_state": json.dumps(self.meter.state_for_resume()),
+                            "yield_units": round(self.meter.scope("run").units, 2),
+                            "updated_utc": utcnow()},
+                           {"run_id": self.run_id})
+        except Exception as exc:
+            log.debug("could not persist the yield account: %s", exc)
 
     def _task_total(self) -> int:
         """Tasks done plus tasks still queued — the denominator the user sees."""
@@ -1034,6 +1156,8 @@ class CommunityRunner:
         snapshots_fetched = 0
         #: Discovered is not fetched, and the report must show both (brief §63).
         archive_discovered = 0
+        #: Tiers not retrieved because the archive stopped paying for itself.
+        archive_truncated: list[str] = []
         for domain, source_id in list(domains.items())[:12]:
             # Enumerating the archive for one domain is a long single request;
             # between domains is the safe boundary (brief §24).
@@ -1079,42 +1203,78 @@ class CommunityRunner:
                 {"source_id": source_id},
             )
             archive_discovered += len(parsed.entries)
-            # How many snapshots this domain can afford, not how many exist.
-            # The archive is the slowest thing the crawler touches, so the cap
-            # is whatever the stage's remaining share of the budget pays for
-            # (brief §19, §23).
-            configured = int(run_cfg.get("max_snapshot_fetches_per_domain", 40))
-            affordable = configured
-            if self.budget is not None:
-                per_snapshot_s = float(run_cfg.get("estimated_seconds_per_snapshot", 3.0))
-                remaining_domains = max(1, len(domains) - reachable + 1)
-                share = self.budget.stage_remaining_s(4) / remaining_domains
-                affordable = max(4, min(configured, int(share / max(0.5, per_snapshot_s))))
-            chosen = wayback_mod.select_snapshots(
+            # ENUMERATION IS NOT RETRIEVAL (brief §14). Five thousand CDX rows
+            # cost one request; fetching them would cost four hours. So the
+            # index is sorted into three tiers by what each snapshot IS, and
+            # each tier is retrieved only while the archive is still repaying
+            # the time (brief §15).
+            #
+            #   tier 1  deleted documents, named priority pages, strongly
+            #           historical paths — always retrieved
+            #   tier 2  a strategic sample across the years of relevant pages
+            #   tier 3  everything else — only while yield stays high
+            #
+            # The enumeration cap below bounds how much of a huge index is even
+            # considered; it is not a retrieval budget, and tier 1 is never
+            # withheld to satisfy a clock.
+            enumeration_cap = int(run_cfg.get("max_snapshots_considered_per_domain", 400))
+            tiers = wayback_mod.select_snapshots_by_tier(
                 parsed.entries,
                 priority_paths=archive_cfg.get("priority_snapshot_paths", ["/"]),
                 max_per_url=int(run_cfg.get("max_snapshots_per_url", 20)),
-                max_total=affordable,
+                max_total=enumeration_cap,
                 max_low_relevance_share=float(
                     run_cfg.get("low_relevance_snapshot_share", 0.25)),
             )
-            if affordable < configured:
-                event(log, "ARCHIVE",
-                      f"{domain}: {len(parsed.entries)} archived URLs listed; the time "
-                      f"budget affords {affordable} of them, chosen by path relevance "
-                      "and dating value")
             template = archive_cfg.get("snapshot_url_template",
                                        "https://web.archive.org/web/{timestamp}id_/{url}")
-            for snapshot in chosen:
-                if snapshot.kind == "image":
+            archive_scope = f"archive:{domain}"
+            event(log, "ARCHIVE",
+                  f"{domain}: {len(parsed.entries)} archived URLs listed — "
+                  f"{len(tiers[wayback_mod.TIER_HIGH_VALUE])} high-value, "
+                  f"{len(tiers[wayback_mod.TIER_STRATEGIC])} strategic, "
+                  f"{len(tiers[wayback_mod.TIER_ADDITIONAL])} additional")
+
+            for tier in (wayback_mod.TIER_HIGH_VALUE, wayback_mod.TIER_STRATEGIC,
+                         wayback_mod.TIER_ADDITIONAL):
+                batch = tiers.get(tier) or []
+                if not batch:
                     continue
-                snapshot_url = snapshot.snapshot_url(template)
-                if self.frontier.add(snapshot_url, source_id=source_id, depth=1, stage=4,
-                                     kind=snapshot.kind, discovery_method="cdx",
-                                     source_priority="A", priority=12.0):
-                    snapshots_fetched += 1
-                    self._log_discovery(4, "cdx", snapshot.original, "new_url",
-                                        f"snapshot {snapshot.iso_date}")
+                if tier > wayback_mod.TIER_HIGH_VALUE:
+                    verdict = self._archive_tier_verdict(archive_scope, tier, domain)
+                    if not verdict.keep_going:
+                        archive_truncated.append(
+                            f"{domain} tier {tier}: {verdict.reason}")
+                        event(log, "ARCHIVE",
+                              f"{domain}: stopping before tier {tier} — {verdict.reason}")
+                        break
+                queued = 0
+                for snapshot in batch[:int(run_cfg.get(
+                        "max_snapshot_fetches_per_domain_per_tier", 120))]:
+                    if snapshot.kind == "image":
+                        continue
+                    snapshot_url = snapshot.snapshot_url(template)
+                    if self.frontier.add(snapshot_url, source_id=source_id, depth=1,
+                                         stage=4, kind=snapshot.kind,
+                                         discovery_method=f"cdx-tier{tier}",
+                                         source_priority="A",
+                                         priority=14.0 - tier):
+                        queued += 1
+                        snapshots_fetched += 1
+                        self._log_discovery(4, "cdx", snapshot.original, "new_url",
+                                            f"snapshot {snapshot.iso_date} "
+                                            f"(tier {tier}: {snapshot.reason})")
+                if not queued:
+                    continue
+                self._current_source = source_id
+                before = self.meter.scope(archive_scope).units
+                await self.crawler.run(stage=4)
+                self._charge_active_time()
+                gained = self.meter.scope(archive_scope).units - before
+                event(log, "ARCHIVE",
+                      f"{domain} tier {tier}: {queued} snapshots retrieved, "
+                      f"{gained:.0f} yield units")
+                self._current_source = ""
 
         await self.crawler.run(stage=4)
 
@@ -1129,8 +1289,18 @@ class CommunityRunner:
                             + ", ".join(unreachable))
             self._mark_truncated(
                 "the web archive was unreachable for " + ", ".join(unreachable))
+        elif archive_truncated:
+            # Deliberate, evidence-driven, and never mislabelled as exhaustive
+            # (brief §61).
+            stage.status = "complete"
+            stage.detail = ("deeper archive tiers were not retrieved because their "
+                            "marginal yield had fallen away: "
+                            + "; ".join(archive_truncated[:6]))
+            self._mark_truncated(
+                "TRUNCATED_LOW_YIELD: " + "; ".join(archive_truncated[:6]))
         else:
             stage.status = "complete"
+        self.archive_truncated = archive_truncated
         # Discovered is not fetched, and both belong in the record: the archive
         # is sampled by relevance, never enumerated (brief §19, §63).
         self.archive_discovered = archive_discovered

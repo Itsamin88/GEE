@@ -19,7 +19,9 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable, Mapping, Sequence
 
-from .budget import PHASE_FINALISATION, PHASE_OVER, PHASE_WIND_DOWN, TimeBudget
+from .budget import (PHASE_FINALISATION, PHASE_OVER, PHASE_WIND_DOWN,
+                     WorkBudget)
+from .yieldmeter import YieldMeter
 from .control import (CANCELLED, PAUSED_MANUAL, PAUSED_NETWORK, RUNNING,
                       RunCancelled, RunControl)
 from .logging_setup import event, get_logger
@@ -28,18 +30,41 @@ from .net.connectivity import FULL, OFFLINE, PARTIAL, ConnectivityMonitor, class
 log = get_logger("supervisor")
 
 
-class BudgetExhausted(Exception):
-    """Raised when the active-time budget is spent and finalisation must begin.
+class RetrievalFinished(Exception):
+    """Raised when retrieval should end and finalisation must begin.
 
-    Not a failure. The run stops starting work, reconciles what it has and
-    exports; the result is COMPLETE_WITH_TRUNCATION with an honest account of
-    what was not reached (brief §28).
+    Not a failure, and — since the thirty-minute cap was removed — usually not
+    a truncation either. It is raised for three quite different reasons, and
+    the run's final status depends on which:
+
+    ``exhausted``   the yield governor judged the community worked out: every
+                    scope has stopped producing. The protocol finished on the
+                    evidence, so the run is COMPLETE.
+    ``ceiling``     an operator opted into a safety ceiling and it was reached.
+                    COMPLETE_WITH_TRUNCATION, with an account of what was left.
+    ``requested``   the researcher asked for the run to be wrapped up now.
+                    COMPLETE_WITH_TRUNCATION.
+
+    The old name is kept as an alias because a great deal of the runner catches
+    it, but "the budget is spent" is no longer what it means (brief §61, §92).
     """
 
-    def __init__(self, reason: str = "", snapshot: Any = None):
-        super().__init__(reason or "the active-processing budget is spent")
+    def __init__(self, reason: str = "", snapshot: Any = None,
+                 cause: str = "exhausted"):
+        super().__init__(reason or "retrieval is finished")
         self.reason = reason
         self.snapshot = snapshot
+        #: exhausted | ceiling | requested
+        self.cause = cause
+
+    @property
+    def truncated(self) -> bool:
+        """Did the run stop with work still worth doing?"""
+        return self.cause != "exhausted"
+
+
+#: Kept so existing call sites and tests keep working.
+BudgetExhausted = RetrievalFinished
 
 
 class RunPaused(Exception):
@@ -82,14 +107,18 @@ class Supervisor:
         config: Mapping[str, Any] | None = None,
         on_status: Callable[[str], None] | None = None,
         on_resume: Callable[[str], None] | None = None,
+        on_gate: Callable[[], None] | None = None,
         sleep: Callable[[float], Awaitable[None]] | None = None,
-        budget: TimeBudget | None = None,
+        budget: WorkBudget | None = None,
+        meter: YieldMeter | None = None,
     ):
         self.control = control
         self.monitor = monitor
         #: The active-processing clock. Without one the gate behaves exactly as
         #: it did before, which is what the pause/resume tests rely on.
         self.budget = budget
+        #: What the crawl is finding. The clock measures; this decides.
+        self.meter = meter
         config = dict(config or {})
         #: `wait` keeps the process alive so RESUME continues in place;
         #: `exit` checkpoints and returns, leaving the run PAUSED_MANUAL for a
@@ -103,11 +132,27 @@ class Supervisor:
         self.max_offline_wait_s = float(config.get("max_offline_wait_s", 0) or 0)
         #: Consecutive network-shaped failures before a probe is worth making.
         self.failure_threshold = int(config.get("failures_before_probe", 3))
+        #: The run-level stopping rule. Deliberately slacker than a source's:
+        #: a whole community is only worked out when the crawl as a whole has
+        #: gone quiet, not when one stage has.
+        self.run_floor_per_min = float(config.get("run_yield_floor_per_min", 1.0))
+        self.run_decay_fraction = float(config.get("run_yield_decay_fraction", 0.08))
+        self.run_warmup_s = float(config.get("run_yield_warmup_minutes", 4.0)) * 60.0
+        self.run_warmup_attempts = int(config.get("run_yield_warmup_attempts", 60))
+        #: exhausted | ceiling | requested — why retrieval ended.
+        self._stop_cause = ""
         self.stats = SupervisorStats()
         self._on_status = on_status
         #: Called when a pause ends, so the fetcher can forget the circuits it
         #: opened while nothing was reachable.
         self._on_resume = on_resume
+        #: Called at every safe boundary, before the gate decides. The runner
+        #: uses it to charge elapsed active seconds to the yield accounts, so
+        #: the denominator of the yield rate is kept up to date without any
+        #: component having to know about any other.
+        self._on_gate = on_gate
+        #: Supplies the scope names for per-request accounting.
+        self._scopes_hook: Callable[[], Sequence[str]] | None = None
         self._sleep = sleep or asyncio.sleep
         self._recent_failures: list[str] = []
         self._suspended = False
@@ -115,6 +160,7 @@ class Supervisor:
     # -- what the crawl reports to us --------------------------------------
     def note_failure(self, error_type: str | None) -> None:
         """A fetch failed. Enough of these, of the right shape, triggers a probe."""
+        self._note_attempt()
         if not error_type:
             return
         self._recent_failures.append(error_type)
@@ -123,9 +169,28 @@ class Supervisor:
 
     def note_success(self) -> None:
         """A fetch worked, so the machine is demonstrably online."""
+        self._note_attempt()
         self._recent_failures.clear()
         if self.control.connectivity == OFFLINE:
             self.control.set_connectivity(FULL, "a request succeeded")
+
+    def _note_attempt(self) -> None:
+        """One more request tried. A scope that has attempted almost nothing is
+        not exhausted, however low its yield rate reads."""
+        if self.meter is None:
+            return
+        try:
+            self.meter.attempt(self._attempt_scopes())
+        except Exception:
+            pass
+
+    def _attempt_scopes(self) -> tuple[str, ...]:
+        if self._scopes_hook is not None:
+            try:
+                return tuple(self._scopes_hook())
+            except Exception:
+                return ("run",)
+        return ("run",)
 
     def _failures_suggest_outage(self) -> bool:
         if len(self._recent_failures) < self.failure_threshold:
@@ -153,6 +218,8 @@ class Supervisor:
         and raises :class:`RunPaused` when a pause should end this process.
         """
         self.stats.gates += 1
+        if self._on_gate is not None:
+            self._on_gate()
         self._enforce_budget(stage_no)
         self.control.checkpoint(
             stage_no=stage_no, stage_name=stage_name, source_id=source_id,
@@ -177,35 +244,87 @@ class Supervisor:
         if should_probe and self.monitor is not None:
             await self._check_network()
 
-    # -- the time budget ---------------------------------------------------
+    # -- deciding when retrieval is finished --------------------------------
     def _enforce_budget(self, stage_no: int | None) -> None:
-        """Stop the crawl in time to finalise, and say so once.
+        """Is there still research worth doing? Asked at every safe boundary.
 
-        Called at every safe boundary. The reserve at the end is what makes the
-        difference between a run that produces a workbook and a run that spent
-        thirty minutes producing nothing (brief §7).
+        Three things can end retrieval, and the run reports which:
+
+        1. **The yield governor.** Every scope has stopped producing evidence.
+           This is the normal ending of an unbounded run and it is *not* a
+           truncation — the protocol finished because there was nothing left to
+           find, which is a complete research record (brief §25, §66).
+        2. **A safety ceiling**, if an operator opted into one. Truncation, and
+           recorded as such.
+        3. **The researcher**, asking for the run to be wrapped up now.
+
+        Whichever it is, the reserve at the end is what makes the difference
+        between a run that produces a workbook and one that produces nothing.
         """
         budget = self.budget
         if budget is None:
             return
+
+        if not budget.retrieval_stopped:
+            verdict = self._run_exhausted()
+            if verdict is not None:
+                budget.begin_wind_down(verdict)
+                self._stop_cause = "exhausted"
+
         phase = budget.phase
         if phase == PHASE_WIND_DOWN and budget.announce(PHASE_WIND_DOWN):
             self._status(
-                f"Status: WINDING DOWN   {budget.active_s / 60:.0f} min of "
-                f"{budget.budget_s / 60:.0f} used. No new expensive work will start; "
+                f"Status: WINDING DOWN   {budget.active_s / 60:.0f} min of active "
+                f"work. {budget.stop_reason or 'no new expensive work will start'}; "
                 "work already in flight will finish.")
         if budget.must_finalise:
+            # A budget that reached finalisation without anything asking it to
+            # can only have got there by its ceiling.
+            cause = self._stop_cause or ("ceiling" if budget.bounded else "requested")
             if budget.announce(PHASE_FINALISATION):
                 self._status(
-                    f"Status: FINALISING   the active budget is spent "
-                    f"({budget.active_s / 60:.1f} min). Reconciling and exporting "
-                    "what has been gathered.")
-            raise BudgetExhausted(
-                f"the {budget.budget_s / 60:.0f}-minute active budget was reached "
-                f"at stage {stage_no}; the remaining time is reserved for "
-                "reconciliation and export",
+                    f"Status: FINALISING   after {budget.active_s / 60:.1f} min of "
+                    f"active work. Reconciling and exporting what has been gathered.")
+            raise RetrievalFinished(
+                budget.stop_reason or
+                f"retrieval ended at stage {stage_no}; the remaining time is "
+                "reserved for reconciliation and export",
                 snapshot=budget.snapshot(),
+                cause=cause,
             )
+
+    def _run_exhausted(self) -> str | None:
+        """Has the whole community stopped producing? The reason, or None.
+
+        The run-level scope is the last thing to be judged, and it is judged
+        gently: a stage or a source going quiet is ordinary and is handled where
+        it happens. This asks whether the *community* is worked out, which is
+        only true once the crawl as a whole has fallen below its floor and
+        stayed there — so a lull between stages cannot end a run that is about
+        to open thirty archived PDFs.
+        """
+        if self.meter is None:
+            return None
+        verdict = self.meter.verdict(
+            "run",
+            absolute_floor=self.run_floor_per_min,
+            decay_fraction=self.run_decay_fraction,
+            warmup_s=self.run_warmup_s,
+            warmup_attempts=self.run_warmup_attempts,
+        )
+        if verdict.keep_going:
+            return None
+        return f"the community is worked out: {verdict.reason}"
+
+    def bind_scopes(self, hook: Callable[[], Sequence[str]]) -> None:
+        """Tell the supervisor which yield accounts the current work belongs to."""
+        self._scopes_hook = hook
+
+    def request_wind_down(self, reason: str) -> None:
+        """The researcher (or the orchestrator) asks this community to wrap up."""
+        self._stop_cause = "requested"
+        if self.budget is not None:
+            self.budget.begin_wind_down(reason)
 
     def affords(self, estimated_s: float) -> bool:
         """May a task of this expected cost start?"""
@@ -391,6 +510,13 @@ class NullSupervisor:
     suspended = False
     winding_down = False
     budget = None
+    meter = None
+
+    def request_wind_down(self, reason: str = "") -> None:
+        return None
+
+    def bind_scopes(self, hook: Any) -> None:
+        return None
 
     async def gate(self, **kwargs: Any) -> None:
         return None
