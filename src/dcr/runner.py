@@ -2489,14 +2489,59 @@ def _cell_ref(table: Any, row_index: int, col_index: int) -> str:
     return f"{letters}{row_index + 1}"
 
 
+#: Country name -> ccTLD, for domain guessing and the local-language sweep.
+#: Keyed on the canonical English short names the master input file uses
+#: (ISO 3166 English short name), so every country in the 212-community cohort
+#: resolves rather than eighteen of them. An ISO alpha-2 code passed straight
+#: through also works, because the master file carries `country_iso2` too.
+_COUNTRY_CODES = {
+    "france": "fr", "netherlands": "nl", "germany": "de", "spain": "es",
+    "portugal": "pt", "italy": "it", "belgium": "be", "sweden": "se",
+    "denmark": "dk", "norway": "no", "finland": "fi", "poland": "pl",
+    "austria": "at", "switzerland": "ch", "united kingdom": "uk",
+    "ireland": "ie", "iceland": "is", "greece": "gr", "slovenia": "si",
+    "czechia": "cz", "czech republic": "cz", "romania": "ro", "hungary": "hu",
+    "north macedonia": "mk", "ukraine": "ua", "russia": "ru",
+    "russian federation": "ru", "turkey": "tr", "türkiye": "tr",
+    "estonia": "ee", "latvia": "lv", "lithuania": "lt", "croatia": "hr",
+    "serbia": "rs", "bulgaria": "bg", "slovakia": "sk", "luxembourg": "lu",
+    "brazil": "br", "argentina": "ar", "chile": "cl", "colombia": "co",
+    "peru": "pe", "ecuador": "ec", "bolivia": "bo", "uruguay": "uy",
+    "paraguay": "py", "venezuela": "ve", "mexico": "mx", "guatemala": "gt",
+    "belize": "bz", "costa rica": "cr", "panama": "pa", "nicaragua": "ni",
+    "honduras": "hn", "el salvador": "sv", "cuba": "cu", "haiti": "ht",
+    "dominican republic": "do", "trinidad and tobago": "tt", "jamaica": "jm",
+    "united states": "us", "canada": "ca",
+    "australia": "au", "new zealand": "nz",
+    "india": "in", "nepal": "np", "sri lanka": "lk", "bangladesh": "bd",
+    "pakistan": "pk", "bhutan": "bt", "china": "cn", "japan": "jp",
+    "south korea": "kr", "thailand": "th", "vietnam": "vn", "cambodia": "kh",
+    "laos": "la", "malaysia": "my", "singapore": "sg", "indonesia": "id",
+    "philippines": "ph", "myanmar": "mm", "mongolia": "mn",
+    "israel": "il", "palestine": "ps", "jordan": "jo", "lebanon": "lb",
+    "iran": "ir", "iraq": "iq", "egypt": "eg", "morocco": "ma",
+    "tunisia": "tn", "algeria": "dz", "united arab emirates": "ae",
+    "saudi arabia": "sa", "georgia": "ge", "armenia": "am",
+    "south africa": "za", "kenya": "ke", "tanzania": "tz", "uganda": "ug",
+    "zimbabwe": "zw", "zambia": "zm", "malawi": "mw", "mozambique": "mz",
+    "botswana": "bw", "namibia": "na", "eswatini": "sz", "lesotho": "ls",
+    "ghana": "gh", "nigeria": "ng", "senegal": "sn", "gambia": "gm",
+    "mali": "ml", "burkina faso": "bf", "benin": "bj", "togo": "tg",
+    "ivory coast": "ci", "côte d'ivoire": "ci", "cameroon": "cm",
+    "ethiopia": "et", "rwanda": "rw", "burundi": "bi", "madagascar": "mg",
+    "sierra leone": "sl", "liberia": "lr", "guinea": "gn",
+    "democratic republic of the congo": "cd", "sudan": "sd",
+}
+
+
 def _country_code(country: str | None) -> str | None:
-    codes = {
-        "France": "fr", "Netherlands": "nl", "Germany": "de", "Spain": "es", "Portugal": "pt",
-        "Italy": "it", "Belgium": "be", "Sweden": "se", "Denmark": "dk", "Norway": "no",
-        "Finland": "fi", "Poland": "pl", "Austria": "at", "Switzerland": "ch",
-        "United Kingdom": "uk", "Ireland": "ie", "Brazil": "br", "Portugal ": "pt",
-    }
-    return codes.get(country or "")
+    """ccTLD for a country name, or for an ISO alpha-2 code passed straight in."""
+    text = (country or "").strip().lower()
+    if not text:
+        return None
+    if len(text) == 2 and text.isalpha():
+        return text
+    return _COUNTRY_CODES.get(text)
 
 
 def _funding_is_environmental(record: Any) -> bool:

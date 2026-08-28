@@ -1,0 +1,4430 @@
+[
+ {
+  "seq": 1,
+  "community_name_original": "Soheili Village_Hara",
+  "community_name_normalized": "Soheili Village_Hara",
+  "text_repaired": false,
+  "source_rows": [
+   2
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 2,
+    "latitude": 26.790237,
+    "longitude": 55.771104
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 2,
+  "community_name_original": "Ecovillage Bhrugu Aranya",
+  "community_name_normalized": "Ecovillage Bhrugu Aranya",
+  "text_repaired": false,
+  "source_rows": [
+   3
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 3,
+    "latitude": 49.610737,
+    "longitude": 19.816232
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 3,
+  "community_name_original": "Lost Valley Education Center",
+  "community_name_normalized": "Lost Valley Education Center",
+  "text_repaired": false,
+  "source_rows": [
+   4
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 4,
+    "latitude": 43.891293,
+    "longitude": -122.825738
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 4,
+  "community_name_original": "Dream village biohub",
+  "community_name_normalized": "Dream village biohub",
+  "text_repaired": false,
+  "source_rows": [
+   5
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 5,
+    "latitude": 8.076801,
+    "longitude": 0.194328
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 5,
+  "community_name_original": "Kuthumba Ecovillage",
+  "community_name_normalized": "Kuthumba Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   6
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 6,
+    "latitude": -33.978198,
+    "longitude": 23.493313
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 6,
+  "community_name_original": "Ssamba Foundation – Uganda Volunteer Program",
+  "community_name_normalized": "Ssamba Foundation – Uganda Volunteer Program",
+  "text_repaired": false,
+  "source_rows": [
+   7
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 7,
+    "latitude": 0.513729,
+    "longitude": 32.732357
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 7,
+  "community_name_original": "SEKEM",
+  "community_name_normalized": "SEKEM",
+  "text_repaired": false,
+  "source_rows": [
+   8
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 8,
+    "latitude": 30.420438,
+    "longitude": 31.635801
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 8,
+  "community_name_original": "Kufunda Village",
+  "community_name_normalized": "Kufunda Village",
+  "text_repaired": false,
+  "source_rows": [
+   9
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 9,
+    "latitude": -17.976451,
+    "longitude": 31.156586
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 9,
+  "community_name_original": "The Unity Eco-Village",
+  "community_name_normalized": "The Unity Eco-Village",
+  "text_repaired": false,
+  "source_rows": [
+   10
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 10,
+    "latitude": 28.224812,
+    "longitude": 83.879931
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 10,
+  "community_name_original": "Cabiokid Foundation",
+  "community_name_normalized": "Cabiokid Foundation",
+  "text_repaired": false,
+  "source_rows": [
+   11
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 11,
+    "latitude": 15.229279,
+    "longitude": 120.848381
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 11,
+  "community_name_original": "Konohana Family",
+  "community_name_normalized": "Konohana Family",
+  "text_repaired": false,
+  "source_rows": [
+   12
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 12,
+    "latitude": 35.255504,
+    "longitude": 138.567401
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 12,
+  "community_name_original": "Southern Life Community",
+  "community_name_normalized": "Southern Life Community",
+  "text_repaired": false,
+  "source_rows": [
+   13
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 13,
+    "latitude": 26.203635,
+    "longitude": 119.19017
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 13,
+  "community_name_original": "Manav Chetna Vikas Kendra (MCVK)",
+  "community_name_normalized": "Manav Chetna Vikas Kendra (MCVK)",
+  "text_repaired": false,
+  "source_rows": [
+   14
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 14,
+    "latitude": 22.625327,
+    "longitude": 76.03297
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 14,
+  "community_name_original": "Kibbutz Lotan",
+  "community_name_normalized": "Kibbutz Lotan",
+  "text_repaired": false,
+  "source_rows": [
+   15
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 15,
+    "latitude": 29.988996,
+    "longitude": 35.086617
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 15,
+  "community_name_original": "Biosphere Foundation",
+  "community_name_normalized": "Biosphere Foundation",
+  "text_repaired": false,
+  "source_rows": [
+   16
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 16,
+    "latitude": -8.16064,
+    "longitude": 114.585539
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 16,
+  "community_name_original": "TI EcoVillage",
+  "community_name_normalized": "TI EcoVillage",
+  "text_repaired": false,
+  "source_rows": [
+   17
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 17,
+    "latitude": 12.833221,
+    "longitude": 77.498425
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 17,
+  "community_name_original": "Govardhan Ecovillage",
+  "community_name_normalized": "Govardhan Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   18
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 18,
+    "latitude": 19.655445,
+    "longitude": 72.967781
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 18,
+  "community_name_original": "Kibbutz Gezer",
+  "community_name_normalized": "Kibbutz Gezer",
+  "text_repaired": false,
+  "source_rows": [
+   19
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 19,
+    "latitude": 31.876067,
+    "longitude": 34.920482
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 19,
+  "community_name_original": "Taman Petanu Eco Neighborhood",
+  "community_name_normalized": "Taman Petanu Eco Neighborhood",
+  "text_repaired": false,
+  "source_rows": [
+   20
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 20,
+    "latitude": -8.54869,
+    "longitude": 115.290196
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 20,
+  "community_name_original": "Sadhana Forest India",
+  "community_name_normalized": "Sadhana Forest India",
+  "text_repaired": false,
+  "source_rows": [
+   21
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 21,
+    "latitude": 11.980512,
+    "longitude": 79.777322
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 21,
+  "community_name_original": "Better In Belize Eco-Community",
+  "community_name_normalized": "Better In Belize Eco-Community",
+  "text_repaired": false,
+  "source_rows": [
+   22
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 22,
+    "latitude": 16.992082,
+    "longitude": -89.047539
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 22,
+  "community_name_original": "Rancho Mastatal",
+  "community_name_normalized": "Rancho Mastatal",
+  "text_repaired": false,
+  "source_rows": [
+   23
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 23,
+    "latitude": 9.673092,
+    "longitude": -84.373902
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 23,
+  "community_name_original": "Sat Yoga Ashram &amp; Wisdom School",
+  "community_name_normalized": "Sat Yoga Ashram & Wisdom School",
+  "text_repaired": true,
+  "source_rows": [
+   24
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 24,
+    "latitude": 9.409167,
+    "longitude": -83.831672
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 24,
+  "community_name_original": "VerdEnergia Pacifica",
+  "community_name_normalized": "VerdEnergia Pacifica",
+  "text_repaired": false,
+  "source_rows": [
+   25
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 25,
+    "latitude": 9.736122,
+    "longitude": -84.463414
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 25,
+  "community_name_original": "Gaia Terra",
+  "community_name_normalized": "Gaia Terra",
+  "text_repaired": false,
+  "source_rows": [
+   26
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 26,
+    "latitude": 45.893946,
+    "longitude": 13.061545
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 26,
+  "community_name_original": "Cambium · Leben in Gemeinschaft",
+  "community_name_normalized": "Cambium · Leben in Gemeinschaft",
+  "text_repaired": false,
+  "source_rows": [
+   27
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 27,
+    "latitude": 46.93244,
+    "longitude": 16.020261
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 27,
+  "community_name_original": "Boekel Ecovillage",
+  "community_name_normalized": "Boekel Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   28
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 28,
+    "latitude": 51.59507,
+    "longitude": 5.68108
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 28,
+  "community_name_original": "Co-housing project HASENDORF (= bunny",
+  "community_name_normalized": "Co-housing project HASENDORF (= bunny",
+  "text_repaired": false,
+  "source_rows": [
+   29
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 29,
+    "latitude": 48.300822,
+    "longitude": 15.829862
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 29,
+  "community_name_original": "La Bolina",
+  "community_name_normalized": "La Bolina",
+  "text_repaired": false,
+  "source_rows": [
+   30
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 30,
+    "latitude": 36.929365,
+    "longitude": -3.582513
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 30,
+  "community_name_original": "EcoVillage de Pourgues",
+  "community_name_normalized": "EcoVillage de Pourgues",
+  "text_repaired": false,
+  "source_rows": [
+   31
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 31,
+    "latitude": 43.177351,
+    "longitude": 1.435599
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 31,
+  "community_name_original": "Oasis du Coq Ã  lâ€™Ã‚me",
+  "community_name_normalized": "Oasis du Coq à l'Âme",
+  "text_repaired": true,
+  "source_rows": [
+   32
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 32,
+    "latitude": 45.88003,
+    "longitude": 0.134812
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 32,
+  "community_name_original": "meltemi",
+  "community_name_normalized": "meltemi",
+  "text_repaired": false,
+  "source_rows": [
+   33
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 33,
+    "latitude": 38.004674,
+    "longitude": 24.021794
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 33,
+  "community_name_original": "ECOlonie â€&quot; Centre Ecologique International",
+  "community_name_normalized": "ECOlonie – Centre Ecologique International",
+  "text_repaired": true,
+  "source_rows": [
+   34
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 34,
+    "latitude": 48.050363,
+    "longitude": 6.105263
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 34,
+  "community_name_original": "Matavenero y Poibueno",
+  "community_name_normalized": "Matavenero y Poibueno",
+  "text_repaired": false,
+  "source_rows": [
+   35
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 35,
+    "latitude": 42.537166,
+    "longitude": -6.372006
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 35,
+  "community_name_original": "CommunautÃ© de lâ€™Arche de Saint-Antoine",
+  "community_name_normalized": "Communauté de l'Arche de Saint-Antoine",
+  "text_repaired": true,
+  "source_rows": [
+   36
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 36,
+    "latitude": 45.17499,
+    "longitude": 5.21669
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 36,
+  "community_name_original": "Tamera",
+  "community_name_normalized": "Tamera",
+  "text_repaired": false,
+  "source_rows": [
+   37
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 37,
+    "latitude": 37.720593,
+    "longitude": -8.518849
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 37,
+  "community_name_original": "Cheiry",
+  "community_name_normalized": "Cheiry",
+  "text_repaired": false,
+  "source_rows": [
+   38
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 38,
+    "latitude": 46.751193,
+    "longitude": 6.836893
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 38,
+  "community_name_original": "Hallingelille Ecovillage",
+  "community_name_normalized": "Hallingelille Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   39
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 39,
+    "latitude": 55.494351,
+    "longitude": 11.819877
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 39,
+  "community_name_original": "Munksøgårds",
+  "community_name_normalized": "Munksøgårds",
+  "text_repaired": false,
+  "source_rows": [
+   40
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 40,
+    "latitude": 55.657897,
+    "longitude": 12.132336
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 40,
+  "community_name_original": "Lebensgarten Steyerberg",
+  "community_name_normalized": "Lebensgarten Steyerberg",
+  "text_repaired": false,
+  "source_rows": [
+   41
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 41,
+    "latitude": 52.585216,
+    "longitude": 9.023218
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 41,
+  "community_name_original": "Braziers Park",
+  "community_name_normalized": "Braziers Park",
+  "text_repaired": false,
+  "source_rows": [
+   42
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 42,
+    "latitude": 51.55445,
+    "longitude": -1.084837
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 42,
+  "community_name_original": "SÃ³lheimar Iceland",
+  "community_name_normalized": "Sólheimar Iceland",
+  "text_repaired": true,
+  "source_rows": [
+   43
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 43,
+    "latitude": 64.066438,
+    "longitude": -20.64183
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 43,
+  "community_name_original": "Sieben Linden Ecovillage",
+  "community_name_normalized": "Sieben Linden Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   44
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 44,
+    "latitude": 52.689416,
+    "longitude": 11.143641
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 44,
+  "community_name_original": "Schloss Glarisegg",
+  "community_name_normalized": "Schloss Glarisegg",
+  "text_repaired": false,
+  "source_rows": [
+   45
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 45,
+    "latitude": 47.654734,
+    "longitude": 8.956555
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 45,
+  "community_name_original": "Villaggio Verde",
+  "community_name_normalized": "Villaggio Verde",
+  "text_repaired": false,
+  "source_rows": [
+   46
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 46,
+    "latitude": 45.650872,
+    "longitude": 8.413166
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 46,
+  "community_name_original": "hagaby",
+  "community_name_normalized": "hagaby",
+  "text_repaired": false,
+  "source_rows": [
+   47
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 47,
+    "latitude": 59.148556,
+    "longitude": 15.116483
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 47,
+  "community_name_original": "La CittÃ  della Luce",
+  "community_name_normalized": "La Città della Luce",
+  "text_repaired": true,
+  "source_rows": [
+   48
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 48,
+    "latitude": 43.662751,
+    "longitude": 13.123505
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 48,
+  "community_name_original": "Sunseed Desert Technology",
+  "community_name_normalized": "Sunseed Desert Technology",
+  "text_repaired": false,
+  "source_rows": [
+   49
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 49,
+    "latitude": 37.088377,
+    "longitude": -2.073451
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 49,
+  "community_name_original": "ZEGG",
+  "community_name_normalized": "ZEGG",
+  "text_repaired": false,
+  "source_rows": [
+   50
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 50,
+    "latitude": 52.157004,
+    "longitude": 12.590874
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 50,
+  "community_name_original": "Green Commune Belica",
+  "community_name_normalized": "Green Commune Belica",
+  "text_repaired": false,
+  "source_rows": [
+   51
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 51,
+    "latitude": 41.401714,
+    "longitude": 20.952099
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 51,
+  "community_name_original": "The Park, Ecovillage Findhorn",
+  "community_name_normalized": "The Park, Ecovillage Findhorn",
+  "text_repaired": false,
+  "source_rows": [
+   52
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 52,
+    "latitude": 57.653174,
+    "longitude": -3.593418
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 52,
+  "community_name_original": "Holistic Center Manas",
+  "community_name_normalized": "Holistic Center Manas",
+  "text_repaired": false,
+  "source_rows": [
+   53
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 53,
+    "latitude": 45.992388,
+    "longitude": 14.658149
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 53,
+  "community_name_original": "Hertha LevefÃ¦llesskab/Hertha Living",
+  "community_name_normalized": "Hertha Levefællesskab/Hertha Living",
+  "text_repaired": true,
+  "source_rows": [
+   54
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 54,
+    "latitude": 56.181872,
+    "longitude": 9.971224
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 54,
+  "community_name_original": "Bowden House Community",
+  "community_name_normalized": "Bowden House Community",
+  "text_repaired": false,
+  "source_rows": [
+   55
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 55,
+    "latitude": 50.417254,
+    "longitude": -3.688328
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 55,
+  "community_name_original": "Vlierhof",
+  "community_name_normalized": "Vlierhof",
+  "text_repaired": false,
+  "source_rows": [
+   56
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 56,
+    "latitude": 51.846842,
+    "longitude": 6.081005
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 56,
+  "community_name_original": "Charlottendals Farm and EcoVillage",
+  "community_name_normalized": "Charlottendals Farm and EcoVillage",
+  "text_repaired": false,
+  "source_rows": [
+   57
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 57,
+    "latitude": 59.090864,
+    "longitude": 17.532511
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 57,
+  "community_name_original": "LUMEN Ecovillage",
+  "community_name_normalized": "LUMEN Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   58
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 58,
+    "latitude": 45.035623,
+    "longitude": 9.933535
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 58,
+  "community_name_original": "The Hollies Centre for Practical Sustainability",
+  "community_name_normalized": "The Hollies Centre for Practical Sustainability",
+  "text_repaired": false,
+  "source_rows": [
+   59
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 59,
+    "latitude": 51.761673,
+    "longitude": -8.954811
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 59,
+  "community_name_original": "Selba – Artosilla",
+  "community_name_normalized": "Selba – Artosilla",
+  "text_repaired": false,
+  "source_rows": [
+   60
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 60,
+    "latitude": 42.425796,
+    "longitude": -0.262284
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 60,
+  "community_name_original": "Ecoaldea Los Portales",
+  "community_name_normalized": "Ecoaldea Los Portales",
+  "text_repaired": false,
+  "source_rows": [
+   61
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 61,
+    "latitude": 37.784434,
+    "longitude": -5.9569
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 61,
+  "community_name_original": "Herzfeld Sennrueti",
+  "community_name_normalized": "Herzfeld Sennrueti",
+  "text_repaired": false,
+  "source_rows": [
+   62
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 62,
+    "latitude": 47.376031,
+    "longitude": 9.192655
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 62,
+  "community_name_original": "Lebenstraumgemeinschaft Jahnishausen",
+  "community_name_normalized": "Lebenstraumgemeinschaft Jahnishausen",
+  "text_repaired": false,
+  "source_rows": [
+   63
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 63,
+    "latitude": 51.273941,
+    "longitude": 13.28541
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 63,
+  "community_name_original": "Zonca Ecovillage Italy",
+  "community_name_normalized": "Zonca Ecovillage Italy",
+  "text_repaired": false,
+  "source_rows": [
+   64
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 64,
+    "latitude": 46.057074,
+    "longitude": 8.205941
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 64,
+  "community_name_original": "Suderbyn Permaculture Eco-village",
+  "community_name_normalized": "Suderbyn Permaculture Eco-village",
+  "text_repaired": false,
+  "source_rows": [
+   65
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 65,
+    "latitude": 57.573741,
+    "longitude": 18.208672
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 65,
+  "community_name_original": "DNS The Necessary Teacher Training",
+  "community_name_normalized": "DNS The Necessary Teacher Training",
+  "text_repaired": false,
+  "source_rows": [
+   66
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 66,
+    "latitude": 56.25716,
+    "longitude": 8.27804
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 66,
+  "community_name_original": "Bhakti Tirtha Dhama",
+  "community_name_normalized": "Bhakti Tirtha Dhama",
+  "text_repaired": false,
+  "source_rows": [
+   67
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 67,
+    "latitude": 49.809769,
+    "longitude": 29.514843
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 67,
+  "community_name_original": "Ecovillage Torri Superiore",
+  "community_name_normalized": "Ecovillage Torri Superiore",
+  "text_repaired": false,
+  "source_rows": [
+   68
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 68,
+    "latitude": 43.840361,
+    "longitude": 7.551118
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 68,
+  "community_name_original": "Freedom Village Georgia",
+  "community_name_normalized": "Freedom Village Georgia",
+  "text_repaired": false,
+  "source_rows": [
+   69
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 69,
+    "latitude": 33.360134,
+    "longitude": -82.863336
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 69,
+  "community_name_original": "Hearthstone Village",
+  "community_name_normalized": "Hearthstone Village",
+  "text_repaired": false,
+  "source_rows": [
+   70
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 70,
+    "latitude": 49.781734,
+    "longitude": -124.337462
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 70,
+  "community_name_original": "Windekind Commons Vermont Cohousing",
+  "community_name_normalized": "Windekind Commons Vermont Cohousing",
+  "text_repaired": false,
+  "source_rows": [
+   71
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 71,
+    "latitude": 44.315808,
+    "longitude": -72.941782
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 71,
+  "community_name_original": "HawaiiSPACE",
+  "community_name_normalized": "HawaiiSPACE",
+  "text_repaired": false,
+  "source_rows": [
+   72
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 72,
+    "latitude": 19.408572,
+    "longitude": -154.927618
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 72,
+  "community_name_original": "Greenbriar Community School",
+  "community_name_normalized": "Greenbriar Community School",
+  "text_repaired": false,
+  "source_rows": [
+   73
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 73,
+    "latitude": 30.249293,
+    "longitude": -97.346087
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 73,
+  "community_name_original": "White Hawk Ecovillage",
+  "community_name_normalized": "White Hawk Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   74
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 74,
+    "latitude": 42.362704,
+    "longitude": -76.493173
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 74,
+  "community_name_original": "The Farm",
+  "community_name_normalized": "The Farm",
+  "text_repaired": false,
+  "source_rows": [
+   75
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 75,
+    "latitude": 35.479582,
+    "longitude": -87.328645
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 75,
+  "community_name_original": "Camphill Village Minnesota",
+  "community_name_normalized": "Camphill Village Minnesota",
+  "text_repaired": false,
+  "source_rows": [
+   76
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 76,
+    "latitude": 45.848562,
+    "longitude": -94.911001
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 76,
+  "community_name_original": "eastwind community",
+  "community_name_normalized": "eastwind community",
+  "text_repaired": false,
+  "source_rows": [
+   77
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 77,
+    "latitude": 36.558903,
+    "longitude": -92.308975
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 77,
+  "community_name_original": "Cinderland Ecovillage",
+  "community_name_normalized": "Cinderland Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   78
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 78,
+    "latitude": 19.518199,
+    "longitude": -154.844215
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 78,
+  "community_name_original": "Whole Village",
+  "community_name_normalized": "Whole Village",
+  "text_repaired": false,
+  "source_rows": [
+   79
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 79,
+    "latitude": 43.860761,
+    "longitude": -80.106729
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 79,
+  "community_name_original": "Synergia Ranch (HQ of Ecotechnics)",
+  "community_name_normalized": "Synergia Ranch (HQ of Ecotechnics)",
+  "text_repaired": false,
+  "source_rows": [
+   80
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 80,
+    "latitude": 35.491047,
+    "longitude": -106.095476
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 80,
+  "community_name_original": "Dancing Rabbit Ecovillage",
+  "community_name_normalized": "Dancing Rabbit Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   81
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 81,
+    "latitude": 40.332966,
+    "longitude": -92.096463
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 81,
+  "community_name_original": "Earthaven Ecovillage",
+  "community_name_normalized": "Earthaven Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   82
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 82,
+    "latitude": 35.519705,
+    "longitude": -82.202311
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 82,
+  "community_name_original": "Living Well Community",
+  "community_name_normalized": "Living Well Community",
+  "text_repaired": false,
+  "source_rows": [
+   83
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 83,
+    "latitude": 35.73697,
+    "longitude": -79.681773
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 83,
+  "community_name_original": "Sirius Community",
+  "community_name_normalized": "Sirius Community",
+  "text_repaired": false,
+  "source_rows": [
+   84
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 84,
+    "latitude": 42.419219,
+    "longitude": -72.425852
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 84,
+  "community_name_original": "Hickory Nut Forest Eco-Community",
+  "community_name_normalized": "Hickory Nut Forest Eco-Community",
+  "text_repaired": false,
+  "source_rows": [
+   85
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 85,
+    "latitude": 35.47263,
+    "longitude": -82.339856
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 85,
+  "community_name_original": "Villages at Crest Mountain",
+  "community_name_normalized": "Villages at Crest Mountain",
+  "text_repaired": false,
+  "source_rows": [
+   86
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 86,
+    "latitude": 35.610457,
+    "longitude": -82.616044
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 86,
+  "community_name_original": "IDEAL Society",
+  "community_name_normalized": "IDEAL Society",
+  "text_repaired": false,
+  "source_rows": [
+   87
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 87,
+    "latitude": 49.354342,
+    "longitude": -115.296459
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 87,
+  "community_name_original": "Cite Ecologique (Qc, Canada)",
+  "community_name_normalized": "Cite Ecologique (Qc, Canada)",
+  "text_repaired": false,
+  "source_rows": [
+   88
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 88,
+    "latitude": 45.855019,
+    "longitude": -71.639806
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 88,
+  "community_name_original": "Cedar Moon",
+  "community_name_normalized": "Cedar Moon",
+  "text_repaired": false,
+  "source_rows": [
+   89
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 89,
+    "latitude": 45.44079,
+    "longitude": -122.684757
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 89,
+  "community_name_original": "Twin Oaks Community",
+  "community_name_normalized": "Twin Oaks Community",
+  "text_repaired": false,
+  "source_rows": [
+   90
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 90,
+    "latitude": 37.932583,
+    "longitude": -77.992429
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 90,
+  "community_name_original": "Cobb Hill Cohousing",
+  "community_name_normalized": "Cobb Hill Cohousing",
+  "text_repaired": false,
+  "source_rows": [
+   91
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 91,
+    "latitude": 43.548718,
+    "longitude": -72.425999
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 91,
+  "community_name_original": "Avalon Organic Gardens &amp; EcoVillage",
+  "community_name_normalized": "Avalon Organic Gardens & EcoVillage",
+  "text_repaired": true,
+  "source_rows": [
+   92
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 92,
+    "latitude": 31.575956,
+    "longitude": -111.041119
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 92,
+  "community_name_original": "Ixixtlan",
+  "community_name_normalized": "Ixixtlan",
+  "text_repaired": false,
+  "source_rows": [
+   93
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 93,
+    "latitude": 18.870572,
+    "longitude": -98.398332
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 93,
+  "community_name_original": "Abundance Ecovillage",
+  "community_name_normalized": "Abundance Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   94
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 94,
+    "latitude": 41.042021,
+    "longitude": -91.959907
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 94,
+  "community_name_original": "Stowe Farm Community",
+  "community_name_normalized": "Stowe Farm Community",
+  "text_repaired": false,
+  "source_rows": [
+   95
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 95,
+    "latitude": 42.702264,
+    "longitude": -72.775739
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 95,
+  "community_name_original": "Ecovillage at Ithaca",
+  "community_name_normalized": "Ecovillage at Ithaca",
+  "text_repaired": false,
+  "source_rows": [
+   96
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 96,
+    "latitude": 42.441648,
+    "longitude": -76.542637
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 96,
+  "community_name_original": "The Garden",
+  "community_name_normalized": "The Garden",
+  "text_repaired": false,
+  "source_rows": [
+   97
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 97,
+    "latitude": 36.5982,
+    "longitude": -85.931557
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 97,
+  "community_name_original": "Gita Nagari Eco-Farm and Sanctuary",
+  "community_name_normalized": "Gita Nagari Eco-Farm and Sanctuary",
+  "text_repaired": false,
+  "source_rows": [
+   98
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 98,
+    "latitude": 40.490405,
+    "longitude": -77.461402
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 98,
+  "community_name_original": "The Camphill School",
+  "community_name_normalized": "The Camphill School",
+  "text_repaired": false,
+  "source_rows": [
+   99
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 99,
+    "latitude": 40.136841,
+    "longitude": -75.707889
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 99,
+  "community_name_original": "Hundredfold Farm",
+  "community_name_normalized": "Hundredfold Farm",
+  "text_repaired": false,
+  "source_rows": [
+   100
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 100,
+    "latitude": 39.889294,
+    "longitude": -77.376676
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 100,
+  "community_name_original": "Sawyer Hill Ecovillage",
+  "community_name_normalized": "Sawyer Hill Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   101
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 101,
+    "latitude": 42.372911,
+    "longitude": -71.626188
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 101,
+  "community_name_original": "Moora Moora Co-operative",
+  "community_name_normalized": "Moora Moora Co-operative",
+  "text_repaired": false,
+  "source_rows": [
+   102
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 102,
+    "latitude": -37.720704,
+    "longitude": 145.569887
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 102,
+  "community_name_original": "The Ecovillage at Currumbin",
+  "community_name_normalized": "The Ecovillage at Currumbin",
+  "text_repaired": false,
+  "source_rows": [
+   103
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 103,
+    "latitude": -28.176828,
+    "longitude": 153.432741
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 103,
+  "community_name_original": "Crystal Waters",
+  "community_name_normalized": "Crystal Waters",
+  "text_repaired": false,
+  "source_rows": [
+   104
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 104,
+    "latitude": -26.78553,
+    "longitude": 152.718245
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 104,
+  "community_name_original": "Atamai Village",
+  "community_name_normalized": "Atamai Village",
+  "text_repaired": false,
+  "source_rows": [
+   105
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 105,
+    "latitude": -41.141905,
+    "longitude": 172.956729
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 105,
+  "community_name_original": "Narara Ecovillage",
+  "community_name_normalized": "Narara Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   106
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 106,
+    "latitude": -33.392643,
+    "longitude": 151.328289
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 106,
+  "community_name_original": "Tui Community",
+  "community_name_normalized": "Tui Community",
+  "text_repaired": false,
+  "source_rows": [
+   107
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 107,
+    "latitude": -40.811793,
+    "longitude": 172.957757
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 107,
+  "community_name_original": "Wilderland",
+  "community_name_normalized": "Wilderland",
+  "text_repaired": false,
+  "source_rows": [
+   108
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 108,
+    "latitude": -36.886277,
+    "longitude": 175.674232
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 108,
+  "community_name_original": "Bellbunya Sustainable Community",
+  "community_name_normalized": "Bellbunya Sustainable Community",
+  "text_repaired": false,
+  "source_rows": [
+   109
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 109,
+    "latitude": -26.491096,
+    "longitude": 152.853409
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 109,
+  "community_name_original": "Aldinga Arts Ecovillage",
+  "community_name_normalized": "Aldinga Arts Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   110
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 110,
+    "latitude": -35.265685,
+    "longitude": 138.479025
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 110,
+  "community_name_original": "Gulpa Creek Community",
+  "community_name_normalized": "Gulpa Creek Community",
+  "text_repaired": false,
+  "source_rows": [
+   111
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 111,
+    "latitude": -35.722683,
+    "longitude": 144.893102
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 111,
+  "community_name_original": "Eco Aldea de los glaciares sagrados – Maras",
+  "community_name_normalized": "Eco Aldea de los glaciares sagrados – Maras",
+  "text_repaired": false,
+  "source_rows": [
+   112
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 112,
+    "latitude": -13.339833,
+    "longitude": -72.144032
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 112,
+  "community_name_original": "Terra Luminous",
+  "community_name_normalized": "Terra Luminous",
+  "text_repaired": false,
+  "source_rows": [
+   113
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 113,
+    "latitude": -24.02194,
+    "longitude": -47.068398
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 113,
+  "community_name_original": "Ecovilla GAIA – Argentina",
+  "community_name_normalized": "Ecovilla GAIA – Argentina",
+  "text_repaired": false,
+  "source_rows": [
+   114
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 114,
+    "latitude": -34.947362,
+    "longitude": -59.337962
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 114,
+  "community_name_original": "El Manzano",
+  "community_name_normalized": "El Manzano",
+  "text_repaired": false,
+  "source_rows": [
+   115
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 115,
+    "latitude": -37.15607,
+    "longitude": -72.286233
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 115,
+  "community_name_original": "Agrovilla El Prado",
+  "community_name_normalized": "Agrovilla El Prado",
+  "text_repaired": false,
+  "source_rows": [
+   116
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 116,
+    "latitude": 4.787184,
+    "longitude": -75.643927
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 116,
+  "community_name_original": "Aldeafeliz Ecovillage",
+  "community_name_normalized": "Aldeafeliz Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   117
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 117,
+    "latitude": 4.987656,
+    "longitude": -74.279152
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 117,
+  "community_name_original": "Peoples Coast Ecovillage Network",
+  "community_name_normalized": "Peoples Coast Ecovillage Network",
+  "text_repaired": false,
+  "source_rows": [
+   118
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 118,
+    "latitude": 13.089183,
+    "longitude": -16.759665
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 118,
+  "community_name_original": "Tlholego Ecovillage and Learning Centre",
+  "community_name_normalized": "Tlholego Ecovillage and Learning Centre",
+  "text_repaired": false,
+  "source_rows": [
+   119
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 119,
+    "latitude": -25.684519,
+    "longitude": 27.099662
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 119,
+  "community_name_original": "Green Village Bali",
+  "community_name_normalized": "Green Village Bali",
+  "text_repaired": false,
+  "source_rows": [
+   120
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 120,
+    "latitude": -8.574186,
+    "longitude": 115.214248
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 120,
+  "community_name_original": "Assalam eco-village by the Indian Ocean",
+  "community_name_normalized": "Assalam eco-village by the Indian Ocean",
+  "text_repaired": false,
+  "source_rows": [
+   121
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 121,
+    "latitude": -6.448134,
+    "longitude": 39.466153
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 121,
+  "community_name_original": "The Sustainability Institute and Lynedoch",
+  "community_name_normalized": "The Sustainability Institute and Lynedoch",
+  "text_repaired": false,
+  "source_rows": [
+   122
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 122,
+    "latitude": -33.982689,
+    "longitude": 18.768245
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 122,
+  "community_name_original": "Chisapani Ecovillage Tarebhir",
+  "community_name_normalized": "Chisapani Ecovillage Tarebhir",
+  "text_repaired": false,
+  "source_rows": [
+   123
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 123,
+    "latitude": 28.20735,
+    "longitude": 83.906688
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 123,
+  "community_name_original": "Ruma Eco Village , Mayagdi Nepal",
+  "community_name_normalized": "Ruma Eco Village , Mayagdi Nepal",
+  "text_repaired": false,
+  "source_rows": [
+   124
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 124,
+    "latitude": 28.412866,
+    "longitude": 83.384985
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 124,
+  "community_name_original": "Suwan organic farmstay",
+  "community_name_normalized": "Suwan organic farmstay",
+  "text_repaired": false,
+  "source_rows": [
+   125
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 125,
+    "latitude": 17.671088,
+    "longitude": 102.839151
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 125,
+  "community_name_original": "Daruma Ecovillage",
+  "community_name_normalized": "Daruma Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   126
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 126,
+    "latitude": 13.236989,
+    "longitude": 100.952719
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 126,
+  "community_name_original": "Protopia Community",
+  "community_name_normalized": "Protopia Community",
+  "text_repaired": false,
+  "source_rows": [
+   127
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 127,
+    "latitude": 10.593709,
+    "longitude": -84.841019
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 127,
+  "community_name_original": "Eco Aldeia do Vale â€&quot; Instituto Permacultura",
+  "community_name_normalized": "Eco Aldeia do Vale – Instituto Permacultura",
+  "text_repaired": true,
+  "source_rows": [
+   128
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 128,
+    "latitude": 38.880436,
+    "longitude": -9.307763
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 128,
+  "community_name_original": "Spoluzemě Vrábsko",
+  "community_name_normalized": "Spoluzemě Vrábsko",
+  "text_repaired": false,
+  "source_rows": [
+   129
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 129,
+    "latitude": 49.46448,
+    "longitude": 14.103488
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 129,
+  "community_name_original": "Friskoven",
+  "community_name_normalized": "Friskoven",
+  "text_repaired": false,
+  "source_rows": [
+   130
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 130,
+    "latitude": 55.095061,
+    "longitude": 14.944695
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 130,
+  "community_name_original": "Gemeinschaft Sulzbrunn",
+  "community_name_normalized": "Gemeinschaft Sulzbrunn",
+  "text_repaired": false,
+  "source_rows": [
+   131
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 131,
+    "latitude": 47.670555,
+    "longitude": 10.384863
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 131,
+  "community_name_original": "Eotopia",
+  "community_name_normalized": "Eotopia",
+  "text_repaired": false,
+  "source_rows": [
+   132
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 132,
+    "latitude": 46.709743,
+    "longitude": 3.681777
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 132,
+  "community_name_original": "ComunitÃ  rigenerative",
+  "community_name_normalized": "Comunità rigenerative",
+  "text_repaired": true,
+  "source_rows": [
+   133
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 133,
+    "latitude": 45.994696,
+    "longitude": 12.999064
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 133,
+  "community_name_original": "Thabarwa Nature Centre EU",
+  "community_name_normalized": "Thabarwa Nature Centre EU",
+  "text_repaired": false,
+  "source_rows": [
+   134
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 134,
+    "latitude": 44.703496,
+    "longitude": 8.851423
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 134,
+  "community_name_original": "Gut Alaune",
+  "community_name_normalized": "Gut Alaune",
+  "text_repaired": false,
+  "source_rows": [
+   135
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 135,
+    "latitude": 51.526603,
+    "longitude": 11.919516
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 135,
+  "community_name_original": "Ängsbacka",
+  "community_name_normalized": "Ängsbacka",
+  "text_repaired": false,
+  "source_rows": [
+   136
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 136,
+    "latitude": 59.601268,
+    "longitude": 13.700271
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 136,
+  "community_name_original": "New Mayapur",
+  "community_name_normalized": "New Mayapur",
+  "text_repaired": false,
+  "source_rows": [
+   137
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 137,
+    "latitude": 47.084388,
+    "longitude": 1.405437
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 137,
+  "community_name_original": "Los Guindales",
+  "community_name_normalized": "Los Guindales",
+  "text_repaired": false,
+  "source_rows": [
+   138
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 138,
+    "latitude": 36.566965,
+    "longitude": -5.278144
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 138,
+  "community_name_original": "Ferme de la Chaux, Goshen",
+  "community_name_normalized": "Ferme de la Chaux, Goshen",
+  "text_repaired": false,
+  "source_rows": [
+   139
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 139,
+    "latitude": 47.218402,
+    "longitude": 4.671591
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 139,
+  "community_name_original": "Aletheia Springs",
+  "community_name_normalized": "Aletheia Springs",
+  "text_repaired": false,
+  "source_rows": [
+   140
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 140,
+    "latitude": 38.394538,
+    "longitude": -122.550868
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 140,
+  "community_name_original": "Entelechy",
+  "community_name_normalized": "Entelechy",
+  "text_repaired": false,
+  "source_rows": [
+   141
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 141,
+    "latitude": 48.805441,
+    "longitude": -123.489671
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 141,
+  "community_name_original": "Pura Vida Village at Tico Time River Resort",
+  "community_name_normalized": "Pura Vida Village at Tico Time River Resort",
+  "text_repaired": false,
+  "source_rows": [
+   142
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 142,
+    "latitude": 36.98919,
+    "longitude": -107.87048
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 142,
+  "community_name_original": "ReTribe at NorthernShire",
+  "community_name_normalized": "ReTribe at NorthernShire",
+  "text_repaired": false,
+  "source_rows": [
+   143
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 143,
+    "latitude": 44.506074,
+    "longitude": -72.86514
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 143,
+  "community_name_original": "PORTAL XIBALBA: ECO-VILLAGE IN THE JUNGLE OF PLAYA DEL CARMEN",
+  "community_name_normalized": "PORTAL XIBALBA: ECO-VILLAGE IN THE JUNGLE OF PLAYA DEL CARMEN",
+  "text_repaired": false,
+  "source_rows": [
+   144
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 144,
+    "latitude": 20.699931,
+    "longitude": -87.06081
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 144,
+  "community_name_original": "Emerald Earth Sanctuary",
+  "community_name_normalized": "Emerald Earth Sanctuary",
+  "text_repaired": false,
+  "source_rows": [
+   145
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 145,
+    "latitude": 39.025389,
+    "longitude": -123.292036
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 145,
+  "community_name_original": "Maleny Eco Village",
+  "community_name_normalized": "Maleny Eco Village",
+  "text_repaired": false,
+  "source_rows": [
+   146
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 146,
+    "latitude": -26.758032,
+    "longitude": 152.84838
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 146,
+  "community_name_original": "Billen Cliff",
+  "community_name_normalized": "Billen Cliff",
+  "text_repaired": false,
+  "source_rows": [
+   147
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 147,
+    "latitude": -28.612343,
+    "longitude": 153.133824
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 147,
+  "community_name_original": "Arca Verde",
+  "community_name_normalized": "Arca Verde",
+  "text_repaired": false,
+  "source_rows": [
+   148
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 148,
+    "latitude": -29.465191,
+    "longitude": -50.500893
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 148,
+  "community_name_original": "Villa Productiva Agroecológica JANUS",
+  "community_name_normalized": "Villa Productiva Agroecológica JANUS",
+  "text_repaired": false,
+  "source_rows": [
+   149
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 149,
+    "latitude": -38.74731,
+    "longitude": -68.11762
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 149,
+  "community_name_original": "Wisdom Forest",
+  "community_name_normalized": "Wisdom Forest",
+  "text_repaired": false,
+  "source_rows": [
+   150
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 150,
+    "latitude": -1.055126,
+    "longitude": -77.895996
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 150,
+  "community_name_original": "Bambako Eco Farm / YIRABAH Gambia",
+  "community_name_normalized": "Bambako Eco Farm / YIRABAH Gambia",
+  "text_repaired": false,
+  "source_rows": [
+   151
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 151,
+    "latitude": 13.405483,
+    "longitude": -15.767966
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 151,
+  "community_name_original": "Honeyville Farm",
+  "community_name_normalized": "Honeyville Farm",
+  "text_repaired": false,
+  "source_rows": [
+   152
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 152,
+    "latitude": -33.931231,
+    "longitude": 24.764866
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 152,
+  "community_name_original": "Yasna Sloboda",
+  "community_name_normalized": "Yasna Sloboda",
+  "text_repaired": false,
+  "source_rows": [
+   153
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 153,
+    "latitude": 54.756701,
+    "longitude": 37.875068
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 153,
+  "community_name_original": "Ecovillage Kovcheg",
+  "community_name_normalized": "Ecovillage Kovcheg",
+  "text_repaired": false,
+  "source_rows": [
+   154
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 154,
+    "latitude": 55.061992,
+    "longitude": 36.128649
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 154,
+  "community_name_original": "Yeniköy",
+  "community_name_normalized": "Yeniköy",
+  "text_repaired": false,
+  "source_rows": [
+   155
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 155,
+    "latitude": 39.933706,
+    "longitude": 26.165414
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 155,
+  "community_name_original": "Serene Eco Village",
+  "community_name_normalized": "Serene Eco Village",
+  "text_repaired": false,
+  "source_rows": [
+   156
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 156,
+    "latitude": 18.315759,
+    "longitude": 73.624871
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 156,
+  "community_name_original": "Tasman Ecovillage",
+  "community_name_normalized": "Tasman Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   157
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 157,
+    "latitude": -43.093448,
+    "longitude": 147.742258
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 157,
+  "community_name_original": "Patanga",
+  "community_name_normalized": "Patanga",
+  "text_repaired": false,
+  "source_rows": [
+   158
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 158,
+    "latitude": -30.438118,
+    "longitude": 152.694861
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 158,
+  "community_name_original": "Ecolieu Argoumbat",
+  "community_name_normalized": "Ecolieu Argoumbat",
+  "text_repaired": false,
+  "source_rows": [
+   159
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 159,
+    "latitude": 43.910315,
+    "longitude": 0.98036
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 159,
+  "community_name_original": "Arterra Bizimodu",
+  "community_name_normalized": "Arterra Bizimodu",
+  "text_repaired": false,
+  "source_rows": [
+   160
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 160,
+    "latitude": 42.715388,
+    "longitude": -1.325865
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 160,
+  "community_name_original": "Keuruu Ecovillage",
+  "community_name_normalized": "Keuruu Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   161
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 161,
+    "latitude": 62.306323,
+    "longitude": 24.622492
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 161,
+  "community_name_original": "Zeleni Kruchi",
+  "community_name_normalized": "Zeleni Kruchi",
+  "text_repaired": false,
+  "source_rows": [
+   162
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 162,
+    "latitude": 49.425633,
+    "longitude": 30.869992
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 162,
+  "community_name_original": "Damanhur",
+  "community_name_normalized": "Damanhur",
+  "text_repaired": false,
+  "source_rows": [
+   163
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 163,
+    "latitude": 45.431012,
+    "longitude": 7.757471
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 163,
+  "community_name_original": "Soheili Village",
+  "community_name_normalized": "Soheili Village",
+  "text_repaired": false,
+  "source_rows": [
+   164
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 164,
+    "latitude": 26.755264,
+    "longitude": 55.787829
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 164,
+  "community_name_original": "Land van Aine",
+  "community_name_normalized": "Land van Aine",
+  "text_repaired": false,
+  "source_rows": [
+   165
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 165,
+    "latitude": 52.867512,
+    "longitude": 7.088633
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 165,
+  "community_name_original": "Bali Ecovillage",
+  "community_name_normalized": "Bali Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   166
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 166,
+    "latitude": -8.268028,
+    "longitude": 115.249245
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 166,
+  "community_name_original": "Pun Pun",
+  "community_name_normalized": "Pun Pun",
+  "text_repaired": false,
+  "source_rows": [
+   167
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 167,
+    "latitude": 19.214646,
+    "longitude": 99.012448
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 167,
+  "community_name_original": "Neot Semadar",
+  "community_name_normalized": "Neot Semadar",
+  "text_repaired": false,
+  "source_rows": [
+   168
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 168,
+    "latitude": 30.048671,
+    "longitude": 35.026633
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 168,
+  "community_name_original": "Witchcliffe Ecovillage",
+  "community_name_normalized": "Witchcliffe Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   169
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 169,
+    "latitude": -34.024552,
+    "longitude": 115.104041
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 169,
+  "community_name_original": "Almost Heaven Farms",
+  "community_name_normalized": "Almost Heaven Farms",
+  "text_repaired": false,
+  "source_rows": [
+   170
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 170,
+    "latitude": 26.88519,
+    "longitude": 88.043108
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 170,
+  "community_name_original": "Baireni Ecovillage",
+  "community_name_normalized": "Baireni Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   171
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 171,
+    "latitude": 26.981135,
+    "longitude": 86.533428
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 171,
+  "community_name_original": "Blue Star Tapovan Trinidad",
+  "community_name_normalized": "Blue Star Tapovan Trinidad",
+  "text_repaired": false,
+  "source_rows": [
+   172
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 172,
+    "latitude": 10.349735,
+    "longitude": -61.452866
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 172,
+  "community_name_original": "Chambalabamba",
+  "community_name_normalized": "Chambalabamba",
+  "text_repaired": false,
+  "source_rows": [
+   173
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 173,
+    "latitude": -4.274831,
+    "longitude": -79.203292
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 173,
+  "community_name_original": "Chanchos de Monte",
+  "community_name_normalized": "Chanchos de Monte",
+  "text_repaired": false,
+  "source_rows": [
+   174
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 174,
+    "latitude": 10.793327,
+    "longitude": -84.393727
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 174,
+  "community_name_original": "Ecovila Piracanga",
+  "community_name_normalized": "Ecovila Piracanga",
+  "text_repaired": false,
+  "source_rows": [
+   175
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 175,
+    "latitude": -14.214697,
+    "longitude": -38.995034
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 175,
+  "community_name_original": "Ecovila Raiz do Anuhmas",
+  "community_name_normalized": "Ecovila Raiz do Anuhmas",
+  "text_repaired": false,
+  "source_rows": [
+   176
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 176,
+    "latitude": -22.791348,
+    "longitude": -47.05044
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 176,
+  "community_name_original": "Ecovila Santa Margarida",
+  "community_name_normalized": "Ecovila Santa Margarida",
+  "text_repaired": false,
+  "source_rows": [
+   177
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 177,
+    "latitude": -22.789479,
+    "longitude": -47.069783
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 177,
+  "community_name_original": "Ecovillage Pentierebougou",
+  "community_name_normalized": "Ecovillage Pentierebougou",
+  "text_repaired": false,
+  "source_rows": [
+   178
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 178,
+    "latitude": 13.086727,
+    "longitude": -7.940589
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 178,
+  "community_name_original": "Jyagdi EcoVillage Chapakot Syangja Nepal",
+  "community_name_normalized": "Jyagdi EcoVillage Chapakot Syangja Nepal",
+  "text_repaired": false,
+  "source_rows": [
+   179
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 179,
+    "latitude": 27.93584,
+    "longitude": 83.878329
+   }
+  ],
+  "candidate_count": 1,
+  "candidate_spread_km": 0.0
+ },
+ {
+  "seq": 179,
+  "community_name_original": "Habiba Community",
+  "community_name_normalized": "Habiba Community",
+  "text_repaired": false,
+  "source_rows": [
+   180,
+   181,
+   182,
+   183
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 180,
+    "latitude": 28.612207,
+    "longitude": 34.557279
+   },
+   {
+    "source_line": 181,
+    "latitude": 28.929031,
+    "longitude": 34.642872
+   },
+   {
+    "source_line": 182,
+    "latitude": 28.509623,
+    "longitude": 34.514068
+   },
+   {
+    "source_line": 183,
+    "latitude": 29.010284,
+    "longitude": 34.670396
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 57.719
+ },
+ {
+  "seq": 180,
+  "community_name_original": "Fruit Haven EcoVillage Ecuador",
+  "community_name_normalized": "Fruit Haven EcoVillage Ecuador",
+  "text_repaired": false,
+  "source_rows": [
+   184,
+   185,
+   186,
+   187
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 184,
+    "latitude": -3.204382,
+    "longitude": -78.434897
+   },
+   {
+    "source_line": 185,
+    "latitude": -3.727531,
+    "longitude": -78.52983
+   },
+   {
+    "source_line": 186,
+    "latitude": -3.405627,
+    "longitude": -78.58245
+   },
+   {
+    "source_line": 187,
+    "latitude": -3.527531,
+    "longitude": -78.52983
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 59.118
+ },
+ {
+  "seq": 181,
+  "community_name_original": "Valle de Sensaciones",
+  "community_name_normalized": "Valle de Sensaciones",
+  "text_repaired": false,
+  "source_rows": [
+   188,
+   189,
+   190,
+   191
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 188,
+    "latitude": 37.01,
+    "longitude": -2.739901
+   },
+   {
+    "source_line": 189,
+    "latitude": 37.040521,
+    "longitude": -2.661636
+   },
+   {
+    "source_line": 190,
+    "latitude": 37.146121,
+    "longitude": -3.567734
+   },
+   {
+    "source_line": 191,
+    "latitude": 36.95727,
+    "longitude": -3.136732
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 81.22
+ },
+ {
+  "seq": 182,
+  "community_name_original": "Las Cañadas Bosque de Niebla",
+  "community_name_normalized": "Las Cañadas Bosque de Niebla",
+  "text_repaired": false,
+  "source_rows": [
+   192,
+   193,
+   194,
+   195
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 192,
+    "latitude": 19.381856,
+    "longitude": -97.078764
+   },
+   {
+    "source_line": 193,
+    "latitude": 19.473477,
+    "longitude": -96.998428
+   },
+   {
+    "source_line": 194,
+    "latitude": 19.423259,
+    "longitude": -97.013185
+   },
+   {
+    "source_line": 195,
+    "latitude": 19.176892,
+    "longitude": -96.972307
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 33.092
+ },
+ {
+  "seq": 183,
+  "community_name_original": "Valdepielagos",
+  "community_name_normalized": "Valdepielagos",
+  "text_repaired": false,
+  "source_rows": [
+   196,
+   197,
+   198,
+   199
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 196,
+    "latitude": 40.867064,
+    "longitude": -3.057009
+   },
+   {
+    "source_line": 197,
+    "latitude": 40.52927,
+    "longitude": -3.829909
+   },
+   {
+    "source_line": 198,
+    "latitude": 40.475278,
+    "longitude": -3.875856
+   },
+   {
+    "source_line": 199,
+    "latitude": 40.760722,
+    "longitude": -3.465693
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 81.652
+ },
+ {
+  "seq": 184,
+  "community_name_original": "Earthship Greater World Community",
+  "community_name_normalized": "Earthship Greater World Community",
+  "text_repaired": false,
+  "source_rows": [
+   200,
+   201,
+   202,
+   203
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 200,
+    "latitude": 36.438188,
+    "longitude": -105.544605
+   },
+   {
+    "source_line": 201,
+    "latitude": 36.37896,
+    "longitude": -105.746606
+   },
+   {
+    "source_line": 202,
+    "latitude": 35.678588,
+    "longitude": -105.928746
+   },
+   {
+    "source_line": 203,
+    "latitude": 36.494782,
+    "longitude": -105.752179
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 92.133
+ },
+ {
+  "seq": 185,
+  "community_name_original": "Wind Spirit Community",
+  "community_name_normalized": "Wind Spirit Community",
+  "text_repaired": false,
+  "source_rows": [
+   204,
+   205,
+   206,
+   207
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 204,
+    "latitude": 32.920233,
+    "longitude": -110.728282
+   },
+   {
+    "source_line": 205,
+    "latitude": 33.119606,
+    "longitude": -110.705413
+   },
+   {
+    "source_line": 206,
+    "latitude": 32.239667,
+    "longitude": -110.931139
+   },
+   {
+    "source_line": 207,
+    "latitude": 33.14686,
+    "longitude": -110.835378
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 101.273
+ },
+ {
+  "seq": 186,
+  "community_name_original": "TerraSante Village",
+  "community_name_normalized": "TerraSante Village",
+  "text_repaired": false,
+  "source_rows": [
+   208,
+   209,
+   210,
+   211
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 208,
+    "latitude": 31.952695,
+    "longitude": -110.933283
+   },
+   {
+    "source_line": 209,
+    "latitude": 32.126271,
+    "longitude": -111.560682
+   },
+   {
+    "source_line": 210,
+    "latitude": 32.170992,
+    "longitude": -110.972659
+   },
+   {
+    "source_line": 211,
+    "latitude": 32.111705,
+    "longitude": -111.254893
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 62.207
+ },
+ {
+  "seq": 187,
+  "community_name_original": "Catfarm",
+  "community_name_normalized": "Catfarm",
+  "text_repaired": false,
+  "source_rows": [
+   212,
+   213,
+   214,
+   215
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 212,
+    "latitude": 43.518894,
+    "longitude": 3.142473
+   },
+   {
+    "source_line": 213,
+    "latitude": 43.594831,
+    "longitude": 3.400745
+   },
+   {
+    "source_line": 214,
+    "latitude": 43.355072,
+    "longitude": 3.226497
+   },
+   {
+    "source_line": 215,
+    "latitude": 43.498233,
+    "longitude": 3.657874
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 41.629
+ },
+ {
+  "seq": 188,
+  "community_name_original": "Grishino Ecovillage",
+  "community_name_normalized": "Grishino Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   216,
+   217,
+   218,
+   219
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 216,
+    "latitude": 61.425742,
+    "longitude": 34.439842
+   },
+   {
+    "source_line": 217,
+    "latitude": 60.973294,
+    "longitude": 34.542661
+   },
+   {
+    "source_line": 218,
+    "latitude": 60.920762,
+    "longitude": 34.140283
+   },
+   {
+    "source_line": 219,
+    "latitude": 61.087028,
+    "longitude": 34.0813
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 58.403
+ },
+ {
+  "seq": 189,
+  "community_name_original": "Hurdal Ecovillage",
+  "community_name_normalized": "Hurdal Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   220,
+   221,
+   222,
+   223
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 220,
+    "latitude": 60.740503,
+    "longitude": 11.36602
+   },
+   {
+    "source_line": 221,
+    "latitude": 60.047314,
+    "longitude": 11.567405
+   },
+   {
+    "source_line": 222,
+    "latitude": 60.799045,
+    "longitude": 11.074949
+   },
+   {
+    "source_line": 223,
+    "latitude": 60.411096,
+    "longitude": 11.052614
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 87.849
+ },
+ {
+  "seq": 190,
+  "community_name_original": "Nackunga Community",
+  "community_name_normalized": "Nackunga Community",
+  "text_repaired": false,
+  "source_rows": [
+   224,
+   225,
+   226,
+   227
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 224,
+    "latitude": 58.921292,
+    "longitude": 17.450216
+   },
+   {
+    "source_line": 225,
+    "latitude": 59.208488,
+    "longitude": 16.996666
+   },
+   {
+    "source_line": 226,
+    "latitude": 59.18988,
+    "longitude": 17.813966
+   },
+   {
+    "source_line": 227,
+    "latitude": 59.024944,
+    "longitude": 17.564475
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 46.581
+ },
+ {
+  "seq": 191,
+  "community_name_original": "Tuggelite Ecovillage",
+  "community_name_normalized": "Tuggelite Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   228,
+   229,
+   230,
+   231
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 228,
+    "latitude": 59.38474,
+    "longitude": 13.047757
+   },
+   {
+    "source_line": 229,
+    "latitude": 59.377628,
+    "longitude": 13.369102
+   },
+   {
+    "source_line": 230,
+    "latitude": 59.391109,
+    "longitude": 13.524578
+   },
+   {
+    "source_line": 231,
+    "latitude": 59.422998,
+    "longitude": 13.438836
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 27.008
+ },
+ {
+  "seq": 192,
+  "community_name_original": "Ecotopia Romania — Stanciova",
+  "community_name_normalized": "Ecotopia Romania — Stanciova",
+  "text_repaired": false,
+  "source_rows": [
+   232,
+   233,
+   234,
+   235
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 232,
+    "latitude": 45.894688,
+    "longitude": 21.880667
+   },
+   {
+    "source_line": 233,
+    "latitude": 45.796329,
+    "longitude": 22.01053
+   },
+   {
+    "source_line": 234,
+    "latitude": 45.801507,
+    "longitude": 21.246586
+   },
+   {
+    "source_line": 235,
+    "latitude": 45.862744,
+    "longitude": 21.575335
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 59.226
+ },
+ {
+  "seq": 193,
+  "community_name_original": "Schloss Tempelhof",
+  "community_name_normalized": "Schloss Tempelhof",
+  "text_repaired": false,
+  "source_rows": [
+   236,
+   237,
+   238,
+   239
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 236,
+    "latitude": 49.1941,
+    "longitude": 10.369826
+   },
+   {
+    "source_line": 237,
+    "latitude": 49.175155,
+    "longitude": 10.561528
+   },
+   {
+    "source_line": 238,
+    "latitude": 49.304795,
+    "longitude": 10.58656
+   },
+   {
+    "source_line": 239,
+    "latitude": 49.126124,
+    "longitude": 10.206793
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 33.994
+ },
+ {
+  "seq": 194,
+  "community_name_original": "Possibility Alliance",
+  "community_name_normalized": "Possibility Alliance",
+  "text_repaired": false,
+  "source_rows": [
+   240,
+   241,
+   242,
+   243
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 240,
+    "latitude": 40.147564,
+    "longitude": -92.378033
+   },
+   {
+    "source_line": 241,
+    "latitude": 40.377446,
+    "longitude": -92.346357
+   },
+   {
+    "source_line": 242,
+    "latitude": 40.194983,
+    "longitude": -92.576291
+   },
+   {
+    "source_line": 243,
+    "latitude": 40.074724,
+    "longitude": -92.458811
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 34.989
+ },
+ {
+  "seq": 195,
+  "community_name_original": "Rodnoe (Rodnoye) Settlement",
+  "community_name_normalized": "Rodnoe (Rodnoye) Settlement",
+  "text_repaired": false,
+  "source_rows": [
+   244,
+   245,
+   246,
+   247
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 244,
+    "latitude": 56.140901,
+    "longitude": 40.87087
+   },
+   {
+    "source_line": 245,
+    "latitude": 56.151222,
+    "longitude": 40.766331
+   },
+   {
+    "source_line": 246,
+    "latitude": 56.111858,
+    "longitude": 40.363651
+   },
+   {
+    "source_line": 247,
+    "latitude": 55.915364,
+    "longitude": 40.553046
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 31.92
+ },
+ {
+  "seq": 196,
+  "community_name_original": "Cloughjordan Ecovillage",
+  "community_name_normalized": "Cloughjordan Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   248,
+   249,
+   250,
+   251
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 248,
+    "latitude": 52.984386,
+    "longitude": -7.924957
+   },
+   {
+    "source_line": 249,
+    "latitude": 53.124284,
+    "longitude": -7.525888
+   },
+   {
+    "source_line": 250,
+    "latitude": 52.666186,
+    "longitude": -8.570831
+   },
+   {
+    "source_line": 251,
+    "latitude": 52.946515,
+    "longitude": -8.036953
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 86.648
+ },
+ {
+  "seq": 197,
+  "community_name_original": "O.U.R Ecovillage",
+  "community_name_normalized": "O.U.R Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   252,
+   253,
+   254,
+   255
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 252,
+    "latitude": 48.69161,
+    "longitude": -123.603499
+   },
+   {
+    "source_line": 253,
+    "latitude": 48.480165,
+    "longitude": -123.459587
+   },
+   {
+    "source_line": 254,
+    "latitude": 48.424469,
+    "longitude": -123.341908
+   },
+   {
+    "source_line": 255,
+    "latitude": 48.640102,
+    "longitude": -123.610282
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 35.398
+ },
+ {
+  "seq": 198,
+  "community_name_original": "Lammas Ecovillage (Tir-y-Gafel)",
+  "community_name_normalized": "Lammas Ecovillage (Tir-y-Gafel)",
+  "text_repaired": false,
+  "source_rows": [
+   256,
+   257,
+   258,
+   259
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 256,
+    "latitude": 51.894809,
+    "longitude": -4.906431
+   },
+   {
+    "source_line": 257,
+    "latitude": 51.966315,
+    "longitude": -4.73314
+   },
+   {
+    "source_line": 258,
+    "latitude": 51.682322,
+    "longitude": -4.121079
+   },
+   {
+    "source_line": 259,
+    "latitude": 51.934066,
+    "longitude": -4.623775
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 58.959
+ },
+ {
+  "seq": 199,
+  "community_name_original": "Friland",
+  "community_name_normalized": "Friland",
+  "text_repaired": false,
+  "source_rows": [
+   260,
+   261,
+   262,
+   263
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 260,
+    "latitude": 56.400436,
+    "longitude": 10.712567
+   },
+   {
+    "source_line": 261,
+    "latitude": 56.286562,
+    "longitude": 10.464254
+   },
+   {
+    "source_line": 262,
+    "latitude": 56.482237,
+    "longitude": 10.014967
+   },
+   {
+    "source_line": 263,
+    "latitude": 56.280995,
+    "longitude": 10.58589
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 43.834
+ },
+ {
+  "seq": 200,
+  "community_name_original": "Sadhana Forest Haiti",
+  "community_name_normalized": "Sadhana Forest Haiti",
+  "text_repaired": false,
+  "source_rows": [
+   264,
+   265,
+   266,
+   267
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 264,
+    "latitude": 18.572554,
+    "longitude": -72.072359
+   },
+   {
+    "source_line": 265,
+    "latitude": 18.077235,
+    "longitude": -71.805601
+   },
+   {
+    "source_line": 266,
+    "latitude": 18.558181,
+    "longitude": -72.309515
+   },
+   {
+    "source_line": 267,
+    "latitude": 18.04636,
+    "longitude": -71.762129
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 81.107
+ },
+ {
+  "seq": 201,
+  "community_name_original": "Hockerton Housing Project",
+  "community_name_normalized": "Hockerton Housing Project",
+  "text_repaired": false,
+  "source_rows": [
+   268,
+   269,
+   270,
+   271
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 268,
+    "latitude": 53.277152,
+    "longitude": -0.79406
+   },
+   {
+    "source_line": 269,
+    "latitude": 53.268968,
+    "longitude": -1.589749
+   },
+   {
+    "source_line": 270,
+    "latitude": 52.979165,
+    "longitude": -1.115959
+   },
+   {
+    "source_line": 271,
+    "latitude": 53.097341,
+    "longitude": -0.929501
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 52.917
+ },
+ {
+  "seq": 202,
+  "community_name_original": "Den Selvforsynende Landsby (Self-Sufficient Village)",
+  "community_name_normalized": "Den Selvforsynende Landsby (Self-Sufficient Village)",
+  "text_repaired": false,
+  "source_rows": [
+   272,
+   273,
+   274,
+   275
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 272,
+    "latitude": 55.538228,
+    "longitude": 10.34717
+   },
+   {
+    "source_line": 273,
+    "latitude": 55.215178,
+    "longitude": 10.544956
+   },
+   {
+    "source_line": 274,
+    "latitude": 55.412464,
+    "longitude": 10.333695
+   },
+   {
+    "source_line": 275,
+    "latitude": 55.09841,
+    "longitude": 10.426727
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 49.164
+ },
+ {
+  "seq": 203,
+  "community_name_original": "Cité Écologique (New Hampshire)",
+  "community_name_normalized": "Cité Écologique (New Hampshire)",
+  "text_repaired": false,
+  "source_rows": [
+   276,
+   277,
+   278,
+   279
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 276,
+    "latitude": 44.810547,
+    "longitude": -71.884611
+   },
+   {
+    "source_line": 277,
+    "latitude": 45.058241,
+    "longitude": -71.279361
+   },
+   {
+    "source_line": 278,
+    "latitude": 44.469187,
+    "longitude": -71.190214
+   },
+   {
+    "source_line": 279,
+    "latitude": 44.935101,
+    "longitude": -71.47749
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 66.777
+ },
+ {
+  "seq": 204,
+  "community_name_original": "Brithdir Mawr",
+  "community_name_normalized": "Brithdir Mawr",
+  "text_repaired": false,
+  "source_rows": [
+   280,
+   281,
+   282,
+   283
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 280,
+    "latitude": 51.946032,
+    "longitude": -5.087031
+   },
+   {
+    "source_line": 281,
+    "latitude": 51.95904,
+    "longitude": -4.71309
+   },
+   {
+    "source_line": 282,
+    "latitude": 51.715371,
+    "longitude": -5.030036
+   },
+   {
+    "source_line": 283,
+    "latitude": 52.000928,
+    "longitude": -4.806572
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 35.267
+ },
+ {
+  "seq": 205,
+  "community_name_original": "Permatopia",
+  "community_name_normalized": "Permatopia",
+  "text_repaired": false,
+  "source_rows": [
+   284,
+   285,
+   286,
+   287
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 284,
+    "latitude": 55.40829,
+    "longitude": 11.88774
+   },
+   {
+    "source_line": 285,
+    "latitude": 55.401684,
+    "longitude": 11.523963
+   },
+   {
+    "source_line": 286,
+    "latitude": 55.621772,
+    "longitude": 12.613619
+   },
+   {
+    "source_line": 287,
+    "latitude": 55.301696,
+    "longitude": 12.19072
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 72.841
+ },
+ {
+  "seq": 206,
+  "community_name_original": "Sadhana Forest Kenya",
+  "community_name_normalized": "Sadhana Forest Kenya",
+  "text_repaired": false,
+  "source_rows": [
+   288,
+   289,
+   290,
+   291
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 288,
+    "latitude": 0.949224,
+    "longitude": 36.765913
+   },
+   {
+    "source_line": 289,
+    "latitude": 0.893126,
+    "longitude": 36.75667
+   },
+   {
+    "source_line": 290,
+    "latitude": 1.094932,
+    "longitude": 36.701045
+   },
+   {
+    "source_line": 291,
+    "latitude": 0.867336,
+    "longitude": 36.806313
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 27.883
+ },
+ {
+  "seq": 207,
+  "community_name_original": "Ecodorp Bergen",
+  "community_name_normalized": "Ecodorp Bergen",
+  "text_repaired": false,
+  "source_rows": [
+   292,
+   293,
+   294,
+   295
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 292,
+    "latitude": 52.544906,
+    "longitude": 4.980055
+   },
+   {
+    "source_line": 293,
+    "latitude": 53.047725,
+    "longitude": 4.728479
+   },
+   {
+    "source_line": 294,
+    "latitude": 52.551485,
+    "longitude": 4.672805
+   },
+   {
+    "source_line": 295,
+    "latitude": 52.651081,
+    "longitude": 4.693376
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 58.413
+ },
+ {
+  "seq": 208,
+  "community_name_original": "Eco Truly Park",
+  "community_name_normalized": "Eco Truly Park",
+  "text_repaired": false,
+  "source_rows": [
+   296,
+   297,
+   298,
+   299
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 296,
+    "latitude": -11.469052,
+    "longitude": -77.27115
+   },
+   {
+    "source_line": 297,
+    "latitude": -11.574941,
+    "longitude": -77.253582
+   },
+   {
+    "source_line": 298,
+    "latitude": -11.995433,
+    "longitude": -77.09311
+   },
+   {
+    "source_line": 299,
+    "latitude": -11.636889,
+    "longitude": -77.217187
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 61.657
+ },
+ {
+  "seq": 209,
+  "community_name_original": "Khula Dhamma Community",
+  "community_name_normalized": "Khula Dhamma Community",
+  "text_repaired": false,
+  "source_rows": [
+   300,
+   301,
+   302,
+   303
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 300,
+    "latitude": -32.728124,
+    "longitude": 28.123413
+   },
+   {
+    "source_line": 301,
+    "latitude": -32.632669,
+    "longitude": 28.25969
+   },
+   {
+    "source_line": 302,
+    "latitude": -32.329583,
+    "longitude": 28.14549
+   },
+   {
+    "source_line": 303,
+    "latitude": -32.697527,
+    "longitude": 28.19499
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 44.364
+ },
+ {
+  "seq": 210,
+  "community_name_original": "Umphakatsi Peace Ecovillage",
+  "community_name_normalized": "Umphakatsi Peace Ecovillage",
+  "text_repaired": false,
+  "source_rows": [
+   304,
+   305,
+   306,
+   307
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 304,
+    "latitude": -26.032377,
+    "longitude": 31.049217
+   },
+   {
+    "source_line": 305,
+    "latitude": -26.046766,
+    "longitude": 30.914098
+   },
+   {
+    "source_line": 306,
+    "latitude": -26.053587,
+    "longitude": 30.777157
+   },
+   {
+    "source_line": 307,
+    "latitude": -26.132179,
+    "longitude": 30.97823
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 27.282
+ },
+ {
+  "seq": 211,
+  "community_name_original": "Green Canvas of Light",
+  "community_name_normalized": "Green Canvas of Light",
+  "text_repaired": false,
+  "source_rows": [
+   308,
+   309,
+   310,
+   311
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 308,
+    "latitude": -34.034836,
+    "longitude": 22.236375
+   },
+   {
+    "source_line": 309,
+    "latitude": -34.056145,
+    "longitude": 22.92538
+   },
+   {
+    "source_line": 310,
+    "latitude": -33.954635,
+    "longitude": 22.482511
+   },
+   {
+    "source_line": 311,
+    "latitude": -33.982512,
+    "longitude": 22.673458
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 63.526
+ },
+ {
+  "seq": 212,
+  "community_name_original": "Agatha Amani House",
+  "community_name_normalized": "Agatha Amani House",
+  "text_repaired": false,
+  "source_rows": [
+   312,
+   313,
+   314,
+   315
+  ],
+  "coordinate_candidates": [
+   {
+    "source_line": 312,
+    "latitude": -0.787038,
+    "longitude": 36.506111
+   },
+   {
+    "source_line": 313,
+    "latitude": -0.403916,
+    "longitude": 36.268338
+   },
+   {
+    "source_line": 314,
+    "latitude": -1.087974,
+    "longitude": 36.630078
+   },
+   {
+    "source_line": 315,
+    "latitude": -0.735154,
+    "longitude": 36.473129
+   }
+  ],
+  "candidate_count": 4,
+  "candidate_spread_km": 86.043
+ }
+]
