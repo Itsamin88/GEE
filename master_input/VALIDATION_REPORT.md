@@ -1,457 +1,328 @@
 # Validation report — `Paper1_Final_Only_Ecovillages_Master_Input.csv`
 
-Built 2026-08-28. Schema version 1.0.0. Original export preserved unmodified at
-`master_input/Paper1_Final_Only Ecovillages.csv`.
+**Status: complete for the work that could be done offline. One environment
+limit remains and is not disguised anywhere in the file.**
+
+All 212 communities have been researched. Every row carries a determined
+country, an actively-checked Global Ecovillage Network status, and a ranked
+seed source set. The 34 communities the export gave four coordinates for have
+been worked through individually; 31 are resolved against their own published
+addresses and 3 are left open on purpose.
+
+**What is still owed: not one URL has been opened over HTTP.** The egress proxy
+in this container answers `403 Forbidden` to `CONNECT` for every research host,
+re-tested at the end of this pass:
+
+```
+CONNECT ecovillage.org:443 HTTP/1.1
+< HTTP/1.1 403 Forbidden
+* CONNECT tunnel failed, response 403
+```
+
+`WebSearch` works, because it runs through a different path; direct fetching of
+arbitrary hosts does not. So `seed_url_validated_count`, `seed_url_dead_count`,
+`seed_url_blocked_count` and `seed_url_duplicate_count` are **empty on every
+row, not zero**. Empty means not measured. Zero would be a measurement, and it
+would be a false one. `seed_url_verification_method` says `search_index`, which
+is exactly what was done: every address was seen in a search index and its
+identity checked against the community, but the page itself was never fetched.
+`master_input/pipeline/step5_validate_urls.py` is written and ready; it needs
+only an environment that permits outbound HTTPS.
 
 ---
 
-## 1. The headline, stated first
-
-**212 of 212 communities are in the file, and every one carries the mandatory
-`https://ecovillage.org` seed. Source discovery was completed for 99 of them.
-The other 113 are in the file with their identity, coordinates and a
-gazetteer-derived country, explicitly marked `discovery_status = PENDING` — not
-silently blank.**
-
-Two environment limits, neither of them a property of the data, produced that
-split. Both are stated here rather than in a footnote, because a reader who
-does not know about them would misread the file.
-
-### Limit 1 — the session's web-search budget ran out
-
-Discovery used two searches per community: one general, one
-`site:ecovillage.org "<name>"` for a defensible GEN answer. The session's cap of
-200 `WebSearch` calls was reached at community 99. The remaining 113 are marked
-`PENDING` and `gen_community_status = NOT_SEARCHED`.
-
-`NOT_SEARCHED` is deliberately not `NOT_FOUND`. Register v2.4 field I12 exists
-for exactly this: a community searched for four minutes and a community
-searched exhaustively that genuinely has nothing arrive as identical thin
-records, and they mean opposite things — one is an absence of evidence, the
-other an absence of effort. Only one of them is a finding.
-
-To finish: raise `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`, run
-`python3 master_input/pipeline/step4_resume_discovery.py --list-pending` for the worklist, and
-rebuild with `python3 master_input/pipeline/step3_build_master.py`. Completed rows are never
-re-fetched.
-
-### Limit 2 — the egress proxy blocked every research host
-
-The session's outbound HTTPS goes through a policy-enforcing gateway that
-answered **403 to CONNECT** for `ecovillage.org`, `wikipedia.org`, `doi.org`,
-and every community website tried. `WebSearch` was unaffected (it does not use
-that path), so discovery is real: every URL in this file was returned by a
-search engine, with a title and a content summary that identified the
-community. But **no address in this file has been fetched over HTTP.**
-
-The file therefore records what actually happened:
-`seed_url_verification_method = search_index`, and
-`seed_url_validated_count` / `dead` / `blocked` / `duplicate` are **empty, not
-zero**. Zero would be a claim; empty is the truth.
-
-`master_input/pipeline/step5_validate_urls.py` performs the HTTP pass and writes
-`http_status`, `final_url`, `content_type`, `crawl_status` (O11 vocabulary) and
-`checked_at` into `seed_sources_json` beside each address, then rolls the four
-counts up. Run it where the network is open — or change this environment's
-network policy (Claude Code on the web → environment → network access) and run
-it here.
-
----
-
-## 2. Cohort integrity
+## 1. Cohort integrity
 
 | Check | Result |
 |---|---|
-| Communities in the original export | 212 unique names across 314 rows |
+| Communities in the original export | 212 (from 314 data rows) |
 | Communities in the master file | **212** |
-| Communities deleted, merged or invented | **0** |
-| Original coordinates recoverable from the file | **314 of 314** |
-| Duplicate `community_id` | 0 |
-| Duplicate (name, coordinate) rows | 0 |
-| Ragged rows / column shifts | 0 |
-| UTF-8 round trip | passes |
-| BOM | absent |
+| Deleted | 0 |
+| Merged | 0 |
+| Invented | 0 |
+| Original name preserved verbatim | 212 / 212 |
+| Original coordinate recoverable | 212 / 212 |
+| Original file modified | no — `Paper1_Final_Only Ecovillages.csv` is byte-identical, sha256 `6e39c841…` |
 
-### The original file, audited
+Ten names carried double mojibake (cp1252 → UTF-8 applied twice, in one case
+with HTML escaping on top). All ten are repaired in
+`community_name_normalized`, flagged by `name_repair_applied = yes`, and the
+damaged original is kept in `community_name_original`, which is also the join
+key back to the export.
 
-Structurally a valid CSV: 315 lines, all 14 columns wide, UTF-8, CRLF, no BOM,
-no embedded line breaks, no blank rows, all coordinates parse and are in range.
-All four URL columns × 10 were empty and all `Country` cells were empty.
+Two rows are near-duplicates of each other by identity — seq 1
+`Soheili Village_Hara` and seq 163 `Soheili Village` both appear to be the
+village on Qeshm Island beside the Hara mangroves. Both are **retained**, as
+required, and the relationship is stated in the notes on each.
 
-Three content faults were found and handled:
+## 2. Coordinates
 
-**1. Double mojibake in 10 names.** The export was decoded as cp1252 and
-re-encoded as UTF-8 twice, with non-breaking spaces flattened to spaces in
-between and one smart quote HTML-escaped. `La CittÃ  della Luce` is bytes
-`C3 83 20 20`, which is `à` plus the original space with the NBSP damage on top.
-All ten repairs, with the original preserved beside each:
-
-| Original | Repaired |
+| | Count |
 |---|---|
-| `Sat Yoga Ashram &amp; Wisdom School` | Sat Yoga Ashram & Wisdom School |
-| `Oasis du Coq Ã  lâ€™Ã‚me` | Oasis du Coq à l'Âme |
-| `ECOlonie â€&quot; Centre Ecologique International` | ECOlonie – Centre Ecologique International |
-| `CommunautÃ© de lâ€™Arche de Saint-Antoine` | Communauté de l'Arche de Saint-Antoine |
-| `SÃ³lheimar Iceland` | Sólheimar Iceland |
-| `La CittÃ  della Luce` | La Città della Luce |
-| `Hertha LevefÃ¦llesskab/Hertha Living` | Hertha Levefællesskab/Hertha Living |
-| `Avalon Organic Gardens &amp; EcoVillage` | Avalon Organic Gardens & EcoVillage |
-| `Eco Aldeia do Vale â€&quot; Instituto Permacultura` | Eco Aldeia do Vale – Instituto Permacultura |
-| `ComunitÃ  rigenerative` | Comunità rigenerative |
+| `SINGLE` — the export gave one coordinate | 178 |
+| `MULTIPLE_CANDIDATES_RESOLVED` | 31 |
+| `MULTIPLE_CANDIDATES_UNRESOLVED` | 3 |
+| Coordinate confidence HIGH / MEDIUM / LOW | 204 / 5 / 3 |
 
-The repair function is idempotent and each output was checked against the
-community's own published name during discovery.
+The 34 multi-coordinate communities are the **last 34 in file order**, seq
+179–212 with no gaps, each with exactly four candidates — the signature of a
+geocoder asked for candidates rather than an answer. Slot 3 is a decoy that
+lands on the nearest large city; slot 4 is the community; **slot 1, which the
+export puts first and which this file was previously shipping, is frequently
+wrong by up to ninety kilometres.**
 
-**2. One truncated name.** Row 29 reads `Co-housing project HASENDORF (= bunny`
-— an unbalanced parenthesis. GEN's page for the community gives the full name,
-`Co-housing project HASENDORF (= bunny village)`. The truncated original is
-preserved verbatim; the normalised column carries the complete name on GEN's
-authority.
+Nearly every "location conflict" flagged during source discovery turned out to
+be that artefact rather than a real disagreement. Sadhana Forest Haiti was
+pointing near Port-au-Prince instead of Anse-à-Pitres, in the wrong department.
+Cité Écologique's slot-1 coordinate is what drove the gazetteer to vote Canada
+for a community in New Hampshire.
 
-**3. Thirty-four communities with four coordinates each.** 34 names appear four
-times, with candidate coordinates **27 to 101 km apart** (median ≈ 58 km). At
-most one of each set can be the site. All 136 rows are preserved: the first
-occurrence becomes the row's primary coordinate under an explicit,
-non-substantive rule (`coordinate_primary_rule = first_source_row`), all four
-are listed in `coordinate_candidates`, and every one of the 34 rows carries
-`coordinate_status = MULTIPLE_CANDIDATES_UNRESOLVED` and
-`review_required = yes`.
+Each of the 31 resolutions was verified against **that** community's published
+address, not inferred from the pattern — §33 forbids transferring a result
+between communities, and this is precisely where that temptation was strongest.
+Every pick carries its published locality, the URL that published it, and the
+reasoning, in `coordinate_evidence`.
 
-> **A lead, offered as a lead and not as a finding.** In the handful of these
-> that discovery happened to reach — among them Cité Écologique (New Hampshire),
-> Habiba Community and Cloughjordan Ecovillage — the **fourth** candidate is the
-> one matching the community's published location, and the first three are tens
-> of kilometres off. If that pattern holds it would resolve all 34. It has not
-> been verified community by community, and transferring a factual result from
-> one community to another without independent verification is exactly what the
-> brief forbids, so nothing in the file acts on it. It is recorded here because
-> checking 34 fourth-candidates is a short job for someone with a map.
+Three are unresolved and say why: **Grishino** (no gazetteer city near any
+candidate, so no slot betrays itself), **Rodnoe** (sources name only an oblast,
+and a hundred one-hectare kin domains have no single point), and **Sadhana
+Forest Kenya** (sources say only "the Maralal area", and the planting is
+scattered across family farms county-wide, so no point represents it).
 
----
+Nothing was discarded: all four candidates remain in `coordinate_candidates`
+and the export's original first coordinate has its own two columns.
 
 ## 3. Country
 
 | | |
 |---|---|
-| Communities with a country | **212 of 212** |
-| Distinct countries | **58** |
-| Canonical representation | ISO 3166 English short name, one spelling per country |
-| Machine-readable pair | `country_iso2`, `country_iso3` on every row |
-| Rows where two independent signals agree | **95** (`HIGH`) |
-| Rows resting on one signal, or on a correction | **105** (`MEDIUM`) |
-| Rows resting on a non-unanimous gazetteer vote alone | **12** (`LOW`) |
+| Rows with a country | **212 / 212** |
+| Distinct countries | 57 |
+| Confidence HIGH / MEDIUM | 204 / 8 |
+| Determined from the community name | **0** |
 
-Country was never inferred from the community's name. The primary signal is an
-offline gazetteer vote: for each of the 314 coordinates, the five nearest
-populated places (GeoNames ≥ 15 000, bundled with `geonamescache`) vote on the
-country, and both the winner and the vote's own quality are carried into the
-file. Fully reproducible from the repository; no coordinate leaves the machine.
+Country was established from coordinates first — an offline k-nearest vote over
+the GeoNames gazetteer (cities ≥ 15,000; k = 5) — then checked against published
+administrative geography, official sites and institutional records. The
+gazetteer's own verdict is kept in `country_gazetteer_code` even where it was
+overruled, so every override is visible.
 
-Vote quality across all 314 coordinates: **UNANIMOUS 284 · MAJORITY 19 ·
-SPLIT 11**. Every one of the 11 splits is a genuine border, gulf or lake case —
-Kibbutz Lotan and Neot Semadar across the Gulf of Aqaba, Better In Belize on the
-Guatemalan border, Vlierhof and Land van Aine on the Dutch–German line, Torri
-Superiore near the French and Monegasque borders, Almost Heaven Farms on the
-Nepal–India line, and all four Habiba candidates in the Sinai.
+Eight countries were corrected against the gazetteer vote on published
+evidence, each flagged `country_corrected_from_gazetteer`. Two are worth
+naming: **Almost Heaven Farms** voted India because the farm sits within a few
+kilometres of the Mechi border and every nearby town is in Darjeeling or
+Sikkim — GEN, Good Market and the local business record all place it in Ilam,
+**Nepal**. **Cité Écologique** voted Canada because Colebrook is in the Great
+North Woods and every nearby town above the size threshold is Québécois; its
+French name is not evidence either, since it is the New Hampshire offshoot of a
+Quebec parent. It is in the **United States**.
 
-**Four countries were corrected against the gazetteer on published evidence**,
-each flagged `country_corrected_from_gazetteer`:
+## 4. Global Ecovillage Network (§5–§8, §35–§37)
 
-| Community | Gazetteer said | Corrected to | Why the gazetteer was wrong |
-|---|---|---|---|
-| Kibbutz Lotan | Jordan | **Israel** | Jordanian towns across the Gulf of Aqaba are nearer than Israeli ones |
-| Better In Belize | Guatemala | **Belize** | Guatemalan towns sit just west of the border |
-| Schloss Glarisegg | Germany | **Switzerland** | Radolfzell lies across the Untersee |
-| Vlierhof | Netherlands | **Germany** | GEN's own site address is Kleve-Keeken, Germany; only the postbox is Dutch |
-
-One administrative correction did not change the country: **Cambium** is in
-Fehring, **Styria**, not Burgenland. Two further placements conflict with their
-coordinate and are flagged rather than resolved: **Hågaby** (the GEN ecovillage
-of that name is at Uppsala; the coordinate is ~190 km away near Kumla) and
-**The Garden** (GEN says Lafayette; the coordinate is ~40 km east near Celina).
-**Stowe Farm Community** is in Colrain, **Massachusetts**, not Vermont, though
-it sits on the state line.
-
----
-
-## 4. The Global Ecovillage Network requirement
-
-| | |
-|---|---|
-| Rows carrying `https://ecovillage.org` as `gen_global_url` | **212 of 212** |
-| Rows carrying it inside `urls` | **212 of 212** |
-| `gen_global_status` | `FIXED_GLOBAL_SOURCE` on every row |
-| **Verified community-specific GEN pages** | **92** |
-| — clean `/project/` or `/ecovillage/` or `/map/community/` page | 87 |
-| — legacy host (`gen.ecovillage.org`) | 1 |
-| — sub-page only, parent not constructed | 2 |
-| — parent/umbrella listing only | 1 |
-| — page exists but identity uncertain | 1 |
-| Searched, no GEN page exists | **7** |
-| **Not yet searched** | **113** |
-| GEN URLs constructed or guessed | **0** |
-
-The seven searched-and-absent: Soheili Village_Hara, Cabiokid Foundation, Green
-Commune Belica, DNS The Necessary Teacher Training, Windekind Commons, Dancing
-Rabbit Ecovillage, Ixixtlan. Each carries the negative-search evidence in
-`gen_evidence_note`.
-
-**No GEN URL was constructed, and the file demonstrates why that rule matters.**
-Real slugs found by search include `/project/tamera-0/` (an arbitrary `-0`
-suffix), `/ecovillage/seaview-performing-arts-center/` for a community called
-**HawaiiSPACE**, and `/project/global-community-communications-all-0/` for one
-called **Avalon Organic Gardens & EcoVillage**. None is derivable from the
-community's name. GEN also serves community pages under four different path
-shapes; the shape actually found is recorded rather than normalised.
-
-**Independence.** Every GEN address — global and community-specific alike —
-carries `independence_group = G1`, the community's own voice. A GEN profile is
-self-submitted, so it corroborates the community's website rather than
-confirming it, and the global page can never count as a second source beside a
-community profile. The test suite asserts this on every row.
-
----
-
-## 5. The seed source set
-
-| | |
-|---|---|
-| Total seed addresses | **761** |
-| Distinct addresses | **550** |
-| Community-specific addresses (excluding the 212 mandatory GEN globals) | **549** |
-| Addresses appearing under more than one community | **0** |
-| Addresses per researched community — min / median / mean / max | **2 / 7 / 6.55 / 9** |
-| Researched communities with 3–10 addresses | 98 of 99 |
-| Researched communities with fewer than 3 | 1, flagged |
-
-No quota was met by padding. Where a community genuinely had little, the row
-says so: `thin_source_set` (1 row) and `single_independence_group` (5 rows).
-
-### By source class (register S1–S8, community-specific addresses)
-
-| Class | What it is | Count |
-|---|---|---|
-| S1 | Academic — papers, theses, university repositories | **17** |
-| S2 | Institutional — government, NGO, certification, grant records | **78** |
-| S3 | External network or directory profile | **195** |
-| S4 | The community's own current material | **137** |
-| S5 | Archived / former-domain material | **3** |
-| S6 | Journalism and documentary media | **92** |
-| S7 | Social media and member accounts | **27** |
-| S8 | Direct communication | 0 (not applicable to a source table) |
-
-### By platform type (workbook O11 vocabulary)
-
-directory listing **185** · other **147** · own website **122** · news outlet
-**34** · Facebook **17** · secondary or former website **15** · booking or
-hosting **11** · blog platform **8** · YouTube **5** · Instagram 2 · LinkedIn 2
-· crowdfunding 1.
-
-Social and video together are 26 addresses out of 549 — under 5%. They were
-added only where the account is demonstrably the community's own and likely to
-carry dated material (a YouTube channel sorted oldest-first is a dated record;
-an empty Instagram is not).
-
-### Address confidence
-
-HIGH **376** · MEDIUM **156** · LOW **17**.
-
-### Independence groups — the number that actually matters
-
-| | |
-|---|---|
-| Groups per researched community — min / mean / max | **1 / 3.46 / 6** |
-| Communities reaching the register's "three independent sources" target | **76 of 99** |
-| Communities whose entire source set is one voice | **5**, all flagged |
-
-The register is explicit that corroboration counts groups, never URLs. A
-community with a website, a Facebook page, an Instagram account and a GEN
-listing has **one** channel of self-documentation, not four. That is why this
-table reports 3.46 groups against 6.55 addresses.
-
-### Sources worth naming
-
-Discovery turned up material well beyond directory listings, which is the point
-of the exercise:
-
-* **Government and registry records** — the French Ministry of Housing
-  ÉcoQuartier file for Oasis du Coq à l'Âme; the French open business registry
-  entry (SIREN 379340524) for ECOlonie; the Canton Thurgau heritage-database PDF
-  for Schloss Glarisegg; Minnesota's state disability-services register for
-  Camphill Village Minnesota; Saxony-Anhalt's state feature on Sieben Linden;
-  Bonjour Québec for Cité Écologique.
-* **Peer-reviewed and academic** — an economic analysis of the Tamera Water
-  Retention Landscape; *npj Climate Action* (2024) on Danish ecovillages; a
-  Tufts case study of Sirius and its town; a University of Brighton publication
-  drawing on the **Braziers Park archive**; the **UMass Amherst Special
-  Collections finding aid for the Sirius Community papers**.
-* **EU and international institutions** — the BASE adaptation platform and
-  Spain's AdapteCCa on Tamera; European Social Fund Plus on Suderbyn; Horizon
-  HOUSEFUL on Cambium; NOBEL GRID on Meltemi; UNCCD on Govardhan; UNEP Champions
-  of the Earth on SEKEM; the UN SDG partnership register on Biosphere
-  Foundation; REScoop and the EU Energy Community Platform on Belica.
-* **Dated land instruments** — Whole Village's 999-year conservation easement;
-  the permanent easement over West Haven Farm at EcoVillage at Ithaca via the
-  Finger Lakes Land Trust; the 1986 transfer of Artosilla by the Government of
-  Aragón; the 2001 purchase of the Jahnishausen estate; Hearthstone Village's
-  move-in on 8 January 2019; the October 1963 purchase of the 57-acre East
-  Nantmeal farm by The Camphill School.
-* **Published plans and drawings** — Taman Petanu's site master plan; Living
-  Well's landscape-architecture project record; einszueins architektur's
-  documentation of Wohnprojekt Hasendorf; Dancing Rabbit's quantified land page
-  (six ponds, 40 acres woodland, 12,000+ trees on 30 acres, ~20 acres restored
-  prairie).
-* **Former identities**, each a distinct search string the crawler would
-  otherwise miss: Sunseed was **Green Deserts**; Stowe Farm was **Katywil**;
-  The Garden was **Shut Up and Grow It**; EcoVillage de Pourgues now continues
-  as **Bloom Hills**.
-
----
-
-## 6. Review queue
-
-**133 of 212 rows** carry `review_required = yes`. Reasons overlap; counts are
-per reason.
-
-| Reason | Rows |
-|---|---|
-| `discovery_pending` | 113 |
-| `gen_not_searched` | 113 |
-| `country_not_web_verified` | 113 |
-| `multiple_coordinate_candidates` | 34 |
-| `identity_confidence_below_high` | 12 |
-| `gazetteer_split` | 8 |
-| `single_independence_group` | 5 |
-| `gen_page_qualified` | 5 |
-| `country_corrected_from_gazetteer` | 4 |
-| `thin_source_set` | 1 |
-
-Of the 99 researched communities, **20 are flagged** and 79 are clean.
-
----
-
-## 7. Crawler compatibility
-
-Verified against the real reader, `read_community_file()` in
-`src/dcr/orchestrator/session.py`, not against an assumption about it.
+**The fixed network seed is on every row without exception.**
 
 | Check | Result |
 |---|---|
-| Rows loaded | **212 of 212** |
-| Communities with a usable name | 212 |
-| Address lists reconstructed exactly | 212 of 212, byte-identical |
-| Addresses truncated, split or merged | 0 |
-| Spurious entries in the queue | 0 |
-| Coordinates parsed | 212 |
-| Countries resolving to a ccTLD for the local-language sweep | 212 |
-| `mode` accepted by `MODE_STAGES` | 212 |
-| `build_plan()` sizes and orders the cohort | 212 jobs, 212 distinct `site_id` |
-| `https://ecovillage.org` classified as `directory`, not `website` | yes |
+| `gen_global_url` = `https://ecovillage.org` on all 212 rows | ✅ |
+| `gen_global_status` = `FIXED_GLOBAL_SOURCE` on all 212 | ✅ |
+| The seed appears in `urls` on all 212 | ✅ |
+| `gen_global_url` ever treated as proof of GEN registration | ❌ never |
+| `gen_independence_group` = `G1` on all 212 | ✅ |
 
-### Three parser faults found and fixed
+The last row is the one that matters for §8: the global URL and a community's
+own GEN profile sit in the **same** independence group, so a community whose
+only sources are its own site and its GEN listing counts as **one** voice, not
+three. 21 rows are flagged `single_independence_group` for exactly that reason.
 
-Testing the real file against the real reader found three defects that would
-each have damaged this run. All three are fixed in
-`src/dcr/orchestrator/session.py`, and the full existing suite still passes
-(554 passed; 3 pre-existing failures are missing PDF libraries in this
-container, untouched by these changes).
+Community page status:
 
-**1. Any column beginning with `url` became an address.** The reader collected
-values from every key matching `key.startswith("url")`. A QC column named the
-obvious way — `url_count` — would have put its own value into the crawl queue,
-and the frontier would have tried to fetch `7`. Now only `urls`, `url` and
-`url<digits>` are addresses. The schema also avoids the trap independently, so
-the file is safe against an unpatched copy of the reader.
-
-**2. The delimiter sniffer could silently choose the wrong character.** A
-`urls` cell holding a `;`-separated list can contain more semicolons than the
-header row has commas; `csv.Sniffer` then reads the whole file as
-semicolon-delimited, finds no `name` column, and returns **zero communities
-with no error at all**. The sniffed dialect is now checked against the header
-and discarded if it does not yield a name column. The file additionally uses
-`" | "`, which the sniffer does not consider.
-
-**3. A single address containing a comma was split in two.** The splitter fell
-through to comma-splitting whenever no `;` or `|` was present, so
-`https://maps.example.org/?bbox=1,2,3,4` became four fragments. Comma-splitting
-now only fires when every resulting piece still looks like an address. The file
-contains several comma- and query-string addresses that exercise this.
-
-### Two further fixes, both required by this cohort
-
-**The reader now accepts `Ecovillage_Name` as the name column.** The
-researcher's own export uses it. Before the alias, that file loaded as **zero
-communities, with no error message** — the failure most likely to cost a day.
-It now loads all 314 rows, and there is a test that says so.
-
-**`_country_code()` covered 18 countries; the cohort spans 58.** Every country
-outside that list returned `None`, and the local-language sweep and domain
-guessing were skipped for it. The map now covers ~130 countries by ISO English
-short name and passes an ISO alpha-2 code straight through.
-
----
-
-## 8. Format conformance
-
-| Requirement | Result |
+| Status | Count |
 |---|---|
-| Valid CSV | yes — 213 lines, 52 columns throughout |
-| UTF-8 | yes, round-trips byte-identically |
-| BOM | absent |
-| Quoting | `QUOTE_MINIMAL`, correctly escaped throughout |
-| Consistent row lengths | yes |
-| Excel-readable | yes — no formula-leading cells, no embedded newlines, CRLF endings |
-| pandas-readable | yes — `read_csv` returns 212 × 52 with identical column order |
-| Crawler-readable | yes — 212 communities via `read_community_file` |
-| Safe for query-parameter URLs | yes — pipe delimiter, and the comma fix above |
-| Safe for Unicode names | yes — Sólheimar, Città, Levefællesskab, Cité Écologique, Comunità |
-| Safe for semicolons and commas in cells | yes |
-| Malformed records | 0 |
-| Column shifts | 0 |
+| `VERIFIED_COMMUNITY_SOURCE` | 164 |
+| `VERIFIED_COMMUNITY_SOURCE_LEGACY_HOST` | 4 |
+| `VERIFIED_COMMUNITY_SOURCE_IDENTITY_UNCERTAIN` | 3 |
+| `VERIFIED_COMMUNITY_SOURCE_SUBPAGE_ONLY` | 3 |
+| `VERIFIED_COMMUNITY_SOURCE_PARENT_ONLY` | 2 |
+| `NOT_FOUND` — searched, no page exists | 36 |
+| `NOT_SEARCHED` | **0** |
 
----
+**No GEN URL was ever constructed.** That is not a claim of restraint; the
+slugs make guessing impossible, and this pass turned up four that prove it:
+
+* `/project/dubravushka` — Zeleni Kruchi is filed under the name it dropped in 2018.
+* `/ecovillage/fruit-haven-ecovllage-ecuador/` — GEN's own typo, missing an `i`.
+* `/project/chambalabamba-2/` — an internal disambiguator.
+* `/project/green-canvas-light/` — silently drops the word "of".
+
+Earlier passes found `/ecovillage/seaview-performing-arts-center/` for
+HawaiiSPACE and `/ecovillage/sustainability-insitute/`, another GEN typo. No
+rule derives any of these from a community name.
+
+A defect found and fixed during this pass belongs here: a discovery entry
+marked `NOT_SEARCHED` was being silently rewritten to `NOT_FOUND` when the row
+was built — exactly the failure register v2.4 field I12 warns against, absence
+of effort presented as absence of evidence. `step3` now preserves the
+distinction, a test guards it, and the four entries that had hit that path were
+re-researched with real `site:ecovillage.org` queries rather than left to the
+default.
+
+## 5. Seed source set (§9–§11, §19–§22)
+
+| | |
+|---|---|
+| Total addresses | **1,307** |
+| Mean per community | 6.17 |
+| Range | 2 – 9 |
+| Within the 3–10 target band | **206 / 212** |
+| Two or more independent groups | **191 / 212** |
+| Mean independence groups | 3.17 |
+
+The six rows below three addresses are below it because the evidence is thin,
+not because a quota was waived — §10 forbids inventing to reach a number. Each
+says so in `qc_notes`: Bali Ecovillage could not be tied to any organisation
+at all and carries **only** the network seed rather than a plausible-looking
+Bali project attached to a generic name.
+
+Source classes present (register v2.4 §S):
+
+| Class | Rows |
+|---|---|
+| S1 academic | 36 |
+| S2 institutional | 93 |
+| S3 network / directory | 207 |
+| S4 community's own | 156 |
+| S5 archived | 5 |
+| S6 journalism | 108 |
+| S7 social | 51 |
+| S8 direct communication | 1 |
+
+Ranking (§39) puts the strongest community-specific source first and the GEN
+global seed **last** on every row, so a peer-reviewed article always outranks
+the network URL. 36 rows lead with an S1 academic source; 74 with an S2
+institutional one.
+
+## 6. Review queue (§38)
+
+**68 rows** carry `review_required = yes`, each with machine-readable reasons:
+
+| Reason | Rows |
+|---|---|
+| `identity_confidence_below_high` | 35 |
+| `single_independence_group` | 21 |
+| `gen_page_qualified` | 12 |
+| `country_corrected_from_gazetteer` | 8 |
+| `gazetteer_split` | 8 |
+| `thin_source_set` | 6 |
+| `coordinate_resolved_below_high` | 5 |
+| `multiple_coordinate_candidates` | 3 |
+
+Findings a coder should see before analysis, all flagged in the file:
+
+* **Ecovila Santa Margarida (seq 176) is not an intentional community.** Every
+  source identifies it as a 192-unit residential condominium launched in 2021
+  by a developer trading as "Eco Vila Incorporadora" — four towers, a heated
+  pool, a cinema, a sports court. The row is **retained** as required, but
+  including it would bias any cohort statistic. It sits about 2 km from seq 175
+  Ecovila Raiz do Anuhmas, which is a genuine community, and the shared
+  "Ecovila" prefix is the likely route by which it entered the list.
+* **Agatha Amani House (seq 212) is a refuge for survivors of sexual and
+  domestic violence.** It appears in GEN because it runs permaculture on site.
+  Publishing precise coordinates or identifying imagery could put residents at
+  risk. The row carries a safeguarding note; that consideration should override
+  the rest of the protocol for this site.
+* **The Possibility Alliance (seq 194) was electricity-free by choice** — no
+  grid connection and no solar array — so it has no night-lights signal and no
+  photovoltaic signature at all, and their absence must not be read as the
+  community's absence. Multiple sources report it relocated from Missouri to
+  Maine; the site should not be assumed occupied for the later study period.
+* **Hockerton's five houses are earth-sheltered** and will read from above as a
+  grassed bank. A built-up classifier will likely record no construction there.
+* **Sadhana Forest Haiti and Kenya** plant across thousands of scattered family
+  plots, not on their campus parcels. A point-anchored reading misses the
+  intervention almost entirely; the right unit is the municipality or county.
+* **Brithdir Mawr was discovered in 1998 by an aerial survey** that
+  photographed sunlight glinting off a solar panel — a community found by
+  remote sensing, which bears directly on this study's own method.
+
+## 7. Crawler compatibility (§25, §26, §42)
+
+The crawler's real input parser is `read_community_file()` in
+`src/dcr/orchestrator/session.py`. It was read, not assumed, and tested against
+this file.
+
+| Check | Result |
+|---|---|
+| Communities loaded | **212 / 212** |
+| Addresses delivered | 1,307 |
+| Rows with a name, coordinates and a country | 212 |
+| Every row's last URL is the GEN seed | ✅ |
+
+**The original export would have loaded as zero communities.** Its header says
+`Ecovillage_Name`; the parser wanted `name`. Three further defects were found
+and fixed in the parser, each with a regression test:
+
+1. Any column whose key merely *started with* `url` was swept into the address
+   list, so `url_verification_method` would have been crawled as an address.
+2. `csv.Sniffer` was trusted unconditionally and mis-detected the delimiter on
+   files containing quoted commas.
+3. A single URL containing a comma — ordinary in query strings — was split into
+   two broken addresses.
+
+`" | "` was chosen as the address delimiter specifically because `csv.Sniffer`
+weighs only `,`, `;` and tab, so it cannot mis-fire on it.
+
+## 8. Format conformance (§27, §28)
+
+| Check | Result |
+|---|---|
+| Valid CSV, `QUOTE_MINIMAL` | ✅ |
+| UTF-8, no BOM | ✅ |
+| CRLF line endings | ✅ 213 (header + 212) |
+| Consistent row length | ✅ 56 fields on every row |
+| Parses with `csv` | ✅ |
+| Parses with `pandas` | ✅ |
+| Opens in Excel | not tested — no Excel here. The file meets the requirements (valid CSV, CRLF, `QUOTE_MINIMAL`), but note it is UTF-8 **without** BOM, which some Windows builds of Excel mis-render for non-ASCII names unless the file is imported rather than double-clicked. A BOM was left off because a BOM is not part of UTF-8 and trips many naive parsers; this crawler is not one of them — prepending a BOM was tested and it still reads all 212 rows. |
+| Embedded commas, semicolons, quotes, non-ASCII survive | ✅ |
+| Query-parameter URLs survive | ✅ |
+| Address list reconstructs deterministically from `seed_sources_json` | ✅ |
+| Separate QC file created | ❌ none — QC is inside this CSV, as §23 requires |
+
+Size 833,554 bytes.
 
 ## 9. Automated checks
 
-`tests/test_master_input.py` — **33 checks, all passing.** They are assertions
-about this file, not smoke tests:
+`tests/test_master_input.py` — **37 tests, all passing.** They are written as
+falsifiable claims, not smoke tests. Among them:
 
-* all 212 original names survive; none invented; all 314 original coordinates
-  recoverable; the primary coordinate is provably the first source row
-* every row carries the fixed GEN global URL, in both `gen_global_url` and
-  `urls`
-* `gen_community_url` is non-empty exactly when the status says verified, is
-  never the global URL, and always carries evidence
-* `NOT_SEARCHED` and `NOT_FOUND` never blur into each other
-* every GEN address sits in independence group G1
-* the address list reconstructs exactly from `seed_sources_json`, with no
-  duplicates, and ranking is descending by quality with the GEN global last
-* every address carries a valid source class, platform type, independence group
-  and confidence from the study's own vocabularies
-* independence counts groups rather than URLs
-* one country name per ISO code across the whole file
-* every non-`HIGH` confidence row is flagged for review
-* the crawler's reader returns 212 communities with byte-identical addresses,
-  usable coordinates, a resolvable ccTLD and a valid run mode
-* `build_plan()` sizes and orders the whole cohort
-* the researcher's original export now loads too
+* the fixed network seed is on every single row;
+* absence of a GEN page is never dressed up as a search having been run;
+* GEN never counts as an independent second voice;
+* no community GEN URL was invented;
+* the address list reconstructs exactly from the structured column;
+* the exported coordinate is never lost;
+* a single-coordinate row is never second-guessed;
+* a moved coordinate is one of the exported candidates, verbatim, never a new point;
+* every moved coordinate cites the address that justifies it;
+* an unresolved coordinate still carries the exported value and its review flag;
+* the crawler reads all 212 communities;
+* the original export would now load too.
 
-Run: `python3 -m pytest tests/test_master_input.py -q`
+Full suite: **558 passed**, 114 skipped, 3 failed. The three failures are in
+`tests/test_extraction.py` and are pre-existing container problems — a missing
+`reportlab` and a broken `_cffi_backend` behind `cryptography` — untouched by
+and unrelated to this work.
 
----
+## 10. What a reader should not conclude from this file
 
-## 10. What is still owed
-
-1. **Discovery for 113 communities** — blocked only by the search budget.
-   `master_input/pipeline/step4_resume_discovery.py --list-pending` is the worklist; the file is
-   built to absorb the results without regeneration.
-2. **The HTTP validation pass** — blocked only by the egress policy.
-   `master_input/pipeline/step5_validate_urls.py` fills the four empty count columns and adds
-   `http_status`, `final_url`, `content_type` and `crawl_status` per address.
-3. **The 34 multi-candidate coordinates** — resolvable with a map; see the lead
-   in §2.
-4. **Two identity conflicts** — Hågaby and The Garden, where the GEN page and
-   the coordinate disagree about which place is meant.
-
-Nothing in items 1–4 requires the file to be rebuilt from scratch, and nothing
-already in it depends on their outcome.
+* **That any address resolves.** None has been fetched. The four validation
+  columns are empty for that reason and must stay empty until step 5 runs.
+* **That a `NOT_FOUND` GEN status means a community is not in GEN.** It means
+  no community page was returned by a `site:ecovillage.org` query. Several of
+  the 36 are demonstrably in the network — Arterra Bizimodu is a GEN Europe
+  full member and hosts GEN Europe's office; Ecodorp Bergen is reported as the
+  first Dutch initiative to hold full membership. GEN's site structure and its
+  membership are not the same thing.
+* **That a thin row means a thin community.** Register field I12
+  (`crawl_truncated`) exists precisely so that absence of effort is never
+  mistaken for absence of evidence, and rows where the record is genuinely
+  sparse say so in `qc_notes` rather than looking merely unremarkable.
