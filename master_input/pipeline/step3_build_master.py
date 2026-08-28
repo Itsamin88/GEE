@@ -185,7 +185,13 @@ def build_row(community: dict, discovery: dict | None) -> dict[str, str]:
         gen_status_raw = discovery["gen_status"]
         gen_evidence = discovery["gen_evidence"]
         gen_method = "search_index" if gen_url else "search_index_negative"
-        if gen_url:
+        if gen_status_raw.startswith("NOT_SEARCHED"):
+            # A community researched for its other sources but never actually
+            # queried against ecovillage.org must not be reported as NOT_FOUND.
+            # Register v2.4 I12: absence of effort is not absence of evidence.
+            gen_url, gen_status, gen_method = "", "NOT_SEARCHED", "none"
+            reviews.append("gen_not_searched")
+        elif gen_url:
             gen_status = "VERIFIED_COMMUNITY_SOURCE"
             if gen_status_raw != "VERIFIED_SEARCH_INDEX":
                 gen_status = f"VERIFIED_COMMUNITY_SOURCE_{gen_status_raw.replace('VERIFIED_SEARCH_INDEX_', '')}"

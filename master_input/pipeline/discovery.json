@@ -11593,5 +11593,1445 @@
     "evidence": "Fixed network seed source"
    }
   ]
+ },
+ "192": {
+  "country": "Romania",
+  "country_iso2": "RO",
+  "admin_region": "Timis County; Recas commune; Stanciova",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/ecotopia-romania-association",
+  "gen_community_url": "https://ecovillage.org/ecovillage/ecotopia-romania-association",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned the community page, but it is FILED UNDER THE ASSOCIATION NAME 'Ecotopia Romania Association', not under Stanciova - a name-only search on 'Stanciova' does not reach it",
+  "alternative_names": "Ecotopia Romania - Stanciova; Ecotopia Stanciova; Ecotopia Romania Association; Asociatia Ecotopia; Stanciova community",
+  "identity_confidence": "HIGH",
+  "notes": "A RETROFIT INTO AN EXISTING VILLAGE, not a new settlement: the group moved INTO Stanciova, a poor village of about 300 houses and 400 inhabitants, and by their own account reached 7 HOUSEHOLDS - the largest group of this kind in Romania. So the community is a minority within an existing village footprint and cannot be separated from it in imagery. Origin: a student environmentalist group in Timisoara in 1997-98; the Stanciova initiative began in 2001. NOTABLE SHIFT: they arrived with a technology-led vision (LETS, solar panels, permaculture design) and deliberately abandoned it in favour of the host village's own needs - running the village kindergarten and renovating the public building - so the expected technological signals (solar arrays, new eco-buildings) may simply not exist.",
+  "sources": [
+   {
+    "url": "https://glamurs.eu/case_study/the-region-of-banat-timis-romania/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "GLAMURS, an EU-funded research project on green lifestyles and sustainability transitions - its Banat-Timis case study covers this community; independent academic fieldwork"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/ecotopia-romania-association",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN community page, filed under the association name"
+   },
+   {
+    "url": "https://ecotopiaromania.wordpress.com/home/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "The association's own site, including a dated history of the 2001-2004 period"
+   },
+   {
+    "url": "https://ecobasa.org/en/communities/stanciova-an-open-community/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Ecobasa network record, 'Stanciova - an open community'"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "193": {
+  "country": "Germany",
+  "country_iso2": "DE",
+  "admin_region": "Baden-Wurttemberg; Schwabisch Hall district; Kressberg; 74594",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.schloss-tempelhof.de/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org returned only ARTICLE pages about the community - /schloss-tempelhof/ ('The first Earthship in Germany') and a resources-library article - not a /project/ or /ecovillage/ community profile. Articles are recorded as sources; they are not promoted to a community page.",
+  "alternative_names": "Schloss Tempelhof; Gemeinschaft Schloss Tempelhof; Gemeinschaft Tempelhof; Tempelhof (Gemeinschaft); Stiftung Schloss Tempelhof",
+  "identity_confidence": "HIGH",
+  "notes": "FOUNDING YEAR CORRECTED: 2010, not 2012 - German Wikipedia, GLS Bank and GEN all give 2010. FULL LAND BREAKDOWN, one of the most precise in the cohort: 34 HECTARES TOTAL, comprising 4 HA OF BUILDING LAND with numerous existing structures, 28 HA OF AGRICULTURAL LAND and 2 HA OF FOREST. Around 150 residents (roughly 100 adults and 50 children). Solidarische Landwirtschaft (community-supported agriculture) on permaculture principles. Site of the FIRST OFFICIALLY APPROVED EARTHSHIP IN GERMANY - an off-grid community building with kitchen, dining and living space and facilities for 25 people, at the centre of experimental living units in yurts and site trailers, so part of the residential stock is non-permanent and may not read as building. The site was an existing manor estate before 2010, so pre-community imagery shows farm buildings, not open land. FINANCING LEAVES A PAPER TRAIL: GLS Bank, the German ethical bank, publishes its role in the project.",
+  "sources": [
+   {
+    "url": "https://www.schloss-tempelhof.de/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://de.wikipedia.org/wiki/Tempelhof_(Gemeinschaft)",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "German Wikipedia article - the source of the 34 ha / 4 ha / 28 ha / 2 ha breakdown and the 2010 founding"
+   },
+   {
+    "url": "https://www.gls.de/gls-bank/nachhaltigkeit/wo-wirkt-die-gls/nachhaltige-wirtschaft/schloss-tempelhof/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "GLS Bank's own record of financing the project - a dated financial-institution source independent of the community"
+   },
+   {
+    "url": "https://sdg21.eu/en/db/schloss-tempelhof",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "sdg21.eu sustainable-settlements database entry, 'Schloss Tempelhof mit Earthship' - a curated technical database record"
+   },
+   {
+    "url": "https://gen-deutschland.de/projekt/schloss-tempelhof/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.58,
+    "evidence": "GEN Deutschland national network project record"
+   },
+   {
+    "url": "https://ecovillage.org/schloss-tempelhof/",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "GEN article on the community's Earthship - a GEN article page, explicitly not a community profile"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "194": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "Missouri; Macon County; La Plata",
+  "country_method": "coordinate_gazetteer+multiple_published_sources",
+  "country_source": "https://www.motherearthnews.com/sustainable-living/nature-and-environment/possibility-alliance-ze0z11zmar/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org run for the Possibility Alliance: no ecovillage.org community page. The community had no website at all - visitors were asked to telephone or write - so its documentary footprint is entirely third-party.",
+  "alternative_names": "Possibility Alliance; The Possibility Alliance; Stillwater Sanctuary; Possibility Alliance La Plata",
+  "identity_confidence": "MEDIUM",
+  "notes": "RELOCATION IS NOW CORROBORATED, NOT JUST SUSPECTED - REVIEW REQUIRED. Multiple independent sources report the Possibility Alliance MOVING FROM MISSOURI TO BELFAST, MAINE (a permies.com logistics thread about the move, and the 2018 Bangor Daily News profile of the family off-grid in Maine). The La Plata site should therefore NOT be assumed occupied for the later part of the study period, and any decline in the imagery is likely to be departure rather than failure. The exact departure date was not established here and must be checked. THE MOST EXTREME OFF-GRID CASE IN THE COHORT AND A CRITICAL SENSOR CAVEAT: the community was car-free, petroleum-free AND ELECTRICITY-FREE - candlelight and wood stoves, no grid connection and no solar array. There is therefore NO night-lights signal and NO photovoltaic signature to detect, and absence of those must not be read as absence of the community. It also had NO WEBSITE by choice. Started 2007 on 110 ACRES at La Plata, Missouri, about 40 miles from Dancing Rabbit Ecovillage. Free classes in straw-bale building, homesteading, wild edibles, permaculture and organic gardening; roughly 1,500 visitors a year against an expected 200, and more than 10,000 in total. Reported to have catalysed a cluster of homesteads and sympathetic neighbours around La Plata, so nearby land-use change may be attributable to it without being on its parcel. Also associated with the name Stillwater Sanctuary.",
+  "sources": [
+   {
+    "url": "https://www.motherearthnews.com/sustainable-living/nature-and-environment/possibility-alliance-ze0z11zmar/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Mother Earth News feature on the educational homestead - the source of the 110-acre figure and the 2007 start"
+   },
+   {
+    "url": "https://www.dancingrabbit.org/ecovillage-life/our-land/local-intentional-communities/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.64,
+    "evidence": "Dancing Rabbit Ecovillage's page on neighbouring communities - a nearby community's independent confirmation that the site exists and roughly where"
+   },
+   {
+    "url": "https://www.bangordailynews.com/2018/10/26/living/this-family-takes-off-the-grid-to-the-extreme/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.66,
+    "evidence": "Bangor Daily News, 26 October 2018 - the source that raises the relocation-to-Maine question; recorded because it bears directly on whether the Missouri site is still occupied"
+   },
+   {
+    "url": "https://permies.com/t/79358/Transportation-Possibility-Alliance-Moving-Missouri",
+    "source_class": "S8",
+    "platform_type": "other",
+    "independence_group": "G6",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Public forum thread organising transport for the Possibility Alliance's move from Missouri to Maine - direct communication from people involved, and the clearest evidence that the Missouri site was vacated"
+   },
+   {
+    "url": "https://www.mensjournal.com/travel/dropping-out-for-a-weekend-at-missouris-ecovillages-20150518/possibility-alliance/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G7",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Men's Journal, 18 May 2015 - a dated visit to the Missouri site while it was still active, useful as an end-of-occupation time point"
+   },
+   {
+    "url": "https://www.gen-us.net/back-to-life-returning-from-the-virtual-to-the-real/",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "GEN-US article about the community - the US regional network's site, not a GEN community profile"
+   },
+   {
+    "url": "https://www.behance.net/gallery/9815701/Off-The-Grid-Living-with-the-Possibility-Alliance",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "Katie Currid's documentary photo essay 'Off The Grid - Living with the Possibility Alliance' - a dated photographic record by an outside photojournalist"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "195": {
+  "country": "Russia",
+  "country_iso2": "RU",
+  "admin_region": "Vladimir Oblast",
+  "country_method": "coordinate_gazetteer+published_sources",
+  "country_source": "https://vmegre.com/en/kin-domain/vladimir-oblast-region-rodnoe/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org run for Rodnoe and for kin-domain settlements: no community page. GEN does carry a page for the sister kin-domain settlement Kovcheg, explicitly labelled 'not GEN member', which shows GEN indexes this movement but has not listed Rodnoe.",
+  "alternative_names": "Rodnoe; Rodnoye; Rodnoe Settlement; Rodnoe kin's domain settlement; Rodnoye ecovillage; Rodnoe and Slavnoye",
+  "identity_confidence": "MEDIUM",
+  "notes": "THE CLEAREST DESIGNED-AFFORESTATION CASE IN THE COHORT. Rodnoe is a KIN DOMAIN (rodovoe pomestie) settlement in the Ringing Cedars / Anastasia movement founded by Vladimir Megre's books. The design rules are explicit and quantitative: EACH FAMILY HOLDS AT LEAST ONE HECTARE; the boundary of every domain is a LIVING FENCE of trees and shrubs; and BETWEEN ONE QUARTER AND THREE QUARTERS OF EACH DOMAIN IS PLANTED WITH PERENNIALS - forest and fruit trees and bushes. If those rules were followed, tree cover on this site should have risen sharply and measurably from 2001 onward, on former open farmland. Founded March 2001 when the group chose a site overlooking fields. About 60 permanent residents in 60 families, drawn from Russia, Kazakhstan, Kyrgyzstan, Moldova, Germany, the United States and Poland. NOTE the adjacent settlement Slavnoye - the two are usually described together and the boundary between them may not be obvious from imagery. SCALE UPDATE from a second source: Rodnoe is described as having ABOUT 100 PLOTS, each no smaller than one hectare - so the settlement footprint is on the order of 100 ha, larger than the 60-family figure alone suggests.",
+  "sources": [
+   {
+    "url": "https://vmegre.com/en/kin-domain/vladimir-oblast-region-rodnoe/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.72,
+    "evidence": "The movement's own settlement record for Rodnoe in Vladimir Oblast - the source of the March 2001 founding and the 60-family figure"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Ringing_Cedars%27_Anastasianism",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Encyclopaedia account of the movement and the kin-domain concept - context for the design rules, not for this site specifically"
+   },
+   {
+    "url": "https://www.youtube.com/watch?v=rculyuqQviw",
+    "source_class": "S7",
+    "platform_type": "YouTube",
+    "independence_group": "G4",
+    "confidence": "LOW",
+    "score": 0.34,
+    "evidence": "'Kin's domains of the Earth' series episode on Rodnoe - the source of the ~100 one-hectare plots figure; visual context"
+   },
+   {
+    "url": "http://slideplayer.com/slide/8483269",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.64,
+    "evidence": "Antonina Kulyasova, Centre for Independent Social Research, 'Kin Domains concept and practical experience' - academic fieldwork on Russian kin-domain settlements; about the sister settlement Kovcheg rather than Rodnoe, so it informs the design rules but must not be transferred to this site as fact"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "196": {
+  "country": "Ireland",
+  "country_iso2": "IE",
+  "admin_region": "County Tipperary; Cloughjordan; townland of Oxpark",
+  "country_method": "coordinate_gazetteer+gen_page+official_site",
+  "country_source": "https://www.thevillage.ie/about-us/our-story/",
+  "gen_community_url": "https://ecovillage.org/project/cloughjordan-ecovillage",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned the /project/cloughjordan-ecovillage community page; GEN also carries several articles about the community and lists it as a showcase ecovillage",
+  "alternative_names": "Cloughjordan Ecovillage; The Village; Cloughjordan; Sustainable Projects Ireland; Ireland's ecovillage",
+  "identity_confidence": "HIGH",
+  "notes": "ONE OF THE BEST-EVIDENCED SITES IN THE COHORT, WITH A DATED PLANTING RECORD THAT IS DIRECTLY REMOTE-SENSABLE: 20,000 NEWLY PLANTED TREES on a 67-ACRE SITE. The land, a farm in the townland of OXPARK adjoining the existing village, was PURCHASED IN 2005; the idea dates to a 1999 meeting in Dublin; THE FIRST RESIDENTS MOVED IN IN DECEMBER 2009. Now 120+ residents in more than 50 high-performance homes. Ireland's largest renewable-energy DISTRICT HEATING SYSTEM, run on a wood-chip boiler - a single plant serving all homes, which is a distinctive built feature. Measured ecological footprint of 2 gha per resident in 2014 against an Irish average of 4.7. INSTITUTIONAL RECOGNITION: selected for the EU-funded MILESECURE-2050 project, one of the final 23 from 1,500 candidate projects, and a 2020 Transformative Cities finalist. Merges directly with the existing village of Cloughjordan, so the ecovillage boundary and the village boundary are contiguous and must be separated deliberately.",
+  "sources": [
+   {
+    "url": "https://www.thevillage.ie/about-us/our-story/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official history - the 67 acres, the 2005 purchase, the December 2009 first occupation and the 20,000 trees"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Cloughjordan_Ecovillage",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Encyclopaedia article - useful mainly as a bibliography of the substantial independent literature"
+   },
+   {
+    "url": "https://www.irishtimes.com/news/environment/cloughjordan-inside-ireland-s-only-ecovillage-1.2462135",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Irish Times environment feature reported from the site - national newspaper journalism"
+   },
+   {
+    "url": "https://www.tni.org/en/article/the-future-is-now-at-irelands-cloughjordan-ecovillage",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "Transnational Institute article"
+   },
+   {
+    "url": "https://ecovillage.org/project/cloughjordan-ecovillage",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://carboncopy.eco/initiatives/cloughjordan-ecovillage-co-tipperary",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "CarbonCopy initiative record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "197": {
+  "country": "Canada",
+  "country_iso2": "CA",
+  "admin_region": "British Columbia; Cowichan Valley Regional District; Shawnigan Lake; 1565 Baldy Mountain Rd",
+  "country_method": "coordinate_gazetteer+gen_page+official_site",
+  "country_source": "https://ourecovillage.org/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/our-ecovillage-shawnigan-lake-british-columbia-canada/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'OUR Ecovillage - Shawnigan Lake, British Columbia, Canada'",
+  "alternative_names": "O.U.R. Ecovillage; OUR Ecovillage; O.U.R. ECOVILLAGE; One United Resource; OUR Ecovillage Shawnigan Lake",
+  "identity_confidence": "HIGH",
+  "notes": "SMALL AND PRECISELY ADDRESSED: 25 ACRES at 1565 Baldy Mountain Rd, Shawnigan Lake, BC V8H 2A9, on southern Vancouver Island. Operating since 1999 as a demonstration sustainable village, a regenerative-living demonstration site, research centre and bioregional school, with a land-based permaculture learning community, farm operations, courses and accommodation. NOT VERIFIED HERE: the community is often credited with pioneering a bespoke zoning and covenant agreement with the Cowichan Valley Regional District - this was NOT confirmed by any source in this pass and must not be repeated as fact without checking the CVRD's own records. If it is real it would be a strong government paper trail; treat it as a lead, not a finding. At 25 acres this is a small parcel and its buildings are dispersed among trees, which will limit what a coarse sensor can resolve.",
+  "sources": [
+   {
+    "url": "https://ourecovillage.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/our-ecovillage-shawnigan-lake-british-columbia-canada/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://youngagrarians.org/land-opportunity-unique-land-share-at-our-ecovillage-shawnigan-lake-bc/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "Young Agrarians land-opportunity listing - a BC farmland-access organisation's record, which describes the land and the tenure arrangement from outside"
+   },
+   {
+    "url": "https://www.tourismcowichan.com/things-to-do/our-ecovillage/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Tourism Cowichan, the regional destination organisation - a local institutional record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "198": {
+  "country": "United Kingdom",
+  "country_iso2": "GB",
+  "admin_region": "Wales; Pembrokeshire; Glandwr, near Crymych",
+  "country_method": "coordinate_gazetteer+planning_record+official_site",
+  "country_source": "https://lammas.org.uk/en/ecovillage/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org run for Lammas and for Welsh ecovillages: no ecovillage.org community page was returned. The best-known ecovillage in Wales is documented through its planning record and the academic literature rather than through GEN.",
+  "alternative_names": "Lammas Ecovillage; Lammas; Tir y Gafel; Tir-y-Gafel; Lammas Tir y Gafel; Glandwr ecovillage",
+  "identity_confidence": "HIGH",
+  "notes": "THE STRONGEST PLANNING AND LAND-USE RECORD IN THE ENTIRE COHORT, and the one site where the land-cover change is not merely observed but LEGALLY REQUIRED AND MONITORED. Nine households plus a community hub on a 76-ACRE (31 HA) SITE at Glandwr near Crymych. Planning took from DECEMBER 2006 to AUGUST 2009 under Pembrokeshire's Policy 52 on low-impact development; in AUGUST 2009 a Welsh Government planning inspector granted temporary permission ON APPEAL for nine households to develop smallholdings on 70 ACRES OF FORMER PASTURELAND. THE CONDITION IS THE KEY FACT: each household must demonstrate that AT LEAST 75% OF ITS NEEDS - food, energy and livelihood - are met on site through agriculture, forestry or related enterprise. That means (a) the prior land cover is documented as pasture, (b) the start date is exact, and (c) the occupants were legally obliged to convert that pasture to productive use and to report on it annually. Lammas directly informed the Welsh Government's ONE PLANET DEVELOPMENT policy, introduced in 2011, and was among the first projects to benefit from it - so this single site has a national policy literature attached to it. ADDITIONAL: Lammas was THE FIRST ECOVILLAGE IN THE UK TO OBTAIN PROSPECTIVE PLANNING PERMISSION, won in 2009 after a three-year campaign that ended in a public hearing - so the appeal documents themselves are a public record of the site's condition before development.",
+  "sources": [
+   {
+    "url": "https://lammas.org.uk/en/ecovillage/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official ecovillage page"
+   },
+   {
+    "url": "https://ukerc-observatory.ac.uk/case_study/lammas-eco-village/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "UK Energy Research Centre Public Engagement Observatory case study - an academic research centre's structured record of the project"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Lammas_Ecovillage",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Encyclopaedia article - the source of the 76 acres / 31 ha figure and the planning chronology"
+   },
+   {
+    "url": "https://www.lowimpact.org/posts/wales-unique-one-planet-planning-policy-lammas-ecovillage",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.64,
+    "evidence": "Lowimpact.org account of Policy 52 and the One Planet Development policy that followed"
+   },
+   {
+    "url": "https://westwalesnewsreview.wordpress.com/2019/04/30/news-lammas-ecovillage-ten-years-on-revitalised-land-some-rocky-relationships/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.68,
+    "evidence": "West Wales News Review, 30 April 2019, 'Lammas Ecovillage Ten Years On: Revitalised Land, Some Rocky Relationships' - a dated ten-year local-journalism assessment, valuable precisely because it is not celebratory"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "199": {
+  "country": "Denmark",
+  "country_iso2": "DK",
+  "admin_region": "Central Denmark Region; Syddjurs Municipality; Feldballe, Djursland",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://start.friland.org/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org run for Friland: no community page. The community's network presence is through the Danish national association and the permaculture networks instead.",
+  "alternative_names": "Friland; Frilandsprojektet; Friland Feldballe; Friland Djursland; Andelsforeningen Friland",
+  "identity_confidence": "HIGH",
+  "notes": "EXACT DATES AND AN EXACT AREA, both from the community's own record: the association was founded at a general assembly on 20 JANUARY 2002 and BOUGHT 4.5 HECTARES ON 1 MARCH 2002, paid for outright. Now about 45 HOUSES and roughly 75 PEOPLE - a dense settlement on a small parcel. TWO FEATURES MAKE THIS AN UNUSUAL DOCUMENTARY CASE. First, the building materials: straw houses plastered with clay, grass houses insulated with wood fibre, sheep's wool, hemp and flax, and foundations laid on mussel shells - low-contrast, irregular structures that automated built-up classifiers handle poorly. Second, and more valuable, the site was filmed by DR, the Danish public broadcaster, in a MULTI-YEAR TELEVISION SERIES ('Nybyggerne', 'Frilandshuset') - a longitudinal, professionally dated visual record of construction, which very few sites in this cohort have. The economic rule is also unusual and worth noting: residents may not borrow against the land or houses, and sale prices are capped to prevent speculation. PRIOR LAND USE NAMED: an outside video documentary describes the founders turning A CORN FIELD into the settlement - so the pre-2002 cover was arable, not pasture or scrub. Founded by 13 FAMILIES in 2002, now about 45.",
+  "sources": [
+   {
+    "url": "https://start.friland.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://da.wikipedia.org/wiki/Friland",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Danish Wikipedia - the source of the 20 January 2002 founding, the 1 March 2002 purchase of 4.5 ha and the 45 houses / 75 residents figures"
+   },
+   {
+    "url": "https://faircompanies.com/videos/danish-friends-turn-corn-field-into-debt-free-ecovillage-of-friland/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "*faircompanies documentary video filmed on site - the source that names the prior land cover as a corn field"
+   },
+   {
+    "url": "https://permateachers.eu/case-study-friland-denmark",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G6",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Permaculture Teachers Europe structured case study of Friland - an educational-network technical record"
+   },
+   {
+    "url": "https://www.dr.dk/presse/dr-friland-nybyggerne-1-6",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "DR, the Danish public broadcaster - press record for the multi-part television series filmed at Friland; the anchor for the longitudinal broadcast record"
+   },
+   {
+    "url": "https://www.visitaarhus.com/aarhus-region/plan-your-trip/friland-an-eco-community-on-djursland-gdk1137430",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "VisitAarhus, the regional destination organisation - a local institutional record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "200": {
+  "country": "Haiti",
+  "country_iso2": "HT",
+  "admin_region": "Sud-Est Department; Anse-a-Pitres",
+  "country_method": "coordinate_gazetteer+gen_page+official_site",
+  "country_source": "https://sadhanaforest.org/haiti/campus-haiti/the-community/",
+  "gen_community_url": "https://ecovillage.org/project/sadhana-forest-haiti",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Sadhana Forest Haiti - Global Ecovillage Network'",
+  "alternative_names": "Sadhana Forest Haiti; Sadhana Forest; Sadhana Forest Anse-a-Pitres",
+  "identity_confidence": "HIGH",
+  "notes": "CRITICAL METHODOLOGICAL WARNING: THE PLANTING IS DISPERSED, NOT ON ONE PARCEL. More than 80,000 TREES have been planted since 2010 across THOUSANDS OF INDIVIDUAL KITCHEN GARDENS and public spaces - schools and parks - throughout the municipality of Anse-a-Pitres, which covers 185 km2 and has 25,000 inhabitants. A crawl or land-cover reading anchored to the single campus coordinate will capture almost none of the actual intervention and will badly understate it. The correct unit here is the municipality, not the point. Work began 2010. The species emphasis is the MAYA NUT (Brosimum alicastrum), chosen because one tree can supply a family of five with protein for a year. The operating model is 'each tree is protected by a person', a direct response to charcoal cutting and grazing - which is also the regional deforestation pressure the trend must be read against, since Haiti is among the most deforested countries in the world. Part of a three-country vegan volunteer organisation also working in India and Kenya (see seq 206).",
+  "sources": [
+   {
+    "url": "https://sadhanaforest.org/haiti/causes-haiti/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official mission page for the Haiti project - the source of the 80,000 trees, the dispersed-planting model and the Maya nut focus"
+   },
+   {
+    "url": "https://ecovillage.org/project/sadhana-forest-haiti",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://www.csmonitor.com/World/Making-a-difference/Change-Agent/2015/0320/At-Sadhana-Forest-trees-spring-from-once-barren-land",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Christian Science Monitor, 20 March 2015 - reported international journalism with a hard date, describing the state of the land at that point"
+   },
+   {
+    "url": "https://fieldstudyoftheworld.com/sadhana-forest-improving-food-security-reforestation-haiti/",
+    "source_class": "S6",
+    "platform_type": "blog platform",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Outside account of the reforestation and food-security work"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Sadhana_Forest",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Encyclopaedia article covering all three Sadhana Forest sites"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "201": {
+  "country": "United Kingdom",
+  "country_iso2": "GB",
+  "admin_region": "England; Nottinghamshire; Newark and Sherwood; Hockerton",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.hockertonhousingproject.org.uk/about-us/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org run for Hockerton Housing Project: no community page. Its record is architectural and energy-research literature rather than ecovillage-network listing.",
+  "alternative_names": "Hockerton Housing Project; HHP; Hockerton; The Hockerton Housing Project",
+  "identity_confidence": "HIGH",
+  "notes": "THE SINGLE MOST IMPORTANT SENSOR CAVEAT IN THE COHORT: THE HOUSES ARE EARTH-SHELTERED. Five single-storey dwellings in a terrace, banked with earth at the rear, so from above they read as a grassed bank rather than as buildings. An optical or built-up-area classifier will very likely record NO construction here at all, and that absence must not be interpreted as no development. EXACT DATE: completed SEPTEMBER 1998, after three years of planning and eighteen months of construction, at about GBP 65,000 per house. Designed by Professor Brenda Vale and Dr Robert Vale. The UK's first earth-sheltered, self-sufficient ecological housing development. No space-heating system at all - passive solar through a south-facing conservatory plus high thermal mass. Residents generate their own electricity, harvest and treat their own water, and grow most of their own food. Operates as a not-for-profit co-operative running tours, courses and consultancy, so it is well documented for its size - but it is only FIVE HOUSES, among the smallest sites in the cohort.",
+  "sources": [
+   {
+    "url": "https://task28.iea-shc.org/Data/Sites/1/publications/task28-demonstration-uk_hockerton.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "International Energy Agency Solar Heating and Cooling Task 28 / ECBCS Annex 38 demonstration report on Hockerton - a peer-reviewed international technical publication with measured performance data"
+   },
+   {
+    "url": "https://www.hockertonhousingproject.org.uk/about-us/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official About page"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Hockerton_Housing_Project",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Encyclopaedia article - source of the September 1998 completion date, the architects and the cost"
+   },
+   {
+    "url": "https://stories.cpre.org.uk/sustainable-rural-living/index.html",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "CPRE (Campaign to Protect Rural England) feature on sustainable rural living - a national NGO's record"
+   },
+   {
+    "url": "https://selfbuildportal.org.uk/case-studies/case-studies-hockerton/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "NaCSBA Self Build Portal case study - a UK housing-sector institutional record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "202": {
+  "country": "Denmark",
+  "country_iso2": "DK",
+  "admin_region": "Region of Southern Denmark; Svendborg Municipality; Hundstrup, 5762 Vester Skerninge, South Funen",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "http://www.selvforsyning.dk/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org run for Den Selvforsynende Landsby: no community page, although GEN's Denmark country archive was returned. The community's network membership is through Landsforeningen for Okosamfund, the Danish national ecovillage association.",
+  "alternative_names": "Den Selvforsynende Landsby; The Self-Sufficient Village; DSL; Den Selvforsynende Landsby Hundstrup",
+  "identity_confidence": "HIGH",
+  "notes": "TWO-STAGE DATING, which matters: the association was FOUNDED IN 2002 but THE LAND - farmland outside Hundstrup - WAS NOT BOUGHT UNTIL 2004, so nothing is visible on the ground before 2004 however the community dates itself. POPULATION FIGURES DISAGREE ACROSS SOURCES AND BOTH ARE RECORDED, NEITHER ADOPTED: one gives 34 adults and 40 children, another 26 adults and 33 children; 19 HOUSEHOLDS, counting both finished houses and ones still under construction - so the settlement was still growing when the records were written and a count taken from imagery will depend heavily on the date. Designed on permaculture principles. Residents self-build from natural and recycled materials and CULTIVATE THE LAND COLLECTIVELY rather than in individual plots, which means the agricultural signal is one block, not a mosaic. Many roofs carry solar collectors or PV. Members owe 8 hours a week of shared work; food is bought collectively and dinner is cooked communally every day.",
+  "sources": [
+   {
+    "url": "http://www.selvforsyning.dk/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Den_Selvforsynende_Landsby",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Encyclopaedia article - source of the 2002 founding and the 2004 land purchase"
+   },
+   {
+    "url": "https://okosamfund.dk/en/elementor-14152/medlemmer-en/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Landsforeningen for Okosamfund (LOS) membership list - the Danish national ecovillage association's own register"
+   },
+   {
+    "url": "https://bofaellesskab.dk/bofaellesskaber/bofaellesskaber/375-den-selvforsynende-landsby",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "bofaellesskab.dk, the Danish cohousing register - carries the address and household count"
+   },
+   {
+    "url": "https://www.wikidata.org/wiki/Q5256482",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.42,
+    "evidence": "Wikidata item - structured identifiers for the settlement"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "203": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "New Hampshire; Coos County; Colebrook, 03576 (Great North Woods)",
+  "country_method": "official_source_overrides_gazetteer",
+  "country_source": "https://ecovillage.org/project/cite-ecologique-of-new-hampshire/",
+  "gen_community_url": "https://ecovillage.org/project/cite-ecologique-of-new-hampshire/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Ecovillage La Cite Ecologique of NH'; GEN-US carries a matching entry",
+  "alternative_names": "Cite Ecologique of New Hampshire; La Cite Ecologique of NH; Ecovillage La Cite Ecologique of NH; Cite Ecologique NH; The Ecovillage Institute",
+  "identity_confidence": "HIGH",
+  "notes": "COUNTRY CORRECTED: the gazetteer voted CANADA because Colebrook sits in the Great North Woods a short distance from the Quebec border and every nearby town above the gazetteer's size threshold is Canadian. The community is in COLEBROOK, NEW HAMPSHIRE, UNITED STATES - address 85 Angels Rd, Colebrook NH 03576. The French name is not evidence of Canada: this is the New Hampshire offshoot of a Quebec parent community of the same name, and the two must not be conflated. CLEAN ACQUISITION DATE AND A LARGE PARCEL: 315 ACRES PURCHASED IN 2003. About 35 permanent residents - a low density over a large area, so most of the parcel is likely unbuilt woodland. A second dated step: the ORGANIC GARDENS AND THE SCHOOLING GROUP BOTH STARTED IN 2007, which is when cultivated ground should first appear. Runs an alternative private school, community businesses and microenterprises, renewable energy, animal husbandry, waste management and permaculture design. Two fixed annual public events (the June open house and the September harvest celebration) which may help date visitor photography.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/cite-ecologique-of-new-hampshire/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page - the source of the 315 acres, the 2003 purchase and the 2007 garden and school start"
+   },
+   {
+    "url": "https://www.gen-us.net/ecovillages/ecovillage-la-cite-ecologique-of-nh/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "GEN-US regional network record"
+   },
+   {
+    "url": "https://find.coop/organizations/22408-cite-ecologique-of-new-hampshire",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "LOW",
+    "score": 0.36,
+    "evidence": "find.coop cooperative directory record"
+   },
+   {
+    "url": "https://www.facebook.com/laciteecologiqueofnh/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.42,
+    "evidence": "Community's own Facebook page - dated photographic record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "204": {
+  "country": "United Kingdom",
+  "country_iso2": "GB",
+  "admin_region": "Wales; Pembrokeshire; near Newport (Trefdraeth)",
+  "country_method": "coordinate_gazetteer+gen_page+official_site",
+  "country_source": "https://ecovillage.org/project/brithdir-mawr/",
+  "gen_community_url": "https://ecovillage.org/project/brithdir-mawr/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Brithdir Mawr - Global Ecovillage Network' at /project/brithdir-mawr/; the same record is also served on GEN's LEGACY HOST at sites.ecovillage.org/brithdir-mawr, which the crawler should recognise as the same source, not a second one",
+  "alternative_names": "Brithdir Mawr; Brithdir Mawr Community; That Roundhouse; Tir Ysbrydol (the associated Roundhouse site)",
+  "identity_confidence": "HIGH",
+  "notes": "THE MOST DIRECTLY RELEVANT SITE IN THE COHORT TO THE METHOD ITSELF: in 1998 A ROUTINE AERIAL SURVEY OF THE PEMBROKESHIRE COAST NATIONAL PARK PHOTOGRAPHED A BRIGHT REFLECTION FROM THE GROUND, WHICH TURNED OUT TO BE A SOLAR PANEL - and that is how the authorities discovered the hidden community and Tony Wrench's unpermitted roundhouse. This is a documented case of an intentional community being detected from the air by a single specular reflection, and it is worth citing in its own right. The roundhouse, built by Tony Wrench and Jane Faith over the winter of 1997-98, is a 30 ft TURF-ROOFED structure that cost about GBP 2,500 in materials and 400 person-hours; it was threatened with demolition and finally granted RETROSPECTIVE PLANNING PERMISSION IN SEPTEMBER 2008, subject to a three-year review. So there is a decade-long public planning file. AREA FIGURES CONFLICT AND BOTH ARE RECORDED, NEITHER ADOPTED: GEN gives 165 ACRES, other sources give 80 ACRES - possibly a whole-farm versus community-land distinction, but that is not established. Population figures also differ: GEN says 20 people, another source 10 adults and 7 children. Off the grid for both electricity and water; coppices its own fuel wood; organic gardening and farming; adults work about three days a week for the community.",
+  "sources": [
+   {
+    "url": "https://brithdirmawr.co.uk/about/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official About page"
+   },
+   {
+    "url": "https://ecovillage.org/project/brithdir-mawr/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page - the source of the 165-acre and 20-resident figures"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/That_Roundhouse",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Encyclopaedia article on the roundhouse - the source of the 1998 aerial-survey discovery and the September 2008 retrospective permission"
+   },
+   {
+    "url": "https://tlio.org.uk/tony-wrenchs-roundhouse-a-short-history/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.64,
+    "evidence": "The Land Is Ours - a land-rights campaign's documented history of the planning dispute"
+   },
+   {
+    "url": "https://www.thatroundhouse.info/echo.htm",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "The roundhouse builders' own site"
+   },
+   {
+    "url": "https://islesproject.wordpress.com/2008/09/18/15th-september-2008-signs-of-transformation-in-the-planning-system-the-case-of-the-brithdir-mawr-roundhouse/",
+    "source_class": "S1",
+    "platform_type": "blog platform",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "The Isles Project, 18 September 2008 - a research project's contemporaneous analysis of the planning decision, dated to the week it was made"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "205": {
+  "country": "Denmark",
+  "country_iso2": "DK",
+  "admin_region": "Region Zealand; Faxe Municipality; Karise",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://permatopia.dk/english/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org run for Permatopia and Karise: no community page. The only ecovillage.org hit was a passing mention in the description of a GEN-published book, which is not a community profile.",
+  "alternative_names": "Permatopia; Karise Permatopia; Andelssamfundet Karise Permatopia",
+  "identity_confidence": "HIGH",
+  "notes": "THE MOST PRECISE LAND-ZONE BREAKDOWN IN THE COHORT, and one with a legal constraint attached: 29.2 HECTARES TOTAL, of which 4.7 HA IS URBAN ZONE (housing, roads and parking), and 24.5 HA IS LAND ZONE; WITHIN THAT LAND ZONE ABOUT 12 HA IS FORMER FREDSKOV - Danish legally protected forest, which by statute cannot be cleared, so that block is fixed by law and should show no change. A separate 7 HA IS CERTIFIED ORGANIC AGRICULTURE - vegetable field, market garden, greenhouses, permaculture gardens and a fruit and berry orchard - grown mainly for internal consumption with the surplus sold to local restaurants. Established 2018, about an hour from Copenhagen. 90 TOWNHOUSES, built as a combined almen bofaellesskab (public-housing community) and andelsbolig-selskab (cooperative housing company); the target population is around 200. Because it was built as a single developer-delivered scheme rather than self-built over years, the construction signal should be sharp and confined to 2017-2018.",
+  "sources": [
+   {
+    "url": "https://permatopia.dk/english/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official English page"
+   },
+   {
+    "url": "https://rgo.dk/en/in-Karise-on-South-Zealand,-200-people-will-live-as-self-sufficiently-and-circularly-as-possible/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "Green Transition Denmark (Radet for Gron Omstilling), a national environmental NGO - the source of the 29.2 / 4.7 / 24.5 / 12 / 7 hectare breakdown"
+   },
+   {
+    "url": "https://backlund.dk/menu/referencer/permatopia-karise",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.64,
+    "evidence": "Backlund Ecology project reference - the ecological engineering consultancy's own record, useful for the sanitation and water systems as built"
+   },
+   {
+    "url": "https://danakon.dk/projekt/karise-permatopia/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "Danakon project record - a construction consultancy's file on the scheme, which is where build dates can be pinned down"
+   },
+   {
+    "url": "https://bofaellesskab.dk/bofaellesskaber/bofaellesskaber/498-karise-permatopia",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Danish cohousing register entry"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "206": {
+  "country": "Kenya",
+  "country_iso2": "KE",
+  "admin_region": "Samburu County; Maralal area; Rift Valley",
+  "country_method": "coordinate_gazetteer+gen_page+official_site",
+  "country_source": "https://sadhanaforest.org/kenya/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/sadhana-forest-kenya/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Sadhana Forest Kenya - Global Ecovillage Network'",
+  "alternative_names": "Sadhana Forest Kenya; Sadhana Forest; Sadhana Forest Samburu",
+  "identity_confidence": "HIGH",
+  "notes": "THE SAME DISPERSAL WARNING AS THE HAITI SITE (seq 200) APPLIES HERE, AND IT IS THE CENTRAL METHODOLOGICAL POINT: the planting is done IN LOCAL SHAMBAS - individual Samburu family farms - SCATTERED ACROSS SAMBURU COUNTY, not on one campus parcel. A point-anchored land-cover reading will miss almost all of it. Established as an international NGO in 2012. The county is arid to semi-arid northern Kenya, in the Rift Valley, inhabited by the Samburu; recurrent drought is the driving problem. The intervention is specific and countable: 18 SPECIES OF INDIGENOUS, DROUGHT-RESISTANT, FOOD-BEARING TREES, plus shrubs and grasses, planted with families to build food and water security and reduce dependence on food aid. Because the species are drought-adapted natives rather than irrigated exotics, the greenness signal will be modest and strongly seasonal, and separating planted trees from natural rainfall-driven flushes will be difficult. One of three Sadhana Forest sites; see seq 200 for Haiti.",
+  "sources": [
+   {
+    "url": "https://sadhanaforest.org/causes/food-forests-in-samburu/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official 'Food Forests in Samburu' page - the source of the 18-species figure and the shamba-based planting model"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/sadhana-forest-kenya/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Sadhana_Forest",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Encyclopaedia article covering all three Sadhana Forest sites"
+   },
+   {
+    "url": "http://www.studentoftheworld.de/index.php/world-map/kenya-samburu-county-sadhana-forest/",
+    "source_class": "S6",
+    "platform_type": "blog platform",
+    "independence_group": "G3",
+    "confidence": "LOW",
+    "score": 0.4,
+    "evidence": "Outside visitor account from Samburu County"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "207": {
+  "country": "Netherlands",
+  "country_iso2": "NL",
+  "admin_region": "Noord-Holland; Bergen (NH); the former MOB-complex",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.ecodorpbergen.nl/over-ons/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org returned only an ARTICLE, 'Ecodorp Bergen - army land turns into the first ecovillage in Holland', not a /project/ or /ecovillage/ community profile. The article is recorded as a source; it is not promoted to a community page. Note the community IS reported to be the first Dutch initiative to hold full GEN membership, so the absence of a profile page reflects GEN's own site structure, not the community's status.",
+  "alternative_names": "Ecodorp Bergen; Ecovillage Bergen; Ecodorp Bergen NH; the MOB-complex Bergen",
+  "identity_confidence": "HIGH",
+  "notes": "AN EXCEPTIONAL PRIOR-LAND-USE CASE, MILITARY AND FULLY DATED: the 15 HECTARES were a FORMER MILITARY TERRAIN - the site began as a SECOND WORLD WAR AIRSTRIP and was later a COLD WAR MOBILISATION COMPLEX (MOB-complex) for reservists. SEVEN PEOPLE BOUGHT THE LAND ON 16 MAY 2013. So pre-2013 imagery shows military hardstanding, bunkers and runway remnants, not farmland or scrub, and the change to watch is de-paving and re-greening rather than clearance. Located in Bergen, 50 km north of Amsterdam and 6 km from the North Sea coast. At the time of the sources about 20 residents plus 10-15 regular volunteers, in self-provided temporary housing, with a ten-year plan to reach 60-80 people and AT LEAST 25 NEW HOMES - so the construction signal was still almost entirely in the future when these records were written, and the date of any imagery matters enormously. Governed by sociocracy with consent decision-making. Reported as the first Dutch ecovillage initiative to become a full member of the Global Ecovillage Network.",
+  "sources": [
+   {
+    "url": "http://www.transitsocialinnovation.eu/sii/ecovillage-bergen",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "TRANSIT, an EU-funded research project on transformative social innovation - a structured academic case study of Ecovillage Bergen, and the source of the MOB-complex history and the 16 May 2013 purchase"
+   },
+   {
+    "url": "https://www.ecodorpbergen.nl/over-ons/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official 'Over ons' page"
+   },
+   {
+    "url": "https://ecovillage.org/ecodorp-bergen-army-land-turns-into-the-first-ecovillage-in-holland/",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "GEN article on the site's conversion from army land - a GEN article page, explicitly not a community profile"
+   },
+   {
+    "url": "https://www.landschapnoordholland.nl/vrijwilligers/groepen/ecodorp-bergen",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "Landschap Noord-Holland, the provincial landscape conservation body - its volunteer-group record for the site, an independent institutional source with an interest in the land itself"
+   },
+   {
+    "url": "https://partnerkaart.natuurenmilieufederaties.nl/partner/ecodorp-bergen/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Natuur en Milieufederaties partner record - the Dutch provincial environmental federations' register"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "208": {
+  "country": "Peru",
+  "country_iso2": "PE",
+  "admin_region": "Lima Region; Huaral Province; Aucallama District; Chacra y Mar",
+  "country_method": "coordinate_gazetteer+gen_page+official_sources",
+  "country_source": "https://ecovillage.org/ecovillage/eco-truly-park-eco-village/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/eco-truly-park-eco-village/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Eco Truly Park - Eco Village'; the same record also survives on GEN's LEGACY HOST at gen.ecovillage.org/de/eco-truly-park-eco-village, which is the same source on an old domain, not a second one",
+  "alternative_names": "Eco Truly Park; Comunidad Ecologica Eco Truly Park; Eco Truly Park Eco Village; Eco Truly; Chacra y Mar community",
+  "identity_confidence": "HIGH",
+  "notes": "THE CLEANEST BARE-GROUND BASELINE IN THE COHORT: the site sits at 2.5 METRES ABOVE SEA LEVEL ON COMPLETELY SANDY LAND on the Peruvian Pacific coast - effectively bare coastal desert before development, so any vegetation at all is unambiguously anthropogenic and irrigation-dependent. Small: about 4 HECTARES (one source says 3.5 ha). At Chacra y Mar beach, Aucallama district, Huaral province, 63 km and about an hour north of Lima. DATES DISAGREE AND BOTH ARE RECORDED: construction is said to have begun in 1989, while the volunteer programme dates from the end of 2006 - these are probably different things (site founding versus programme founding) but that is not established here. A Hare Krishna / Vaishnava community. ARCHITECTURALLY DISTINCTIVE AND EASY TO IDENTIFY FROM ABOVE: the 'trulys' are oval and inverted-conical or pyramidal clay structures, unlike anything else nearby - a rare case where the buildings themselves are a reliable visual signature. More than 75,000 visitors since inception; described as Peru's first ecological education centre, and the model for similar projects in Chile, Ecuador, Colombia and Bolivia.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/eco-truly-park-eco-village/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page - the source of the 63 km / Aucallama location and the 75,000-visitor figure"
+   },
+   {
+    "url": "https://www.turismoperuano.com/eco-truly-park-la-comunidad-ecologica-lima",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "Peruvian tourism-press record - the source of the roughly 4 ha area and the 2.5 m elevation on sandy ground"
+   },
+   {
+    "url": "https://www.idealist.org/en/nonprofit/7524ceb0d4584cc596037c56924dec59-comunidad-ecologica-eco-truly-park",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "Idealist non-profit record for Comunidad Ecologica Eco Truly Park"
+   },
+   {
+    "url": "https://www.netzkraft.net/profil.php?teilnehmer=976&lg=en",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "LOW",
+    "score": 0.38,
+    "evidence": "Netzkraft Movement profile"
+   },
+   {
+    "url": "https://actualidad.rt.com/actualidad/395299-hare-krishna-aldea-ecologica-turismo-peru",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Spanish-language news feature on the community and its rules"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "209": {
+  "country": "South Africa",
+  "country_iso2": "ZA",
+  "admin_region": "Eastern Cape; Great Kei / Komga area; near Haga-Haga, on the Quko River",
+  "country_method": "coordinate_gazetteer+gen_page+official_site",
+  "country_source": "https://ecovillage.org/ecovillage/khula-dhamma-community/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/khula-dhamma-community/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Khula Dhamma Community - Global Ecovillage Network'",
+  "alternative_names": "Khula Dhamma; Khula Dharma; Khula Dhamma Community; Khula Dharma Eco Village; Khula Dharma natural farm",
+  "identity_confidence": "HIGH",
+  "notes": "SPELLING VARIANT MATTERS: GEN and this cohort use 'Khula DHAMMA', but the community's own domain and current branding are 'Khula DHARMA' (khuladharma.com) - a name-only search on one spelling misses half the record. From isiXhosa khula, 'grow', plus dharma. AN UNUSUALLY SLOW DEVELOPMENT CURVE, WHICH IS THE KEY FACT HERE: FIVE FRIENDS BOUGHT THE LAND IN 2000; from 2000 to 2003 THE SITE RARELY HAD MORE THAN TWO PEOPLE LIVING ON IT FULL TIME; and as late as 2008 the built stock amounted to a solar water pump, a small garden, bee hives, one outdoor compost toilet and THREE natural dwellings. So on JUST UNDER 300 HECTARES the human footprint was, for the first decade, almost nothing - and a land-cover reading over that window should be expected to show no signal at all. That is a genuine result, not a failed crawl. The land is rolling bushveld with greenbelts, about 8 km from the sea, bordered by the QUKO RIVER, on the southern edge of the subtropical zone, which the community says permits year-round cultivation. Historically significant within the network: research done by a resident, Lua Bashala-Kekana, fed into the formation of GEN Congo in 2009.",
+  "sources": [
+   {
+    "url": "https://www.khuladharma.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site, under the 'Dharma' spelling"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/khula-dhamma-community/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page - the source of the 2000 purchase, the just-under-300-hectare area and the year-by-year development account"
+   },
+   {
+    "url": "https://gaia.org/gaia-trust/grants-awards/attachment/cob-house-khula-dhamma-eastern-cape-south-africa/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Gaia Trust grants and awards record documenting a cob house at Khula Dhamma - a dated funding record from an independent foundation"
+   },
+   {
+    "url": "http://naturalhomes.org/timeline/khuladhamma.htm",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "naturalhomes.org timeline entry - a natural-building archive's dated record of the dwellings"
+   },
+   {
+    "url": "https://ecobasa.org/en/communities/khula-dharma-eco-village/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Ecobasa network record, under the 'Dharma' spelling"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "210": {
+  "country": "South Africa",
+  "country_iso2": "ZA",
+  "admin_region": "Mpumalanga; Chief Albert Luthuli Local Municipality; Steynsdorp No 2, next to Elukwatini",
+  "country_method": "official_source_confirms_gazetteer",
+  "country_source": "https://ecovillage.org/ecovillage/umphakatsi-peace-ecovillage/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/umphakatsi-peace-ecovillage/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned the community page on both the /ecovillage/ and /project/ paths, plus a GEN article about a Women for Women Ecovillage Design Education course held at the site in Mpumalanga",
+  "alternative_names": "Umphakatsi Peace Ecovillage; Umphakatsi Peace Eco Village; Umphakatsi; Umphakatsi Peace Eco-Village South Africa; Steynsdorp ecovillage",
+  "identity_confidence": "HIGH",
+  "notes": "COUNTRY QUESTION SETTLED: the name Umphakatsi is siSwati and Zulu for a chief's homestead, and the coordinate lies close to the Eswatini border, so Eswatini is a natural guess - but every source places the ecovillage at STEYNSDORP No 2, NEXT TO ELUKWATINI, MPUMALANGA PROVINCE, SOUTH AFRICA. The gazetteer's majority vote for South Africa is therefore confirmed on published evidence, not merely accepted. A COMMUNITY-INITIATED DEVELOPMENT PROJECT WITHIN AN EXISTING VILLAGE, not a founded intentional community: in 2006 the local community of Steynsdorp village set the institution up themselves to create local jobs and preserve the dignity of young people, and it reports having generated MORE THAN 100 JOBS since. So the site is embedded in an existing rural settlement and cannot be separated from it in imagery. Buildings are designed to maximise wind, sun, water and earth for energy and food; work covers permaculture, indigenous knowledge systems, renewable energy and conflict resolution, with monthly two-day residential workshops. Winner of a 2018 African Excellence Award. The community's own web presence is spread across a Wix site, a Blogspot blog and two Facebook pages rather than one domain, so the crawl must gather several small sources rather than one.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/umphakatsi-peace-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page - the source of the Steynsdorp/Elukwatini/Mpumalanga location, the 2006 founding and the 100-jobs figure"
+   },
+   {
+    "url": "https://sarahmotha.wixsite.com/peacevillage/history-of-umphakatsi-peace-ecovillage",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.78,
+    "evidence": "The community's own written history of the project"
+   },
+   {
+    "url": "https://umphakatsi-eco.blogspot.com/",
+    "source_class": "S4",
+    "platform_type": "blog platform",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "The community's own blog, carrying dated posts from 2014 onward"
+   },
+   {
+    "url": "https://www.mea-markets.com/winners/2018-umphakatsi-peace-ecovillage/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "MEA Markets record of the 2018 African Excellence Award - an outside award citation with a hard date"
+   },
+   {
+    "url": "https://ecovillage.org/women-for-women-ecovillage-design-education-ede-umphakatsi-peace-ecovillage-mpumalanga-south-africa/",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "GEN article on a Women for Women Ecovillage Design Education course held at the site - dated evidence of activity on the ground"
+   },
+   {
+    "url": "https://www.facebook.com/Umphakats/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.4,
+    "evidence": "Community Facebook page (Steynsdorp)"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "211": {
+  "country": "South Africa",
+  "country_iso2": "ZA",
+  "admin_region": "Western Cape; Garden Route; sources say the Wilderness Lakes area, while the coordinate's nearest town is Groot-Brakrivier - see notes",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/project/green-canvas-light/",
+  "gen_community_url": "https://ecovillage.org/project/green-canvas-light/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Green Canvas of Light'. NOTE THE SLUG DROPS THE WORD 'OF' - /project/green-canvas-light/ - so it could not have been constructed from the community's name; another case where the URL had to be observed rather than guessed.",
+  "alternative_names": "Green Canvas of Light; Green Canvas; Green Canvas of Light Ecovillage",
+  "identity_confidence": "MEDIUM",
+  "notes": "LOCATION NEEDS NARROWING - REVIEW SUGGESTED. GEN places the farm in the WILDERNESS LAKES area of the Garden Route; the cohort coordinate's nearest town is GROOT-BRAKRIVIER, which is on the same Garden Route stretch but some distance west. The province (Western Cape) and the region are not in doubt; the parcel is. A 50 HECTARE FOREST-FARM held by TEN SHAREHOLDERS - a shareholding structure rather than a single owner or a trust, which is worth noting for any deeds search. Described as a permaculture development project, an intentional community, and a place of yoga and spiritual practice organised around the principle of 'Prior Unity'. The land is shared with fish eagles, leopard, wild boar and monkeys, which indicates substantial standing indigenous forest rather than cleared farmland. THIN DOCUMENTARY RECORD: no independent website was found; the community's public presence is a Facebook group plus contact details on the GEN page, and no founding date, resident count or dated development milestone was published anywhere the search reached. Do not infer any of them. I12 crawl_truncated should be treated as live for this row.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/green-canvas-light/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page - the only substantive record found, and the source of the 50 ha area, the ten shareholders and the Wilderness Lakes location"
+   },
+   {
+    "url": "https://ecovillage.org/gen_country/south-africa/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.36,
+    "evidence": "GEN South Africa country archive - corroborates the listing but adds nothing about the site"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "212": {
+  "country": "Kenya",
+  "country_iso2": "KE",
+  "admin_region": "Nakuru County; Naivasha and Mai Mahiu area",
+  "country_method": "coordinate_gazetteer+gen_page+official_site",
+  "country_source": "https://www.agathaamanihouse.org/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/agatha-amani-house-shelter-2/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Agatha Amani House Shelter'. The slug carries a '-2' disambiguator that could not have been derived from the name.",
+  "alternative_names": "Agatha Amani House; AAH; Agatha Amani House Shelter; Agatha Amani House Kenya",
+  "identity_confidence": "HIGH",
+  "notes": "SAFEGUARDING FLAG - HANDLE THIS ROW DIFFERENTLY FROM THE REST OF THE COHORT. Agatha Amani House is not an ecovillage in the usual sense: it is A SAFE SHELTER FOR SURVIVORS OF SEXUAL AND DOMESTIC VIOLENCE, a registered Kenyan charitable trust, and reportedly the first refuge of its kind in Kenya offering extended stays with psychosocial support and skills training. It appears in GEN because it runs regenerative agriculture and permaculture on site as part of its healing and sustainability programme. TWO CONSEQUENCES FOLLOW. First, methodological: this is a single institutional compound - a main house with an attached kitchen and training room and an on-site well, completed in 2014 - not a settlement, so settlement-scale metrics do not apply and it should probably be reported separately from the rest of the cohort. Second, and more important, ETHICAL: publishing precise coordinates, high-resolution imagery or anything that could identify residents of a domestic-violence refuge carries a real risk to the people sheltered there. Any output that names or locates this site should be reviewed on that basis before publication, whatever the rest of the protocol says. On-site activity: crops plus goats, cows, chickens and rabbits, both for consumption and for sale at the local market; a sanitary-pad machine; baking and sewing programmes.",
+  "sources": [
+   {
+    "url": "https://www.agathaamanihouse.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/agatha-amani-house-shelter-2/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page describing the permaculture and regenerative-agriculture programme"
+   },
+   {
+    "url": "https://www.globalgiving.org/projects/feed-100s-of-abused-women-and-children-in-kenya/",
+    "source_class": "S2",
+    "platform_type": "crowdfunding",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "GlobalGiving project record - a vetted grant-platform file with reporting requirements, so it is an independently checked institutional source rather than self-description"
+   },
+   {
+    "url": "https://www.globalgiving.org/pfil/51537/projdoc.pdf",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "The project document lodged with GlobalGiving - the mission statement and programme detail as filed with the funder; same origin as the record above, so the same independence group"
+   },
+   {
+    "url": "https://www.empoweringmindsinternational.org/agathaamanihouse.html",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Empowering Minds International's record of its support for the shelter - a partner organisation's independent account"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
  }
 }
