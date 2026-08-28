@@ -8791,5 +8791,2807 @@
     "evidence": "Official page; carries the France 3 ten-year anniversary report - dated visual documentation"
    }
   ]
+ },
+ "139": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "California; Sonoma County; Sonoma Valley (Morton's Warm Springs)",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.aletheiasprings.com/village",
+  "gen_community_url": "https://ecovillage.org/project/aletheia-springs/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Aletheia Springs - Global Ecovillage Network' at /project/ and /ecovillage/ paths",
+  "alternative_names": "Aletheia Springs; Morton's Warm Springs; Restore the Springs",
+  "identity_confidence": "HIGH",
+  "notes": "~20 acres around historic geothermal mineral springs in Sonoma Valley, converting from a 1950s summer-recreation business - a documented prior land use. Heritage oak woodlands and open meadows. Runs a non-profit initiative, Restore the Springs, working on the WATER CYCLE AND LOCAL AQUIFERS - a named, datable hydrological intervention.",
+  "sources": [
+   {
+    "url": "https://www.aletheiasprings.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://www.aletheiasprings.com/village",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.78,
+    "evidence": "Village page - residents, land and programmes"
+   },
+   {
+    "url": "https://www.aletheiasprings.com/vision",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Vision page including the water-restoration initiative"
+   },
+   {
+    "url": "https://ecovillage.org/project/aletheia-springs/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.64,
+    "evidence": "Verified GEN project page with the 20-acre figure and land description"
+   },
+   {
+    "url": "https://www.ic.org/directory/community/aletheia-springs/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "Foundation for Intentional Community entry"
+   },
+   {
+    "url": "https://bohemian.com/planned-communities-1/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "North Bay Bohemian feature on Sonoma/Napa planned communities"
+   }
+  ]
+ },
+ "140": {
+  "country": "Canada",
+  "country_iso2": "CA",
+  "admin_region": "British Columbia; Salt Spring Island",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/ecovillage/entelechy/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/entelechy/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Entelechy - Global Ecovillage Network' community page placing it on Salt Spring Island, BC",
+  "alternative_names": "Entelechy; Entelechy Salt Spring Island",
+  "identity_confidence": "HIGH",
+  "notes": "13.5 acres on Salt Spring Island; 18+ long-term residents plus work-stay guests. Runs a seven-day residential mini Ecovillage Design Education, 'From The Ground Up'. The coordinate (48.805N 123.490W) is consistent with Salt Spring Island. No independent non-GEN source located in this pass - a general web search failed on the rate limit and should be repeated.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/entelechy/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page - the fullest description found"
+   }
+  ]
+ },
+ "141": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "New Mexico; San Juan County; Aztec, on the Animas River, ~20 min south of Durango CO",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/ecovillage/pura-vida-village-at-tico-time-river-resort/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/pura-vida-village-at-tico-time-river-resort/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Pura Vida Village at Tico Time River Resort - Global Ecovillage Network' community page",
+  "alternative_names": "Pura Vida Village; Tico Time River Resort; Pura Vida Venue at Tico Time",
+  "identity_confidence": "MEDIUM",
+  "notes": "ADMIN NOTE: the resort is on the Animas River at AZTEC, NEW MEXICO, about 20 minutes south of Durango, Colorado - the coordinate (36.989N 107.870W) is in New Mexico, so state and country agree. 64-acre riverfront property; the ecovillage element established 2019 alongside eco-tourism, permaculture and a holistic centre. E2 needs a coder decision: an RV resort and festival venue with an ecovillage project inside it.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/pura-vida-village-at-tico-time-river-resort/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN community page with the 2019 date and project description"
+   },
+   {
+    "url": "https://ticotimeresort.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "The resort's own site - the landholder, a partly separate voice from the ecovillage project"
+   },
+   {
+    "url": "https://www.instagram.com/pura_vida_venue/",
+    "source_class": "S7",
+    "platform_type": "Instagram",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.24,
+    "evidence": "Pura Vida venue account; expect BLOCKED to automated reading"
+   }
+  ]
+ },
+ "142": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "Vermont; Lamoille County; near Mt Mansfield and the Long Trail",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/retribe-at-northernshire",
+  "gen_community_url": "https://ecovillage.org/project/retribe-at-northernshire",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'ReTribe at NorthernShire - Global Ecovillage Network' project page",
+  "alternative_names": "ReTribe; NorthernShire; ReTribe at NorthernShire",
+  "identity_confidence": "HIGH",
+  "notes": "ReTribe BECAME STEWARDS OF THE LAND CALLED NORTHERNSHIRE IN 2018 - a dated tenure event, and the two names are distinct (the organisation and the land). 80 acres with a swimming pond, a brook with three waterfalls, woods and playfields, one mile from Mt Mansfield. Residents live in a shared dorm building, so 'permanent residents' (E3) needs care.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/retribe-at-northernshire",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN project page with the 2018 stewardship date and land description"
+   }
+  ]
+ },
+ "143": {
+  "country": "Mexico",
+  "country_iso2": "MX",
+  "admin_region": "Quintana Roo; Playa del Carmen; Fraccionamiento Pueblo Sacbe",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/portal-xibalba-eco-village-in-the-jungle-of-playa-del-carmen",
+  "gen_community_url": "https://ecovillage.org/project/portal-xibalba-eco-village-in-the-jungle-of-playa-del-carmen",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'PORTAL XIBALBA: ECO-VILLAGE IN THE JUNGLE OF PLAYA DEL CARMEN - Global Ecovillage Network' project page with the Pueblo Sacbe address",
+  "alternative_names": "Portal Xibalba; Portal Xibalba Eco-Village; Pueblo Sacbe",
+  "identity_confidence": "MEDIUM",
+  "notes": "Established 2000 in jungle at Fraccionamiento Pueblo Sacbe, Playa del Carmen; eco-community, eco-tourism, holistic and spiritual centre focused on ancestral wisdom and traditional medicine. Peri-urban jungle setting on the edge of a fast-growing resort city, so surrounding land-cover change is a major confounder. No independent non-GEN source located; a general web search failed on the rate limit and should be repeated.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/portal-xibalba-eco-village-in-the-jungle-of-playa-del-carmen",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page - the only substantive description found"
+   }
+  ]
+ },
+ "144": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "California; Mendocino County; near Boonville, Anderson Valley",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.emeraldearth.org",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "A site:ecovillage.org search for 'Emerald Earth' hit the per-turn rate limit and returned no results, so GEN presence is UNRESOLVED rather than established. Recorded as NOT_FOUND with this caveat; re-run the GEN search for this row.",
+  "alternative_names": "Emerald Earth; Emerald Earth Sanctuary",
+  "identity_confidence": "HIGH",
+  "notes": "189 ACRES of mixed forest and meadow in Mendocino County, owned by the non-profit Emerald Earth Sanctuary - a clean tenure record. Ten full-time residents growing the majority of their own food; teaches natural building and permaculture. GEN STATUS UNRESOLVED (see gen_evidence) - the negative here is weaker than elsewhere in this file and should be re-checked.",
+  "sources": [
+   {
+    "url": "https://www.emeraldearth.org",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://www.ic.org/directory/emerald-earth/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.52,
+    "evidence": "Foundation for Intentional Community entry"
+   },
+   {
+    "url": "https://ecologycenter.org/directory/directory-entries/emerald-earth-sanctuary/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "Ecology Center directory record with the 189-acre figure"
+   },
+   {
+    "url": "https://numundo.org/center/united-states/emerald-earth-sanctuary",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.32,
+    "evidence": "NuMundo centre listing"
+   },
+   {
+    "url": "https://www.facebook.com/Emeraldearth.org/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.28,
+    "evidence": "Official page"
+   }
+  ]
+ },
+ "145": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "Queensland; Sunshine Coast hinterland; Maleny, by Obi Obi Creek",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.ecovillages.au/maleny-eco-village",
+  "gen_community_url": "https://ecovillage.org/ecovillage/maleny-eco-village/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Maleny Eco Village - Global Ecovillage Network' community page",
+  "alternative_names": "Maleny Eco Village; Eco Villages Australia; EVA",
+  "identity_confidence": "HIGH",
+  "notes": "Eco Villages Australia founded 2018 by Claire Ogden and Andrew McLean; THE MALENY PROPERTY WAS PURCHASED IN 2019 - a precise land-acquisition date, and the organisation published the purchase announcement. Only 3.5 acres, with a spring-fed dam and some rainforest, seven minutes' walk from town: a very small, peri-urban parcel that will test the polygon method. 'Collective stewardship' tenure model.",
+  "sources": [
+   {
+    "url": "https://www.ecovillages.au/maleny-eco-village",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official page for the Maleny site"
+   },
+   {
+    "url": "https://www.ecovillages.au/post/eco-village-site-confirmed-property-purchased",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "Dated announcement of the 2019 property purchase - a rank 1-2 onset record"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/maleny-eco-village/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://cosmosmagazine.com/earth/sustainability/maleny-eco-village/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Cosmos Magazine feature - independent science journalism"
+   },
+   {
+    "url": "https://theculturetrip.com/pacific/australia/articles/two-eco-villages-on-the-sunshine-coast-you-must-see",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "LOW",
+    "score": 0.3,
+    "evidence": "Regional feature naming the Sunshine Coast ecovillages"
+   }
+  ]
+ },
+ "146": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "New South Wales; Northern Rivers; Larnook, Martin Road (near Nimbin)",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/billen-cliff/",
+  "gen_community_url": "https://ecovillage.org/project/billen-cliff/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Billen Cliff - Global Ecovillage Network' project page with the Larnook, NSW address",
+  "alternative_names": "Billen Cliff; Billen Cliffs Village; Billen Cliffs",
+  "identity_confidence": "HIGH",
+  "notes": "Established 1981 - one of the older multiple-occupancy communities of the Nimbin region. STRUCTURE IS UNUSUALLY EXPLICIT: 115 two-acre units PLUS 700 ACRES OF COMMONS, ~150 members. That is a textbook total-holding versus individually-held split for register block E, and the commons is the part the ecological analysis should follow.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/billen-cliff/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "Verified GEN project page with the 1981 date, unit structure and 700-acre commons"
+   }
+  ]
+ },
+ "147": {
+  "country": "Brazil",
+  "country_iso2": "BR",
+  "admin_region": "Rio Grande do Sul; Sao Francisco de Paula, araucaria forest",
+  "country_method": "coordinate_gazetteer+published_source",
+  "country_source": "https://lume.ufrgs.br/handle/10183/272282",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "A site:ecovillage.org search for 'Arca Verde' hit the per-turn rate limit and returned no results, so GEN presence is UNRESOLVED rather than established. Recorded as NOT_FOUND with this caveat; re-run the GEN search for this row.",
+  "alternative_names": "Arca Verde; Instituto Arca Verde; Ecovila Arca Verde",
+  "identity_confidence": "HIGH",
+  "notes": "Ecovila and Instituto Arca Verde in the ARAUCARIA FOREST at Sao Francisco de Paula, teaching SYNTROPIC AGRICULTURE (agroforestry) - a named, high-signal land practice in a threatened forest type. A UFRGS UNIVERSITY DISSERTATION on the collective's permaculture discourse is deposited in the Lume repository, which is the strongest kind of source the register recognises. GEN status unresolved (see gen_evidence).",
+  "sources": [
+   {
+    "url": "https://lume.ufrgs.br/handle/10183/272282",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.94,
+    "evidence": "UFRGS Lume institutional repository: a dissertation on permaculture discourse at Ecovila Arca Verde - register class S1, verified repository record"
+   },
+   {
+    "url": "https://www.tuaradio.com.br/noticias/meio-ambiente/30-10-2019/curso-do-instituto-arca-verde-em-sao-francisco-de-paula-ensina-a-agricultura-sintropica-na-mata-de-araucaria",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Dated 2019 report on the syntropic agriculture course in the araucaria forest"
+   },
+   {
+    "url": "https://www.facebook.com/institutoarcaverde/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.44,
+    "evidence": "Official page - the institute's principal current channel"
+   },
+   {
+    "url": "https://www.volunteersbase.com/americas/brazil/instituto-arca-verde-brasil-portuguese_i313",
+    "source_class": "S3",
+    "platform_type": "booking or hosting",
+    "independence_group": "G4",
+    "confidence": "LOW",
+    "score": 0.26,
+    "evidence": "Volunteer platform listing with site detail"
+   }
+  ]
+ },
+ "149": {
+  "country": "Ecuador",
+  "country_iso2": "EC",
+  "admin_region": "Napo Province; near Tena, Ecuadorian Amazon",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/ecovillage/wisdom-forest/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/wisdom-forest/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "Search returned 'Wisdom Forest - Global Ecovillage Network' community page",
+  "alternative_names": "Wisdom Forest; Wisdom Forest Ecuador",
+  "identity_confidence": "MEDIUM",
+  "notes": "In the hills near Tena in the Ecuadorian Amazon; ecotourism, volunteering and REFORESTATION of cut-over Amazon plots. The wider Tena area has documented participatory reforestation with Kichwa farmers (tens of thousands of trees over multi-year programmes), so regional reforestation is a confounder that must be distinguished from this site's own planting. A general search located the site but the GEN-specific search hit the rate limit; the GEN URL above came from the general search.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/wisdom-forest/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://www.atreeforyou.org/en/ecuador-tena-2025-2029-participatory-reforestation-in-the-ecuadorian-amazon/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "A Tree For You programme record for participatory reforestation around Tena - institutional, dated, and the key context for separating site from region"
+   },
+   {
+    "url": "https://satoyamainitiative.org/case_studies/comdeks-project-napo-river-watershed-ecuador/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Satoyama Initiative COMDEKS case study of the Napo River watershed - peer-reviewed-adjacent landscape research"
+   },
+   {
+    "url": "https://www.facebook.com/wisdomforestecuador/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.32,
+    "evidence": "Official page"
+   }
+  ]
+ },
+ "150": {
+  "country": "Gambia",
+  "country_iso2": "GM",
+  "admin_region": "Kiang Central District; Bambako village",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/ecovillage/bambako-eco-farm-yirabah-gambia-association/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/bambako-eco-farm-yirabah-gambia-association/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "Search returned 'Bambako Eco Farm / YIRABAH Gambia Association - Global Ecovillage Network' community page",
+  "alternative_names": "Bambako Eco Farm; YIRABAH Gambia; Yirabah Gambia e.V.; Bambako village",
+  "identity_confidence": "HIGH",
+  "notes": "YIRABAH Gambia e.V. founded 2007 (a German registered association working in rural Gambia); the Bambako Eco Farm teaches organic agriculture, composting, mulching and crop rotation to local farmers. A DROP4DROP water project is documented at Bambako village - an independent, dated infrastructure record. The German e.V. status means filed association records exist.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/bambako-eco-farm-yirabah-gambia-association/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://drop4drop.org/projects/bambako/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.78,
+    "evidence": "DROP4DROP project record for Bambako village, Kiang Central - an independent NGO with a dated water project"
+   },
+   {
+    "url": "https://m.facebook.com/Yirabah/photos/-exciting-news-from-bambako-eco-farm-we-are-thrilled-to-announce-that-our-bambak/590996070277066/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.36,
+    "evidence": "Yirabah Gambia e.V. post announcing farm news - dated self-documentation"
+   },
+   {
+    "url": "https://ecovillage.org/gen_country/gambia/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "LOW",
+    "score": 0.28,
+    "evidence": "GEN Gambia index - route to sibling listings"
+   }
+  ]
+ },
+ "148": {
+  "country": "Argentina",
+  "country_iso2": "AR",
+  "admin_region": "Rio Negro Province; Contralmirante Cordero, Alto Valle",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://janus.bio/nueva-ruralidad-y-el-buen-vivir/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org returned GEN Argentina index pages and other Argentine communities (Faro del Mundo, Campo Divino) but no community page for JANUS. No GEN URL recorded.",
+  "alternative_names": "JANUS; Villa Productiva Agroecologica JANUS; JANUS Proyecto Rural Integrador",
+  "identity_confidence": "HIGH",
+  "notes": "ADMIN NOTE: in RIO NEGRO province (Contralmirante Cordero, Alto Valle), not Neuquen - the coordinate sits on the provincial border near Cipolletti. 8 ha to be divided into 1,000 sq m lots with co-owned common productive space, on biodynamic-agriculture principles and a CSA model. ORDINANCE 26/24, PASSED 31 DECEMBER 2024 by the Contralmirante Cordero Deliberative Council, authorised the first Agroecological Villa of the Alto Valle - a precisely dated municipal legal instrument, register rank 1.",
+  "sources": [
+   {
+    "url": "https://janus.bio/nueva-ruralidad-y-el-buen-vivir/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site - the 'New Rurality' concept behind the villa"
+   },
+   {
+    "url": "https://masp.lmneuquen.com/fruticultura/como-sera-la-primera-villa-agroecologica-un-municipio-del-alto-valle-n1165302",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "La Manana de Neuquen report on Ordinance 26/24 and the villa's design - dated regional journalism carrying the legal detail"
+   },
+   {
+    "url": "https://janus.bio/parador-janus-alojamiento-descanso-y-alimento-vital/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "Site page on the parador and food production"
+   },
+   {
+    "url": "https://www.revistainternos.com.ar/2018/10/otra-manera-de-vivir-el-campo-janus-proyecto-rural-integrador/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Revista InterNos feature, dated 2018 - predates the villa ordinance, useful for the project's earlier phase"
+   }
+  ]
+ },
+ "151": {
+  "country": "South Africa",
+  "country_iso2": "ZA",
+  "admin_region": "Eastern Cape; near Humansdorp, inland from Jeffreys Bay; borders Baviaanskloof Nature Reserve",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/honeyville-farm/",
+  "gen_community_url": "https://ecovillage.org/project/honeyville-farm/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Honeyville Farm - Global Ecovillage Network' project page",
+  "alternative_names": "Honeyville Farm; Honeyville Eco Village; Honeyville Nature Reserve",
+  "identity_confidence": "HIGH",
+  "notes": "800 HECTARES of which only 45 ha are designated for development and the rest kept as protected wild land bordering the Baviaanskloof Nature Reserve; 30 ha of old arable land with 10 acres currently in organic production. That three-way split - total holding, development footprint, actively farmed extent - is the clearest example in the cohort of why the register separates total holding from managed area.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/honeyville-farm/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "Verified GEN project page with the 800/45/30/10 land breakdown"
+   },
+   {
+    "url": "https://www.facebook.com/honeyvillecovillage/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.44,
+    "evidence": "Official page - the community's main current channel"
+   },
+   {
+    "url": "https://www.youtube.com/watch?v=4SI-8pLnnk0",
+    "source_class": "S7",
+    "platform_type": "YouTube",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.4,
+    "evidence": "'Honeyville farm proposed permaculture ecovillage' - visual documentation of the plan"
+   },
+   {
+    "url": "https://za.geoview.info/honeyville,995745",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "LOW",
+    "score": 0.24,
+    "evidence": "South African place-name gazetteer record for Honeyville farmstead - locality corroboration"
+   }
+  ]
+ },
+ "152": {
+  "country": "Russia",
+  "country_iso2": "RU",
+  "admin_region": "Tula Oblast; Yasnogorsky District, near the Oka, ~107 km from Moscow",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://yasnasloboda.ru/mesto",
+  "gen_community_url": "https://ecovillage.org/ecovillage/yasna-sloboda/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Yasna Sloboda - Global Ecovillage Network' community page plus several /project/yasna-sloboda/ sub-pages",
+  "alternative_names": "Yasna Sloboda; Yasnaya Sloboda; Semeynoe poselenie Yasnaya sloboda",
+  "identity_confidence": "HIGH",
+  "notes": "A family settlement of ~15 families in Tula Oblast built around a WALDORF EDUCATION CENTRE (5 teachers, 28 children); governs by sociocracy and teaches it. Member of the Russian Union of Ecovillages and listed in the European 'Eurotopia' directory - two independent network confirmations. The community's own site documents an exchange visit to Sieben Linden, another cohort member.",
+  "sources": [
+   {
+    "url": "https://yasnasloboda.ru/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official settlement site"
+   },
+   {
+    "url": "https://yasnasloboda.ru/mesto",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "'Mesto' - the place/land page giving the location detail"
+   },
+   {
+    "url": "https://yasnasloboda.ru/o-proekte/o-proekte",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Project description page"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/yasna-sloboda/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN community page with the Waldorf centre and sociocracy detail"
+   },
+   {
+    "url": "https://yasnasloboda.ru/en/8-novosti/101-yasnaya-sloboda-voshla-v-soyuz-ekoposelenij-i-eko-initsiativ",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Dated announcement of joining the Russian ecovillage union"
+   },
+   {
+    "url": "http://humanworld.info/ru-RU/Users/368",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "LOW",
+    "score": 0.24,
+    "evidence": "Third-party Russian community directory entry"
+   }
+  ]
+ },
+ "153": {
+  "country": "Russia",
+  "country_iso2": "RU",
+  "admin_region": "Kaluga Oblast; Maloyaroslavets District, near Mosolovo, ~140 km SW of Moscow",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.eco-kovcheg.ru/index_en.html",
+  "gen_community_url": "https://ecovillage.org/ecovillage/ecovillage-kovcheg-not-gen-member/",
+  "gen_status": "VERIFIED_SEARCH_INDEX_PARENT_ONLY",
+  "gen_evidence": "site:ecovillage.org returned a GEN page whose own title states 'Ecovillage Kovcheg (NOT GEN MEMBER)'. The page is real and community-specific, so the URL is recorded, but GEN itself denies membership - so this is emphatically not evidence of GEN registration.",
+  "alternative_names": "Kovcheg; Ecovillage Kovcheg; Ekoposelenie Kovcheg; The Ark",
+  "identity_confidence": "HIGH",
+  "notes": "121 HA about 140 km south-west of Moscow, organised as FAMILY ESTATES OF ONE HECTARE EACH held in the family across generations, each with woods, fruit trees, garden and a small pond - a distinctive Russian 'kin's domain' tenure model that the area coding must handle carefully, since the managed unit is the hectare estate rather than the settlement. GEN explicitly records it as NOT a member.",
+  "sources": [
+   {
+    "url": "https://www.eco-kovcheg.ru/index_en.html",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site, English edition"
+   },
+   {
+    "url": "https://www.eco-kovcheg.ru/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "Official Russian-language site"
+   },
+   {
+    "url": "https://www.eco-kovcheg.ru/index3.html",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "'How we register the land' - the community's own account of its land tenure"
+   },
+   {
+    "url": "https://www.eco-kovcheg.ru/news.html",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Dated news index - continuity evidence"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/ecovillage-kovcheg-not-gen-member/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.58,
+    "evidence": "GEN page, explicitly marked not a member"
+   },
+   {
+    "url": "https://kovcheg-village.ru/",
+    "source_class": "S4",
+    "platform_type": "secondary or former website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "Second community domain"
+   }
+  ]
+ },
+ "154": {
+  "country": "Turkey",
+  "country_iso2": "TR",
+  "admin_region": "CONFLICT: GEN's project is Bayramic Yenikoy (Bayramic district, Canakkale); the supplied coordinate lies near Ezine, ~45 km away",
+  "country_method": "coordinate_gazetteer+GEN_profile_CONFLICTING",
+  "country_source": "https://ecovillage.org/project/bayramic-yenikoy",
+  "gen_community_url": "https://ecovillage.org/project/bayramic-yenikoy",
+  "gen_status": "VERIFIED_SEARCH_INDEX_IDENTITY_UNCERTAIN",
+  "gen_evidence": "site:ecovillage.org returned 'Bayramic Yenikoy - Global Ecovillage Network'. Canakkale province contains several villages called Yenikoy (in Ezine, Yenice and Bayramic districts); the GEN project is the BAYRAMIC one, while the supplied coordinate falls nearer Ezine. Recorded and flagged rather than assumed identical.",
+  "alternative_names": "Yenikoy; Bayramic Yenikoy; EKOYER network member",
+  "identity_confidence": "LOW",
+  "notes": "IDENTITY CONFLICT - see gen_evidence. The Bayramic Yenikoy project is an NGO building a self-sustaining village on permaculture principles, known for LOCAL SEED PRODUCTION, natural farming and surplus-sharing economics, and part of Turkey's EKOYER network. A ResearchGate paper 'Ecovillage Movement in Turkey' should help settle which Yenikoy this row denotes.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/bayramic-yenikoy",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.64,
+    "evidence": "GEN project page for Bayramic Yenikoy - real, but possibly a different village from the coordinate"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/344919304_Ecovillage_Movement_in_Turkey",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Academic paper 'Ecovillage Movement in Turkey' - register class S1, and the best route to disambiguating the Yenikoy sites"
+   },
+   {
+    "url": "https://ecovillage.org/gen_country/turkey/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.34,
+    "evidence": "GEN Turkey index - route to sibling listings"
+   }
+  ]
+ },
+ "155": {
+  "country": "India",
+  "country_iso2": "IN",
+  "admin_region": "Maharashtra; Pune district; near Velhe, by the Gunjavani dam, ~45 km from Pune",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://sereneecovillage.com/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "A site:ecovillage.org search returned only third-party pages (TripAdvisor, The Better India, Facebook) and the community's own site; no GEN community page for Serene Eco Village surfaced. No GEN URL recorded.",
+  "alternative_names": "Serene Eco Village; Dr Pravin Chordia's forest",
+  "identity_confidence": "HIGH",
+  "notes": "A MAN-MADE FOREST on land bought BARREN by Dr Pravin Chordia and family more than 15 years ago, with a reported 250,000 TREES PLANTED - an exceptionally strong before/after reforestation case on a documented degraded baseline, on a hillside above the Gunjavani dam. Not GEN-listed. Also a wellness/agri-tourism destination, so E2 needs a coder decision.",
+  "sources": [
+   {
+    "url": "https://sereneecovillage.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://thebetterindia.com/70981/doctor-pravin-chordia-forest-serene-eco-village-medicine-free-life/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "The Better India long-form piece - the source of the barren-land origin and the planting figure"
+   },
+   {
+    "url": "https://sereneecovillage.com/contact-us/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Contact page giving the locality"
+   },
+   {
+    "url": "https://lbb.in/mumbai/check-serene-eco-village-staying-mud-houses-organic-farming-lush-treks/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "Independent feature describing the mud houses and organic farming"
+   },
+   {
+    "url": "https://www.facebook.com/sereneecovillage",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.3,
+    "evidence": "Official page"
+   }
+  ]
+ },
+ "156": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "Tasmania; Tasman Peninsula; Nubeena, overlooking Parsons Bay",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://tasmanecovillage.org.au/village/location",
+  "gen_community_url": "https://ecovillage.org/project/tasman-ecovillage/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Tasman Ecovillage - Global Ecovillage Network' project page",
+  "alternative_names": "Tasman Ecovillage; Tasman Ecovillage Tasmania",
+  "identity_confidence": "HIGH",
+  "notes": "Tasmania's first ecovillage; CAME INTO EXISTENCE IN 2013 when the Community Development Scheme (Strata Title) was lodged - a precisely dated legal instrument and a clean tenure record. ~40 Body Corporate owners with 12 dwellings completed as at 2023, so the built area is still growing during the study window. Permaculture and cohousing principles; a dedicated land sub-domain exists.",
+  "sources": [
+   {
+    "url": "https://tasmanecovillage.org.au/village/location",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official location page"
+   },
+   {
+    "url": "https://land.tasmanecovillage.org.au/tasman-ecovillage-location",
+    "source_class": "S4",
+    "platform_type": "secondary or former website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Dedicated land sub-domain - parcel-level material"
+   },
+   {
+    "url": "https://ecovillage.org/project/tasman-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN project page with the 2013 strata-title date and build progress"
+   },
+   {
+    "url": "https://tasmanecovillage.org.au/village/for-sale",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Lots for sale - tenure and parcel information"
+   },
+   {
+    "url": "https://medium.com/@petergringinger/community-living-on-the-southern-edge-tasman-ecovillage-tasmania-7011eef4594c",
+    "source_class": "S6",
+    "platform_type": "blog platform",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Independent long-form visit account"
+   }
+  ]
+ },
+ "157": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "New South Wales; Bellinger Valley; Thora, Darkwood Road (near Bellingen)",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "http://patanga.org.au/contact.html",
+  "gen_community_url": "https://ecovillage.org/project/patanga",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Patanga - Global Ecovillage Network' project page",
+  "alternative_names": "Patanga; Patanga Bellinger Valley",
+  "identity_confidence": "HIGH",
+  "notes": "Founded decades ago by a group from Sydney; a company with 15 director-shareholders. TWO STRONG ECOLOGICAL CREDENTIALS: the property is a REGISTERED WILDLIFE REFUGE with the NSW parks and wildlife authority, and the community is CERTIFIED BIODYNAMIC - both are third-party assessed designations (register V3), and both should have dated documentary records.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/patanga",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "Verified GEN project page recording the wildlife-refuge registration and biodynamic certification"
+   },
+   {
+    "url": "https://patanga.org.au/index.php?catid=102&id=87%3Awelcome&view=article",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Official welcome page; heavily parameterised URL with percent-encoding - a URL-fidelity test case"
+   },
+   {
+    "url": "http://patanga.org.au/contact.html",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "Contact page giving the Darkwood Road address"
+   },
+   {
+    "url": "https://www.bluemountainsgazette.com.au/story/4258861/meet-the-aussies-living-in-intentional-communities/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Fairfax regional feature on Australian intentional communities covering Patanga's structure"
+   }
+  ]
+ },
+ "158": {
+  "country": "France",
+  "country_iso2": "FR",
+  "admin_region": "Occitanie; Tarn-et-Garonne; Beaumont-de-Lomagne",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.argoumbat.org/ecolieu/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/argoumbat/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Argoumbat - Global Ecovillage Network' community page; also listed among GEN Europe aspiring members",
+  "alternative_names": "Ecolieu Argoumbat; Argoumbat; Les Lucioles d'Argoumbat",
+  "identity_confidence": "HIGH",
+  "notes": "ADMIN NOTE: at Beaumont-de-Lomagne in TARN-ET-GARONNE, not Gers or Lot-et-Garonne. Founded 2021 as a cooperative; 38 HA OF FOREST WITH 5 HA OF GARDENS AND MEADOWS - an explicit forest/managed split. ~10 adults and 5 children. Works on permaculture, agroforestry and regenerative farming. Very young, so the satellite record may show little change yet.",
+  "sources": [
+   {
+    "url": "https://www.argoumbat.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://www.argoumbat.org/ecolieu/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.78,
+    "evidence": "Ecolieu page - the land description"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/argoumbat/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page with the 38 ha / 5 ha split and the 2021 founding"
+   },
+   {
+    "url": "https://www.helloasso.com/associations/les-lucioles-d-argoumbat",
+    "source_class": "S2",
+    "platform_type": "crowdfunding",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "HelloAsso association record for Les Lucioles d'Argoumbat - a dated French association and funding record"
+   },
+   {
+    "url": "https://colibris-lafabrique.org/les-projets/ecolieu-argoumbat",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "Colibris La Fabrique project record"
+   }
+  ]
+ },
+ "159": {
+  "country": "Spain",
+  "country_iso2": "ES",
+  "admin_region": "Navarra; Artieda",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.arterrabizimodu.org/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org searched; Arterra appears on GEN Europe network and news pages as a FULL member and as the host of GEN Europe's office, but no /project/ or /ecovillage/ community page was returned",
+  "alternative_names": "Arterra Bizimodu; Arterra; Arterra Bizimodu Elkartea",
+  "identity_confidence": "HIGH",
+  "notes": "Born spring 2014 in a FORMER SPA / BALNEARIO BUILDING of about 8,000 m2 plus roughly 3 ha of fields, at Artieda in the Navarran Pyrenean foothills. Around 32-50 people. Governed by sociocracy. GEN Europe FULL member and host of the GEN Europe office, so the building predates the community by decades - the satellite record will show adaptive reuse rather than new construction.",
+  "sources": [
+   {
+    "url": "https://www.arterrabizimodu.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://gen-europe.org/members/arterra-bizimodu/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "GEN Europe full-member record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "160": {
+  "country": "Finland",
+  "country_iso2": "FI",
+  "admin_region": "Central Finland; Keuruu",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/keuruu-ecovillage/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/keuruu-ecovillage/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Keuruu Ecovillage - Global Ecovillage Network'",
+  "alternative_names": "Keuruun ekokyla; Keuruu Ecovillage; Keuruun Ekokyla ry",
+  "identity_confidence": "HIGH",
+  "notes": "LAND SPLIT IS EXPLICIT: 54 ha of which 24 ha biologically cultivated and the remainder preserved forest. Founded 1997. About 30 buildings beside Lake Kivijarvi. This is one of the clearest cultivated/forest baselines in the cohort.",
+  "sources": [
+   {
+    "url": "https://www.keuruunekokyla.fi/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/keuruu-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page carrying the 54 ha / 24 ha split and the 1997 founding"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "161": {
+  "country": "Ukraine",
+  "country_iso2": "UA",
+  "admin_region": "Kyiv Oblast; Boguslav district; Dmytrenky",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/project/dubravushka",
+  "gen_community_url": "https://ecovillage.org/project/dubravushka",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "GEN page is filed under the community's FORMER NAME Dubravushka - the slug /project/dubravushka could not have been guessed from 'Zeleni Kruchi'. Renamed in 2018.",
+  "alternative_names": "Zeleni Kruchi; Zeleni Kruchi (Green Slopes); Dubravushka (former name to 2018); Dubravushka eco-settlement",
+  "identity_confidence": "HIGH",
+  "notes": "RENAMED IN 2018 from Dubravushka, which is why the GEN slug does not match the name in the cohort - a second unguessable-slug case. Founded 2012 at Dmytrenky, Boguslav district, Kyiv region. 13 adults and 10 children. About 4 ha permaculture plot. Runs the 'Green Road' project housing internally displaced people since the full-scale invasion, so post-2022 imagery may show rapid new building for wartime reasons rather than growth.",
+  "sources": [
+   {
+    "url": "https://zelenikruchi.in.ua/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/project/dubravushka",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "GEN community page under the pre-2018 name, confirming the rename and the 4 ha plot"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "162": {
+  "country": "Italy",
+  "country_iso2": "IT",
+  "admin_region": "Piedmont; Metropolitan City of Turin; Valchiusella / Vidracco",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/project/damanhur-federation",
+  "gen_community_url": "https://ecovillage.org/project/damanhur-federation",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned the 'Damanhur Federation' project page",
+  "alternative_names": "Damanhur; Federation of Damanhur; Federazione di Damanhur; Damanhur Federation of Communities",
+  "identity_confidence": "HIGH",
+  "notes": "One of the largest and oldest in the cohort. Founded 1975 by Oberto Airaudi. SPREAD OVER 1,200+ ACRES of woodland, farmland and residential land in Valchiusella, Piedmont - a federation of many nucleo-communities rather than a single site, so a single coordinate under-represents it and the crawl should expect dispersed built area. Temples of Humankind are underground and will not appear in imagery. Has its own constitution and internal currency.",
+  "sources": [
+   {
+    "url": "https://damanhur.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/project/damanhur-federation",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Damanhur_(commune)",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Encyclopaedia record - useful only as a bibliography of the substantial independent literature on Damanhur"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "163": {
+  "country": "Iran",
+  "country_iso2": "IR",
+  "admin_region": "Hormozgan; Qeshm Island; Soheili",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://soheilivillage.com/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org searched under Soheili, Soheili Village and Qeshm; no GEN community page returned",
+  "alternative_names": "Soheili Village; Soheili; Sohaili; Roostaye Soheili",
+  "identity_confidence": "MEDIUM",
+  "notes": "DUPLICATE-IDENTITY FLAG: this is very probably the same place as seq 1 'Soheili Village_Hara' in this cohort. Both rows are preserved per the no-deletion rule, but a coder should treat them as one site or explain the split. Soheili is on Qeshm Island, Hormozgan, beside the Hara (mangrove) protected area - which is what the '_Hara' suffix on seq 1 refers to. Named a UN Tourism (UNWTO) Best Tourism Village in 2025. This is a traditional village with an ecotourism programme rather than an intentional community founded from scratch, so 'ecovillage' here means a designated eco-village, a different category from most of the cohort.",
+  "sources": [
+   {
+    "url": "https://soheilivillage.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.72,
+    "evidence": "Village ecotourism site"
+   },
+   {
+    "url": "https://www.unwto.org/best-tourism-villages",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "UN Tourism Best Tourism Villages programme - the 2025 designation is an institutional record independent of the village"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "164": {
+  "country": "Netherlands",
+  "country_iso2": "NL",
+  "admin_region": "Groningen; Westerwolde; Ter Apel",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.ecodorplandvanaine.nl/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org searched under Land van Aine and Ecodorp Land van Aine; no GEN community page returned",
+  "alternative_names": "Land van Aine; Ecodorp Land van Aine; Land van Aine Ter Apel",
+  "identity_confidence": "HIGH",
+  "notes": "COUNTRY RESOLVED: the gazetteer vote was split NL/DE because Ter Apel sits on the German border; the official site and the Interreg record both place it in Groningen, NETHERLANDS. Built on a FORMER POTATO STARCH FACTORY - a 9.5 ha industrial brownfield - with work since 2018. 50-65 residents including about 25 children. A food forest has been planted. The pre-2018 imagery therefore shows industrial buildings and hardstanding, not farmland; expect de-paving rather than land clearance.",
+  "sources": [
+   {
+    "url": "https://www.ecodorplandvanaine.nl/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://www.interregeurope.eu/good-practices",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "Interreg Europe good-practice database record - an EU institutional source independent of the community"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "165": {
+  "country": "Indonesia",
+  "country_iso2": "ID",
+  "admin_region": "Bali",
+  "country_method": "coordinate_gazetteer",
+  "country_source": "coordinate gazetteer vote",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org searched for 'Bali Ecovillage'; GEN lists other Bali communities (Inspirement Village, Alaya Ecolodge, Mandala Eco-Village) but nothing under this name",
+  "alternative_names": "Bali Ecovillage",
+  "identity_confidence": "LOW",
+  "notes": "IDENTITY UNRESOLVED - REVIEW REQUIRED. 'Bali Ecovillage' is a generic label and no single organisation was found using it as its own name. GEN lists several distinct Bali communities and none matches. No official site was confirmed. The coordinate is trusted (it is the only signal here) but the NAME cannot be tied to a specific organisation, so no community-specific URL is recorded rather than attaching a plausible-looking Bali project. A human coder must identify this site from the coordinate before any source is accepted.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "166": {
+  "country": "Thailand",
+  "country_iso2": "TH",
+  "admin_region": "Chiang Mai; Mae Taeng",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/project/pun-pun",
+  "gen_community_url": "https://ecovillage.org/project/pun-pun",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned the 'Pun Pun' project page",
+  "alternative_names": "Pun Pun; Pun Pun Organic Farm; Punpun; Pun Pun Center for Self-Reliance",
+  "identity_confidence": "HIGH",
+  "notes": "Founded July 2003 by Jon Jandai and Peggy Reents at Mae Taeng, about 50 km north of Chiang Mai. A seed-saving centre and natural-building school; roughly 30 people. Widely covered in the natural-building and seed-sovereignty literature, so academic sources are likely to exist beyond what this pass found.",
+  "sources": [
+   {
+    "url": "https://www.punpunthailand.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/project/pun-pun",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN project page with the 2003 founding and the Mae Taeng location"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "167": {
+  "country": "Israel",
+  "country_iso2": "IL",
+  "admin_region": "Southern District; Arava / Negev; Neot Semadar",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.neot-semadar.com/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org searched; only a /t/kibbutz/ tag page and an article mentioning the kibbutz were returned, not a community profile page. A tag page is not a community page and is not recorded as one.",
+  "alternative_names": "Neot Semadar; Neot Smadar; Kibbutz Neot Semadar; Kibbutz Neot Smadar",
+  "identity_confidence": "HIGH",
+  "notes": "Established 1989 in the southern Negev / Arava, about 60 km north of Eilat. 90 adult members, 70 children and roughly 50 volunteers. DESERT AGRICULTURE ON RECYCLED WATER - organic orchards, a winery and olive oil - so the vegetation signal against bare desert should be unusually sharp and is irrigation-driven. UN Tourism Best Tourism Village 2025. The Art Centre building is a landmark.",
+  "sources": [
+   {
+    "url": "https://www.neot-semadar.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://www.unwto.org/best-tourism-villages",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "UN Tourism Best Tourism Villages 2025 designation - institutional and independent of the kibbutz"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "168": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "Western Australia; Shire of Augusta-Margaret River; Witchcliffe",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/witchcliffe-ecovillage/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/witchcliffe-ecovillage/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Witchcliffe Ecovillage - Global Ecovillage Network'",
+  "alternative_names": "Witchcliffe Ecovillage; The Witchcliffe Ecovillage; Witchcliffe",
+  "identity_confidence": "HIGH",
+  "notes": "STRONG DOCUMENTARY CASE: 120 ha of farmland PURCHASED IN 2010 in a 50/50 joint venture, then developed as a staged subdivision - so there is a planning-approval paper trail with the Shire of Augusta-Margaret River and the WA Planning Commission. Self-sufficient in renewable energy, water and food. About 150 residents. UDIA national Project of the Year 2024. The 2010 purchase date gives a clean pre-development baseline.",
+  "sources": [
+   {
+    "url": "https://ecovillage.net.au/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/witchcliffe-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://www.amrshire.wa.gov.au/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "Shire of Augusta-Margaret River - the local planning authority that approved the staged subdivision; the structure-plan and approval documents are the independent institutional record"
+   },
+   {
+    "url": "https://udia.com.au/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Urban Development Institute of Australia - awarded national Project of the Year 2024, an industry record independent of the developer"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "169": {
+  "country": "Nepal",
+  "country_iso2": "NP",
+  "admin_region": "Koshi Province; Ilam",
+  "country_method": "official_source_overrides_gazetteer",
+  "country_source": "https://ecovillage.org/project/almost-heaven-farms/",
+  "gen_community_url": "https://ecovillage.org/project/almost-heaven-farms/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Almost Heaven Farms - Global Ecovillage Network'; the GEN text places the farm at Ilam, Nepal",
+  "alternative_names": "Almost Heaven Farms; AHF; Almost Heaven Farm",
+  "identity_confidence": "HIGH",
+  "notes": "COUNTRY CORRECTED: the gazetteer vote split and returned INDIA, because the coordinate sits within a few kilometres of the Mechi border and the nearest large towns are in Darjeeling and Sikkim. GEN, Good Market and the local business record all place the farm in ILAM, NEPAL ('108 Buddhanagar, Ilam'), so Nepal is taken on published evidence rather than on the vote. Established 2013 as a permaculture demonstration, training and research centre in the eastern Himalayan hills. Works with surrounding smallholders on regenerative agriculture, so the land-cover change of interest may extend beyond the farm boundary onto neighbouring farms.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/almost-heaven-farms/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN project page; the source that establishes Nepal rather than India"
+   },
+   {
+    "url": "https://www.goodmarket.global/almostheavenfarms",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Good Market vetted-enterprise listing - Good Market screens applicants, so this is a light verification independent of GEN"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "170": {
+  "country": "Nepal",
+  "country_iso2": "NP",
+  "admin_region": "Koshi Province; Udayapur; Triyuga Municipality; Rajabas / Gaighat",
+  "country_method": "coordinate_gazetteer+gen_page+academic",
+  "country_source": "https://ecovillage.org/ecovillage/baireni-ecovillage/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/baireni-ecovillage/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Baireni Ecovillage'; the same record is reachable under BOTH /ecovillage/baireni-ecovillage/ and /project/baireni-ecovillage/ - GEN serves some communities on two paths, which the crawler should treat as one page, not two sources",
+  "alternative_names": "Baireni Ecovillage; Ecovillage Baireni; Baireni, Udayapur; Rajabas Baireni",
+  "identity_confidence": "HIGH",
+  "notes": "DISAMBIGUATION: there are several places called Baireni in Nepal (Dhading, Chitwan). This one is in TRIYUGA MUNICIPALITY, RAJABAS, UDAYAPUR, near Gaighat - which is what the coordinate matches. NOT the Dhading Baireni. One of five villages in Dr Rajbhandari's programme converting existing traditional villages to ecovillages on a bio-intensive farming model - so this is a RETROFIT of an existing settlement, not a new build, and imagery will show incremental change (biogas plants, improved stoves and toilets, micro-irrigation, animal sheds) rather than new construction. A peer-reviewed study of exactly this transformation exists and is the strongest source in the record.",
+  "sources": [
+   {
+    "url": "https://www.researchgate.net/publication/310302840_Socio-economic_and_technological_transformation_in_ecovillage_Baireni_Udayapur",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "Peer-reviewed study 'Socio-economic and technological transformation in ecovillage Baireni, Udayapur' - independent academic assessment of this exact site"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/baireni-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://ecovillage.org/project/baireni-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "Same GEN record on GEN's alternate /project/ path - recorded so the crawler recognises it as a duplicate rather than a second source"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "171": {
+  "country": "Trinidad and Tobago",
+  "country_iso2": "TT",
+  "admin_region": "Couva-Tabaquite-Talparo; Montserrat Hills; Brasso Venado",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/project/blue-star-tapovan-trinidad/",
+  "gen_community_url": "https://ecovillage.org/project/blue-star-tapovan-trinidad/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Blue Star Tapovan Trinidad - Global Ecovillage Network'",
+  "alternative_names": "Blue Star Tapovan Trinidad; Tapovan; Tapovan TT; Tapovan Ecological Project; Vrindavan Eco Village of Blue Star",
+  "identity_confidence": "HIGH",
+  "notes": "DATED LAND ACQUISITION: just over 51 ACRES at Brasso Venado in the Montserrat Hills, bought in TWO tranches, 2009 and 2012 - a clean two-step baseline. The land is tropical rainforest plus a FORMER COCOA, COFFEE AND CITRUS PLANTATION, so 'reforestation' here is partly abandoned-plantation succession and should not be read as new planting without care. ADMIN NOTE: the cohort coordinate falls nearer Marabella than Brasso Venado, roughly 10 km west of the stated location - treat the coordinate as approximate. Name from Sanskrit tapo (spiritual practice) + vana (forest).",
+  "sources": [
+   {
+    "url": "https://www.blue-star.org/tapovan/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official Tapovan Ecological Project page - carries the 51 acres and the 2009/2012 purchase dates"
+   },
+   {
+    "url": "https://www.blue-star.org/vrindavan-story/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Official history of the Trinidad site"
+   },
+   {
+    "url": "https://ecovillage.org/project/blue-star-tapovan-trinidad/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://www.facebook.com/TapovanEcoProject/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.4,
+    "evidence": "Community's own Facebook page, posting dated field work - useful only as change-over-time imagery"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "172": {
+  "country": "Ecuador",
+  "country_iso2": "EC",
+  "admin_region": "Loja Province; Loja Canton; Vilcabamba",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/project/chambalabamba-2/",
+  "gen_community_url": "https://ecovillage.org/project/chambalabamba-2/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned the community page at the slug /project/chambalabamba-2/ - the trailing '-2' is a GEN-internal disambiguator and could not have been derived from the name",
+  "alternative_names": "Chambalabamba; Chambala Bamba; Shambalabamba (the spelling used by the Foundation for Intentional Community); Chambalabamba Vilcabamba",
+  "identity_confidence": "HIGH",
+  "notes": "SPELLING VARIANT MATTERS: the Foundation for Intentional Community files this community under 'shambalabamba', so a name-only search misses that directory record. Founded December 2012 in the Vilcabamba valley, Loja, between Vilcabamba and Podocarpus National Park. 6 HECTARES of flat Andean land beside the Chamba River, assembled by buying adjacent properties - so the parcel boundary GREW over time and a single early boundary will understate it. Built features are light and largely non-permanent (6 teepees, a 12 m open-sided malokka, dry toilets, a swimming pond), which will read faintly in imagery; the clearer signals are the vegetable gardens, cultivated fields and fruit trees.",
+  "sources": [
+   {
+    "url": "https://chambalabamba.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/project/chambalabamba-2/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN project page with the 6 ha figure and the December 2012 founding"
+   },
+   {
+    "url": "https://www.ic.org/directory/shambalabamba/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Foundation for Intentional Community directory record, filed under the variant spelling 'shambalabamba'"
+   },
+   {
+    "url": "https://www.idealist.org/en/nonprofit/c2ced085d3d4446e9d228e9238fd7480-chambalabamba-vilcabamba",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "Idealist non-profit record"
+   },
+   {
+    "url": "https://www.spiritualityhealth.com/articles/2018/08/27/welcome-to-chambala-bamba",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "Dated 2018 magazine feature written from a visit - independent journalism"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "173": {
+  "country": "Costa Rica",
+  "country_iso2": "CR",
+  "admin_region": "CONFLICT - see notes; GEN gives Las Nubes de Abangares, Guanacaste; the coordinate falls in Alajuela near Ciudad Quesada",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/chanchos-de-monte/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/chanchos-de-monte/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Chanchos de Monte - Global Ecovillage Network'",
+  "alternative_names": "Chanchos de Monte; Ecoaldea Chanchos de Monte; Chanchos de Monte Las Nubes",
+  "identity_confidence": "MEDIUM",
+  "notes": "LOCATION CONFLICT - REVIEW REQUIRED. The GEN record places the ecoaldea at LAS NUBES DE ABANGARES, 3 km north of the Santa Elena plaza (the Monteverde area, roughly 10.3N 84.8W). The cohort coordinate is at 10.79N 84.39W, near Ciudad Quesada in Alajuela - about 75 km north-east. Both are in Costa Rica so the country is not in doubt, but the SITE is: a coder must decide which point to crawl before any land-cover reading is trusted. Also note the name is a common Costa Rican term for the white-lipped peccary (Tayassu pecari), so most search hits are wildlife literature rather than this community. Small: about ONE HECTARE, of which 40% is cloud forest with water sources - at that size the parcel may be near the limit of what a coarse land-cover product can resolve. As of 2019 the community was still defining its governance and site plan and had not yet built its operations centre.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/chanchos-de-monte/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page - the only located record found; carries the 1 ha / 40% cloud forest figure and the Las Nubes de Abangares address"
+   },
+   {
+    "url": "https://seedsforecocommunities.org/list-of-eco-communities",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "LOW",
+    "score": 0.34,
+    "evidence": "Seeds for Eco Communities list - a cross-check that the community exists outside GEN, but not a located record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "174": {
+  "country": "Brazil",
+  "country_iso2": "BR",
+  "admin_region": "Bahia; Marau; Peninsula de Marau, between Itacare and Algodoes",
+  "country_method": "coordinate_gazetteer+gen_page+academic",
+  "country_source": "https://ecovillage.org/project/ecovila-piracanga/",
+  "gen_community_url": "https://ecovillage.org/project/ecovila-piracanga/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Ecovila Piracanga'; GEN also carries a Hildur Jackson Award 2021 finalist page and an interview with Bruno Tambellini of Piracanga",
+  "alternative_names": "Ecovila Piracanga; Piracanga; Piracanga Ecovillage; Inkiri Piracanga; Comunidade Inkiri; Piracanga Centro de Permacultura",
+  "identity_confidence": "HIGH",
+  "notes": "BEST-DOCUMENTED BRAZILIAN SITE IN THE COHORT and the clearest land-history case: the land was ACQUIRED IN 2000 AS A DEFORESTED COCONUT FARM - it had already been cleared for coconut cultivation before the community existed. So a pre-community baseline shows cleared plantation, not primary forest, and any regrowth after 2006-2011 is restoration of previously cleared ground. Settlement from about 2006; formally structured as a community in 2010-2011 after workshops led by Damanhur (seq 162 in this cohort - the two communities are linked). Roughly 180-200 residents including about 40 children. The Inkiri Community proper was founded 2015 with 43 adults and 15 children, so 'Piracanga' and 'Inkiri' are nested, not synonymous. Inside a federal environmental protection area, among forest, river, sea, mangrove and coconut grove.",
+  "sources": [
+   {
+    "url": "https://www.scielo.br/j/sn/a/9GkN4p77pSDchJcnpLhVR4j/abstract/?lang=pt",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.94,
+    "evidence": "Peer-reviewed article in Sociedade & Natureza, 'Ecovila como alternativa de organizacao socioambiental sustentavel: uma avaliacao de Piracanga, Bahia' - an independent scholarly assessment of this exact site, open access on SciELO"
+   },
+   {
+    "url": "https://www.redalyc.org/journal/3213/321355044007/html/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "Full text of the same article on Redalyc - same work and same authors, so the SAME independence group, not a second voice"
+   },
+   {
+    "url": "https://www.ecovilapiracanga.com.br/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/project/ecovila-piracanga/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://ecovillage.org/hildur-jackson-award-2021-finalists/piracanga-centro-de-permacultura/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "GEN Hildur Jackson Award 2021 finalist page for the Piracanga permaculture centre"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "175": {
+  "country": "Brazil",
+  "country_iso2": "BR",
+  "admin_region": "Sao Paulo; Campinas; Cidade Universitaria / Barao Geraldo, Anhumas",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/ecovila-raiz-do-anuhmas/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/ecovila-raiz-do-anuhmas/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Ecovila Raiz do Anuhmas - Global Ecovillage Network'",
+  "alternative_names": "Ecovila Raiz do Anuhmas; Ecovila Raiz do Anhumas; Raiz do Anhumas; Ecovila Raiz do Anhumas Campinas",
+  "identity_confidence": "HIGH",
+  "notes": "SPELLING VARIANT MATTERS: GEN and the cohort spell it 'Anuhmas', but the community's own Instagram and the Brazilian business records spell it 'ANHUMAS' - after the Anhumas river and district in Campinas. Search both. Established 2011; 20 families / 20 members, closed to new members at the time of the GEN record. Bioconstruction and organic food production, governed by sociocracy. NOT RURAL: it sits inside a technology pole in Campinas, ringed by two large universities, so the surrounding land cover is peri-urban and the community parcel is small against an urbanising background - the confound to watch is city growth, not agriculture. NOTE the neighbouring cohort row seq 176 'Ecovila Santa Margarida' is only about 2 km away and is a commercial condominium, not a community; do not conflate them.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/ecovila-raiz-do-anuhmas/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page with the 2011 founding and the 20-member figure"
+   },
+   {
+    "url": "https://www.instagram.com/ecovilaraizdoanhumas/",
+    "source_class": "S7",
+    "platform_type": "Instagram",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "Community's own Instagram, under the 'Anhumas' spelling - dated photographic record"
+   },
+   {
+    "url": "https://www.redecasabrasil.org/post/mapeamento-de-ecovilas-e-comunidades-regenerativas-no-brasil-2022",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Rede CASA Brasil 2022 national mapping of Brazilian ecovillages - a regional network census independent of GEN"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "176": {
+  "country": "Brazil",
+  "country_iso2": "BR",
+  "admin_region": "Sao Paulo; Paulinia; Morumbi",
+  "country_method": "coordinate_gazetteer+developer_record",
+  "country_source": "https://ecovilasantamargarida.com.br/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org and open-web searches returned no GEN record and no intentional-community record under this name",
+  "alternative_names": "Ecovila Santa Margarida; Eco Vila Santa Margarida",
+  "identity_confidence": "HIGH",
+  "notes": "CATEGORY MISMATCH - REVIEW REQUIRED. THIS IS NOT AN INTENTIONAL COMMUNITY OR ECOVILLAGE. Every source found identifies 'Eco Vila Santa Margarida' as a COMMERCIAL RESIDENTIAL CONDOMINIUM launched in November 2021 by Furlan Participacoes / Eco Vila Incorporadora at Av. Alexandre Martins Laroca, Morumbi, Paulinia: 4 towers, 192 apartments of 65-99 m2, marketed with a heated pool, cinema, sports court, sauna and gourmet kiosks. 'Eco Vila' here is the developer's brand, not a community form. The coordinate matches the development site. The row is RETAINED UNCHANGED as required, but it should not be analysed as an ecovillage, and including it would bias any cohort statistic. A coder must decide whether to exclude it at analysis time. Note it is about 2 km from seq 175 Ecovila Raiz do Anuhmas, which IS a genuine community - the proximity plus the shared 'Ecovila' prefix is the likely route by which this entry entered the list.",
+  "sources": [
+   {
+    "url": "https://ecovilasantamargarida.com.br/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "The development's own marketing site - the evidence that this is a residential real-estate product"
+   },
+   {
+    "url": "https://www.ecovilaincorporadora.com.br/empreendimentos/eco-vila-santa-margarida/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Developer's project record - names the launch date, tower count and unit count"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "177": {
+  "country": "Mali",
+  "country_iso2": "ML",
+  "admin_region": "Koulikoro Region; Cercle de Kati; Commune de Nossombougou",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/project/ecovillage-pentierebougou/",
+  "gen_community_url": "https://ecovillage.org/project/ecovillage-pentierebougou/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Ecovillage Pentierebougou - Global Ecovillage Network'; also listed under GEN Africa's ecovillage projects",
+  "alternative_names": "Ecovillage Pentierebougou; Pentierebougou; Pentierebougou-Est; Pentiere Bougou",
+  "identity_confidence": "MEDIUM",
+  "notes": "ADMIN NOTE: GEN places the village in the COMMUNE OF NOSSOMBOUGOU, north of Bamako in Kati Cercle; the cohort coordinate falls nearer Kati town itself, roughly 30 km south - treat the coordinate as approximate and verify before crawling. This is a DEVELOPMENT-PROGRAMME ECOVILLAGE, not a founded intentional community: l'Association Malienne pour la Solidarite et le Developpement (AMSD) runs a 'promotion of an entire village' pilot converting an existing Malian village, with poverty-reduction targets, farm-income growth and infrastructure works, and a stated 2024 vision for Pentierebougou-Est. So the imagery signal is village infrastructure and agricultural intensification in an existing settlement, not new settlement construction. The project is francophone; French-language searching is likely to find the AMSD and donor reports that this English pass did not.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/ecovillage-pentierebougou/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page - names AMSD as implementer and Nossombougou as the commune"
+   },
+   {
+    "url": "https://ecovillage.org/region/gen-africa/ecovillage-projects/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.4,
+    "evidence": "GEN Africa regional project index - corroborates the listing within the network"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "178": {
+  "country": "Nepal",
+  "country_iso2": "NP",
+  "admin_region": "Gandaki Province; Syangja; Chapakot Municipality; Ramadanda-5",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/jyagdi-ecovillage-chapakot-syangja-nepal/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/jyagdi-ecovillage-chapakot-syangja-nepal/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Jyagdi EcoVillage Chapakot Syangja Nepal - Global Ecovillage Network'",
+  "alternative_names": "Jyagdi EcoVillage; Jyagdi Eco Village; Jyagdi EcoVillage Chapakot Syangja Nepal; Ecotreks",
+  "identity_confidence": "HIGH",
+  "notes": "Chapakot Municipality ward 5, Ramadanda, Syangja - the coordinate matches. ECO-TOURISM LED: homestays, guided eco-tours, yoga and meditation retreats, alongside organic farming, plastic-waste reduction and reforestation. No standalone website was found; the community's public presence is on Facebook (two pages, one under the 'ecotreks.org' handle) and YouTube, so the documentary record is social-media-borne and thin, and I12 crawl_truncated is a live risk here. Reforestation is a stated activity, so a vegetation-gain signal is plausible and worth testing.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/jyagdi-ecovillage-chapakot-syangja-nepal/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN community page - the only structured record found"
+   },
+   {
+    "url": "https://www.facebook.com/jyagdiecovillage/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "Community's own Facebook page"
+   },
+   {
+    "url": "https://www.facebook.com/ecotreks.org",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.42,
+    "evidence": "Second Facebook page run by the same project under the Ecotreks handle, carrying dated site photography and video"
+   },
+   {
+    "url": "https://www.youtube.com/watch?v=7m45KWB4dhc",
+    "source_class": "S7",
+    "platform_type": "YouTube",
+    "independence_group": "G1",
+    "confidence": "LOW",
+    "score": 0.32,
+    "evidence": "Video of the site - visual context only"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "179": {
+  "country": "Egypt",
+  "country_iso2": "EG",
+  "admin_region": "South Sinai; Nuweiba; Wadi Watir delta",
+  "country_method": "official_source_resolves_gazetteer_split",
+  "country_source": "https://habibacommunity.com/agriculture/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/habiba-community/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Habiba Community - Global Ecovillage Network'",
+  "alternative_names": "Habiba Community; Habiba Organic Farm; HOF; Habiba Beach Lodge; Habiba Learning Center; Sinai Date Palm Foundation",
+  "identity_confidence": "HIGH",
+  "notes": "COORDINATE CONFLICT - REVIEW REQUIRED. Every source places Habiba at NUWEIBA, at the base of the WADI WATIR DELTA about 2 km from the sea (near 29.03N). The cohort coordinate is at 28.61N, roughly 45 km south, nearer Dahab. The country is not in doubt - the gazetteer split only because the Saudi coast is a few tens of kilometres across the Gulf of Aqaba - but the SITE must be re-fixed before crawling. EXCELLENT PHYSICAL BASELINE: the farm is a stated 16,000 m2 on SALINE DESERT SOIL, so vegetation against bare desert should be a very high-contrast signal and is entirely irrigation-dependent. Founded in the late 1990s by Maged Elsaid; comprises an eco-lodge, a certified organic farm and a regenerative-agriculture learning centre. Crops include moringa, quinoa, dates, olives and pomegranate. Also runs the Sinai Date Palm Foundation and the Habiba Learning Center.",
+  "sources": [
+   {
+    "url": "https://habibacommunity.com/agriculture/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official agriculture page - carries the 16,000 m2 figure and the Wadi Watir delta location"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/habiba-community/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://medomed.org/featured_item/the-habiba-organic-farm/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Med-O-Med, the FUNCI (Fundacion de Cultura Islamica) programme on Mediterranean gardens and landscapes - an institutional record independent of the farm"
+   },
+   {
+    "url": "https://ecosystemrestorationcommunities.org/2024/11/26/from-scarcity-to-abundance-the-inspiring-regenerative-journey-of-habiba-community/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "Dated November 2024 write-up by Ecosystem Restoration Communities - an outside network's account of the restoration trajectory"
+   },
+   {
+    "url": "https://permacultureglobal.org/projects/1127-habiba-organic-farm",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Permaculture Global project record"
+   },
+   {
+    "url": "https://cairoscene.com/lifestyle/habiba-organic-farm-leading-the-way-in-egyptian-agro-tourism",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "CairoScene feature - Egyptian journalism independent of the farm"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "180": {
+  "country": "Ecuador",
+  "country_iso2": "EC",
+  "admin_region": "CONFLICT - see notes; sources give Chuchumbletza / Gualaquiza, Morona Santiago; the gazetteer's nearest town is Gualaceo, Azuay",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/fruit-haven-ecovllage-ecuador/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/fruit-haven-ecovllage-ecuador/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Fruit Haven EcoVillage Ecuador'. NOTE THE TYPO IN GEN'S OWN SLUG - 'ecovllage', missing the i - so the URL could not have been constructed from the name. Served on both /ecovillage/ and /project/ paths.",
+  "alternative_names": "Fruit Haven EcoVillage Ecuador; Fruit Haven; Fruit Haven Ecovillage Gualaquiza; Fruithaven",
+  "identity_confidence": "HIGH",
+  "notes": "PROVINCE CONFLICT - REVIEW REQUIRED. Sources place the community at Chuchumbletza, near Gualaquiza, MORONA SANTIAGO province, on the Amazon side of the Andean foothills; the gazetteer's nearest town for the cohort coordinate is Gualaceo in AZUAY, a different province on the other side of the divide. Verify the point before crawling. SCALE FIGURES DISAGREE AND ARE NOT RECONCILED HERE: one community source says members bought 'over 1000 acres' (about 405 ha), another says '7 independent properties of over 150 hectares'. FOUNDING YEAR ALSO DISAGREES: GEN says established 2014, the community's own text says the first property was bought in 2016. Both are recorded as found; neither is adopted. IMPORTANT FOR LAND ANALYSIS: this is a MULTI-PARCEL, INDIVIDUALLY-OWNED land buy - 7 separate properties, 40+ owners, 40+ lots still for sale - so there is no single contiguous boundary and the built-up signal will be scattered lots appearing one at a time. Vegan/fruitarian community; the stated purpose of the land purchase is Amazon rainforest preservation, so the expected signal is forest RETENTION against a deforesting background, not forest gain.",
+  "sources": [
+   {
+    "url": "https://fruithaven.land/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/fruit-haven-ecovllage-ecuador/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page (note GEN's misspelled slug)"
+   },
+   {
+    "url": "https://ecovillage.org/project/fruit-haven-ecovllage-ecuador/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "The same GEN record on the alternate /project/ path - a duplicate, not a second source"
+   },
+   {
+    "url": "https://www.tripadvisor.com/Attraction_Review-g654329-d26834904-Reviews-Fruit_Haven_Ecovillage_Ecuador-Gualaquiza_Morona_Santiago_Province.html",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "TripAdvisor record - low evidential value in itself, but it is the source that independently files the community under Gualaquiza, Morona Santiago, and so bears on the province conflict"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "181": {
+  "country": "Spain",
+  "country_iso2": "ES",
+  "admin_region": "CONFLICT - see notes; sources give Yator / Cadiar, Las Alpujarras, GRANADA (18448); the gazetteer's nearest town is Vicar, ALMERIA",
+  "country_method": "coordinate_gazetteer+multiple_published_addresses",
+  "country_source": "https://ecohomes.blog/2010/06/15/el-valle-de-sensaciones-yator-spain/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site: and open-web searches returned no ecovillage.org community page. GEN Europe carries a notice about renting the community house over winter, which shows network association but is a network news item, not a community profile, and is not recorded as one.",
+  "alternative_names": "Valle de Sensaciones; El Valle de Sensaciones; Valley of Sensations; Sensaciones",
+  "identity_confidence": "HIGH",
+  "notes": "PROVINCE CONFLICT - REVIEW REQUIRED. Independent sources agree the site is at YATOR, in the Cadiar area of Las Alpujarras, postcode 18448, GRANADA province. The gazetteer's nearest town for the cohort coordinate is Vicar, in ALMERIA province. Verify before crawling. Founded by the German artist and traveller Achim Burkard, who began the project in the mid-1990s. Describes itself as an 'ecovillage laboratory' rather than a settled village: POPULATION FLUCTUATES BETWEEN ABOUT 3 AND 30, many of them nomads, so a stable resident count does not exist and permanence-based indicators will read low. The built environment is deliberately ephemeral and artistic - treehouses, cave spaces, clay buildings, circus caravans, a glass temple, a moon temple, a medicine wheel and a natural pool - which is poor material for a built-up-area signal.",
+  "sources": [
+   {
+    "url": "https://spacesarchives.org/explore/search-the-online-collection/achim-burkard-valle-de-sensaciones/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "SPACES Archives (Saving and Preserving Arts and Cultural Environments) - a curated archive of art environments; an institutional, catalogued record of the site independent of the community"
+   },
+   {
+    "url": "https://gen-europe.org/rental-opportunity-community-house-in-south-of-spain-during-winter/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "GEN Europe notice - evidence of network association; explicitly NOT a GEN community profile"
+   },
+   {
+    "url": "https://ecohomes.blog/2010/06/15/el-valle-de-sensaciones-yator-spain/",
+    "source_class": "S6",
+    "platform_type": "blog platform",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Dated 2010 visitor account with the Yator address - an outside observer's record, useful as an early time point"
+   },
+   {
+    "url": "https://find.coop/organizations/22032-valle-de-sensaciones",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "LOW",
+    "score": 0.34,
+    "evidence": "find.coop cooperative directory record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "182": {
+  "country": "Mexico",
+  "country_iso2": "MX",
+  "admin_region": "Veracruz; Huatusco de Chicuellar",
+  "country_method": "coordinate_gazetteer+gen_page+institutional",
+  "country_source": "https://bosquedeniebla.com.mx/quienes-somos/",
+  "gen_community_url": "https://ecovillage.org/project/las-canadas-bosque-de-niebla/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Las Canadas Bosque de Niebla'; GEN's 2021 Ecovillage Summit also carries a speaker page and a recorded talk for the community",
+  "alternative_names": "Las Canadas Bosque de Niebla; Las Canadas; Bosque de Niebla; Cooperativa Las Canadas; Las Canadas de Huatusco",
+  "identity_confidence": "HIGH",
+  "notes": "THE STRONGEST QUANTIFIED LAND-CHANGE CASE IN THE WHOLE COHORT, and the numbers come from the community's own published account: 225 HECTARES OF PASTURELAND RESTORED to cloud forest over more than 30 years; the cooperative sits on 307 HECTARES of which 265 IS NOW FORESTED. That is an explicit, datable pasture-to-forest conversion at a scale any moderate-resolution sensor will resolve, and it is the reverse of the usual regional trend. Work since 1999; the cooperative was legally constituted in 2006; 22 working partners. Projects include permaculture, agroecology, a coffee farm, bamboo, managed forestry, bioconstruction and ecotechnologies; they grow maize, beans, tubers, vegetables, eggs, milk and some meat. Situated in one of the last remaining fragments of central Veracruz cloud forest. ADMIN NOTE: the gazetteer's nearest town is Xico; the community's address is Huatusco de Chicuellar - both are in the same central Veracruz mountain zone, so this is a minor difference, not a conflict.",
+  "sources": [
+   {
+    "url": "https://bosquedeniebla.com.mx/quienes-somos/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official 'Quienes Somos' page - the source of the 225 ha restored / 307 ha total / 265 ha forested figures"
+   },
+   {
+    "url": "https://ecotec.unam.mx/organizaciones/las-canadas-bosque-de-niebla",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "Unidad de Ecotecnologias, UNAM Campus Morelia - a national university research unit's organisational record; independent academic recognition of the site"
+   },
+   {
+    "url": "https://ecovillage.org/project/las-canadas-bosque-de-niebla/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://summit2021.ecovillage.org/talks/las-canadas-bosque-de-niebla-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Recorded talk given by the community at GEN's 2021 Ecovillage Summit - the community's own voice, dated"
+   },
+   {
+    "url": "https://www.cantaroazul.org/post/experiencia-en-las-ca%C3%B1adas-bosque-de-niebla-en-huatusco-de-chicu%C3%A9llar-veracruz",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Cantaro Azul, a Mexican water-and-sanitation NGO, reporting a site visit - an outside organisation's dated account"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "183": {
+  "country": "Spain",
+  "country_iso2": "ES",
+  "admin_region": "CONFLICT - see notes; sources give Valdepielagos, Comunidad de MADRID, about 50 km north of Madrid; the gazetteer's nearest city is Guadalajara",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/valdepielagos/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/valdepielagos/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Valdepielagos - Global Ecovillage Network'",
+  "alternative_names": "Valdepielagos; Ecoaldea de Valdepielagos; Valdepielagos ecoaldea; Sociedad Cooperativa de Viviendas Bioclimaticas de Valdepielagos",
+  "identity_confidence": "HIGH",
+  "notes": "PROVINCE CONFLICT - REVIEW REQUIRED. Sources place the ecoaldea in the municipality of VALDEPIELAGOS in the Comunidad de Madrid, about 50 km north of the city; the gazetteer's nearest city for the cohort coordinate is Guadalajara, a different province to the east. Verify before crawling. CLEAN TWO-DATE BASELINE: the housing cooperative was constituted in 1996 and the 30 SINGLE-FAMILY HOMES WERE FIRST OCCUPIED IN SPRING 2008 - so there is a twelve-year planning gap and then a single, sharp construction event, which is unusually easy to date in imagery. 30 families. Bioclimatic and bioconstruction design, solar thermal, greywater reuse, rainwater harvesting into a shared 150 m3 tank used to irrigate the common fruit trees. NOT A GREENFIELD SITE: it was built as an extension of an existing village and is repeatedly described as having brought new life to it, so the change signal is village growth, not isolated settlement. Member of the Red Iberica de Ecoaldeas.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/valdepielagos/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://ecoaldeas.org/valdepielagos/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "Red Iberica de Ecoaldeas record - the Iberian ecovillage network's own listing, carrying the 1996 constitution and 2008 occupation dates"
+   },
+   {
+    "url": "https://www.telemadrid.es/programas/madrid-directo/asi-se-vive-ecoaldea-Valdepielagos-2-2118408183--20190503083325.html",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Telemadrid 'Madrid Directo' broadcast report, dated 3 May 2019 - regional public-service journalism filmed on site"
+   },
+   {
+    "url": "https://eutopia-earth.com/en/articoli/valdepi%C3%A9lagos-the-sustainable-cohousing-that-brought-new-life-to-a-village",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "Eutopia feature on the cohousing scheme and its effect on the host village"
+   },
+   {
+    "url": "https://numundo.org/center/spain/ecoaldea-de-valdepielagos",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G5",
+    "confidence": "LOW",
+    "score": 0.36,
+    "evidence": "NuMundo directory record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "184": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "New Mexico; Taos County; mesa north-west of Taos, Tres Piedras postal area",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://earthship.com/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org searched under Greater World, Earthship and Earthship Biotecture; no GEN community page returned",
+  "alternative_names": "Earthship Greater World Community; Greater World Earthship Community; Greater World Subdivision; Greater World; Earthship Biotecture; REACH community",
+  "identity_confidence": "HIGH",
+  "notes": "BEST GOVERNMENT PAPER TRAIL IN THE COHORT: in MARCH 2004 the Taos County Commission formally approved the development, subject to conditions - private ownership of individual lots, uniform roads and standardised house plans - so there is a county planning record with a hard date, and the conditions themselves predict what the imagery will show. THE WORLD'S FIRST EARTHSHIP SUBDIVISION, founded by Mike Reynolds of Earthship Biotecture. AREA FIGURES DIFFER BY SOURCE AND ARE BOTH RECORDED: total given as '600+ acres' and as '634 acres'; shared/common land given as 'more than 300 acres' and as '347 acres'. At least 130 full-time residents. Fully off-grid on solar and wind. Explicitly a 20-year build-out, so growth should be gradual and lot-by-lot rather than a single construction event. Earthships are earth-bermed and made from rammed tyres, so the roof signature is unusual and thermal or built-up classifiers may under-count them.",
+  "sources": [
+   {
+    "url": "https://sah-archipedia.org/buildings/NM-01-055-0185",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "SAH Archipedia, the Society of Architectural Historians' peer-reviewed encyclopaedia of American architecture - a scholarly, edited entry on the Greater World Earthship Community; the source of the March 2004 county approval and its conditions"
+   },
+   {
+    "url": "https://earthship.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "Earthship Biotecture, the founding organisation's site"
+   },
+   {
+    "url": "https://greaterworldhoa.communitysite.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "The Greater World homeowners' association site - the residents' own governance body, and the source that files the subdivision under Tres Piedras, NM"
+   },
+   {
+    "url": "https://taos.org/explore/landmarks/taos-earthships/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Taos County official tourism body's landmark record - a local institutional source"
+   },
+   {
+    "url": "https://roadtrippers.com/magazine/earthship-biotecture-off-grid-living/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Feature written from a visit - independent journalism"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "185": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "Arizona; Pinal County; Dripping Springs Valley",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://windspiritcommunity.org/about/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org and open-web searches returned no GEN community page; the community's directory presence is on the Foundation for Intentional Community and find.coop instead",
+  "alternative_names": "Wind Spirit Community; Wind Spirit; Wind Spirit Community Inc; formerly part of Christmas Star Community",
+  "identity_confidence": "HIGH",
+  "notes": "PRIOR-COMMUNITY LAND HISTORY, which matters for any baseline: the land 'was once part of the CHRISTMAS STAR COMMUNITY' - so this parcel was already an intentional community before Wind Spirit, and pre-Wind-Spirit imagery will not show untouched ground. About 30 years old. 16 ACRES in the Dripping Springs Valley, Pinal County, less than two hours from either Tucson or Phoenix. Elevation 2,700 ft, which the community says gives a year-round vegetable growing season. OVER 60 VARIETIES OF MATURE ORGANIC FRUIT AND NUT TREES plus natives - mature orchard, so tree cover here is decades old and is not a recent planting signal. At 16 acres this is one of the smallest parcels in the cohort and is near the resolution floor for coarse land-cover products.",
+  "sources": [
+   {
+    "url": "https://windspiritcommunity.org/about/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official About page - source of the 16 acres, the 2,700 ft elevation, the 60+ tree varieties and the Christmas Star Community predecessor"
+   },
+   {
+    "url": "https://cronkitenews.azpbs.org/2018/03/19/eco-villages/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Cronkite News (Arizona PBS / ASU's Cronkite School), dated 19 March 2018 - reported journalism covering Arizona ecovillages including this one and TerraSante (seq 186)"
+   },
+   {
+    "url": "https://www.ic.org/arizona-ecovillages/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Foundation for Intentional Community page on Arizona ecovillages"
+   },
+   {
+    "url": "https://find.coop/organizations/22305-wind-spirit-community",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "LOW",
+    "score": 0.34,
+    "evidence": "find.coop cooperative directory record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "186": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "CONFLICT - see notes; sources give 13535 W. Sacred Earth Pl., Tucson AZ 85735, about 25 miles SOUTH-WEST of Tucson; the gazetteer's nearest town is Sahuarita, which lies south-east of Tucson",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.terrasante.org/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org and open-web searches returned no GEN community page",
+  "alternative_names": "TerraSante Village; Terrasante Village; TSV; Terrasante Community; Sacred Earth neighborhood; Harmony and Health Foundation",
+  "identity_confidence": "HIGH",
+  "notes": "LOCATION CONFLICT - REVIEW REQUIRED. The published address is in the 85735 ZIP (the Three Points / Robles Junction area WEST of Tucson) and the community describes itself as 25 miles south-WEST of Tucson; the gazetteer's nearest town for the cohort coordinate is Sahuarita, which is south-EAST of Tucson. Re-fix the point before crawling. EXPLICIT NESTED PARCEL, which is the key figure here: the village occupies 8.4 ACRES WITHIN A 160-ACRE Terrasante / Sacred Earth neighbourhood - so 'the community' and 'the land it sits in' are two different areas by a factor of nearly twenty, and choosing the wrong one changes every areal statistic. Sonoran desert at 2,450 ft. Arizona non-profit from 2008, 501(c)(3) from 2011. Runs as a living laboratory for permaculture, earth architecture, solar and renewable energy, water harvesting and locally sustainable agriculture.",
+  "sources": [
+   {
+    "url": "https://www.terrasante.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site - source of the 8.4-of-160-acre figure, the address and the 2008/2011 incorporation dates"
+   },
+   {
+    "url": "https://www.azpm.org/s/5443-the-terrasante-experiment/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Arizona Public Media documentary segment 'The TerraSante Experiment' - public-service broadcast journalism filmed on site"
+   },
+   {
+    "url": "https://cronkitenews.azpbs.org/2018/03/19/eco-villages/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "Cronkite News, 19 March 2018 - Arizona ecovillages report covering this community"
+   },
+   {
+    "url": "http://harmonyandhealth.org/community/",
+    "source_class": "S4",
+    "platform_type": "secondary or former website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Harmony and Health Foundation community page - the affiliated non-profit's own account"
+   },
+   {
+    "url": "https://find.coop/organizations/22051-terrasante-village-terrasante-community-sacred-earth-neighborhood",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "LOW",
+    "score": 0.34,
+    "evidence": "find.coop record; useful mainly because it names the village and the wider neighbourhood as distinct entities"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "187": {
+  "country": "France",
+  "country_iso2": "FR",
+  "admin_region": "Occitanie; Herault; near Poussan (gazetteer's nearest city is Beziers - see notes)",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://catfarm.net/about-us/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/catfarm/impact-assessment/",
+  "gen_status": "VERIFIED_SEARCH_INDEX_SUBPAGE_ONLY",
+  "gen_evidence": "site:ecovillage.org indexed only the community's Ecovillage Impact Assessment SUBPAGE at /ecovillage/catfarm/impact-assessment/. The parent /ecovillage/catfarm/ is implied by that path but was NOT itself returned by any search, so only the observed URL is recorded and the status is marked subpage-only rather than promoting an unobserved parent URL.",
+  "alternative_names": "Catfarm; the Catfarm; Cat farm; Catfarm Poussan",
+  "identity_confidence": "HIGH",
+  "notes": "ADMIN NOTE: sources place the farm near POUSSAN in the Herault; the gazetteer's nearest city for the cohort coordinate is Beziers, also in the Herault but a different part of it - worth verifying, though the department is not in doubt. An OFF-GRID community and educational non-profit on a rural farmhouse property. Membership is highly transient - international volunteers on a one-month minimum, ESC participants, digital nomads and artists - so resident counts are unstable and the documentary record is volunteer-facing. Off-grid status means no grid connection to trace and a small, low-contrast built footprint. Hosts volunteers through Worldpackers and through GEN itself, which is how it enters the network.",
+  "sources": [
+   {
+    "url": "https://catfarm.net/about-us/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official About page"
+   },
+   {
+    "url": "https://catfarm.net/community-living/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Official community-living page describing the site and the membership model"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/catfarm/impact-assessment/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "GEN Ecovillage Impact Assessment page for Catfarm - a structured GEN self-assessment record, and the only GEN path actually observed"
+   },
+   {
+    "url": "https://voluntouring.org/2019/08/16/catfarm-community-south-of-france/",
+    "source_class": "S6",
+    "platform_type": "blog platform",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Dated August 2019 outside account of a stay at the farm"
+   },
+   {
+    "url": "https://www.creativecultureguide.org/resources/catfarm",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "LOW",
+    "score": 0.36,
+    "evidence": "Creative Culture Guide directory record"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "188": {
+  "country": "Russia",
+  "country_iso2": "RU",
+  "admin_region": "Leningrad Oblast; Podporozhsky District; Vashinskoye settlement; Grishino",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/project/ecovillage-grishino/",
+  "gen_community_url": "https://ecovillage.org/project/ecovillage-grishino/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Ecovillage Grishino - Global Ecovillage Network'",
+  "alternative_names": "Grishino Ecovillage; Ecovillage Grishino; Ekoposelenie Grishino; Grishino, Podporozhsky District",
+  "identity_confidence": "MEDIUM",
+  "notes": "DISAMBIGUATION IS ESSENTIAL: there are at least five other Russian settlements called Grishino (in Vologda, Ivanovo and Vladimir Oblasts), and a name-only search returns them first. THIS one is in PODPOROZHSKY DISTRICT, LENINGRAD OBLAST, about 300 km north-east of St Petersburg, at the confluence of two rivers; the gazetteer's nearest large city is Petrozavodsk in Karelia, which is consistent because Podporozhye sits close to the Karelian border. Founded 1993 - one of the first ecovillages in Russia, so it has a long record. VERY SMALL PERMANENT POPULATION: SEVEN people year-round, in two community houses in traditional Russian style, with residents building individual log houses. Several vegetable gardens and a large wildflower meadow. A settlement this small in a forested landscape is at genuine risk of being invisible to coarse land-cover products, and I12 crawl_truncated is a live risk given the thin online record.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/ecovillage-grishino/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page - source of the 1993 founding, the seven year-round residents and the two community houses"
+   },
+   {
+    "url": "https://www.wikidata.org/wiki/Q18406117",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Wikidata item fixing the settlement's administrative placement (Vashinskoye, Podporozhsky District, Leningrad Oblast) - the record that separates it from the homonymous villages"
+   },
+   {
+    "url": "https://www.youtube.com/watch?v=Sb9VATyxjZI",
+    "source_class": "S7",
+    "platform_type": "YouTube",
+    "independence_group": "G1",
+    "confidence": "LOW",
+    "score": 0.32,
+    "evidence": "Community presentation video - visual context only"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "189": {
+  "country": "Norway",
+  "country_iso2": "NO",
+  "admin_region": "CONFLICT - see notes; sources give Hurdal municipality, Akershus, 80 km north of Oslo; the gazetteer's nearest city is Hamar",
+  "country_method": "coordinate_gazetteer+academic+official_site",
+  "country_source": "https://hurdallandsbyene.no/en/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org searched under Hurdal, Hurdal Ecovillage and Hurdal okolandsby; no ecovillage.org community page was returned - the results were academic articles and third-party directories instead",
+  "alternative_names": "Hurdal Ecovillage; Hurdal Okolandsby; Hurdal Oekolandsby; Hurdalsjoen Okologiske Landsby; Hurdal Landsbyene; Baerekraftsdalen (The Sustainable Valley)",
+  "identity_confidence": "HIGH",
+  "notes": "BY FAR THE MOST HEAVILY STUDIED COMMUNITY IN THIS COHORT - at least four peer-reviewed journal articles, in Sustainability (2018), Journal of Rural Studies (2022), Geografiska Annaler B (2024) and Sustainability: Science, Practice and Policy (2024). Any documentary analysis that misses these is missing the bulk of the evidence. TWO SHARPLY DIFFERENT DEVELOPMENT PHASES, which is the single most important fact for change detection: PHASE 1, roughly 2002-2013, members jointly owned the land and self-built their houses; PHASE 2, from 2013, professional developers took over and sold ready-made houses to individual families. Expect a slow, irregular early signal and then a fast, regular one. The founding farm had 16 HA OF FERTILE FARMLAND plus substantial forest, a lakeshore beach and a river. By November 2016, 160+ residents and 70 houses sold, against a plan of 200 dwellings and about 500 people. Hurdal municipality has under 3,000 inhabitants and renamed its district Baerekraftsdalen, 'The Sustainable Valley' - so municipal records exist. The vision dates back to a group of 40-50 people in the mid-1990s. ADMIN NOTE: the gazetteer's nearest city is Hamar, which is in a neighbouring county; verify the point.",
+  "sources": [
+   {
+    "url": "https://www.mdpi.com/2071-1050/10/6/2074",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.94,
+    "evidence": "'The Creation of an Ecovillage: Handling Identities in a Norwegian Sustainable Valley', Sustainability 2018 - open-access peer-reviewed case study of this site"
+   },
+   {
+    "url": "https://www.tandfonline.com/doi/full/10.1080/15487733.2024.2393912",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "'Ecovillage scale-up and its well-being challenges: a case study from Norway', Sustainability: Science, Practice and Policy 2024 - peer-reviewed study of the phase-2 scale-up specifically"
+   },
+   {
+    "url": "https://www.tandfonline.com/doi/full/10.1080/04353684.2024.2392598",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "'Negotiating sustainability and place: migration to an ecovillage and local community', Geografiska Annaler Series B 2024 - peer-reviewed, on migration into Hurdal"
+   },
+   {
+    "url": "https://www.sciencedirect.com/science/article/pii/S0743016722002224",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G5",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "'Alternative places for alternative people? A changing ecovillage discourse from Othered lifestyle to another rurality', Journal of Rural Studies 2022"
+   },
+   {
+    "url": "https://hurdallandsbyene.no/en/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "Official site of the Hurdal villages"
+   },
+   {
+    "url": "https://gaiaeducation.medium.com/the-story-of-hurdal-ecovillage-18d667106fe5",
+    "source_class": "S4",
+    "platform_type": "blog platform",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "'The story of Hurdal Ecovillage' by Simen Torp, the founder - the community's own account, published via Gaia Education"
+   },
+   {
+    "url": "https://www.hyllanderiksen.net/blog/2018/12/12/hurdal-ecovillage-as-an-alternative-ecological-space",
+    "source_class": "S1",
+    "platform_type": "blog platform",
+    "independence_group": "G6",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Field note by Thomas Hylland Eriksen, professor of social anthropology, dated December 2018 - scholarly but not peer-reviewed"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "190": {
+  "country": "Sweden",
+  "country_iso2": "SE",
+  "admin_region": "Sodermanland; between Nykoping and the Jarna area south of Stockholm - see notes",
+  "country_method": "coordinate_gazetteer+gen_page",
+  "country_source": "https://ecovillage.org/ecovillage/nackunga-community/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/nackunga-community/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Nackunga Community - Global Ecovillage Network'; also listed on GEN's Sweden country archive",
+  "alternative_names": "Nackunga Community; Nackunga",
+  "identity_confidence": "MEDIUM",
+  "notes": "THIN RECORD - the GEN page is effectively the only substantive source found, and I12 crawl_truncated should be considered live for this row. An intentional community of families and adults living and working together, running outward-facing projects in Transition, reconnection with nature and self-development. LOCATION IS ONLY LOOSELY FIXED: the GEN text places it 'in the area around Jarna, south of Stockholm', while the cohort coordinate's nearest city is Nykoping - these are in the same broad Sodermanland corridor but are not the same place, and no precise address was found. No land area, member count or founding date was published anywhere the search reached. Do not infer any of these.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/nackunga-community/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN community page - the only substantive record found"
+   },
+   {
+    "url": "https://ecovillage.org/gen_country/sweden/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.38,
+    "evidence": "GEN Sweden country archive - corroborates the listing but adds nothing about the site"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
+ },
+ "191": {
+  "country": "Sweden",
+  "country_iso2": "SE",
+  "admin_region": "Varmland; Karlstad Municipality; Skare, about 10 km north of Karlstad",
+  "country_method": "coordinate_gazetteer+multiple_published_sources",
+  "country_source": "https://hbvarmland.se/brf-tuggelite/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org returned nothing for Tuggelite - the query produced only generic ecovillage pages and Wikipedia. Sweden's first ecovillage does not appear to have a GEN community page.",
+  "alternative_names": "Tuggelite; Ekoby Tuggelite; BRF Tuggelite; Brf Tuggelite Karlstad; Tuggelite ekoby",
+  "identity_confidence": "HIGH",
+  "notes": "HISTORICALLY THE MOST IMPORTANT SWEDISH SITE IN THE COHORT: SWEDEN'S FIRST MODERN ECOVILLAGE, INAUGURATED IN 1984 - which makes it one of the earliest founding dates anywhere in this cohort and puts its construction before most usable satellite archives. Located at Skare, about 10 km north of Karlstad; the gazetteer's nearest city is Karlstad, so the coordinate is consistent. VERY SMALL AND DENSE: 16 households in FIVE APARTMENT BUILDINGS on a single block - this is a compact cohousing block, not a dispersed rural settlement, and at that footprint it will occupy only a handful of pixels in moderate-resolution imagery. Legally a bostadsrattsforening (housing cooperative), which is why Swedish property and building records exist for it. Features: composting toilets, shared gardens and greenhouses, a common house, a pellet boiler, and SOLAR PANELS ADDED IN 1988 - a dated retrofit. Two Swedish university theses on the site are available in full text through DiVA.",
+  "sources": [
+   {
+    "url": "https://www.diva-portal.org/smash/get/diva2:225216/FULLTEXT01.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Full-text Karlstad University thesis on Tuggelite, via DiVA, the Swedish academic repository"
+   },
+   {
+    "url": "https://www.diva-portal.org/smash/get/diva2:962977/FULLTEXT01.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "Full-text master's thesis in Sustainable Development (no. 312) covering Tuggelite, via DiVA - a separate author and work from the above, so a separate independence group"
+   },
+   {
+    "url": "https://hbvarmland.se/brf-tuggelite/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Hallbart Byggande i Varmland (Sustainable Building in Varmland) record for BRF Tuggelite - a regional building-sector institutional source with the 1984 inauguration and the 16-household figure"
+   },
+   {
+    "url": "http://www.ekoby.org/cs1.html",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Martha Norbeck's ekoby.org case study of Tuggelite - an architect's technical case record"
+   },
+   {
+    "url": "https://www.youtube.com/watch?v=eDzrLIFudMs",
+    "source_class": "S7",
+    "platform_type": "YouTube",
+    "independence_group": "G6",
+    "confidence": "LOW",
+    "score": 0.34,
+    "evidence": "Video feature, 'Tuggelite - Sveriges forsta (moderna) ekoby'"
+   },
+   {
+    "url": "https://ecovillage.org/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.3,
+    "evidence": "Fixed network seed source"
+   }
+  ]
  }
 }
