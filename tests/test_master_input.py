@@ -17,10 +17,12 @@ read it to prove the master file preserved it.
 
 from __future__ import annotations
 
+import collections
 import csv
 import io
 import json
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -126,15 +128,74 @@ def test_every_original_coordinate_is_still_recoverable(rows, original):
     assert sum(int(r["coordinate_candidate_count"]) for r in rows) == EXPECTED_SOURCE_ROWS
 
 
-def test_the_primary_coordinate_is_the_first_source_row(rows, original):
+def test_the_exported_coordinate_is_never_lost(rows, original):
+    """Whatever the crawler is given, the export's own first coordinate survives.
+
+    The primary coordinate moves for the 31 rows where the export listed four
+    geocoder candidates and step6 established which one matches the community's
+    published address. Nothing may be discarded in the process: the coordinate
+    the export put first has to remain byte-for-byte recoverable, or the
+    original data has been silently rewritten.
+    """
     first_seen: dict[str, tuple[str, str]] = {}
     for record in original:
         first_seen.setdefault(record["Ecovillage_Name"],
                               (record["Latitude"], record["Longitude"]))
     for row in rows:
         lat, lon = first_seen[row["community_name_original"]]
-        assert row["latitude"] == f"{float(lat):.6f}"
-        assert row["longitude"] == f"{float(lon):.6f}"
+        assert row["latitude_as_exported"] == f"{float(lat):.6f}", row["community_id"]
+        assert row["longitude_as_exported"] == f"{float(lon):.6f}", row["community_id"]
+        # and it is still among the candidate list too
+        assert f"{float(lat):.6f},{float(lon):.6f}" in row["coordinate_candidates"]
+
+
+def test_a_single_coordinate_row_is_never_second_guessed(rows, original):
+    """Rows the export gave one coordinate for keep it, untouched."""
+    for row in (r for r in rows if r["coordinate_status"] == "SINGLE"):
+        assert row["latitude"] == row["latitude_as_exported"], row["community_id"]
+        assert row["longitude"] == row["longitude_as_exported"], row["community_id"]
+        assert row["coordinate_primary_rule"] == "single_source_row"
+
+
+def test_a_moved_coordinate_is_one_of_the_exported_candidates(rows):
+    """A resolved coordinate is a CHOICE among the four given, never a new point.
+
+    This is the guard against the resolution step quietly inventing a location:
+    the promoted latitude/longitude must appear verbatim in the candidate list
+    the export supplied.
+    """
+    moved = [r for r in rows if r["latitude"] != r["latitude_as_exported"]
+             or r["longitude"] != r["longitude_as_exported"]]
+    assert moved, "expected the resolution step to have moved some coordinates"
+    for row in moved:
+        assert row["coordinate_status"] == "MULTIPLE_CANDIDATES_RESOLVED", row["community_id"]
+        pair = f"{float(row['latitude']):.6f},{float(row['longitude']):.6f}"
+        assert pair in row["coordinate_candidates"].split(URL_DELIMITER), row["community_id"]
+
+
+def test_every_moved_coordinate_cites_the_address_that_justifies_it(rows):
+    """No coordinate may be reassigned on a hunch - each carries its evidence."""
+    for row in (r for r in rows
+                if r["coordinate_status"] == "MULTIPLE_CANDIDATES_RESOLVED"):
+        evidence = row["coordinate_evidence"]
+        assert "published locality:" in evidence, row["community_id"]
+        assert "http" in evidence, row["community_id"]
+        assert len(evidence) > 120, row["community_id"]
+        assert row["coordinate_confidence"] in {"HIGH", "MEDIUM"}, row["community_id"]
+        assert row["coordinate_primary_rule"].startswith(
+            "verified_against_published_address_candidate_"), row["community_id"]
+
+
+def test_an_unresolved_coordinate_is_still_flagged_and_still_the_exported_one(rows):
+    """Where the address could not separate the candidates, nothing was chosen."""
+    unresolved = [r for r in rows
+                  if r["coordinate_status"] == "MULTIPLE_CANDIDATES_UNRESOLVED"]
+    assert unresolved, "the honest outcome for some rows is no answer"
+    for row in unresolved:
+        assert row["latitude"] == row["latitude_as_exported"], row["community_id"]
+        assert row["longitude"] == row["longitude_as_exported"], row["community_id"]
+        assert row["coordinate_confidence"] == "LOW", row["community_id"]
+        assert "multiple_coordinate_candidates" in row["review_reasons"]
 
 
 def test_coordinates_parse_and_are_on_the_planet(rows):
@@ -183,8 +244,9 @@ def test_no_community_gen_url_was_invented(rows):
         url = row["gen_community_url"]
         if not url:
             continue
-        assert url.startswith("https://ecovillage.org/") or \
-               url.startswith("http://gen.ecovillage.org/"), url
+        host = urlsplit(url).hostname or ""
+        assert host == "ecovillage.org" or host.endswith(".ecovillage.org"), \
+            f"{row['community_id']}: not a GEN host: {url}"
         assert url.rstrip("/") != GEN_GLOBAL_URL
         assert len(row["gen_evidence_note"]) > 30, row["community_id"]
 
@@ -296,8 +358,13 @@ def test_ambiguous_rows_are_flagged_rather_than_quietly_resolved(rows):
             assert "multiple_coordinate_candidates" in reasons
         if row["discovery_status"] == "PENDING":
             assert "discovery_pending" in reasons
-    assert sum(1 for r in rows if r["coordinate_status"] ==
-               "MULTIPLE_CANDIDATES_UNRESOLVED") == 34
+    # The export shipped four geocoder candidates for 34 communities and chose
+    # none. 31 were settled against their own published addresses; the 3 whose
+    # sources name only a district or a region are left open on purpose.
+    statuses = collections.Counter(r["coordinate_status"] for r in rows)
+    assert statuses["MULTIPLE_CANDIDATES_RESOLVED"] == 31
+    assert statuses["MULTIPLE_CANDIDATES_UNRESOLVED"] == 3
+    assert statuses["SINGLE"] == 178
 
 
 def test_pending_rows_still_carry_the_mandatory_seed_and_nothing_invented(rows):

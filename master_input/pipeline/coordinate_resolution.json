@@ -1,0 +1,1532 @@
+{
+ "179": {
+  "community": "Habiba Community",
+  "published_locality": "Nuweiba, at the mouth of the Wadi Watir delta, South Sinai",
+  "locality_source": "https://habibacommunity.com/agriculture/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 29.010284,
+  "longitude": 34.670396,
+  "confidence": "HIGH",
+  "reasoning": "c4 sits on Nuweiba. c1 - the coordinate the export put first - is far to the south towards Dahab, which is the whole of the location conflict this row was flagged for during discovery.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 28.612207,
+    "longitude": 34.557279,
+    "nearest_city": "Sharm el-Sheikh",
+    "nearest_country": "EG",
+    "nearest_km": 80.6
+   },
+   {
+    "candidate": 2,
+    "latitude": 28.929031,
+    "longitude": 34.642872,
+    "nearest_city": "Ḩaql",
+    "nearest_country": "SA",
+    "nearest_km": 49.5
+   },
+   {
+    "candidate": 3,
+    "latitude": 28.509623,
+    "longitude": 34.514068,
+    "nearest_city": "Sharm el-Sheikh",
+    "nearest_country": "EG",
+    "nearest_km": 68.4
+   },
+   {
+    "candidate": 4,
+    "latitude": 29.010284,
+    "longitude": 34.670396,
+    "nearest_city": "Ḩaql",
+    "nearest_country": "SA",
+    "nearest_km": 40.8
+   }
+  ]
+ },
+ "180": {
+  "community": "Fruit Haven EcoVillage Ecuador",
+  "published_locality": "Chuchumbletza, near Gualaquiza, Morona Santiago",
+  "locality_source": "https://ecovillage.org/ecovillage/fruit-haven-ecovllage-ecuador/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": -3.527531,
+  "longitude": -78.52983,
+  "confidence": "MEDIUM",
+  "reasoning": "c3 is Gualaquiza town itself, the decoy slot. c4 lies south of it, which is where Chuchumbletza is. c1 is in Azuay province, which is what made this row look like a province conflict. Held at MEDIUM because the community spans seven separate properties and no single parcel address was published.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": -3.204382,
+    "longitude": -78.434897,
+    "nearest_city": "Gualaceo",
+    "nearest_country": "EC",
+    "nearest_km": 51.5
+   },
+   {
+    "candidate": 2,
+    "latitude": -3.727531,
+    "longitude": -78.52983,
+    "nearest_city": "Zamora",
+    "nearest_country": "EC",
+    "nearest_km": 59.9
+   },
+   {
+    "candidate": 3,
+    "latitude": -3.405627,
+    "longitude": -78.58245,
+    "nearest_city": "Gualaceo",
+    "nearest_country": "EC",
+    "nearest_km": 60.9
+   },
+   {
+    "candidate": 4,
+    "latitude": -3.527531,
+    "longitude": -78.52983,
+    "nearest_city": "Gualaceo",
+    "nearest_country": "EC",
+    "nearest_km": 75.7
+   }
+  ]
+ },
+ "181": {
+  "community": "Valle de Sensaciones",
+  "published_locality": "Yator, Cadiar, Las Alpujarras, Granada 18448",
+  "locality_source": "https://ecohomes.blog/2010/06/15/el-valle-de-sensaciones-yator-spain/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 36.95727,
+  "longitude": -3.136732,
+  "confidence": "HIGH",
+  "reasoning": "c4 falls on Yator in Granada province. c1 is in Almeria province, which is the province conflict recorded against this row.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 37.01,
+    "longitude": -2.739901,
+    "nearest_city": "Vícar",
+    "nearest_country": "ES",
+    "nearest_km": 21.6
+   },
+   {
+    "candidate": 2,
+    "latitude": 37.040521,
+    "longitude": -2.661636,
+    "nearest_city": "Vícar",
+    "nearest_country": "ES",
+    "nearest_km": 23.3
+   },
+   {
+    "candidate": 3,
+    "latitude": 37.146121,
+    "longitude": -3.567734,
+    "nearest_city": "Zubia",
+    "nearest_country": "ES",
+    "nearest_km": 3.3
+   },
+   {
+    "candidate": 4,
+    "latitude": 36.95727,
+    "longitude": -3.136732,
+    "nearest_city": "Berja",
+    "nearest_country": "ES",
+    "nearest_km": 20.7
+   }
+  ]
+ },
+ "182": {
+  "community": "Las Cañadas Bosque de Niebla",
+  "published_locality": "Huatusco de Chicuellar, Veracruz",
+  "locality_source": "https://bosquedeniebla.com.mx/quienes-somos/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 19.176892,
+  "longitude": -96.972307,
+  "confidence": "HIGH",
+  "reasoning": "c4 is on Huatusco; c1 is up towards Xico, which is why the gazetteer named a different town than the community's own address.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 19.381856,
+    "longitude": -97.078764,
+    "nearest_city": "Xico",
+    "nearest_country": "MX",
+    "nearest_km": 8.6
+   },
+   {
+    "candidate": 2,
+    "latitude": 19.473477,
+    "longitude": -96.998428,
+    "nearest_city": "Coatepec",
+    "nearest_country": "MX",
+    "nearest_km": 4.5
+   },
+   {
+    "candidate": 3,
+    "latitude": 19.423259,
+    "longitude": -97.013185,
+    "nearest_city": "Xico",
+    "nearest_country": "MX",
+    "nearest_km": 0.5
+   },
+   {
+    "candidate": 4,
+    "latitude": 19.176892,
+    "longitude": -96.972307,
+    "nearest_city": "Huatusco",
+    "nearest_country": "MX",
+    "nearest_km": 3.2
+   }
+  ]
+ },
+ "183": {
+  "community": "Valdepielagos",
+  "published_locality": "Valdepielagos, Comunidad de Madrid, about 50 km north of Madrid",
+  "locality_source": "https://ecoaldeas.org/valdepielagos/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 40.760722,
+  "longitude": -3.465693,
+  "confidence": "HIGH",
+  "reasoning": "c4 lands on the municipality of Valdepielagos in Madrid. c1 is well east in Guadalajara province - the province conflict on this row.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 40.867064,
+    "longitude": -3.057009,
+    "nearest_city": "Guadalajara",
+    "nearest_country": "ES",
+    "nearest_km": 27.9
+   },
+   {
+    "candidate": 2,
+    "latitude": 40.52927,
+    "longitude": -3.829909,
+    "nearest_city": "Las Rozas de Madrid",
+    "nearest_country": "ES",
+    "nearest_km": 5.5
+   },
+   {
+    "candidate": 3,
+    "latitude": 40.475278,
+    "longitude": -3.875856,
+    "nearest_city": "Majadahonda",
+    "nearest_country": "ES",
+    "nearest_km": 0.4
+   },
+   {
+    "candidate": 4,
+    "latitude": 40.760722,
+    "longitude": -3.465693,
+    "nearest_city": "Algete",
+    "nearest_country": "ES",
+    "nearest_km": 18.4
+   }
+  ]
+ },
+ "184": {
+  "community": "Earthship Greater World Community",
+  "published_locality": "the mesa north-west of Taos across the Rio Grande gorge, Taos County",
+  "locality_source": "https://greaterworldhoa.communitysite.com/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 36.494782,
+  "longitude": -105.752179,
+  "confidence": "HIGH",
+  "reasoning": "c4 is on the mesa north-west of Taos where the subdivision lies; c1 sits east of the gorge, on the wrong side of the canyon from the community.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 36.438188,
+    "longitude": -105.544605,
+    "nearest_city": "Santa Fe",
+    "nearest_country": "US",
+    "nearest_km": 90.7
+   },
+   {
+    "candidate": 2,
+    "latitude": 36.37896,
+    "longitude": -105.746606,
+    "nearest_city": "Santa Fe",
+    "nearest_country": "US",
+    "nearest_km": 78.8
+   },
+   {
+    "candidate": 3,
+    "latitude": 35.678588,
+    "longitude": -105.928746,
+    "nearest_city": "Santa Fe",
+    "nearest_country": "US",
+    "nearest_km": 1.2
+   },
+   {
+    "candidate": 4,
+    "latitude": 36.494782,
+    "longitude": -105.752179,
+    "nearest_city": "Santa Fe",
+    "nearest_country": "US",
+    "nearest_km": 91.4
+   }
+  ]
+ },
+ "185": {
+  "community": "Wind Spirit Community",
+  "published_locality": "Dripping Springs Valley, Pinal County, Arizona",
+  "locality_source": "https://windspiritcommunity.org/about/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 33.14686,
+  "longitude": -110.835378,
+  "confidence": "HIGH",
+  "reasoning": "c4 is in the Dripping Springs Valley; c3 is Tucson, the decoy slot.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 32.920233,
+    "longitude": -110.728282,
+    "nearest_city": "Florence",
+    "nearest_country": "US",
+    "nearest_km": 62.7
+   },
+   {
+    "candidate": 2,
+    "latitude": 33.119606,
+    "longitude": -110.705413,
+    "nearest_city": "Florence",
+    "nearest_country": "US",
+    "nearest_km": 64.3
+   },
+   {
+    "candidate": 3,
+    "latitude": 32.239667,
+    "longitude": -110.931139,
+    "nearest_city": "Tucson",
+    "nearest_country": "US",
+    "nearest_km": 2.0
+   },
+   {
+    "candidate": 4,
+    "latitude": 33.14686,
+    "longitude": -110.835378,
+    "nearest_city": "Florence",
+    "nearest_country": "US",
+    "nearest_km": 53.0
+   }
+  ]
+ },
+ "186": {
+  "community": "TerraSante Village",
+  "published_locality": "13535 W. Sacred Earth Pl., Tucson AZ 85735 - the Three Points area, about 25 miles south-west of Tucson",
+  "locality_source": "https://www.terrasante.org/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 32.111705,
+  "longitude": -111.254893,
+  "confidence": "HIGH",
+  "reasoning": "c4 is west of Tucson in the 85735 area. c1 is south-east of the city near Sahuarita - the location conflict recorded against this row.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 31.952695,
+    "longitude": -110.933283,
+    "nearest_city": "Sahuarita",
+    "nearest_country": "US",
+    "nearest_km": 2.2
+   },
+   {
+    "candidate": 2,
+    "latitude": 32.126271,
+    "longitude": -111.560682,
+    "nearest_city": "Marana",
+    "nearest_country": "US",
+    "nearest_km": 46.7
+   },
+   {
+    "candidate": 3,
+    "latitude": 32.170992,
+    "longitude": -110.972659,
+    "nearest_city": "Drexel Heights",
+    "nearest_country": "US",
+    "nearest_km": 6.2
+   },
+   {
+    "candidate": 4,
+    "latitude": 32.111705,
+    "longitude": -111.254893,
+    "nearest_city": "Drexel Heights",
+    "nearest_country": "US",
+    "nearest_km": 21.6
+   }
+  ]
+ },
+ "187": {
+  "community": "Catfarm",
+  "published_locality": "near Poussan, Herault",
+  "locality_source": "https://catfarm.net/about-us/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 43.498233,
+  "longitude": 3.657874,
+  "confidence": "HIGH",
+  "reasoning": "c4 sits on Poussan. c1 is far west towards Beziers, which is why the gazetteer named the wrong town for this row.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 43.518894,
+    "longitude": 3.142473,
+    "nearest_city": "Béziers",
+    "nearest_country": "FR",
+    "nearest_km": 20.6
+   },
+   {
+    "candidate": 2,
+    "latitude": 43.594831,
+    "longitude": 3.400745,
+    "nearest_city": "Sète",
+    "nearest_country": "FR",
+    "nearest_km": 31.8
+   },
+   {
+    "candidate": 3,
+    "latitude": 43.355072,
+    "longitude": 3.226497,
+    "nearest_city": "Béziers",
+    "nearest_country": "FR",
+    "nearest_km": 1.8
+   },
+   {
+    "candidate": 4,
+    "latitude": 43.498233,
+    "longitude": 3.657874,
+    "nearest_city": "Frontignan",
+    "nearest_country": "FR",
+    "nearest_km": 9.7
+   }
+  ]
+ },
+ "188": {
+  "community": "Grishino Ecovillage",
+  "published_locality": "Grishino, Vashinskoye, Podporozhsky District, Leningrad Oblast",
+  "locality_source": "https://www.wikidata.org/wiki/Q18406117",
+  "resolved": false,
+  "chosen_candidate": null,
+  "latitude": "",
+  "longitude": "",
+  "confidence": "LOW",
+  "reasoning": "UNRESOLVED. The decoy test cannot be applied here: there is no city above the gazetteer's size threshold anywhere near any of the four candidates, so no slot betrays itself as the nearest-city fallback. Two candidates sit in Podporozhsky District and two further north in Karelia, and the published record names the district but not a coordinate. Left for a coder with Russian settlement data rather than guessed at.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 61.425742,
+    "longitude": 34.439842,
+    "nearest_city": "Petrozavodsk",
+    "nearest_country": "RU",
+    "nearest_km": 40.2
+   },
+   {
+    "candidate": 2,
+    "latitude": 60.973294,
+    "longitude": 34.542661,
+    "nearest_city": "Podporozh’ye",
+    "nearest_country": "RU",
+    "nearest_km": 21.7
+   },
+   {
+    "candidate": 3,
+    "latitude": 60.920762,
+    "longitude": 34.140283,
+    "nearest_city": "Podporozh’ye",
+    "nearest_country": "RU",
+    "nearest_km": 1.7
+   },
+   {
+    "candidate": 4,
+    "latitude": 61.087028,
+    "longitude": 34.0813,
+    "nearest_city": "Podporozh’ye",
+    "nearest_country": "RU",
+    "nearest_km": 20.2
+   }
+  ]
+ },
+ "189": {
+  "community": "Hurdal Ecovillage",
+  "published_locality": "Hurdal municipality, Akershus, about 80 km north of Oslo",
+  "locality_source": "https://hurdallandsbyene.no/en/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 60.411096,
+  "longitude": 11.052614,
+  "confidence": "HIGH",
+  "reasoning": "c4 lands on Hurdal. c1 is away to the north-east towards Hamar in a neighbouring county - the conflict flagged on this row.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 60.740503,
+    "longitude": 11.36602,
+    "nearest_city": "Hamar",
+    "nearest_country": "NO",
+    "nearest_km": 17.3
+   },
+   {
+    "candidate": 2,
+    "latitude": 60.047314,
+    "longitude": 11.567405,
+    "nearest_city": "Lillestrøm",
+    "nearest_country": "NO",
+    "nearest_km": 30.5
+   },
+   {
+    "candidate": 3,
+    "latitude": 60.799045,
+    "longitude": 11.074949,
+    "nearest_city": "Hamar",
+    "nearest_country": "NO",
+    "nearest_km": 0.6
+   },
+   {
+    "candidate": 4,
+    "latitude": 60.411096,
+    "longitude": 11.052614,
+    "nearest_city": "Hamar",
+    "nearest_country": "NO",
+    "nearest_km": 42.6
+   }
+  ]
+ },
+ "190": {
+  "community": "Nackunga Community",
+  "published_locality": "the area around Jarna, south of Stockholm",
+  "locality_source": "https://ecovillage.org/ecovillage/nackunga-community/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 59.024944,
+  "longitude": 17.564475,
+  "confidence": "MEDIUM",
+  "reasoning": "c4 is the closest of the four to Jarna, which is the only locality GEN gives. MEDIUM because 'the area around Jarna' is not an address and cannot separate candidates at the kilometre scale.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 58.921292,
+    "longitude": 17.450216,
+    "nearest_city": "Nyköping",
+    "nearest_country": "SE",
+    "nearest_km": 31.6
+   },
+   {
+    "candidate": 2,
+    "latitude": 59.208488,
+    "longitude": 16.996666,
+    "nearest_city": "Eskilstuna",
+    "nearest_country": "SE",
+    "nearest_km": 32.9
+   },
+   {
+    "candidate": 3,
+    "latitude": 59.18988,
+    "longitude": 17.813966,
+    "nearest_city": "Tumba",
+    "nearest_country": "SE",
+    "nearest_km": 1.5
+   },
+   {
+    "candidate": 4,
+    "latitude": 59.024944,
+    "longitude": 17.564475,
+    "nearest_city": "Södertälje",
+    "nearest_country": "SE",
+    "nearest_km": 19.3
+   }
+  ]
+ },
+ "191": {
+  "community": "Tuggelite Ecovillage",
+  "published_locality": "Skare, about 10 km north of Karlstad",
+  "locality_source": "https://hbvarmland.se/brf-tuggelite/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 59.422998,
+  "longitude": 13.438836,
+  "confidence": "HIGH",
+  "reasoning": "c4 sits on Skare, north-west of Karlstad, exactly as the published address describes. c3 is Karlstad city, the decoy slot.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 59.38474,
+    "longitude": 13.047757,
+    "nearest_city": "Karlstad",
+    "nearest_country": "SE",
+    "nearest_km": 25.8
+   },
+   {
+    "candidate": 2,
+    "latitude": 59.377628,
+    "longitude": 13.369102,
+    "nearest_city": "Karlstad",
+    "nearest_country": "SE",
+    "nearest_km": 7.6
+   },
+   {
+    "candidate": 3,
+    "latitude": 59.391109,
+    "longitude": 13.524578,
+    "nearest_city": "Karlstad",
+    "nearest_country": "SE",
+    "nearest_km": 1.8
+   },
+   {
+    "candidate": 4,
+    "latitude": 59.422998,
+    "longitude": 13.438836,
+    "nearest_city": "Karlstad",
+    "nearest_country": "SE",
+    "nearest_km": 6.1
+   }
+  ]
+ },
+ "192": {
+  "community": "Ecotopia Romania — Stanciova",
+  "published_locality": "Stanciova, Recas commune, Timis County",
+  "locality_source": "https://ecobasa.org/en/communities/stanciova-an-open-community/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 45.862744,
+  "longitude": 21.575335,
+  "confidence": "HIGH",
+  "reasoning": "c4 falls on Stanciova between Timisoara and Lugoj; c3 is Timisoara itself, the decoy slot.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 45.894688,
+    "longitude": 21.880667,
+    "nearest_city": "Lugoj",
+    "nearest_country": "RO",
+    "nearest_km": 23.0
+   },
+   {
+    "candidate": 2,
+    "latitude": 45.796329,
+    "longitude": 22.01053,
+    "nearest_city": "Lugoj",
+    "nearest_country": "RO",
+    "nearest_km": 14.6
+   },
+   {
+    "candidate": 3,
+    "latitude": 45.801507,
+    "longitude": 21.246586,
+    "nearest_city": "Timişoara",
+    "nearest_country": "RO",
+    "nearest_km": 5.6
+   },
+   {
+    "candidate": 4,
+    "latitude": 45.862744,
+    "longitude": 21.575335,
+    "nearest_city": "Timişoara",
+    "nearest_country": "RO",
+    "nearest_km": 29.7
+   }
+  ]
+ },
+ "193": {
+  "community": "Schloss Tempelhof",
+  "published_locality": "Kressberg 74594, Schwabisch Hall district, Baden-Wurttemberg",
+  "locality_source": "https://de.wikipedia.org/wiki/Tempelhof_(Gemeinschaft)",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 49.126124,
+  "longitude": 10.206793,
+  "confidence": "HIGH",
+  "reasoning": "c4 is the only candidate in the Schwabisch Hall district, near Crailsheim, where Kressberg is. The other three are all in the Ansbach area in Bavaria, a different state; c3 is Ansbach itself, the decoy slot.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 49.1941,
+    "longitude": 10.369826,
+    "nearest_city": "Ansbach",
+    "nearest_country": "DE",
+    "nearest_km": 20.4
+   },
+   {
+    "candidate": 2,
+    "latitude": 49.175155,
+    "longitude": 10.561528,
+    "nearest_city": "Ansbach",
+    "nearest_country": "DE",
+    "nearest_km": 14.6
+   },
+   {
+    "candidate": 3,
+    "latitude": 49.304795,
+    "longitude": 10.58656,
+    "nearest_city": "Ansbach",
+    "nearest_country": "DE",
+    "nearest_km": 0.5
+   },
+   {
+    "candidate": 4,
+    "latitude": 49.126124,
+    "longitude": 10.206793,
+    "nearest_city": "Crailsheim",
+    "nearest_country": "DE",
+    "nearest_km": 9.9
+   }
+  ]
+ },
+ "194": {
+  "community": "Possibility Alliance",
+  "published_locality": "La Plata, Macon County, Missouri",
+  "locality_source": "https://www.motherearthnews.com/sustainable-living/nature-and-environment/possibility-alliance-ze0z11zmar/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 40.074724,
+  "longitude": -92.458811,
+  "confidence": "HIGH",
+  "reasoning": "c4 is a few kilometres from La Plata; c3 is Kirksville, the decoy slot, and the nearest place of any size.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 40.147564,
+    "longitude": -92.378033,
+    "nearest_city": "Kirksville",
+    "nearest_country": "US",
+    "nearest_km": 18.2
+   },
+   {
+    "candidate": 2,
+    "latitude": 40.377446,
+    "longitude": -92.346357,
+    "nearest_city": "Kirksville",
+    "nearest_country": "US",
+    "nearest_km": 28.6
+   },
+   {
+    "candidate": 3,
+    "latitude": 40.194983,
+    "longitude": -92.576291,
+    "nearest_city": "Kirksville",
+    "nearest_country": "US",
+    "nearest_km": 0.6
+   },
+   {
+    "candidate": 4,
+    "latitude": 40.074724,
+    "longitude": -92.458811,
+    "nearest_city": "Kirksville",
+    "nearest_country": "US",
+    "nearest_km": 17.0
+   }
+  ]
+ },
+ "195": {
+  "community": "Rodnoe (Rodnoye) Settlement",
+  "published_locality": "Vladimir Oblast - no finer locality was published",
+  "locality_source": "https://vmegre.com/en/kin-domain/vladimir-oblast-region-rodnoe/",
+  "resolved": false,
+  "chosen_candidate": null,
+  "latitude": "",
+  "longitude": "",
+  "confidence": "LOW",
+  "reasoning": "UNRESOLVED. c3 is Vladimir city and is clearly the decoy slot, which rules one candidate out but does not choose among the other three. The sources name only the oblast, and a settlement spread over roughly a hundred one-hectare plots has no single point anyway. Left unresolved.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 56.140901,
+    "longitude": 40.87087,
+    "nearest_city": "Vladimir",
+    "nearest_country": "RU",
+    "nearest_km": 29.2
+   },
+   {
+    "candidate": 2,
+    "latitude": 56.151222,
+    "longitude": 40.766331,
+    "nearest_city": "Vladimir",
+    "nearest_country": "RU",
+    "nearest_km": 22.8
+   },
+   {
+    "candidate": 3,
+    "latitude": 56.111858,
+    "longitude": 40.363651,
+    "nearest_city": "Vladimir",
+    "nearest_country": "RU",
+    "nearest_km": 3.7
+   },
+   {
+    "candidate": 4,
+    "latitude": 55.915364,
+    "longitude": 40.553046,
+    "nearest_city": "Raduzhnyy",
+    "nearest_country": "RU",
+    "nearest_km": 16.6
+   }
+  ]
+ },
+ "196": {
+  "community": "Cloughjordan Ecovillage",
+  "published_locality": "the townland of Oxpark adjoining Cloughjordan village, County Tipperary",
+  "locality_source": "https://www.thevillage.ie/about-us/our-story/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 52.946515,
+  "longitude": -8.036953,
+  "confidence": "HIGH",
+  "reasoning": "c4 sits on Cloughjordan. c3 is Limerick, the decoy slot; c1 and c2 are away east in the midlands.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 52.984386,
+    "longitude": -7.924957,
+    "nearest_city": "Portlaoise",
+    "nearest_country": "IE",
+    "nearest_km": 42.2
+   },
+   {
+    "candidate": 2,
+    "latitude": 53.124284,
+    "longitude": -7.525888,
+    "nearest_city": "Tullamore",
+    "nearest_country": "IE",
+    "nearest_km": 16.8
+   },
+   {
+    "candidate": 3,
+    "latitude": 52.666186,
+    "longitude": -8.570831,
+    "nearest_city": "Limerick",
+    "nearest_country": "IE",
+    "nearest_km": 3.5
+   },
+   {
+    "candidate": 4,
+    "latitude": 52.946515,
+    "longitude": -8.036953,
+    "nearest_city": "Portlaoise",
+    "nearest_country": "IE",
+    "nearest_km": 50.3
+   }
+  ]
+ },
+ "197": {
+  "community": "O.U.R Ecovillage",
+  "published_locality": "1565 Baldy Mountain Rd, Shawnigan Lake, British Columbia V8H 2A9",
+  "locality_source": "https://ourecovillage.org/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 48.640102,
+  "longitude": -123.610282,
+  "confidence": "HIGH",
+  "reasoning": "c4 is on the Shawnigan Lake side, south of Duncan, matching the street address. c3 is Victoria city centre, the decoy slot.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 48.69161,
+    "longitude": -123.603499,
+    "nearest_city": "Duncan",
+    "nearest_country": "CA",
+    "nearest_km": 12.5
+   },
+   {
+    "candidate": 2,
+    "latitude": 48.480165,
+    "longitude": -123.459587,
+    "nearest_city": "Langford",
+    "nearest_country": "CA",
+    "nearest_km": 4.6
+   },
+   {
+    "candidate": 3,
+    "latitude": 48.424469,
+    "longitude": -123.341908,
+    "nearest_city": "Victoria",
+    "nearest_country": "CA",
+    "nearest_km": 1.5
+   },
+   {
+    "candidate": 4,
+    "latitude": 48.640102,
+    "longitude": -123.610282,
+    "nearest_city": "Central Saanich",
+    "nearest_country": "CA",
+    "nearest_km": 16.3
+   }
+  ]
+ },
+ "198": {
+  "community": "Lammas Ecovillage (Tir-y-Gafel)",
+  "published_locality": "Glandwr, near Crymych, Pembrokeshire",
+  "locality_source": "https://lammas.org.uk/en/ecovillage/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 51.934066,
+  "longitude": -4.623775,
+  "confidence": "HIGH",
+  "reasoning": "c4 lands on the Glandwr and Crymych area. c3 is Llanelli, the decoy slot, and is in a different county.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 51.894809,
+    "longitude": -4.906431,
+    "nearest_city": "Carmarthen",
+    "nearest_country": "GB",
+    "nearest_km": 41.5
+   },
+   {
+    "candidate": 2,
+    "latitude": 51.966315,
+    "longitude": -4.73314,
+    "nearest_city": "Carmarthen",
+    "nearest_country": "GB",
+    "nearest_km": 31.8
+   },
+   {
+    "candidate": 3,
+    "latitude": 51.682322,
+    "longitude": -4.121079,
+    "nearest_city": "Llanelli",
+    "nearest_country": "GB",
+    "nearest_km": 2.8
+   },
+   {
+    "candidate": 4,
+    "latitude": 51.934066,
+    "longitude": -4.623775,
+    "nearest_city": "Carmarthen",
+    "nearest_country": "GB",
+    "nearest_km": 23.5
+   }
+  ]
+ },
+ "199": {
+  "community": "Friland",
+  "published_locality": "Feldballe, Djursland, Syddjurs Municipality",
+  "locality_source": "https://da.wikipedia.org/wiki/Friland",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 56.280995,
+  "longitude": 10.58589,
+  "confidence": "HIGH",
+  "reasoning": "c4 is on Djursland at Feldballe; c3 is Randers, the decoy slot, and is not on Djursland at all.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 56.400436,
+    "longitude": 10.712567,
+    "nearest_city": "Århus",
+    "nearest_country": "DK",
+    "nearest_km": 41.2
+   },
+   {
+    "candidate": 2,
+    "latitude": 56.286562,
+    "longitude": 10.464254,
+    "nearest_city": "Århus",
+    "nearest_country": "DK",
+    "nearest_km": 21.3
+   },
+   {
+    "candidate": 3,
+    "latitude": 56.482237,
+    "longitude": 10.014967,
+    "nearest_city": "Randers",
+    "nearest_country": "DK",
+    "nearest_km": 2.7
+   },
+   {
+    "candidate": 4,
+    "latitude": 56.280995,
+    "longitude": 10.58589,
+    "nearest_city": "Århus",
+    "nearest_country": "DK",
+    "nearest_km": 27.0
+   }
+  ]
+ },
+ "200": {
+  "community": "Sadhana Forest Haiti",
+  "published_locality": "Anse-a-Pitres, Sud-Est Department, on the Dominican border",
+  "locality_source": "https://sadhanaforest.org/haiti/causes-haiti/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 18.04636,
+  "longitude": -71.762129,
+  "confidence": "HIGH",
+  "reasoning": "c4 sits on Anse-a-Pitres in the far south-east. c1 is near Thomazeau outside Port-au-Prince, roughly ninety kilometres away and in the wrong department, and c3 is Port-au-Prince itself, the decoy slot. Note that the planting this community does is dispersed across the whole municipality, so even the correct point represents only its base.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 18.572554,
+    "longitude": -72.072359,
+    "nearest_city": "Thomazeau",
+    "nearest_country": "HT",
+    "nearest_km": 9.2
+   },
+   {
+    "candidate": 2,
+    "latitude": 18.077235,
+    "longitude": -71.805601,
+    "nearest_city": "Grand Gosier",
+    "nearest_country": "HT",
+    "nearest_km": 16.9
+   },
+   {
+    "candidate": 3,
+    "latitude": 18.558181,
+    "longitude": -72.309515,
+    "nearest_city": "Delmas",
+    "nearest_country": "HT",
+    "nearest_km": 1.8
+   },
+   {
+    "candidate": 4,
+    "latitude": 18.04636,
+    "longitude": -71.762129,
+    "nearest_city": "Grand Gosier",
+    "nearest_country": "HT",
+    "nearest_km": 22.6
+   }
+  ]
+ },
+ "201": {
+  "community": "Hockerton Housing Project",
+  "published_locality": "Hockerton, Newark and Sherwood district, Nottinghamshire",
+  "locality_source": "https://www.hockertonhousingproject.org.uk/about-us/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 53.097341,
+  "longitude": -0.929501,
+  "confidence": "HIGH",
+  "reasoning": "c4 is the only candidate in the Newark and Sherwood district, a short distance from Newark on Trent, which is where Hockerton is. c3 is Nottingham, the decoy slot.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 53.277152,
+    "longitude": -0.79406,
+    "nearest_city": "Retford",
+    "nearest_country": "GB",
+    "nearest_km": 11.1
+   },
+   {
+    "candidate": 2,
+    "latitude": 53.268968,
+    "longitude": -1.589749,
+    "nearest_city": "Dronfield",
+    "nearest_country": "GB",
+    "nearest_km": 8.5
+   },
+   {
+    "candidate": 3,
+    "latitude": 52.979165,
+    "longitude": -1.115959,
+    "nearest_city": "Arnold",
+    "nearest_country": "GB",
+    "nearest_km": 2.6
+   },
+   {
+    "candidate": 4,
+    "latitude": 53.097341,
+    "longitude": -0.929501,
+    "nearest_city": "Newark on Trent",
+    "nearest_country": "GB",
+    "nearest_km": 8.3
+   }
+  ]
+ },
+ "202": {
+  "community": "Den Selvforsynende Landsby (Self-Sufficient Village)",
+  "published_locality": "Hundstrup, 5762 Vester Skerninge, Svendborg Municipality, South Funen",
+  "locality_source": "http://www.selvforsyning.dk/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 55.09841,
+  "longitude": 10.426727,
+  "confidence": "HIGH",
+  "reasoning": "c4 is in Svendborg Municipality on southern Funen, nearest to the Vester Skerninge area. c3 is Odense, the decoy slot, and is in the north of the island.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 55.538228,
+    "longitude": 10.34717,
+    "nearest_city": "Odense",
+    "nearest_country": "DK",
+    "nearest_km": 16.0
+   },
+   {
+    "candidate": 2,
+    "latitude": 55.215178,
+    "longitude": 10.544956,
+    "nearest_city": "Svendborg",
+    "nearest_country": "DK",
+    "nearest_km": 17.7
+   },
+   {
+    "candidate": 3,
+    "latitude": 55.412464,
+    "longitude": 10.333695,
+    "nearest_city": "Odense",
+    "nearest_country": "DK",
+    "nearest_km": 3.9
+   },
+   {
+    "candidate": 4,
+    "latitude": 55.09841,
+    "longitude": 10.426727,
+    "nearest_city": "Svendborg",
+    "nearest_country": "DK",
+    "nearest_km": 12.2
+   }
+  ]
+ },
+ "203": {
+  "community": "Cité Écologique (New Hampshire)",
+  "published_locality": "Colebrook, Coos County, New Hampshire 03576",
+  "locality_source": "https://ecovillage.org/project/cite-ecologique-of-new-hampshire/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 44.935101,
+  "longitude": -71.47749,
+  "confidence": "HIGH",
+  "reasoning": "c4 falls on Colebrook, New Hampshire. This pick also settles the country: c1, the exported first coordinate, lies west of Colebrook and is what drove the gazetteer's vote for Canada on a community that is in the United States.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 44.810547,
+    "longitude": -71.884611,
+    "nearest_city": "Magog",
+    "nearest_country": "CA",
+    "nearest_km": 54.8
+   },
+   {
+    "candidate": 2,
+    "latitude": 45.058241,
+    "longitude": -71.279361,
+    "nearest_city": "Sherbrooke",
+    "nearest_country": "CA",
+    "nearest_km": 61.6
+   },
+   {
+    "candidate": 3,
+    "latitude": 44.469187,
+    "longitude": -71.190214,
+    "nearest_city": "Auburn",
+    "nearest_country": "US",
+    "nearest_km": 86.8
+   },
+   {
+    "candidate": 4,
+    "latitude": 44.935101,
+    "longitude": -71.47749,
+    "nearest_city": "Sherbrooke",
+    "nearest_country": "CA",
+    "nearest_km": 61.4
+   }
+  ]
+ },
+ "204": {
+  "community": "Brithdir Mawr",
+  "published_locality": "near Newport (Trefdraeth), Pembrokeshire",
+  "locality_source": "https://brithdirmawr.co.uk/about/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 52.000928,
+  "longitude": -4.806572,
+  "confidence": "HIGH",
+  "reasoning": "c4 is nearest the Newport/Trefdraeth coast of north Pembrokeshire where the farm lies; c3 is well south, in the wrong part of the county.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 51.946032,
+    "longitude": -5.087031,
+    "nearest_city": "Carmarthen",
+    "nearest_country": "GB",
+    "nearest_km": 54.6
+   },
+   {
+    "candidate": 2,
+    "latitude": 51.95904,
+    "longitude": -4.71309,
+    "nearest_city": "Carmarthen",
+    "nearest_country": "GB",
+    "nearest_km": 30.2
+   },
+   {
+    "candidate": 3,
+    "latitude": 51.715371,
+    "longitude": -5.030036,
+    "nearest_city": "Carmarthen",
+    "nearest_country": "GB",
+    "nearest_km": 52.2
+   },
+   {
+    "candidate": 4,
+    "latitude": 52.000928,
+    "longitude": -4.806572,
+    "nearest_city": "Carmarthen",
+    "nearest_country": "GB",
+    "nearest_km": 38.0
+   }
+  ]
+ },
+ "205": {
+  "community": "Permatopia",
+  "published_locality": "Karise, Faxe Municipality, Region Zealand",
+  "locality_source": "https://permatopia.dk/english/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 55.301696,
+  "longitude": 12.19072,
+  "confidence": "HIGH",
+  "reasoning": "c4 is south of Koge in the Karise and Faxe area. c3 is central Copenhagen, the decoy slot; c1 is at Ringsted, a different municipality.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 55.40829,
+    "longitude": 11.88774,
+    "nearest_city": "Ringsted",
+    "nearest_country": "DK",
+    "nearest_km": 7.2
+   },
+   {
+    "candidate": 2,
+    "latitude": 55.401684,
+    "longitude": 11.523963,
+    "nearest_city": "Slagelse",
+    "nearest_country": "DK",
+    "nearest_km": 10.7
+   },
+   {
+    "candidate": 3,
+    "latitude": 55.621772,
+    "longitude": 12.613619,
+    "nearest_city": "Indre By",
+    "nearest_country": "DK",
+    "nearest_km": 6.7
+   },
+   {
+    "candidate": 4,
+    "latitude": 55.301696,
+    "longitude": 12.19072,
+    "nearest_city": "Køge",
+    "nearest_country": "DK",
+    "nearest_km": 17.4
+   }
+  ]
+ },
+ "206": {
+  "community": "Sadhana Forest Kenya",
+  "published_locality": "Samburu County, the Maralal area - no finer locality was published",
+  "locality_source": "https://sadhanaforest.org/kenya/",
+  "resolved": false,
+  "chosen_candidate": null,
+  "latitude": "",
+  "longitude": "",
+  "confidence": "LOW",
+  "reasoning": "UNRESOLVED. c3 is Maralal town and is plainly the decoy slot, but the other three all sit 18 to 28 km out and the sources say only 'the Maralal area'. The point matters less here than almost anywhere in the cohort: the planting is done in family shambas scattered across the county, not on one parcel, so no single coordinate represents the work. Left unresolved deliberately.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 0.949224,
+    "longitude": 36.765913,
+    "nearest_city": "Maralal",
+    "nearest_country": "KE",
+    "nearest_km": 18.0
+   },
+   {
+    "candidate": 2,
+    "latitude": 0.893126,
+    "longitude": 36.75667,
+    "nearest_city": "Maralal",
+    "nearest_country": "KE",
+    "nearest_km": 23.6
+   },
+   {
+    "candidate": 3,
+    "latitude": 1.094932,
+    "longitude": 36.701045,
+    "nearest_city": "Maralal",
+    "nearest_country": "KE",
+    "nearest_km": 0.4
+   },
+   {
+    "candidate": 4,
+    "latitude": 0.867336,
+    "longitude": 36.806313,
+    "nearest_city": "Maralal",
+    "nearest_country": "KE",
+    "nearest_km": 28.2
+   }
+  ]
+ },
+ "207": {
+  "community": "Ecodorp Bergen",
+  "published_locality": "the former MOB-complex at Bergen, Noord-Holland",
+  "locality_source": "http://www.transitsocialinnovation.eu/sii/ecovillage-bergen",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": 52.651081,
+  "longitude": 4.693376,
+  "confidence": "HIGH",
+  "reasoning": "c4 is the only candidate at Bergen itself - about two kilometres from the town centre. c1 is inland near Purmerend, c2 is up at Den Helder and c3 is Castricum, all different towns.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": 52.544906,
+    "longitude": 4.980055,
+    "nearest_city": "Purmerend",
+    "nearest_country": "NL",
+    "nearest_km": 4.6
+   },
+   {
+    "candidate": 2,
+    "latitude": 53.047725,
+    "longitude": 4.728479,
+    "nearest_city": "Den Helder",
+    "nearest_country": "NL",
+    "nearest_km": 10.0
+   },
+   {
+    "candidate": 3,
+    "latitude": 52.551485,
+    "longitude": 4.672805,
+    "nearest_city": "Castricum",
+    "nearest_country": "NL",
+    "nearest_km": 0.4
+   },
+   {
+    "candidate": 4,
+    "latitude": 52.651081,
+    "longitude": 4.693376,
+    "nearest_city": "Bergen",
+    "nearest_country": "NL",
+    "nearest_km": 2.1
+   }
+  ]
+ },
+ "208": {
+  "community": "Eco Truly Park",
+  "published_locality": "Chacra y Mar beach, Aucallama district, Huaral province",
+  "locality_source": "https://ecovillage.org/ecovillage/eco-truly-park-eco-village/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": -11.636889,
+  "longitude": -77.217187,
+  "confidence": "MEDIUM",
+  "reasoning": "c4 lies on the coast south of Chancay, where Chacra y Mar is. c2 is close enough that it cannot be excluded outright - it sits on Chancay itself - so this is held at MEDIUM rather than HIGH.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": -11.469052,
+    "longitude": -77.27115,
+    "nearest_city": "Huaral",
+    "nearest_country": "PE",
+    "nearest_km": 7.5
+   },
+   {
+    "candidate": 2,
+    "latitude": -11.574941,
+    "longitude": -77.253582,
+    "nearest_city": "Chancay",
+    "nearest_country": "PE",
+    "nearest_km": 1.5
+   },
+   {
+    "candidate": 3,
+    "latitude": -11.995433,
+    "longitude": -77.09311,
+    "nearest_city": "Carmen De La Legua Reynoso",
+    "nearest_country": "PE",
+    "nearest_km": 6.5
+   },
+   {
+    "candidate": 4,
+    "latitude": -11.636889,
+    "longitude": -77.217187,
+    "nearest_city": "Chancay",
+    "nearest_country": "PE",
+    "nearest_km": 9.1
+   }
+  ]
+ },
+ "209": {
+  "community": "Khula Dhamma Community",
+  "published_locality": "near Haga-Haga, on the Quko River, about 8 km from the sea, Eastern Cape",
+  "locality_source": "https://ecovillage.org/ecovillage/khula-dhamma-community/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": -32.697527,
+  "longitude": 28.19499,
+  "confidence": "MEDIUM",
+  "reasoning": "c4 is the closest of the four to Haga-Haga and is consistent with an inland position on the Quko River about eight kilometres from the coast. c1 is only slightly further off, so the margin is thin; MEDIUM. c3 is Butterworth, the decoy slot.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": -32.728124,
+    "longitude": 28.123413,
+    "nearest_city": "Gonubie",
+    "nearest_country": "ZA",
+    "nearest_km": 26.1
+   },
+   {
+    "candidate": 2,
+    "latitude": -32.632669,
+    "longitude": 28.25969,
+    "nearest_city": "Butterworth",
+    "nearest_country": "ZA",
+    "nearest_km": 35.1
+   },
+   {
+    "candidate": 3,
+    "latitude": -32.329583,
+    "longitude": 28.14549,
+    "nearest_city": "Butterworth",
+    "nearest_country": "ZA",
+    "nearest_km": 0.4
+   },
+   {
+    "candidate": 4,
+    "latitude": -32.697527,
+    "longitude": 28.19499,
+    "nearest_city": "Gonubie",
+    "nearest_country": "ZA",
+    "nearest_km": 32.2
+   }
+  ]
+ },
+ "210": {
+  "community": "Umphakatsi Peace Ecovillage",
+  "published_locality": "Steynsdorp No 2, next to Elukwatini, Mpumalanga",
+  "locality_source": "https://ecovillage.org/ecovillage/umphakatsi-peace-ecovillage/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": -26.132179,
+  "longitude": 30.97823,
+  "confidence": "HIGH",
+  "reasoning": "Read carelessly this row looks like a case for c2 or c3, because those are nearest to Elukwatini (the gazetteer's Lukwatini). But the published address is Steynsdorp, which lies south-east of Elukwatini, not in it - and c3 is sitting on Nhlazatje, the decoy slot. c4 is the candidate in the right relation to Elukwatini for Steynsdorp.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": -26.032377,
+    "longitude": 31.049217,
+    "nearest_city": "Lukwatini",
+    "nearest_country": "ZA",
+    "nearest_km": 22.7
+   },
+   {
+    "candidate": 2,
+    "latitude": -26.046766,
+    "longitude": 30.914098,
+    "nearest_city": "Lukwatini",
+    "nearest_country": "ZA",
+    "nearest_km": 9.2
+   },
+   {
+    "candidate": 3,
+    "latitude": -26.053587,
+    "longitude": 30.777157,
+    "nearest_city": "Nhlazatje",
+    "nearest_country": "ZA",
+    "nearest_km": 2.1
+   },
+   {
+    "candidate": 4,
+    "latitude": -26.132179,
+    "longitude": 30.97823,
+    "nearest_city": "Lukwatini",
+    "nearest_country": "ZA",
+    "nearest_km": 17.7
+   }
+  ]
+ },
+ "211": {
+  "community": "Green Canvas of Light",
+  "published_locality": "the Wilderness Lakes area of the Garden Route, Western Cape",
+  "locality_source": "https://ecovillage.org/project/green-canvas-light/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": -33.982512,
+  "longitude": 22.673458,
+  "confidence": "MEDIUM",
+  "reasoning": "c4 is east of Wilderness among the lakes, which is what GEN describes. c3 is George, the decoy slot, and c1 is at Groot-Brakrivier, west of Wilderness - the mismatch recorded against this row. MEDIUM because GEN names a stretch of coast rather than a farm.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": -34.034836,
+    "longitude": 22.236375,
+    "nearest_city": "Groot-Brakrivier",
+    "nearest_country": "ZA",
+    "nearest_km": 1.4
+   },
+   {
+    "candidate": 2,
+    "latitude": -34.056145,
+    "longitude": 22.92538,
+    "nearest_city": "Knysna",
+    "nearest_country": "ZA",
+    "nearest_km": 11.4
+   },
+   {
+    "candidate": 3,
+    "latitude": -33.954635,
+    "longitude": 22.482511,
+    "nearest_city": "George",
+    "nearest_country": "ZA",
+    "nearest_km": 2.1
+   },
+   {
+    "candidate": 4,
+    "latitude": -33.982512,
+    "longitude": 22.673458,
+    "nearest_city": "George",
+    "nearest_country": "ZA",
+    "nearest_km": 19.6
+   }
+  ]
+ },
+ "212": {
+  "community": "Agatha Amani House",
+  "published_locality": "the Naivasha and Mai Mahiu area, Nakuru County",
+  "locality_source": "https://www.agathaamanihouse.org/",
+  "resolved": true,
+  "chosen_candidate": 4,
+  "latitude": -0.735154,
+  "longitude": 36.473129,
+  "confidence": "HIGH",
+  "reasoning": "c4 is about five kilometres from Naivasha, the closest of the four to the published area. c3 is over by Limuru, a different county. Note the safeguarding flag on this row: it is a refuge for survivors of domestic violence, and a more precise coordinate is not something to publish.",
+  "candidate_evidence": [
+   {
+    "candidate": 1,
+    "latitude": -0.787038,
+    "longitude": 36.506111,
+    "nearest_city": "Naivasha",
+    "nearest_country": "KE",
+    "nearest_km": 11.5
+   },
+   {
+    "candidate": 2,
+    "latitude": -0.403916,
+    "longitude": 36.268338,
+    "nearest_city": "Gilgil",
+    "nearest_country": "KE",
+    "nearest_km": 12.4
+   },
+   {
+    "candidate": 3,
+    "latitude": -1.087974,
+    "longitude": 36.630078,
+    "nearest_city": "Limuru",
+    "nearest_country": "KE",
+    "nearest_km": 3.1
+   },
+   {
+    "candidate": 4,
+    "latitude": -0.735154,
+    "longitude": 36.473129,
+    "nearest_city": "Naivasha",
+    "nearest_country": "KE",
+    "nearest_km": 5.1
+   }
+  ]
+ }
+}

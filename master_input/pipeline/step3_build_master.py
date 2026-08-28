@@ -51,7 +51,8 @@ COLUMNS = [
     # --- coordinates, with every candidate the source gave
     "source_rows", "coordinate_primary_rule", "coordinate_candidate_count",
     "coordinate_candidate_spread_km", "coordinate_candidates",
-    "coordinate_status",
+    "coordinate_status", "latitude_as_exported", "longitude_as_exported",
+    "coordinate_confidence", "coordinate_evidence",
     # --- country, and how it was established
     "country_iso2", "country_iso3", "admin_region", "country_confidence",
     "country_verification_method", "country_verification_source",
@@ -123,9 +124,22 @@ def ranked_urls(sources: list[dict]) -> list[str]:
     return out
 
 
-def build_row(community: dict, discovery: dict | None) -> dict[str, str]:
+RESOLUTION = Path("master_input/pipeline/coordinate_resolution.json")
+
+
+def load_resolutions() -> dict[str, dict]:
+    """Per-community verdicts from step6, keyed by seq. Empty if step6 never ran."""
+    if RESOLUTION.exists():
+        return json.loads(RESOLUTION.read_text(encoding="utf-8"))
+    return {}
+
+
+def build_row(community: dict, discovery: dict | None,
+              resolution: dict | None = None) -> dict[str, str]:
     points = community["coordinate_candidates"]
-    primary = points[0]
+    exported = points[0]
+    primary = points[resolution["chosen_candidate"] - 1] if (
+        resolution and resolution["resolved"]) else exported
     gaz = primary["geocode"]
     reviews: list[str] = []
     notes: list[str] = []
@@ -139,15 +153,43 @@ def build_row(community: dict, discovery: dict | None) -> dict[str, str]:
     # ---- coordinates ----------------------------------------------------
     candidates = URL_DELIMITER.join(
         f"{p['latitude']:.6f},{p['longitude']:.6f}" for p in points)
-    if len(points) > 1:
+    coordinate_rule = "single_source_row"
+    coordinate_confidence = "HIGH"
+    coordinate_evidence = ""
+    if len(points) == 1:
+        coordinate_status = "SINGLE"
+    elif resolution and resolution["resolved"]:
+        # The export listed four geocoder candidates and chose none. step6
+        # checked each against this community's own published address; the
+        # winner is promoted to latitude/longitude for the crawler and the
+        # export's original first row is kept in its own columns.
+        coordinate_status = "MULTIPLE_CANDIDATES_RESOLVED"
+        coordinate_rule = f"verified_against_published_address_candidate_{resolution['chosen_candidate']}"
+        coordinate_confidence = resolution["confidence"]
+        coordinate_evidence = (
+            f"published locality: {resolution['published_locality']} "
+            f"[{resolution['locality_source']}]. {resolution['reasoning']}")
+        if coordinate_confidence != "HIGH":
+            reviews.append("coordinate_resolved_below_high")
+        notes.append(
+            f"the export gave {len(points)} geocoder candidates and picked none; "
+            f"candidate {resolution['chosen_candidate']} is the one that matches this "
+            "community's published address, and is what latitude/longitude now carry - "
+            "the export's original first candidate is kept in "
+            "latitude_as_exported/longitude_as_exported")
+    else:
         coordinate_status = "MULTIPLE_CANDIDATES_UNRESOLVED"
+        coordinate_confidence = "LOW"
+        coordinate_rule = "first_source_row"
         reviews.append("multiple_coordinate_candidates")
+        if resolution:
+            coordinate_evidence = (
+                f"published locality: {resolution['published_locality']} "
+                f"[{resolution['locality_source']}]. {resolution['reasoning']}")
         notes.append(
             f"the source file gave {len(points)} coordinates for this one name, "
             f"up to {community['candidate_spread_km']:.0f} km apart, so at most one "
             "can be the site; all are preserved and none is asserted")
-    else:
-        coordinate_status = "SINGLE"
 
     # ---- country --------------------------------------------------------
     gaz_code = gaz["country_code"]
@@ -264,11 +306,15 @@ def build_row(community: dict, discovery: dict | None) -> dict[str, str]:
         "alternative_names": (discovery or {}).get("alternative_names", ""),
         "register_mode": "SETTLEMENT",
         "source_rows": LIST_DELIMITER.join(str(r) for r in community["source_rows"]),
-        "coordinate_primary_rule": "first_source_row",
+        "coordinate_primary_rule": coordinate_rule,
         "coordinate_candidate_count": str(community["candidate_count"]),
         "coordinate_candidate_spread_km": f"{community['candidate_spread_km']:.3f}",
         "coordinate_candidates": candidates,
         "coordinate_status": coordinate_status,
+        "latitude_as_exported": f"{exported['latitude']:.6f}",
+        "longitude_as_exported": f"{exported['longitude']:.6f}",
+        "coordinate_confidence": coordinate_confidence,
+        "coordinate_evidence": coordinate_evidence,
         "country_iso2": iso2,
         "country_iso3": iso3_for(iso2),
         "admin_region": admin,
@@ -312,7 +358,10 @@ def main() -> None:
         Path("master_input/pipeline/communities_geocoded.json").read_text(encoding="utf-8"))
     discovery = json.loads(Path("master_input/pipeline/discovery.json").read_text(encoding="utf-8"))
 
-    rows = [build_row(c, discovery.get(str(c["seq"]))) for c in communities]
+    resolutions = load_resolutions()
+
+    rows = [build_row(c, discovery.get(str(c["seq"])), resolutions.get(str(c["seq"])))
+            for c in communities]
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with OUT.open("w", encoding="utf-8", newline="") as handle:
