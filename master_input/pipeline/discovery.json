@@ -6424,5 +6424,2372 @@
     "evidence": "Mid Atlantic Cohousing record"
    }
   ]
+ },
+ "100": {
+  "country": "United States",
+  "country_iso2": "US",
+  "admin_region": "Massachusetts; Worcester County; Berlin",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.sawyerhill.org/",
+  "gen_community_url": "https://ecovillage.org/project/sawyer-hill-ecovillage/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "Search returned 'Sawyer Hill Ecovillage - Global Ecovillage Network' project page; GEN-US carries a parallel listing",
+  "alternative_names": "Sawyer Hill EcoVillage; Mosaic Commons; Camelot Cohousing",
+  "identity_confidence": "HIGH",
+  "notes": "Two cohousing groups on one site - Mosaic Commons and Camelot Cohousing, 34 units each, completed summer 2009. ~65 acres of which ~30 are preserved conservation land and most of the remaining 35 left as open space. The conservation split is a clean managed-versus-total-holding case.",
+  "sources": [
+   {
+    "url": "https://www.sawyerhill.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Umbrella site for both cohousing groups"
+   },
+   {
+    "url": "https://mosaic-commons.org/plans",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "'The Common House, Our Homes, Our Land' - the land and site plan"
+   },
+   {
+    "url": "https://www.camelotcohousing.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Camelot Cohousing site"
+   },
+   {
+    "url": "https://ecovillage.org/project/sawyer-hill-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://www.gpr-inc.com/portfolio/sawyer-hill/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "GPR engineering portfolio record - independent site/infrastructure documentation"
+   },
+   {
+    "url": "https://www.wgbh.org/news/local/2022-05-06/ecovillages-local-residents-embrace-communal-living-with-a-sustainable-twist",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "GBH public broadcaster feature, dated 2022"
+   },
+   {
+    "url": "https://www.sawyerhill.org/sites/sawyerhill.org/files/2020-03/20%20Village%20Ln%20Listing%20Sheet.pdf",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "A PDF hosted on the community site; percent-encoded spaces - URL-fidelity test case"
+   }
+  ]
+ },
+ "101": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "Victoria; Mount Toolebewong, near Healesville",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://mooramoora.org.au/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/moora-moora-co-operative/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Moora Moora Co-operative - Global Ecovillage Network' community page recording continuous residence since 1974",
+  "alternative_names": "Moora Moora; Moora Moora Co-operative Community",
+  "identity_confidence": "HIGH",
+  "notes": "Living together since 1974; ~50 adults and 20 children in six hamlets on a co-operatively owned 245 ha (600 acre) property at 700 m on Mt Toolebewong. One of Australia's oldest intentional communities; the co-operative title is a clean tenure record.",
+  "sources": [
+   {
+    "url": "https://mooramoora.org.au/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official co-operative site"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/moora-moora-co-operative/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Verified GEN page with the 1974 date"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Moora_Moora",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "Encyclopaedic article with area, altitude and hamlet structure"
+   },
+   {
+    "url": "https://find.coop/organizations/22067-moora-moora-co-operative-community",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.4,
+    "evidence": "Find.coop co-operative register record"
+   },
+   {
+    "url": "http://anxietyanddepression-help.com/mudsmith/moora.html",
+    "source_class": "S5",
+    "platform_type": "secondary or former website",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "A long-standing member's personal page - an old, stable page likely to hold early material"
+   },
+   {
+    "url": "https://www.youtube.com/watch?v=DoIyq-rBtI8",
+    "source_class": "S7",
+    "platform_type": "YouTube",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.36,
+    "evidence": "Independent documentary segment - visual documentation"
+   }
+  ]
+ },
+ "102": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "Queensland; Gold Coast hinterland; Currumbin Valley",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://theecovillage.com.au/about/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/ecovillage-currumbin/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'The Ecovillage at Currumbin - Global Ecovillage Network' plus an impact-assessment sub-page",
+  "alternative_names": "The Ecovillage at Currumbin; Currumbin Ecovillage",
+  "identity_confidence": "HIGH",
+  "notes": "270-272 acres of DEGRADED FARMLAND rehabilitated, with 50% preserved as environmental reserve and 80% of the property left as open space; 140-152 homes, ~450 residents. A documented before/after land conversion with a clear prior state. Most awarded estate in Australia (33+ accolades incl. FIABCI 2008). A Urban Land Institute case-study PDF exists.",
+  "sources": [
+   {
+    "url": "https://theecovillage.com.au/about/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "Official about page with the rehabilitation and reserve figures"
+   },
+   {
+    "url": "https://casestudies.uli.org/wp-content/uploads/2016/06/The-Ecovillage-at-Currumbin.pdf",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "Urban Land Institute case-study PDF - an independent professional document, exactly the kind of source the crawler should mine"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/ecovillage-currumbin/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/ecovillage-currumbin/impact-assessment/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.58,
+    "evidence": "GEN impact-assessment sub-page - quantitative"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Currumbin_Ecovillage",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.64,
+    "evidence": "Encyclopaedic article"
+   },
+   {
+    "url": "https://www.facebook.com/TheEcovillageatCurrumbin/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.3,
+    "evidence": "Official page"
+   }
+  ]
+ },
+ "103": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "Queensland; Sunshine Coast hinterland; Conondale, Mary River headwaters",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://crystalwaters.org.au/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/crystal-waters/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Crystal Waters - Global Ecovillage Network' community page",
+  "alternative_names": "Crystal Waters; Crystal Waters Permaculture Village; Crystal Waters Eco Village; Crystal Waters Community Co-operative",
+  "identity_confidence": "HIGH",
+  "notes": "Established 1987/88 - AUSTRALIA'S FIRST INTENTIONAL PERMACULTURE COMMUNITY; 640 acres of bushland at the Mary River headwaters, 83-85 lots, ~250 residents. Won the 1996 WORLD HABITAT AWARD for low-impact sustainable living. Classified 'Land for Wildlife'. A foundational permaculture case with a long literature.",
+  "sources": [
+   {
+    "url": "https://crystalwaters.org.au/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/crystal-waters/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN page with acreage, lot count and the World Habitat Award"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Crystal_Waters,_Queensland",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "Encyclopaedic article; comma in path - delimiter-safety test case"
+   },
+   {
+    "url": "https://permacultureaustralia.org.au/directory/listings/crystal-waters-permaculture-village/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.58,
+    "evidence": "Permaculture Australia national body record"
+   },
+   {
+    "url": "https://ecovillage.org/australia-robin-clayfield-heart-and-wisewoman-of-crystal-waters/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "GEN profile of a founding figure - historical material"
+   },
+   {
+    "url": "https://www.facebook.com/CrystalWatersEcoVillage/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.3,
+    "evidence": "Official page"
+   }
+  ]
+ },
+ "104": {
+  "country": "New Zealand",
+  "country_iso2": "NZ",
+  "admin_region": "Tasman District; Motueka Valley; Mytton Heights",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://atamaivillage.nz/",
+  "gen_community_url": "https://ecovillage.org/project/atamai-village/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Atamai Village - Global Ecovillage Network' project page recording planning from 2006",
+  "alternative_names": "Atamai Village; Atamai Eco Village; Atamai Heritage Orchard",
+  "identity_confidence": "MEDIUM",
+  "notes": "Planning began 2006; 110 ha (272 acres) of farmland and rolling hills; designed for resilience to energy descent; vineyard, orchard, livestock, ponds, organic farmland, forest. NOTE a financial/ownership disruption is on the public record (a 2017 report of liquidated land being bought up), so tenure and current status need checking before coding.",
+  "sources": [
+   {
+    "url": "https://atamaivillage.nz/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "Current official site (Atamai Heritage Orchard)"
+   },
+   {
+    "url": "https://ecovillage.org/project/atamai-village/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://www.resilience.org/stories/2014-11-25/atamai-village-an-experiment-in-resilient-community/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Resilience.org, dated 2014, substantive account of the design"
+   },
+   {
+    "url": "https://www.stuff.co.nz/business/property/89774973/son-of-atamai-village-financiers-buys-up-liquidated-land-for-new-project",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Stuff.co.nz report on liquidated land - independent, and the key document for tenure and persistence (register block G)"
+   },
+   {
+    "url": "https://livinginthefuture.org/episodes/60-atamai-ecovillage.php",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Documentary episode on Atamai - dated visual record"
+   },
+   {
+    "url": "https://www.facebook.com/atamaivillage/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.28,
+    "evidence": "Official page"
+   }
+  ]
+ },
+ "105": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "New South Wales; Central Coast; Narara, near Gosford",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://nararaecovillage.com/",
+  "gen_community_url": "https://ecovillage.org/project/narara-ecovillage/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Narara Ecovillage - Global Ecovillage Network' project page",
+  "alternative_names": "Narara Ecovillage; NEV; Gosford Agricultural Research Institute (former site use)",
+  "identity_confidence": "HIGH",
+  "notes": "Dream 1999, group 2004, LAND ACQUIRED 2012 - an unusually precise three-stage onset record. 63-64 ha on the former Gosford Agricultural Research Institute, bordered on three sides by Strickland State Forest; ~12 ha residential, ~12 ha agriculture and community gardens, the rest conserved native forest; 45 ML dam. The prior institutional land use means government records should exist.",
+  "sources": [
+   {
+    "url": "https://nararaecovillage.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "Official site"
+   },
+   {
+    "url": "http://nararaecovillage.com/location/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "'Our Location - then and now' - explicitly a before/after land page, high documentary value"
+   },
+   {
+    "url": "https://ecovillage.org/project/narara-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN project page with the 1999/2004/2012 stages"
+   },
+   {
+    "url": "https://nararaecovillage.com/press/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Press index - a route to dated third-party coverage"
+   },
+   {
+    "url": "https://www.visitnsw.com/destinations/central-coast/gosford-area/gosford/attractions/narara-ecovillage",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Destination NSW official tourism record - state government source"
+   },
+   {
+    "url": "https://ecovillage.org/threads-of-sustainability-weaving-an-interconnected-community-with-tanya-mottl-from-narara-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "GEN interview - dated first-person material"
+   }
+  ]
+ },
+ "106": {
+  "country": "New Zealand",
+  "country_iso2": "NZ",
+  "admin_region": "Tasman District; Golden Bay; Wainui Bay, by Abel Tasman National Park",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.tuitrust.org.nz/tui-land",
+  "gen_community_url": "https://ecovillage.org/project/tui-community/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Tui Community - Global Ecovillage Network' project page",
+  "alternative_names": "Tui Community; Tui Land Trust; TUI Ecovillage",
+  "identity_confidence": "HIGH",
+  "notes": "Tui Land Trust formed 1984 and bought a 50 ha (125 acre) farm at Wainui Bay - a dated acquisition on a known prior land use (farm). ~40 adults and children. Organic gardens, two orchards, and an explicitly REGENERATING WETLAND - a discrete, datable, satellite-visible intervention.",
+  "sources": [
+   {
+    "url": "https://www.tuitrust.org.nz/tui-land",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "'Tui Land' page - the land record including the wetland regeneration"
+   },
+   {
+    "url": "https://www.tuitrust.org.nz/history",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "History page with the 1984 trust formation and farm purchase"
+   },
+   {
+    "url": "https://ecovillage.org/project/tui-community/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.64,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://www.theprow.org.nz/society/communal-lifestyle/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "The Prow (Nelson/Tasman regional history resource) on communal living - independently researched"
+   },
+   {
+    "url": "https://genoaecovillage.org/story-of-the-tui-community-being-an-invitation-for-resilience/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "GEN Oceania & Asia feature"
+   },
+   {
+    "url": "https://www.ic.org/directory/tui-community/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.42,
+    "evidence": "Foundation for Intentional Community entry"
+   }
+  ]
+ },
+ "107": {
+  "country": "New Zealand",
+  "country_iso2": "NZ",
+  "admin_region": "Waikato; Coromandel Peninsula; Whitianga-Tairua road",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.wilderland.org.nz/about-us/",
+  "gen_community_url": "http://gen.ecovillage.org/de/wilderland",
+  "gen_status": "VERIFIED_SEARCH_INDEX_LEGACY_HOST",
+  "gen_evidence": "site:ecovillage.org returned a GEN community page on the legacy host gen.ecovillage.org; no current ecovillage.org page surfaced. Recorded on the legacy URL rather than constructing a current one.",
+  "alternative_names": "Wilderland; Wilderland Trust; Wilderland Coromandel Organics",
+  "identity_confidence": "HIGH",
+  "notes": "Founded 1964 by Dan and Edith Hansen - the OLDEST community in the New Zealand set and among the oldest in the cohort; property GIFTED TO A TRUST IN 1989, a dated tenure transfer. 64 ha organic farm. A registered New Zealand charitable trust (CC29221), so audited annual returns are publicly filed - strong dated institutional evidence. A fire is referenced in regional coverage: a disturbance event the satellite record may show.",
+  "sources": [
+   {
+    "url": "https://www.wilderland.org.nz/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official site - 'growing Coromandel Organics since 1964'"
+   },
+   {
+    "url": "https://www.wilderland.org.nz/about-us/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "About page with the 1964 founding and 1989 trust gift"
+   },
+   {
+    "url": "https://register.charities.govt.nz/Charity/CC29221",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "New Zealand Charities Register entry CC29221 - government record with filed annual returns"
+   },
+   {
+    "url": "http://gen.ecovillage.org/de/wilderland",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "GEN community page on the legacy host"
+   },
+   {
+    "url": "https://coromind.nz/from-fire-to-abundant-growth-discovering-wilderland/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Regional feature 'From Fire to Abundant Growth' - documents a disturbance event and recovery"
+   },
+   {
+    "url": "https://www.ecofind.co.nz/accommodation/wilderland-sustainable-community-coromandel/",
+    "source_class": "S3",
+    "platform_type": "booking or hosting",
+    "independence_group": "G4",
+    "confidence": "LOW",
+    "score": 0.26,
+    "evidence": "Regional eco-directory listing"
+   }
+  ]
+ },
+ "108": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "Queensland; Sunshine Coast hinterland; Belli Park, near Eumundi/Noosa",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://bellbunya.org.au/how-to-find-us/",
+  "gen_community_url": "https://ecovillage.org/project/bellbunya-sustainable-community/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Bellbunya Sustainable Community - Global Ecovillage Network' project page",
+  "alternative_names": "Bellbunya; Bellbunya Community Association; Bellbunya Eco Retreat",
+  "identity_confidence": "HIGH",
+  "notes": "Created December 2008; 16 ha (40 acres) with organic food gardens, WILDLIFE CORRIDORS, a creek and lagoon; 100% renewable energy; permaculture and syntropic gardens plus explicit BUSHLAND REGENERATION - a named, datable restoration activity on a modest, mappable area.",
+  "sources": [
+   {
+    "url": "https://bellbunya.org.au/how-to-find-us/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "Official site with the Belli Park address"
+   },
+   {
+    "url": "https://ecovillage.org/project/bellbunya-sustainable-community/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page with area, land features and the regeneration work"
+   },
+   {
+    "url": "https://www.ic.org/directory/community/bellbunya-community-association/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Foundation for Intentional Community entry giving the legal entity name"
+   },
+   {
+    "url": "https://www.retreatfinder.com/centers/bellbunya-eco-retreat-sustainable-community.html",
+    "source_class": "S3",
+    "platform_type": "booking or hosting",
+    "independence_group": "G3",
+    "confidence": "LOW",
+    "score": 0.28,
+    "evidence": "Retreat directory listing"
+   }
+  ]
+ },
+ "109": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "South Australia; Aldinga, ~40 km south of Adelaide; Port Road",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.aldingaartsecovillage.com/",
+  "gen_community_url": "https://ecovillage.org/project/aldinga-arts-ecovillage",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Aldinga Arts Ecovillage - Global Ecovillage Network' project page",
+  "alternative_names": "Aldinga Arts Ecovillage; AAEV; Village Greens Market Garden",
+  "identity_confidence": "HIGH",
+  "notes": "Begun 2002 by artists together with permaculture practitioners - South Australia's first ecovillage; ~100 households. OVER 1000 FRUIT TREES, vegetable gardens, water catchment and retention, an organic farm, the award-winning Village Greens market garden, and a community wastewater treatment plant. Tree counts and a market garden are directly measurable from imagery.",
+  "sources": [
+   {
+    "url": "https://www.aldingaartsecovillage.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/project/aldinga-arts-ecovillage",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://www.sustainablecommunitiessa.org.au/ecology/aldinga-arts-ecovillage-open-day/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "Sustainable Communities SA record - state-level network"
+   },
+   {
+    "url": "https://medium.com/ecovillage-journeys/aldinga-arts-ecovillage-a-collaborative-lifestyle-for-all-ages-34b7d0201a4a",
+    "source_class": "S6",
+    "platform_type": "blog platform",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Independent long-form visit account with land detail"
+   }
+  ]
+ },
+ "110": {
+  "country": "Australia",
+  "country_iso2": "AU",
+  "admin_region": "New South Wales; Murray River Council; 10 km north of Mathoura, on the Cadell Tilt",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/ecovillage/gulpa-creek-community/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/gulpa-creek-community/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Gulpa Creek Community - Global Ecovillage Network' community page",
+  "alternative_names": "Gulpa Creek Community; Gulpa Creek Community Farm; GCCF; Ilderton",
+  "identity_confidence": "HIGH",
+  "notes": "LAND TRUST ESTABLISHED 1975 over 460 acres between the Cobb Highway and Gulpa Creek, an anabranch of the Murray running through one of the world's largest continuous stands of ancient river red gum. Old, land-trust-held, and set in a nationally significant forest - the surrounding forest is a strong confounder the analysis must separate from community management.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/gulpa-creek-community/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN page with the 1975 date and 460-acre land trust"
+   },
+   {
+    "url": "https://www.genaustralia.org.au/2025/09/08/gulpa-creek-community-farm/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "GEN Australia feature, dated 2025 - current status and the regeneration framing"
+   },
+   {
+    "url": "https://www.murrayriver.nsw.gov.au/files/assets/public/v/1/documents/plans-and-strategies/murray-river-local-housing-strategy-implementation-plan-july-2024.pdf",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "Murray River Council Local Housing Strategy PDF (July 2024) naming the community - a government planning document"
+   },
+   {
+    "url": "https://www.aussietowns.com.au/town/mathoura-nsw",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "LOW",
+    "score": 0.26,
+    "evidence": "Locality reference for Mathoura"
+   }
+  ]
+ },
+ "111": {
+  "country": "Peru",
+  "country_iso2": "PE",
+  "admin_region": "Cusco Region; Maras District; Sacred Valley, ~3,300 m",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/eco-aldea-de-los-glaciares-sagrados-maras",
+  "gen_community_url": "https://ecovillage.org/project/eco-aldea-de-los-glaciares-sagrados-maras",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned the project page at /project/... and a parallel /ecovillage/eco-aldea-de-los-glaciares-sagrados-maras/ page",
+  "alternative_names": "Los Glaciares Sagrados; Eco Aldea de los Glaciares Sagrados; Maras Cusco ecoaldea",
+  "identity_confidence": "HIGH",
+  "notes": "First phase of 11 off-grid ecological houses at 3,300 m in the Sacred Valley, 41 km from Cusco; earthship-style tyre walls, rainwater storage, solar, biodigesters and greenhouses. Founders Alain Schneider and Carolina. Small footprint at high altitude - the greenhouses may be the only vegetation signal.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/eco-aldea-de-los-glaciares-sagrados-maras",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page - the fullest description found"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/eco-aldea-de-los-glaciares-sagrados-maras/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Parallel GEN page for the same community - same source family"
+   },
+   {
+    "url": "https://www.facebook.com/losglaciaressagrados/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.46,
+    "evidence": "Official page - the community's principal current channel"
+   },
+   {
+    "url": "https://unanuevaecoaldea.org/aprende/eventos/construyendo-un-earthship-navetierra-100-autonomo",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Una Nueva Ecoaldea event record on building the earthship - dated construction material"
+   }
+  ]
+ },
+ "112": {
+  "country": "Brazil",
+  "country_iso2": "BR",
+  "admin_region": "Sao Paulo State; Juquitiba, ~70 km from Sao Paulo; adjacent to Serra do Mar State Park",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://terraluminous.eco.br/en/who-we-are/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/terra-luminous/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Terra Luminous - Global Ecovillage Network' community page",
+  "alternative_names": "Terra Luminous; Instituto Terra Luminous; ITL; CPMAMA",
+  "identity_confidence": "HIGH",
+  "notes": "339 HECTARES of highly preserved Atlantic Forest in the state's highest water-availability watershed, adjacent to Serra do Mar State Park; ~20 members, 11 resident. Runs its own Atlantic Forest Research and Environmental Monitoring Centre (CPMAMA) SINCE 2020 in partnership with universities - meaning independent scientific monitoring data on fauna, water quality and regeneration may already exist for this site.",
+  "sources": [
+   {
+    "url": "https://terraluminous.eco.br/en/who-we-are/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official about page, English edition"
+   },
+   {
+    "url": "https://terraluminous.eco.br/en/our-space/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "'Our space' - the 339 ha land description"
+   },
+   {
+    "url": "https://terraluminous.eco.br/en/socio-environmental/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "Socio-environmental action page covering CPMAMA's monitoring work"
+   },
+   {
+    "url": "https://4returns.commonland.com/organisations/terra-luminous-green-belt-at-the-atlantic-rainforest-ongoing-project/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Commonland 4 Returns platform project record - an independent landscape-restoration institution"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/terra-luminous/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.6,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://terraluminous.eco.br/en/ecovillage/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Ecovillage page - membership and residence"
+   }
+  ]
+ },
+ "113": {
+  "country": "Argentina",
+  "country_iso2": "AR",
+  "admin_region": "Buenos Aires Province; Navarro, ~110 km from Buenos Aires",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://gaia.org.ar/ecovilla/",
+  "gen_community_url": "https://ecovillage.org/project/asociacion-gaia-ecovilla-navarro/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Ecovilla GAIA - Argentina' at /project/asociacion-gaia-ecovilla-navarro/ - the slug is the association name, not the community name",
+  "alternative_names": "Ecovilla Gaia; Asociacion Gaia; Instituto Argentino de Permacultura; IAP",
+  "identity_confidence": "HIGH",
+  "notes": "Founded 1992 by the Gaia Association on 20 ha - ON THE SITE OF A FORMER ABANDONED DAIRY FACTORY, a clear prior land use. Adobe and straw construction, dry toilets, renewable energy; 22 co-owning families in two condominiums. Hosts the Argentine Permaculture Institute.",
+  "sources": [
+   {
+    "url": "https://gaia.org.ar/ecovilla/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official association site, ecovillage section"
+   },
+   {
+    "url": "https://ecovillage.org/project/asociacion-gaia-ecovilla-navarro/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "Verified GEN project page with the 1992 date and 20 ha"
+   },
+   {
+    "url": "https://www.lanacion.com.ar/lifestyle/gaia-como-es-vivir-villa-ecologica-nid2243163/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "La Nacion national newspaper feature"
+   },
+   {
+    "url": "https://www.lanacion.com.ar/turismo/viajes/la-gran-ecoaldea-nid1472174",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Earlier La Nacion piece - same outlet, same group"
+   },
+   {
+    "url": "https://www.enpositivo.com/2014/03/21/gaia-una-ecoaldea-argentina-basada-en-la-permacultura/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Dated 2014 independent account of the permaculture basis"
+   },
+   {
+    "url": "https://www.facebook.com/gaiaecovilla/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.3,
+    "evidence": "Official page"
+   }
+  ]
+ },
+ "114": {
+  "country": "Chile",
+  "country_iso2": "CL",
+  "admin_region": "Biobio Region; Cabrero commune; ~20 km from Cabrero",
+  "country_method": "coordinate_gazetteer+published_source",
+  "country_source": "https://ecovillage.org/project/el-manzano-2",
+  "gen_community_url": "https://ecovillage.org/project/el-manzano-2",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'El Manzano - Global Ecovillage Network' at /project/el-manzano-2",
+  "alternative_names": "El Manzano; Ecoescuela El Manzano; Casa El Manzano; Villa El Manzano",
+  "identity_confidence": "HIGH",
+  "notes": "A 120 ha family farm plus hamlet, worked by the same family for FIVE GENERATIONS and CERTIFIED ORGANIC SINCE 2008 - a dated certification, which is register class S2 institutional evidence. Gaia Education delivered Chile's first Ecovillage Design Education course here in 2013. A long agricultural baseline with a documented transition point.",
+  "sources": [
+   {
+    "url": "https://nuevo.elmanzano.org/permacultura/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site, permaculture programme"
+   },
+   {
+    "url": "https://ecovillage.org/project/el-manzano-2",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN project page with the five-generation history and 2008 organic certification"
+   },
+   {
+    "url": "https://static.malaga.es/malaga/subidas/archivos/9/8/339689/t2-casa-el-manzano.pdf",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "A PDF hosted by the Malaga provincial authority documenting Casa El Manzano - an institutional document"
+   },
+   {
+    "url": "https://permacultureglobal.org/post_projects/2812",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Worldwide Permaculture Network project record"
+   },
+   {
+    "url": "https://revistanos.cl/villa-el-manzano-el-primer-pueblo-autosustentable-de-biobio/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G4",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Revista Nos regional feature on the village"
+   },
+   {
+    "url": "https://permaculture.fandom.com/wiki/Ecoescuela_El_Manzano",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G5",
+    "confidence": "LOW",
+    "score": 0.24,
+    "evidence": "Permaculture wiki entry - context only"
+   }
+  ]
+ },
+ "115": {
+  "country": "Colombia",
+  "country_iso2": "CO",
+  "admin_region": "Risaralda; Santa Rosa de Cabal, Vereda Las Mangas, near Pereira",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/map/community/agrovilla-el-prado/",
+  "gen_community_url": "https://ecovillage.org/map/community/agrovilla-el-prado/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Agrovilla El Prado - Global Ecovillage Network' as a /map/community/ directory entry",
+  "alternative_names": "Agrovilla El Prado; Ecoaldea Agrovilla El Prado",
+  "identity_confidence": "HIGH",
+  "notes": "Began as an urban group in Dosquebradas, RELOCATED TO THE RURAL SITE IN 2001 - a dated move, so pre-2001 material describes a different place. 14 people in 5 dwellings on UNDER 12,000 sq m (~1.2 ha) - by some distance the smallest holding in the cohort, which will test the polygon and reference-circle method. Two independent Spanish-language PDFs document it.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/map/community/agrovilla-el-prado/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN directory entry with the 2001 relocation and area"
+   },
+   {
+    "url": "https://www.rds.org.co/aa/img_upload/c43752116755565f4b6bec2eb3d19a7a/Ecoaldea_Pereira.pdf",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "Red de Desarrollo Sostenible de Colombia PDF study of the ecoaldea - an institutional document"
+   },
+   {
+    "url": "https://www.scribd.com/document/544623754/ecoaldea-agrovilla-el-prado",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "A hosted study document on the ecoaldea - check provenance before citing"
+   },
+   {
+    "url": "https://1library.co/document/yj7x87lp-ecoaldea-agrovilla-prado-eje-cafetero-colombia.html",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "Mirror of the same coffee-region study - same origin, same group"
+   }
+  ]
+ },
+ "116": {
+  "country": "Colombia",
+  "country_iso2": "CO",
+  "admin_region": "Cundinamarca; San Francisco municipality; vereda San Miguel, ~1,550 m",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://aldeafeliz.org/territorio/",
+  "gen_community_url": "https://ecovillage.org/project/aldeafeliz/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Aldeafeliz Ecovillage - Global Ecovillage Network' at /project/ and /ecovillage/ paths, plus the 2024 Hildur Jackson Award page",
+  "alternative_names": "Aldeafeliz; Aldea Feliz; Ecoaldea AldeaFeliz; Asociacion Aldeafeliz",
+  "identity_confidence": "HIGH",
+  "notes": "Born 2006 from an open call; ~2 hours west of Bogota at 1,550 m. Grows organic coffee, oranges, bananas, plantains, guabas, cacao and vegetables - an unusually specific crop list for agroforestry coding. 2024 HILDUR JACKSON AWARD WINNER, and the subject of a Colombian university thesis indexed in the national research repository.",
+  "sources": [
+   {
+    "url": "https://aldeafeliz.org/territorio/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "'Territorio' - the land page, directly relevant to land-use coding"
+   },
+   {
+    "url": "http://aldeafeliz.com/",
+    "source_class": "S4",
+    "platform_type": "secondary or former website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Second/older domain"
+   },
+   {
+    "url": "https://ecovillage.org/project/aldeafeliz/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "Verified GEN project page with founding date and crops"
+   },
+   {
+    "url": "https://redcol.minciencias.gov.co/Record/EDOCUR2_a1c436d316f1ec88f01bf6abea207911",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Colombian national research repository (MinCiencias) record of a diagnostic thesis on Aldeafeliz - register class S1"
+   },
+   {
+    "url": "https://ecovillage.org/2024-hildur-jackson-award-winner-aldeafeliz/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.56,
+    "evidence": "GEN award page, dated 2024"
+   },
+   {
+    "url": "https://ecohabitar.org/aldea-feliz-grandes-pasos-para-vivir-en-comunidad-colombia/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "EcoHabitar feature"
+   }
+  ]
+ },
+ "117": {
+  "country": "Gambia",
+  "country_iso2": "GM",
+  "admin_region": "West Coast Region; coastal zone from Kartong and Gunjur northward",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/ecovillage/peoples-coast-ecovillage-network/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/peoples-coast-ecovillage-network/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned \"People's Coast Ecovillage Network - Global Ecovillage Network\" community page",
+  "alternative_names": "People's Coast Ecovillage Network; PECEN; Sandele Foundation",
+  "identity_confidence": "MEDIUM",
+  "notes": "A BIO-REGIONAL NETWORK rather than a single settlement: formed 2014-15 when 55 representatives from nine coastal villages completed EDE and permaculture courses, spanning Kafountine (Senegal) to Kachumeh (Gambia). It is restoring two areas HEAVILY DEGRADED BY BEACH SAND MINING at Kartong and Gunjur - a specific, dated, satellite-visible restoration on a known-degraded baseline. But a network spanning nine villages and two countries does not have one polygon: the coder must decide which site this row denotes (E2/A5).",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/peoples-coast-ecovillage-network/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN community page describing the network and its formation"
+   },
+   {
+    "url": "https://www.ecosystemrestorationcommunities.org/community/peoples-coast-gambia/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Ecosystem Restoration Communities record - names the sand-mining degradation and the restoration areas; independent restoration institution"
+   },
+   {
+    "url": "https://ecovillage.org/network/sandele-foundation/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "GEN page for the Sandele Foundation, the network's operational base"
+   },
+   {
+    "url": "https://ecovillage.org/gambia-our-ecovillage-network/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "GEN article on the Gambian network"
+   }
+  ]
+ },
+ "118": {
+  "country": "South Africa",
+  "country_iso2": "ZA",
+  "admin_region": "North West Province; ~15 minutes outside Rustenburg",
+  "country_method": "coordinate_gazetteer+published_source",
+  "country_source": "https://rucore.org.za/tlholego-village/",
+  "gen_community_url": "http://sites.ecovillage.org/en/tlholego-ecovillage",
+  "gen_status": "VERIFIED_SEARCH_INDEX_LEGACY_HOST",
+  "gen_evidence": "site:ecovillage.org returned GEN community pages only on the legacy hosts sites.ecovillage.org and gen.ecovillage.org; no current ecovillage.org page surfaced, and none is constructed",
+  "alternative_names": "Tlholego; Tlholego Ecovillage and Learning Centre; Tlholego Village; Rucore Sustainability Foundation",
+  "identity_confidence": "HIGH",
+  "notes": "Established 1990 by the Rucore Sustainability Foundation on 146 ha - one of South Africa's pioneer centres for permaculture education, natural building and ecovillage development, founded as a post-apartheid sustainability project. 'Tlholego' is Setswana for 'creation from nature'. Rucore hosts its own history page and a technical PDF report.",
+  "sources": [
+   {
+    "url": "https://rucore.org.za/tlholego-village/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Foundation's own village page"
+   },
+   {
+    "url": "https://rucore.org.za/cd-tlholego-village-history/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "Village history page - dated narrative back to 1990"
+   },
+   {
+    "url": "https://rucore.org.za/wp-content/uploads/2011/12/TBS-Final.pdf",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "A 2011 technical report PDF hosted by the foundation - a document, not a page"
+   },
+   {
+    "url": "http://sites.ecovillage.org/en/tlholego-ecovillage",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "GEN community page on the legacy host"
+   },
+   {
+    "url": "https://magaliesbergbiosphere.org.za/inspiration-from-nature/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Magaliesberg Biosphere Reserve feature - an independent biosphere-reserve body"
+   },
+   {
+    "url": "https://ancientwisdom.africa/tlholego-ecovillage/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "LOW",
+    "score": 0.28,
+    "evidence": "Third-party profile"
+   }
+  ]
+ },
+ "119": {
+  "country": "Indonesia",
+  "country_iso2": "ID",
+  "admin_region": "Bali; Badung Regency; Sibang Gede, Abiansemal, by the Ayung River",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://greenvillagebali.com/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org returned GEN Indonesia listings for other Bali communities (Inspirement Village, Alaya Ecolodge, Mandala Eco-Village, Tanjung Ringgit) but no page for Green Village Bali. No GEN URL recorded.",
+  "alternative_names": "Green Village Bali; Ibuku; Green School Bali (adjacent)",
+  "identity_confidence": "MEDIUM",
+  "notes": "Fifteen bamboo houses designed and built by the Ibuku team (Elora Hardy) along the Ayung River at Sibang Gede, adjacent to the Green School. E2 SETTLEMENT TYPE IS A REAL QUESTION: this is a designed bamboo housing development and architectural showcase rather than a member-governed intentional community, and it is not GEN-listed. Flag for the coder.",
+  "sources": [
+   {
+    "url": "https://greenvillagebali.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://architizer.com/projects/green-village/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "Architizer project record for Ibuku's Green Village - independent architectural documentation with drawings"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Environmental_Bamboo_Foundation",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Encyclopaedic article on the associated bamboo foundation - organisational context"
+   },
+   {
+    "url": "https://www.uniqhotels.com/green-village-bali/",
+    "source_class": "S3",
+    "platform_type": "booking or hosting",
+    "independence_group": "G4",
+    "confidence": "LOW",
+    "score": 0.26,
+    "evidence": "Accommodation listing with building detail"
+   }
+  ]
+ },
+ "120": {
+  "country": "Tanzania",
+  "country_iso2": "TZ",
+  "admin_region": "Zanzibar; Unguja South Region; Kizimkazi",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://vassalam.org/visit-assalam-ecovillage/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/assalam-community-permaculture-project-zanzibar/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Assalam eco-village by the Indian Ocean: Sustainable Living in Zanzibar - Global Ecovillage Network'",
+  "alternative_names": "Assalam Ecovillage; Assalam Community Foundation; Assalam Community Permaculture Project Zanzibar",
+  "identity_confidence": "HIGH",
+  "notes": "Began 2018 at Kizimkazi; PEACE model (Permaculture, Education, Art, Community, Empowerment). A permaculture training centre working with 50+ farmers on climate-resilient technique, an eco-school for 170 children, soil-building through natural composting and local seed. Founded by Dr Hatice Colak Ali; partnership with SOAS London gives an academic route.",
+  "sources": [
+   {
+    "url": "https://vassalam.org/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Assalam Community Foundation official site"
+   },
+   {
+    "url": "https://vassalam.org/visit-assalam-ecovillage/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.76,
+    "evidence": "Ecovillage page with location and programme"
+   },
+   {
+    "url": "https://vassalam.org/our-programs/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Programmes page covering the permaculture training centre"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/assalam-community-permaculture-project-zanzibar/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://eaphilanthropynetwork.org/eapn-publications/assalam-community-foundation-zanzibar-tanzania-the-peace-model/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "East Africa Philanthropy Network publication on the PEACE model - an independent institutional study"
+   },
+   {
+    "url": "https://youth.europa.eu/solidarity/opportunity/49693_sv",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "European Solidarity Corps accreditation record"
+   }
+  ]
+ },
+ "121": {
+  "country": "South Africa",
+  "country_iso2": "ZA",
+  "admin_region": "Western Cape; Stellenbosch; Lynedoch, ~50 km from Cape Town",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.sustainabilityinstitute.net/about/lynedoch-ecovillage",
+  "gen_community_url": "https://ecovillage.org/ecovillage/sustainability-insitute/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'The Sustainability Institute and Lynedoch Eco-Village - Global Ecovillage Network' at /ecovillage/sustainability-insitute/ - note GEN's own misspelling of 'institute' in the slug, a further demonstration that these URLs cannot be constructed",
+  "alternative_names": "Lynedoch EcoVillage; The Sustainability Institute; SI; Lynedoch Development",
+  "identity_confidence": "HIGH",
+  "notes": "Sustainability Institute founded 1999; the wider Lynedoch EcoVillage is an ecologically designed, socially mixed community of ~30 families built around a learning precinct - explicitly a post-apartheid social-integration project as well as an ecological one. Financially self-sustaining without external funding. Hosted GEN Africa's first EDE in South Africa. Strong academic ties through Stellenbosch University.",
+  "sources": [
+   {
+    "url": "https://www.sustainabilityinstitute.net/about/lynedoch-ecovillage",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "The Institute's own account of the ecovillage - the authoritative description"
+   },
+   {
+    "url": "https://ecovillage.org/ecovillage/sustainability-insitute/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN community page"
+   },
+   {
+    "url": "https://lynedochecovillage.wordpress.com/wp-content/uploads/2015/04/3959_si.pdf",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "A hosted PDF on the Lynedoch EcoVillage development - a planning/design document"
+   },
+   {
+    "url": "https://www.capetowngreenmap.co.za/cape-town-green-map-online-map/sustainable-living-icons/scientific-research-site/sustainability-institute-and-lynedoch-ecovillage",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Cape Town Green Map record, classified as a scientific research site"
+   },
+   {
+    "url": "https://www.estate-living.co.za/news/lynedoch-eco-village-a-sustainable-development-unlike-any-other/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Independent feature on the development"
+   },
+   {
+    "url": "https://ecovillage.org/lynedoch-eco-village/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "Second GEN page on Lynedoch - same source family"
+   }
+  ]
+ },
+ "122": {
+  "country": "Nepal",
+  "country_iso2": "NP",
+  "admin_region": "Gandaki Province; Kaski district; Tarebhir, Pokhara area",
+  "country_method": "coordinate_gazetteer+published_source",
+  "country_source": "https://ecovillage.org/gen_country/nepal/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org returned GEN Nepal index and project-tag pages whose text describes Chisapani Ecovillage Tarebhir, but no community-page URL for it surfaced in either search. Rather than construct a plausible slug, no GEN community URL is recorded and the row is flagged - a GEN page may well exist and simply not be indexed for these queries.",
+  "alternative_names": "Chisapani Ecovillage; Chisapani Eco Village Tarebhir",
+  "identity_confidence": "LOW",
+  "notes": "Described as an eco-tourism, regenerative agriculture and community-empowerment project doing organic farming and waste management. VERY THIN EVIDENCE: no official website and no community-specific URL was located, only aggregator and hotel-booking pages referencing 'Chisapani Eco Village Tarebhir' in Kaski. The coordinate is consistent with Kaski/Pokhara. This row needs a targeted second pass, including Nepali-language search.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/gen_country/nepal/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.4,
+    "evidence": "GEN Nepal country index - the route to the community page if one exists"
+   },
+   {
+    "url": "https://us.trip.com/hotels/kaski-chisapani-eco-village-tarebhir/hotels-c76813m29484009/",
+    "source_class": "S3",
+    "platform_type": "booking or hosting",
+    "independence_group": "G2",
+    "confidence": "LOW",
+    "score": 0.22,
+    "evidence": "Booking aggregator page confirming the name and placing it in Kaski - weak, but it is locality corroboration"
+   }
+  ]
+ },
+ "123": {
+  "country": "Nepal",
+  "country_iso2": "NP",
+  "admin_region": "Gandaki Province; Myagdi district",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/ecovillage/ruma-eco-village/",
+  "gen_community_url": "https://ecovillage.org/ecovillage/ruma-eco-village/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Ruma Eco Village - Global Ecovillage Network' community page",
+  "alternative_names": "Ruma Eco Village; Ruma EcoVillage Myagdi",
+  "identity_confidence": "MEDIUM",
+  "notes": "Regenerative agriculture, eco-tourism and conservation in a Myagdi mountain community, framed explicitly as a response to RURAL DEPOPULATION - which matters here: the land-cover signal may reflect abandonment and natural regrowth as much as active management. No independent non-GEN source located; a second pass with Nepali-language search is warranted.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/ecovillage/ruma-eco-village/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN community page - the only substantive description found"
+   },
+   {
+    "url": "https://ecovillage.org/gen_country/nepal/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.34,
+    "evidence": "GEN Nepal index - route to related listings"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Annapurna_Rural_Municipality,_Myagdi",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "LOW",
+    "score": 0.26,
+    "evidence": "Administrative context for the Myagdi locality; comma in path"
+   }
+  ]
+ },
+ "124": {
+  "country": "Thailand",
+  "country_iso2": "TH",
+  "admin_region": "Udon Thani Province; Phen district, between Udon Thani and Nong Khai",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://suwan-organic-farmstay.com/en/about-us/",
+  "gen_community_url": "https://ecovillage.org/map/community/suwan-organic-farmstay/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Suwan organic farmstay - Global Ecovillage Network' as a /map/community/ directory entry",
+  "alternative_names": "Suwan Organic Farmstay; Suwan Farmstay",
+  "identity_confidence": "HIGH",
+  "notes": "ADMIN NOTE: sources place it in Phen district, UDON THANI province, 45 minutes from Nong Khai town - the original row name says Nong Khai, which is the nearer landmark rather than the province. 3.2 ha (32,000 sq m) combining permaculture, traditional rice paddies, a TROPICAL FOOD FOREST and natural-material buildings; 100% organic, agroforestry. A food forest on former paddy is a clean, mappable land conversion.",
+  "sources": [
+   {
+    "url": "https://suwan-organic-farmstay.com/en/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site, English edition"
+   },
+   {
+    "url": "https://suwan-organic-farmstay.com/en/about-us/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "About/contact page settling the locality"
+   },
+   {
+    "url": "https://suwan-organic-farmstay.com/en/farmstay-thailand-woofing/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Farm description - the permaculture and food-forest detail"
+   },
+   {
+    "url": "https://ecovillage.org/map/community/suwan-organic-farmstay/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Verified GEN directory entry with the 32,000 sq m figure"
+   },
+   {
+    "url": "https://voluntouring.org/2019/07/20/volunteering-thailand-suwan-organic-farmstay/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "Dated 2019 independent volunteer account"
+   },
+   {
+    "url": "https://www.facebook.com/SuwanOrganicFarmstay/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.28,
+    "evidence": "Official page"
+   }
+  ]
+ },
+ "125": {
+  "country": "Thailand",
+  "country_iso2": "TH",
+  "admin_region": "Chonburi Province; Si Racha District; Bang Phra",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/daruma-ecovillage/",
+  "gen_community_url": "https://ecovillage.org/project/daruma-ecovillage/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Daruma Ecovillage - Global Ecovillage Network' at /project/ and /ecovillage/ paths",
+  "alternative_names": "Daruma; Daruma Eco Farm; Daruma Ecovillage; Mosaic Learning Center",
+  "identity_confidence": "HIGH",
+  "notes": "Founded by Neil Wilmann and his wife Su, who RESTORED AN ABANDONED FARM at Bang Phra - a clear degraded prior state with a datable start, and the site has run for over ten years. Permaculture-designed throughout; the on-site Mosaic Learning Center (60-75+ students) is described as the first school in the world designed on permaculture principles. 500+ volunteers hosted.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/daruma-ecovillage/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page with the address and school detail"
+   },
+   {
+    "url": "https://www.facebook.com/daruma.ecofarm/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.48,
+    "evidence": "Official page - the community's principal current channel"
+   },
+   {
+    "url": "https://mag.luxuryliving.com/daruma-eco-farm-building-a-new-kind-of-community-in-thailand/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.64,
+    "evidence": "Long-form independent feature covering the farm's restoration and the school"
+   },
+   {
+    "url": "https://www.cycleblaze.com/journals/southeastasia/to-daruma-eco-farm-near-chonburi-and-a-day-off-at-the-school-farm/",
+    "source_class": "S6",
+    "platform_type": "blog platform",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Dated independent visit account with on-the-ground detail"
+   },
+   {
+    "url": "https://numundo.org/center/thailand/daruma-ecovillage",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.32,
+    "evidence": "NuMundo centre listing"
+   }
+  ]
+ },
+ "126": {
+  "country": "Costa Rica",
+  "country_iso2": "CR",
+  "admin_region": "Alajuela Province; Cabanga (Pueblo Nuevo), near Arenal",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.protopia.community/",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org returned GEN Costa Rica listings for other communities (RiverFalls Village, Infinite Stillness, Finca Sol y Valle, The ARK) and text describing Protopia's vision, but no community-page URL for Protopia surfaced. No GEN URL recorded.",
+  "alternative_names": "Protopia; Protopia Community; Protopian Convergence",
+  "identity_confidence": "MEDIUM",
+  "notes": "Jungle coliving and regenerative farm near Arenal; permaculture, workshops, venue hire, and a digital-nomad coliving offer at ~$1,200/month. E2 settlement type needs a coder decision: the residential population is largely transient paying guests rather than permanent members.",
+  "sources": [
+   {
+    "url": "https://www.protopia.community/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://numundo.org/center/costa-rica/protopia-community",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.42,
+    "evidence": "NuMundo centre listing"
+   },
+   {
+    "url": "https://retreat.guru/centers/9318-1/protopia-community",
+    "source_class": "S3",
+    "platform_type": "booking or hosting",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.34,
+    "evidence": "Retreat platform record with location detail"
+   },
+   {
+    "url": "https://www.protopianconvergence.org/",
+    "source_class": "S4",
+    "platform_type": "secondary or former website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.4,
+    "evidence": "Associated gathering project on a second domain"
+   }
+  ]
+ },
+ "127": {
+  "country": "Portugal",
+  "country_iso2": "PT",
+  "admin_region": "Lisbon District; Sintra municipality, on the Mafra border near Cheleiros",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/eco-aldeia-do-vale-instituto-permacultura/",
+  "gen_community_url": "https://ecovillage.org/project/eco-aldeia-do-vale-instituto-permacultura/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Eco Aldeia do Vale - Instituto Permacultura - Global Ecovillage Network' project page",
+  "alternative_names": "Aldeia do Vale; Eco Aldeia do Vale; Instituto Permacultura Portugal",
+  "identity_confidence": "HIGH",
+  "notes": "TEXT REPAIR: original cell held an HTML-escaped mojibake en dash; repaired to 'Eco Aldeia do Vale - Instituto Permacultura'. ADMIN NOTE: located in SINTRA on the Mafra border near Cheleiros, not Torres Vedras. Founded 2016 as a sustainability research and training centre; services include reforestation, water harvesting and storage, food forests and ecological infrastructure - practices directly relevant to the land coding.",
+  "sources": [
+   {
+    "url": "https://www.aldeiadovale.com/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://www.aldeiadovale.com/eco-construccedilatildeo.html",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "Eco-construction page; the mangled path is the site's own, preserved verbatim"
+   },
+   {
+    "url": "https://ecovillage.org/project/eco-aldeia-do-vale-instituto-permacultura/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN project page with the 2016 founding and location"
+   },
+   {
+    "url": "https://permacultureglobal.org/projects/2213-aldeia-do-vale-instituto-permacultura-portugal",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Worldwide Permaculture Network record"
+   },
+   {
+    "url": "https://www.jornalmapa.pt/2018/12/05/aldeia-do-vale/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Jornal Mapa feature, dated 2018"
+   }
+  ]
+ },
+ "128": {
+  "country": "Czechia",
+  "country_iso2": "CZ",
+  "admin_region": "South Bohemian Region; Vrabsko, between Pisek and Pribram",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/map/community/spoluzeme-vrabsko/",
+  "gen_community_url": "https://ecovillage.org/map/community/spoluzeme-vrabsko/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Spoluzeme Vrabsko - Global Ecovillage Network' directory entry, plus a /project/spoluzeme-vrabsko/ page; listed among GEN Europe ASPIRING members",
+  "alternative_names": "SpoluZeme Vrabsko; Spolecenstvi Vrabsko; Vrabsko",
+  "identity_confidence": "MEDIUM",
+  "notes": "FOUNDING DATE CONFLICTS ACROSS SOURCES: GEN says autumn 2019, Czech press says formally spring 2021 - both are recorded, neither resolved. ~12-15 adults and a few children in a first phase still building housing, space and garden. A GEN Europe ASPIRING member, not a full member - an early-stage project where the satellite record may show little yet.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/map/community/spoluzeme-vrabsko/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "Verified GEN directory entry"
+   },
+   {
+    "url": "https://ic.org/directory/spoluzeme-vrabsko",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "Foundation for Intentional Community entry"
+   },
+   {
+    "url": "https://info.dingir.cz/2022/12/propoceny-zimni-slunovrat-v-komunite-spoluzeme/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "Nabozensky infoservis (Dingir) dated 2022 field report - independent religious-studies journalism, the source of the spring 2021 date"
+   },
+   {
+    "url": "https://2022.tydenproklima.cz/poradatele/vznikajici-ekovesnice-spoluzeme-vrabsko",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "Czech Climate Week organiser record, dated 2022"
+   },
+   {
+    "url": "https://www.facebook.com/vrabsko/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.3,
+    "evidence": "Community page"
+   }
+  ]
+ },
+ "129": {
+  "country": "Denmark",
+  "country_iso2": "DK",
+  "admin_region": "Capital Region; Bornholm; Almindingen, near Aakirkeby",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.friskoven.dk/",
+  "gen_community_url": "https://ecovillage.org/project/friskoven/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Friskoven - Global Ecovillage Network' project page",
+  "alternative_names": "Friskoven; Okosamfundet Friskoven; Friskoven Almindingen",
+  "identity_confidence": "HIGH",
+  "notes": "A group bought an old production school with 12 HECTARES OF LAND AND 2,500 SQ M OF BUILDINGS IN DECEMBER 2018, on the site of a 1939 LABOUR CAMP in Almindingen forest; the project took off summer 2020 and the housing association was founded 2021. Three precisely dated stages on a known prior land use. 11 adults and 11 children; a master plan is under development with the municipality, so planning documents should exist.",
+  "sources": [
+   {
+    "url": "https://www.friskoven.dk/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/project/friskoven/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Verified GEN project page with the December 2018 purchase and 12 ha"
+   },
+   {
+    "url": "https://www.tv2bornholm.dk/artikel/nyt-program-faellesskab-og-byggeri-i-friskoven",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "TV2 Bornholm - a broadcast series on the community and its building work; dated visual documentation"
+   },
+   {
+    "url": "https://tidende.dk/bornholm/beboerne-i-friskoven-jubler/151822",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Bornholms Tidende regional report"
+   },
+   {
+    "url": "https://okosamfund.dk/en/elementor-14152/medlemmer-en/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.42,
+    "evidence": "Danish national ecovillage association member list"
+   }
+  ]
+ },
+ "130": {
+  "country": "Germany",
+  "country_iso2": "DE",
+  "admin_region": "Bavaria; Allgaeu; Sulzberg, ~900 m",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://sulzbrunn.org/gemeinschaft/",
+  "gen_community_url": "http://sites.ecovillage.org/gemeinschaft-sulzbrunn",
+  "gen_status": "VERIFIED_SEARCH_INDEX_LEGACY_HOST",
+  "gen_evidence": "site:ecovillage.org returned a GEN community page only on the legacy host sites.ecovillage.org; no current ecovillage.org page surfaced and none is constructed",
+  "alternative_names": "Gemeinschaft Sulzbrunn; Sulzbrunn; Seminarhaus Sulzbrunn; Stiftungsfond Sulzbrunn",
+  "identity_confidence": "HIGH",
+  "notes": "~50 people aged 0-80 at 900 m in the Allgaeu. THREE-PART LEGAL STRUCTURE: the Stiftungsfond Sulzbrunn owns the LAND, the Gemeinschaft Sulzbrunn eG cooperative manages the property, and a Foerderverein runs non-profit projects - an unusually clear and separable tenure record for register block E. Runs an ecological seminar house.",
+  "sources": [
+   {
+    "url": "https://sulzbrunn.org/gemeinschaft/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "Official community page with the three-pillar legal structure"
+   },
+   {
+    "url": "https://sulzbrunn.org/seminarhaus/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "Seminar house page"
+   },
+   {
+    "url": "https://gen-deutschland.de/projekt/gemeinschaft-sulzbrunn/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.58,
+    "evidence": "GEN Deutschland project record - same GEN family"
+   },
+   {
+    "url": "http://sites.ecovillage.org/gemeinschaft-sulzbrunn",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "GEN community page on the legacy host"
+   },
+   {
+    "url": "https://b2b.allgaeu.de/service/informationen-kommunen/wohnraum-entwicklung/gemeinschaft-sulzbrunn",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Allgaeu regional development body's housing-development record - an institutional source"
+   },
+   {
+    "url": "https://lernorte.gen-deutschland.de/lernort/gemeinschaft-sulzbrunn/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.4,
+    "evidence": "GEN Deutschland learning-site record"
+   }
+  ]
+ },
+ "131": {
+  "country": "France",
+  "country_iso2": "FR",
+  "admin_region": "Bourgogne-Franche-Comte; Saone-et-Loire; Cronat, south of the Morvan regional park",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/eotopia/",
+  "gen_community_url": "https://ecovillage.org/project/eotopia/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Eotopia - Global Ecovillage Network' project page",
+  "alternative_names": "Eotopia; Ecolieu Eotopia; le jardin Jolivet",
+  "identity_confidence": "HIGH",
+  "notes": "ADMIN NOTE: at Cronat in SAONE-ET-LOIRE, not Nievre. On site since June 2016; 3 ha with a house and barns; ~8 full-time residents. Vegan, gift-economy, permaculture and unschooling; no alcohol, tobacco, tea or coffee. France 3 and 18h39 have both covered it, including a dated five-year retrospective.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/eotopia/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "Verified GEN project page with the June 2016 date and 3 ha"
+   },
+   {
+    "url": "https://france3-regions.franceinfo.fr/bourgogne-franche-comte/saone-loire-visite-au-coeur-du-village-utopique-ecologique-eotopia-1663253.html",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "France 3 regional public broadcaster report - independent, and settles the department"
+   },
+   {
+    "url": "https://www.18h39.fr/articles/5-ans-apres-sa-creation-eotopia-eco-lieu-ecolo-et-vegan-poursuit-sa-quete-dune-vie-plus-simple.html",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Dated five-year retrospective - useful for continuity (register V5)"
+   },
+   {
+    "url": "https://www.18h39.fr/articles/bienvenu-a-eotopia-nous-avons-passe-deux-jours-dans-un-village-100-ecolo-et-collectif.html",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G3",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "Earlier immersive report from the same outlet - same group"
+   },
+   {
+    "url": "https://magazine.laruchequiditoui.fr/eotopia-lecovillage-du-partage/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "Independent magazine feature"
+   }
+  ]
+ },
+ "132": {
+  "country": "Italy",
+  "country_iso2": "IT",
+  "admin_region": "CONFLICT: RIVE places Comunita Rigenerative at Calasca Castiglione, Verbano-Cusio-Ossola (Piedmont); the supplied coordinate falls in Friuli-Venezia Giulia near Pordenone",
+  "country_method": "coordinate_gazetteer+published_source_CONFLICTING",
+  "country_source": "https://www.ecovillaggi.it/comunita-e-progetticomunita/ecovillaggi-rive/338-comunita-rigenerative.html",
+  "gen_community_url": "",
+  "gen_status": "NOT_FOUND",
+  "gen_evidence": "site:ecovillage.org returned the GEN Europe ASPIRING members list, which references Comunita rigenerative, but no community-page URL. No GEN URL recorded.",
+  "alternative_names": "Comunita Rigenerative; Comunita rigenerative Calasca Castiglione",
+  "identity_confidence": "LOW",
+  "notes": "TEXT REPAIR: original cell 'ComunitA  rigenerative' repaired to 'Comunita rigenerative'. IDENTITY AND LOCATION CONFLICT: the RIVE record for a community of this name places it in the frazioni of Castiglione, Porcareccia and Drocala in Calasca Castiglione, PIEDMONT - roughly 400 km from the supplied coordinate near Pordenone in Friuli. Country (Italy) is not in doubt; which site this row denotes is. Eight adults, five permanent and living from the land, two children; recovering ABANDONED TERRACED LAND, which would be a strong restoration case once the site is pinned down.",
+  "sources": [
+   {
+    "url": "https://www.ecovillaggi.it/comunita-e-progetticomunita/ecovillaggi-rive/338-comunita-rigenerative.html",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "RIVE (Italian ecovillage network) record - the fullest description, but of a Piedmont site"
+   },
+   {
+    "url": "https://ecovillage.org/network/gen-europe-aspiring-members/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.36,
+    "evidence": "GEN Europe aspiring-members list naming the community"
+   },
+   {
+    "url": "https://www.produzionidalbasso.com/project/costruiamo-comunita-recuperando-borghi-e-terreni/",
+    "source_class": "S2",
+    "platform_type": "crowdfunding",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "Crowdfunding campaign 'Costruiamo comunita recuperando borghi e terreni' - dated, budgeted and specific about the land recovery"
+   }
+  ]
+ },
+ "133": {
+  "country": "Italy",
+  "country_iso2": "IT",
+  "admin_region": "Piedmont; Alessandria; Serravalle Scrivia, Localita Crenna Superiore",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.thabarwanaturecentre.it/chi-siamo/",
+  "gen_community_url": "https://ecovillage.org/project/thabarwa-nature-centre-eu/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Thabarwa Nature Centre EU - Global Ecovillage Network' project page",
+  "alternative_names": "Thabarwa; Thabarwa Nature Centre EU; ThaBarWa Centre Serravalle Scrivia",
+  "identity_confidence": "HIGH",
+  "notes": "First European centre of the Thabarwa network (founded by the Burmese monk Sayadaw Ashin Ottamathara), opened 2017 at Serravalle Scrivia - the coordinate matches. Free refuge and hospitality for people in difficulty; ~115 Thabarwa centres worldwide, two in Italy (the other at Cinquefrondi, Calabria) - so identity must be pinned to the Serravalle site, not the network.",
+  "sources": [
+   {
+    "url": "https://www.thabarwanaturecentre.it/chi-siamo/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "Italian site, 'chi siamo' - the Serravalle centre"
+   },
+   {
+    "url": "https://www.thabarwanaturecentre.org/english/what-do-we-do/thabarwa-center-serravalle-scrivia-north/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "Page dedicated to the Serravalle Scrivia centre specifically - the right level of identity"
+   },
+   {
+    "url": "https://ecovillage.org/project/thabarwa-nature-centre-eu/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.64,
+    "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://thabarwa-nmc.blogspot.com/2018/01/welcome-to-new-thabarwa-center-in-italy.html",
+    "source_class": "S5",
+    "platform_type": "blog platform",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.6,
+    "evidence": "Network blog post announcing the Italian centre, dated January 2018 - a dated founding record on an older platform"
+   },
+   {
+    "url": "https://www.idealist.org/en/nonprofit/b58dd67d21e8431f89f2488c0da7c5e6-thabarwa-nature-centre-eu-serravalle-scrivia",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G2",
+    "confidence": "MEDIUM",
+    "score": 0.38,
+    "evidence": "Idealist organisation record naming Serravalle Scrivia"
+   }
+  ]
+ },
+ "134": {
+  "country": "Germany",
+  "country_iso2": "DE",
+  "admin_region": "Saxony-Anhalt; northern Halle (Saale)",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://gutalaune.de/",
+  "gen_community_url": "https://ecovillage.org/project/gut-alaune/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Gut Alaune - Global Ecovillage Network' project page",
+  "alternative_names": "Gut Alaune; GutAlaune e.V.; Reallabor Gut Alaune",
+  "identity_confidence": "HIGH",
+  "notes": "Founded 2016; ~8 people on a small property in northern Halle with community gardens and open workshops. ACADEMICALLY UNUSUAL: it hosts a 'Reallabor' (real-world laboratory) research project with Alanus University, FH Potsdam and the Institute for Ecological Economic Research, running eleven research workshops on community practice - a published research programme about this very site.",
+  "sources": [
+   {
+    "url": "https://gutalaune.de/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official site"
+   },
+   {
+    "url": "https://ecovillage.org/project/gut-alaune/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN project page with the 2016 founding"
+   },
+   {
+    "url": "https://zeitschrift-info3.de/blog/forschungsprojekt-wie-gelingt-gemeinschaft/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.78,
+    "evidence": "Account of the research project on the site - academic-adjacent, independent"
+   },
+   {
+    "url": "http://ideenhochdrei.org/de/blog/2021/06/07/gemeinschaftsforschung-im-reallabor-gut-alaune/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Ideen Hoch 3 record of the Reallabor research, dated 2021"
+   },
+   {
+    "url": "https://soziale-innovation.zsh-online.de/gut-alaune.html",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Saxony-Anhalt social-innovation register (ZSH) record - institutional"
+   },
+   {
+    "url": "https://gen-deutschland.de/2022/04/04/das-reallabor-gut-alaune-startet-mit-soziokratie-training-im-juni/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.46,
+    "evidence": "GEN Deutschland article, dated 2022"
+   }
+  ]
+ },
+ "135": {
+  "country": "Sweden",
+  "country_iso2": "SE",
+  "admin_region": "Varmland County; Molkom, near Karlstad",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://www.angsbacka.com/contact/",
+  "gen_community_url": "https://ecovillage.org/project/angsbacka/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Angsbacka - Global Ecovillage Network' at /project/angsbacka/ and /ecovillage/angsbacka/",
+  "alternative_names": "Angsbacka; Angsbacka Kursgard; Angsbacka Kursgard Ekonomisk Forening",
+  "identity_confidence": "HIGH",
+  "notes": "Started 1996/97 in the forests of Varmland; a course and festival centre owned by a non-profit association of ~500 members with a core team of 45, drawing ~6,000 visitors a year, and ~200 people living in the adjacent village because of it. Hosted the EUROPEAN ECOVILLAGE GATHERING in August 2024. E2 needs a coder decision: a course centre with a resident core team rather than a village of households.",
+  "sources": [
+   {
+    "url": "https://www.angsbacka.com/about-angsbacka/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "Official about page"
+   },
+   {
+    "url": "https://ecovillage.org/project/angsbacka/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.66,
+    "evidence": "Verified GEN project page - names the renewable energy, own food production and planned eco-construction"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/%C3%84ngsbacka",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.6,
+    "evidence": "Encyclopaedic article; percent-encoded umlaut - URL-fidelity test case"
+   },
+   {
+    "url": "https://youth.europa.eu/volunteering/organisation/51707_en",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G3",
+    "confidence": "HIGH",
+    "score": 0.62,
+    "evidence": "European Youth Portal accreditation for Angsbacka Kursgard Ekonomisk Forening - names the legal entity"
+   },
+   {
+    "url": "https://ecovillagegathering.org/angsbacka/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "European Ecovillage Gathering host page, 2024"
+   },
+   {
+    "url": "https://www.visitvarmland.com/karlstad/en/products/activities/angsbacka-course-and-festival-center",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G4",
+    "confidence": "MEDIUM",
+    "score": 0.44,
+    "evidence": "Visit Varmland regional tourism record"
+   }
+  ]
+ },
+ "136": {
+  "country": "France",
+  "country_iso2": "FR",
+  "admin_region": "Centre-Val de Loire; Indre; Lucay-le-Male, Chateau d'Oublaise",
+  "country_method": "coordinate_gazetteer+official_site",
+  "country_source": "https://centres.iskcon.org/centre/new-mayapur-france/",
+  "gen_community_url": "https://ecovillage.org/project/new-mayapur/",
+  "gen_status": "VERIFIED_SEARCH_INDEX_IDENTITY_UNCERTAIN",
+  "gen_evidence": "site:ecovillage.org returned a 'New Mayapur' project page - BUT ITS TEXT DESCRIBES A COMMUNITY IN UKRAINE on the River Oryl, 108 km from Dnipro, established 2006. The supplied coordinate is in Indre, FRANCE, at the ISKCON Chateau d'Oublaise. The GEN URL is recorded because the name matches exactly, and flagged because the description does not.",
+  "alternative_names": "New Mayapur; La Nouvelle Mayapur; ISKCON France; Chateau d'Oublaise",
+  "identity_confidence": "MEDIUM",
+  "notes": "IDENTITY CONFLICT ON THE GEN PAGE - see gen_evidence. The French community is well documented independently: the property was acquired 1971, Srila Prabhupada chose the site in July 1974, devotees moved in 1975, and it covers 86 HECTARES around an 1905 chateau. Those dates and that area are from ISKCON's own records and do not depend on the disputed GEN page.",
+  "sources": [
+   {
+    "url": "https://centres.iskcon.org/centre/new-mayapur-france/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "ISKCON's official centre record for the FRENCH site - the identity anchor"
+   },
+   {
+    "url": "https://newmayapur.com/temple",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Community's own temple page"
+   },
+   {
+    "url": "https://iskconnews.org/temple-profile-new-mayapur-france/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.72,
+    "evidence": "ISKCON News temple profile with the 1971/1974/1975 dates and 86 ha"
+   },
+   {
+    "url": "https://ecovillage.org/project/new-mayapur/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "LOW",
+    "score": 0.3,
+    "evidence": "GEN project page of the same name whose text describes a UKRAINIAN community - retained only so the conflict is traceable"
+   },
+   {
+    "url": "https://www.facebook.com/nouvellemayapur/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.3,
+    "evidence": "Official French community page"
+   }
+  ]
+ },
+ "137": {
+  "country": "Spain",
+  "country_iso2": "ES",
+  "admin_region": "Andalusia; Malaga; Algatocin, Serrania de Ronda",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/los-guindales/",
+  "gen_community_url": "https://ecovillage.org/project/los-guindales/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Los Guindales - Global Ecovillage Network' project page plus several bioconstruction-school event pages",
+  "alternative_names": "Los Guindales; Ecoaldea Los Guindales; Casa Los Guindales; Escuela de Bioconstruccion Los Guindales",
+  "identity_confidence": "MEDIUM",
+  "notes": "ADMIN NOTE: at Algatocin in MALAGA province (Serrania de Ronda), not Cadiz. Established 2003/2004; 4.5 HA of chestnut, oak and cork-oak forest with fruit trees and aromatic, medicinal and edible plants. Runs a bioconstruction school. AN ACADEMIC ARTICLE EXISTS: revista PH (Instituto Andaluz del Patrimonio Historico), indexed in Dialnet - a peer-reviewed heritage journal treating the ecoaldea as a rural-culture conservation school.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/los-guindales/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "Verified GEN project page with the 4.5 ha and forest composition"
+   },
+   {
+    "url": "https://www.iaph.es/revistaph/index.php/revistaph/article/view/4510",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "revista PH (Instituto Andaluz del Patrimonio Historico) article on the ecoaldea - peer-reviewed, register class S1"
+   },
+   {
+    "url": "https://dialnet.unirioja.es/servlet/articulo?codigo=7202536",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "Dialnet index record for the same article - same origin, same group; a stable academic identifier"
+   },
+   {
+    "url": "https://inspyria.com/en/venues/los-guindales-ecovillage",
+    "source_class": "S3",
+    "platform_type": "booking or hosting",
+    "independence_group": "G3",
+    "confidence": "LOW",
+    "score": 0.28,
+    "evidence": "Venue listing with site detail"
+   }
+  ]
+ },
+ "138": {
+  "country": "France",
+  "country_iso2": "FR",
+  "admin_region": "Bourgogne-Franche-Comte; Cote-d'Or; La Bussiere-sur-Ouche",
+  "country_method": "coordinate_gazetteer+GEN_profile",
+  "country_source": "https://ecovillage.org/project/ferme-de-la-chaux/",
+  "gen_community_url": "https://ecovillage.org/project/ferme-de-la-chaux/",
+  "gen_status": "VERIFIED_SEARCH_INDEX",
+  "gen_evidence": "site:ecovillage.org returned 'Ferme de la Chaux, Goshen - Global Ecovillage Network' project page with the La Bussiere-sur-Ouche address",
+  "alternative_names": "Ferme de la Chaux; Goshen; Eco-hameau Goshen",
+  "identity_confidence": "HIGH",
+  "notes": "A Christian, participatory eco-hamlet of families and friends at La Bussiere-sur-Ouche, Cote-d'Or; passed its tenth anniversary (covered by France 3 Bourgogne). A DREAL Bourgogne-Franche-Comte PDF documents the farm - a French state environment-directorate document, which is exactly the kind of planning/environmental record the crawler should mine.",
+  "sources": [
+   {
+    "url": "https://ecovillage.org/project/ferme-de-la-chaux/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.68,
+    "evidence": "Verified GEN project page with address and contact"
+   },
+   {
+    "url": "https://www.bourgogne-franche-comte.developpement-durable.gouv.fr/IMG/pdf/chaux_cle22519a.pdf",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G2",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "DREAL Bourgogne-Franche-Comte PDF on La ferme de la Chaux - French state environment directorate document, Tier A"
+   },
+   {
+    "url": "https://institut-bullezzen-paris.fr/fermedelachaux/",
+    "source_class": "S4",
+    "platform_type": "secondary or former website",
+    "independence_group": "G1",
+    "confidence": "MEDIUM",
+    "score": 0.48,
+    "evidence": "A hosted page for the farm - a second web presence"
+   },
+   {
+    "url": "https://www.facebook.com/fermedelachaux/",
+    "source_class": "S7",
+    "platform_type": "Facebook",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.44,
+    "evidence": "Official page; carries the France 3 ten-year anniversary report - dated visual documentation"
+   }
+  ]
  }
 }
