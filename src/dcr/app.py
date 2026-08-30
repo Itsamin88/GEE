@@ -35,7 +35,8 @@ from .workbook_audit import audit
 
 log = get_logger("app")
 
-RUN_MODES = ("FULL", "SOURCE", "ACADEMIC", "RECONCILE", "RESUME", "RETRY_FAILED", "AUDIT", "EXPORT")
+RUN_MODES = ("FULL", "HARVEST", "SOURCE", "ACADEMIC", "RECONCILE", "RESUME",
+             "RETRY_FAILED", "AUDIT", "EXPORT")
 
 BANNER = f"""
 ==============================================================================

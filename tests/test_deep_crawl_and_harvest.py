@@ -454,3 +454,40 @@ def test_no_browser_at_all_is_still_only_a_degradation(monkeypatch):
     # The message has to name the way out, not just the failure.
     assert "playwright install" in pool.unavailable_reason
     assert "Chrome" in pool.unavailable_reason
+
+
+# ---------------------------------------------------------------------------
+# HARVEST mode: do not go looking for what the researcher already supplied
+# ---------------------------------------------------------------------------
+def test_harvest_mode_skips_the_address_finding_stages():
+    """The slowest stages in the program are the ones finding MORE addresses.
+
+    They run against search engines the host broker limits to one request every
+    five or six seconds, shared across every community in the run. On a
+    three-community test that was eighteen minutes inside stage 0 before one
+    page of a community's own site had been read - while the master file already
+    carried 1,366 curated addresses.
+    """
+    from dcr.runner import MODE_STAGES
+
+    harvest = MODE_STAGES["HARVEST"]
+    # Kept: register, crawl, open documents, academic APIs, reconcile.
+    assert harvest == [0, 2, 3, 5, 9]
+    # Dropped: web archive, grey literature, other web sources, language sweep.
+    for finding_stage in (4, 6, 7, 8):
+        assert finding_stage not in harvest
+    # And it is a real mode the CLI will accept.
+    from dcr.app import RUN_MODES
+    assert "HARVEST" in RUN_MODES
+
+
+def test_the_master_file_asks_for_harvest_mode():
+    """The mode the crawler reads has to match the file's own design."""
+    import csv
+    import io
+    from pathlib import Path
+
+    master = Path("master_input/Paper1_Final_Only_Ecovillages_Master_Input.csv")
+    rows = list(csv.DictReader(io.StringIO(master.read_text(encoding="utf-8"))))
+    assert rows
+    assert {r["mode"] for r in rows} == {"HARVEST"}

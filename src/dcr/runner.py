@@ -82,6 +82,20 @@ STAGE_NAMES = {
 
 MODE_STAGES = {
     "FULL": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    # HARVEST: the researcher has already done the finding.
+    #
+    # With 1,366 curated addresses in the master file, the stages that go
+    # looking for MORE addresses are redundant - and they are the slowest ones
+    # in the program, because they run against search engines the broker limits
+    # to one request every five or six seconds, shared across every community in
+    # the run. On a three-community test that was eighteen minutes inside stage
+    # 0 before a single page of a community's own site had been read.
+    #
+    # So: register what was supplied (0), crawl it (2), open the documents (3),
+    # harvest the literature from the academic APIs (5), reconcile (9). Stage 4
+    # (web archive), 6 (grey literature), 7 (other web sources) and 8 (the
+    # local-language sweep) are all address-FINDING stages and are skipped.
+    "HARVEST": [0, 2, 3, 5, 9],
     "SOURCE": [0, 1, 2, 3, 4, 7],
     "ACADEMIC": [0, 5, 6, 8, 9],
     "RESUME": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -662,6 +676,18 @@ class CommunityRunner:
         if not supplied and not existing:
             event(log, "DISCOVER", "no addresses supplied — searching for the community")
             await self._discover_from_nothing()
+
+        # Open-web discovery finds addresses nobody supplied, and when nobody
+        # supplied any it is indispensable. When the researcher has supplied a
+        # curated set it is the opposite: slow, rate-limited by search engines
+        # the whole run shares, and duplicating work already done by hand.
+        if supplied and self.run_mode == "HARVEST":
+            event(log, "DISCOVER",
+                  f"{len(supplied)} addresses supplied and this is a HARVEST run, "
+                  "so the open-web search for more is skipped — it is the slowest "
+                  "stage in the program and the researcher has already done it")
+            stage.detail = f"{len(supplied)} supplied addresses registered; no open-web search"
+            return
 
         await self._discover_additional_addresses()
 

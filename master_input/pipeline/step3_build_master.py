@@ -452,7 +452,11 @@ def build_row(community: dict, discovery: dict | None,
         "latitude": latitude,
         "longitude": longitude,
         "country": country,
-        "mode": "FULL",
+        # HARVEST, not FULL: this file supplies the addresses, so the stages
+        # that go looking for more are redundant - and they are the slowest in
+        # the program, running against search engines limited to one request
+        # every five or six seconds across the whole run.
+        "mode": "HARVEST",
         "coder_id": "",
         "urls": URL_DELIMITER.join(urls),
         "community_name_original": original,
