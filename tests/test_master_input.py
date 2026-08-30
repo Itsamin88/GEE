@@ -31,6 +31,7 @@ from dcr.orchestrator.session import read_community_file
 ROOT = Path(__file__).resolve().parents[1]
 ORIGINAL = ROOT / "master_input" / "Paper1_Final_Only Ecovillages.csv"
 MASTER = ROOT / "master_input" / "Paper1_Final_Only_Ecovillages_Master_Input.csv"
+FINAL_COORDINATES = ROOT / "master_input" / "pipeline" / "final_coordinates.csv"
 
 GEN_GLOBAL_URL = "https://ecovillage.org"
 URL_DELIMITER = " | "
@@ -115,87 +116,53 @@ def test_every_original_community_survived(rows, original):
     assert kept == originals, f"lost or invented: {originals ^ kept}"
 
 
-def test_every_original_coordinate_is_still_recoverable(rows, original):
-    """All 314 source coordinates, not just the 212 that became primary."""
-    wanted = {(r["Ecovillage_Name"],
-               f"{float(r['Latitude']):.6f},{float(r['Longitude']):.6f}")
-              for r in original}
-    have: set[tuple[str, str]] = set()
-    for row in rows:
-        for pair in row["coordinate_candidates"].split(URL_DELIMITER):
-            have.add((row["community_name_original"], pair.strip()))
-    assert wanted <= have, f"coordinates dropped: {sorted(wanted - have)[:5]}"
-    assert sum(int(r["coordinate_candidate_count"]) for r in rows) == EXPECTED_SOURCE_ROWS
+def test_the_coordinates_are_the_researchers_verified_ones(rows):
+    """The file ships exactly the latitude and longitude the researcher returned.
 
-
-def test_the_exported_coordinate_is_never_lost(rows, original):
-    """Whatever the crawler is given, the export's own first coordinate survives.
-
-    The primary coordinate moves for the 31 rows where the export listed four
-    geocoder candidates and step6 established which one matches the community's
-    published address. Nothing may be discarded in the process: the coordinate
-    the export put first has to remain byte-for-byte recoverable, or the
-    original data has been silently rewritten.
+    The export gave four geocoder candidates for the last 34 communities and
+    chose none. The researcher checked those by hand and sent back one pair per
+    community; those are authoritative, and this build may not alter, round or
+    second-guess them. Compared against the researcher's own file, not against
+    anything this pipeline derived.
     """
-    first_seen: dict[str, tuple[str, str]] = {}
-    for record in original:
-        first_seen.setdefault(record["Ecovillage_Name"],
-                              (record["Latitude"], record["Longitude"]))
+    verified = {r["community_id"]: (r["latitude"], r["longitude"])
+                for r in csv.DictReader(
+                    FINAL_COORDINATES.open(encoding="utf-8-sig", newline=""))}
+    assert len(verified) == EXPECTED_COMMUNITIES
     for row in rows:
-        lat, lon = first_seen[row["community_name_original"]]
-        assert row["latitude_as_exported"] == f"{float(lat):.6f}", row["community_id"]
-        assert row["longitude_as_exported"] == f"{float(lon):.6f}", row["community_id"]
-        # and it is still among the candidate list too
-        assert f"{float(lat):.6f},{float(lon):.6f}" in row["coordinate_candidates"]
+        assert row["community_id"] in verified, row["community_id"]
+        lat, lon = verified[row["community_id"]]
+        assert row["latitude"] == lat, row["community_id"]
+        assert row["longitude"] == lon, row["community_id"]
 
 
-def test_a_single_coordinate_row_is_never_second_guessed(rows, original):
-    """Rows the export gave one coordinate for keep it, untouched."""
-    for row in (r for r in rows if r["coordinate_status"] == "SINGLE"):
-        assert row["latitude"] == row["latitude_as_exported"], row["community_id"]
-        assert row["longitude"] == row["longitude_as_exported"], row["community_id"]
-        assert row["coordinate_primary_rule"] == "single_source_row"
+def test_one_coordinate_pair_per_community_and_no_candidate_columns(rows):
+    """The multi-candidate machinery is gone, not merely unused.
 
-
-def test_a_moved_coordinate_is_one_of_the_exported_candidates(rows):
-    """A resolved coordinate is a CHOICE among the four given, never a new point.
-
-    This is the guard against the resolution step quietly inventing a location:
-    the promoted latitude/longitude must appear verbatim in the candidate list
-    the export supplied.
+    Nine columns existed only to carry the export's unresolved geocoder
+    candidates. With verified coordinates in hand they are noise in a crawler
+    input file, and leaving them in place invites a reader to trust a stale
+    `coordinate_status` that no longer describes anything.
     """
-    moved = [r for r in rows if r["latitude"] != r["latitude_as_exported"]
-             or r["longitude"] != r["longitude_as_exported"]]
-    assert moved, "expected the resolution step to have moved some coordinates"
-    for row in moved:
-        assert row["coordinate_status"] == "MULTIPLE_CANDIDATES_RESOLVED", row["community_id"]
-        pair = f"{float(row['latitude']):.6f},{float(row['longitude']):.6f}"
-        assert pair in row["coordinate_candidates"].split(URL_DELIMITER), row["community_id"]
+    retired = {"coordinate_primary_rule", "coordinate_candidate_count",
+               "coordinate_candidate_spread_km", "coordinate_candidates",
+               "coordinate_status", "latitude_as_exported",
+               "longitude_as_exported", "coordinate_confidence",
+               "coordinate_evidence"}
+    present = set(rows[0])
+    assert not (retired & present), sorted(retired & present)
+    for row in rows:
+        assert row["coordinate_source"] in {
+            "researcher_verified", "source_export_single_row"}, row["community_id"]
 
 
-def test_every_moved_coordinate_cites_the_address_that_justifies_it(rows):
-    """No coordinate may be reassigned on a hunch - each carries its evidence."""
-    for row in (r for r in rows
-                if r["coordinate_status"] == "MULTIPLE_CANDIDATES_RESOLVED"):
-        evidence = row["coordinate_evidence"]
-        assert "published locality:" in evidence, row["community_id"]
-        assert "http" in evidence, row["community_id"]
-        assert len(evidence) > 120, row["community_id"]
-        assert row["coordinate_confidence"] in {"HIGH", "MEDIUM"}, row["community_id"]
-        assert row["coordinate_primary_rule"].startswith(
-            "verified_against_published_address_candidate_"), row["community_id"]
-
-
-def test_an_unresolved_coordinate_is_still_flagged_and_still_the_exported_one(rows):
-    """Where the address could not separate the candidates, nothing was chosen."""
-    unresolved = [r for r in rows
-                  if r["coordinate_status"] == "MULTIPLE_CANDIDATES_UNRESOLVED"]
-    assert unresolved, "the honest outcome for some rows is no answer"
-    for row in unresolved:
-        assert row["latitude"] == row["latitude_as_exported"], row["community_id"]
-        assert row["longitude"] == row["longitude_as_exported"], row["community_id"]
-        assert row["coordinate_confidence"] == "LOW", row["community_id"]
-        assert "multiple_coordinate_candidates" in row["review_reasons"]
+def test_the_communities_whose_coordinates_were_checked_say_so(rows):
+    """Provenance survives the cleanup: 34 rows record a human verification."""
+    verified = [r for r in rows if r["coordinate_source"] == "researcher_verified"]
+    assert len(verified) == 34
+    # They are the tail of the file - the block the export mis-geocoded.
+    assert {r["community_id"] for r in verified} == {
+        f"IC{n:03d}" for n in range(179, 213)}
 
 
 def test_coordinates_parse_and_are_on_the_planet(rows):
@@ -354,17 +321,11 @@ def test_ambiguous_rows_are_flagged_rather_than_quietly_resolved(rows):
     for row in rows:
         reasons = row["review_reasons"]
         assert (row["review_required"] == "yes") == bool(reasons), row["community_id"]
-        if row["coordinate_status"] == "MULTIPLE_CANDIDATES_UNRESOLVED":
-            assert "multiple_coordinate_candidates" in reasons
         if row["discovery_status"] == "PENDING":
             assert "discovery_pending" in reasons
-    # The export shipped four geocoder candidates for 34 communities and chose
-    # none. 31 were settled against their own published addresses; the 3 whose
-    # sources name only a district or a region are left open on purpose.
-    statuses = collections.Counter(r["coordinate_status"] for r in rows)
-    assert statuses["MULTIPLE_CANDIDATES_RESOLVED"] == 31
-    assert statuses["MULTIPLE_CANDIDATES_UNRESOLVED"] == 3
-    assert statuses["SINGLE"] == 178
+        # The coordinates are settled, so no row may still be asking about them.
+        assert "multiple_coordinate_candidates" not in reasons, row["community_id"]
+        assert "coordinate_resolved_below_high" not in reasons, row["community_id"]
 
 
 def test_pending_rows_still_carry_the_mandatory_seed_and_nothing_invented(rows):
@@ -444,3 +405,134 @@ def test_the_original_export_would_now_load_too():
     entries = read_community_file(ORIGINAL)
     assert len(entries) == EXPECTED_SOURCE_ROWS
     assert entries[0]["name"] == "Soheili Village_Hara"
+
+
+# ---------------------------------------------------------------------------
+# The crawl policy: what the file tells the crawler to DO
+# ---------------------------------------------------------------------------
+def test_every_deep_crawl_target_is_a_bare_site_root(rows):
+    """A whole-site walk has to start at the front door.
+
+    Discovery recorded the single most useful page on each site, because that is
+    what a ranked seed list wants - Tamera's water-retention-landscape page, not
+    tamera.org. A crawler told to walk the whole site and handed that page
+    starts three levels down and reaches the archive only by luck. So the deep
+    targets are origins, and the specific pages stay in `urls`.
+    """
+    seen = 0
+    for row in rows:
+        for url in row["deep_crawl_urls"].split(URL_DELIMITER):
+            if not url:
+                continue
+            seen += 1
+            parts = urlsplit(url)
+            assert parts.scheme in {"http", "https"}, url
+            assert parts.netloc, url
+            assert parts.path == "/", f"{url} is a page, not a site root"
+            assert not parts.query and not parts.fragment, url
+    assert seen >= 150, "almost every community has a site of its own"
+
+
+def test_the_network_seed_is_never_walked_exhaustively(rows):
+    """ecovillage.org is 212 communities' shared directory, not anyone's site.
+
+    Walking it in full would crawl the whole Global Ecovillage Network once per
+    community, and none of it would be that community's own voice.
+
+    Matched on the host, not on a substring: `ecovillage.org.in` is an Indian
+    community's own domain and has nothing to do with the network's site.
+    """
+    for row in rows:
+        for url in row["deep_crawl_urls"].split(URL_DELIMITER):
+            if not url:
+                continue
+            host = urlsplit(url).netloc.lower().removeprefix("www.")
+            assert host != "ecovillage.org", row["community_id"]
+
+
+def test_deep_targets_and_source_scopes_agree(rows):
+    """`deep_crawl_urls` and the per-source `crawl_scope` cannot disagree.
+
+    They are two views of one decision, and a crawler may read either.
+    """
+    for row in rows:
+        deep_hosts = {urlsplit(u).netloc for u in
+                      row["deep_crawl_urls"].split(URL_DELIMITER) if u}
+        for source in json.loads(row["seed_sources_json"]):
+            expected = "exhaustive" if urlsplit(
+                source["url"]).netloc in deep_hosts else "targeted"
+            assert source["crawl_scope"] == expected, (row["community_id"], source["url"])
+            assert source["asset_download"] == (
+                "all" if expected == "exhaustive" else "evidence_bearing")
+
+
+def test_academic_terms_exist_for_every_community_and_carry_the_names(rows):
+    """The harvest is driven by written-down strings, not by re-derivation.
+
+    Writing the queries into the file is what makes the literature search
+    reproducible: a community that turns up nothing can be told apart from one
+    that was never asked about properly.
+    """
+    for row in rows:
+        terms = [t for t in row["academic_search_terms"].split(URL_DELIMITER) if t]
+        assert len(terms) >= 3, row["community_id"]
+        assert row["name"] in terms, row["community_id"]
+        assert all(t == t.strip() and t for t in terms), row["community_id"]
+
+
+def test_every_alternative_name_is_actually_searched(rows):
+    """A name the community is also known by is worthless if nothing queries it.
+
+    The literature does not agree on names - Khula Dhamma is published as Khula
+    Dharma, Zeleni Kruchi under Dubravushka, Raiz do Anuhmas as Anhumas. Each
+    alternative name must appear in the harvest, or those papers are invisible.
+    """
+    for row in rows:
+        terms = {t.lower() for t in row["academic_search_terms"].split(URL_DELIMITER)}
+        for alt in row["alternative_names"].split("; "):
+            alt = alt.split("(")[0].strip()
+            if not alt:
+                continue
+            assert any(alt.lower() == t or t.startswith(alt.lower() + " ")
+                       for t in terms), (row["community_id"], alt)
+
+
+def test_search_terms_survive_the_reader_intact(rows):
+    """A query is prose: commas and semicolons inside it must not split it.
+
+    "Baireni, Udayapur" is one search string. Splitting it the way an address
+    list is split would search for "Baireni" and "Udayapur" separately and
+    quietly lose the disambiguation that makes the query work.
+    """
+    communities = {c["name"]: c for c in read_community_file(MASTER)}
+    commas = 0
+    for row in rows:
+        parsed = communities[row["name"]]["academic_search_terms"]
+        expected = [t for t in row["academic_search_terms"].split(URL_DELIMITER) if t]
+        assert parsed == expected, row["community_id"]
+        commas += sum(1 for t in expected if "," in t or ";" in t)
+    assert commas, "the guard is worthless if no term contains a comma"
+
+
+def test_the_crawler_reads_the_policy_columns(rows):
+    """The reader must actually surface the policy, or the file is just decor."""
+    communities = read_community_file(MASTER)
+    assert len(communities) == EXPECTED_COMMUNITIES
+    with_deep = [c for c in communities if c["deep_crawl_urls"]]
+    assert len(with_deep) >= 150
+    for community in communities:
+        assert community["crawl_policy"] in {
+            "EXHAUSTIVE_SITE_AND_ACADEMIC", "ACADEMIC_EXHAUSTIVE_ONLY"}
+        assert community["academic_search_terms"]
+
+
+def test_policy_columns_are_optional_for_a_plain_sheet(tmp_path):
+    """A researcher's two-column sheet still loads; it just gets the defaults."""
+    plain = tmp_path / "plain.csv"
+    plain.write_text("Ecovillage_Name,Latitude,Longitude,urls\n"
+                     "Somewhere,1.5,2.5,https://example.org/\n", encoding="utf-8")
+    got = read_community_file(plain)
+    assert len(got) == 1
+    assert got[0]["deep_crawl_urls"] == []
+    assert got[0]["academic_search_terms"] == []
+    assert got[0]["crawl_policy"] is None

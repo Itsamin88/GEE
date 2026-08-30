@@ -306,7 +306,18 @@ class SourceBudget:
 
     def __init__(self, source_id: str, *, base: int, maximum: int,
                  yield_window: int = 10, yield_threshold: float = 0.15,
-                 increment: int = 25, exhaustion_window: int = 20):
+                 increment: int = 25, exhaustion_window: int = 20,
+                 scope: str = "targeted"):
+        #: An exhaustively-crawled source is the community's own site, and the
+        #: goal there is coverage, not a sample. It still stops - a site with no
+        #: more pages is exhausted like any other - but a long barren stretch is
+        #: not proof it is finished: the newsletter archive may be forty pages of
+        #: links before the first PDF. So the exhaustion window is widened rather
+        #: than removed, which keeps the stop condition honest without letting a
+        #: quiet section end the walk.
+        self.scope = scope
+        if scope == "exhaustive":
+            exhaustion_window = max(exhaustion_window * 10, 200)
         self.source_id = source_id
         self.limit = base
         self.maximum = maximum

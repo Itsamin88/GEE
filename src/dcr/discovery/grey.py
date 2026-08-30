@@ -119,9 +119,42 @@ def build_queries(
     return queries
 
 
+#: Grey databases that page, and the parameter that moves the window.
+#: Registries and gazetteers are deliberately absent: a company register returns
+#: one match for one name and paging it is noise, not coverage.
+PAGING = {
+    "openaire_projects": ("page", "page", 1),
+    "opencorporates": ("page", "page", 1),
+    "fr_rna_associations": ("page", "page", 1),
+    "fr_annuaire_entreprises": ("page", "page", 1),
+}
+
+
+def supports_paging(database: dict[str, Any]) -> bool:
+    return database.get("id") in PAGING
+
+
 def request_for(database: dict[str, Any], query: str, *, rows: int,
-                api_key: str | None) -> tuple[str, dict[str, str]] | None:
-    """Build a request for a grey/funding/registry API, or None if not automatable."""
+                api_key: str | None, page: int = 0
+                ) -> tuple[str, dict[str, str]] | None:
+    """Build a request for a grey/funding/registry API, or None if not automatable.
+
+    `page` is 0-based; a database absent from `PAGING` ignores it.
+    """
+    built = _build_request(database, query, rows=rows, api_key=api_key)
+    if built is None or not page:
+        return built
+    url, headers = built
+    entry = PAGING.get(str(database.get("id")))
+    if not entry:
+        return built
+    name, _style, base = entry
+    joiner = "&" if "?" in url else "?"
+    return f"{url}{joiner}{urlencode({name: str(base + page)})}", headers
+
+
+def _build_request(database: dict[str, Any], query: str, *, rows: int,
+                   api_key: str | None) -> tuple[str, dict[str, str]] | None:
     db_id = database.get("id")
     endpoint = database.get("endpoint")
     if database.get("access") != "api" or not endpoint:

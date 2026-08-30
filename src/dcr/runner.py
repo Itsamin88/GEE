@@ -102,6 +102,16 @@ class CommunityInput:
     mode: str = "SETTLEMENT"
     coder_id: str = ""
     fixture: bool = False
+    #: Domains to walk in full rather than sample. The community's own site,
+    #: any former domain, its blog: the places where the gallery, the newsletter
+    #: archive and the buried report all belong to the community itself, and
+    #: where sampling loses precisely the material a documentary study needs.
+    deep_crawl_urls: list[str] = field(default_factory=list)
+    #: Exact query strings for the exhaustive academic harvest. Supplied by the
+    #: master file so the harvest is reproducible and auditable rather than
+    #: re-derived differently on every run.
+    academic_search_terms: list[str] = field(default_factory=list)
+    crawl_policy: str | None = None
     #: The site_id the run orchestrator has already allocated for this
     #: community. With one database per community — which is what makes a
     #: failure in C007 unable to touch C001 — each database would otherwise
@@ -229,10 +239,31 @@ class CommunityRunner:
     # =====================================================================
     # entry point
     # =====================================================================
+    def _scope_for(self, url: str) -> str:
+        """`exhaustive` for the community's own domains, `targeted` otherwise.
+
+        The master file decides this, not a guess from the platform type: a
+        community may hold three domains and a directory listing may sit on the
+        same host as something unrelated. `deep_crawl_urls` is the researcher's
+        statement of which sites are the community's own.
+        """
+        domain = registrable_domain(url)
+        return "exhaustive" if domain and domain in getattr(
+            self, "deep_domains", set()) else "targeted"
+
     async def run(self, community: CommunityInput) -> RunOutcome:
         record = self._ensure_community(community)
         self.community_id = record["community_id"]
         self.community = community
+        # Which registrable domains the master file marked for a full walk.
+        # Matching on the domain rather than the exact URL is deliberate: the
+        # master file names the site root, but discovery, the sitemap and the
+        # archive all queue deeper pages on the same host, and every one of them
+        # belongs to the same exhaustive job.
+        self.deep_domains = {
+            registrable_domain(url) for url in (community.deep_crawl_urls or [])
+            if registrable_domain(url)
+        }
         self.storage = CommunityStorage.create(
             self.settings.output_root, self.community_id, community.name
         )
@@ -986,6 +1017,8 @@ class CommunityRunner:
         for row in targets:
             if row["access_status"] in ("blocked", "dead", "login_required"):
                 continue
+            scope = self._scope_for(row["url"])
+            scope_cfg = (crawl_cfg.get("scopes") or {}).get(scope) or {}
             context = SourceContext(
                 source_id=row["source_id"],
                 url=row["url"],
@@ -996,15 +1029,21 @@ class CommunityRunner:
                 login_walled=(row["platform_type"] in LOGIN_WALLED),
                 budget=SourceBudget(
                     row["source_id"],
-                    base=int(crawl_cfg.get("base_pages_per_source", 40)),
-                    maximum=int(crawl_cfg.get("max_pages_per_source", 400)),
+                    base=int(scope_cfg.get("base_pages_per_source",
+                                           crawl_cfg.get("base_pages_per_source", 40))),
+                    maximum=int(scope_cfg.get("max_pages_per_source",
+                                              crawl_cfg.get("max_pages_per_source", 400))),
                     yield_window=int(crawl_cfg.get("yield_window", 10)),
                     yield_threshold=float(crawl_cfg.get("yield_threshold", 0.15)),
                     increment=int(crawl_cfg.get("budget_increment", 25)),
                     exhaustion_window=int(crawl_cfg.get("exhaustion_window", 20)),
+                    scope=scope,
                 ),
                 scope_domains={registrable_domain(row["url"])},
                 language=row["language"],
+                crawl_scope=scope,
+                max_depth=int(scope_cfg.get("max_depth",
+                                            crawl_cfg.get("max_depth", 6))),
             )
             self.crawler.register_source(context)
             seeded += await self._seed_source(row, context)
@@ -1628,21 +1667,51 @@ class CommunityRunner:
 
         found: list[academic_mod.AcademicRecord] = []
         errors: list[str] = []
+        rows_per_page = int(self.settings.get(
+            "academic", "max_results_per_database", default=100))
+        max_pages = int(self.settings.get(
+            "academic", "max_pages_per_database", default=20))
+        barren_limit = int(self.settings.get(
+            "academic", "stop_after_barren_pages", default=2))
+        if not academic_mod.supports_paging(dict(database)):
+            max_pages = 1
+
         for query, language in queries:
-            request = academic_mod.request_for(
-                dict(database), query,
-                rows=int(self.settings.get("academic", "max_results_per_database", default=50)),
-                api_key=api_key or None)
-            if request is None:
-                continue
-            url, headers = request
-            result = await self.fetcher.fetch(url, kind="page", headers=headers,
-                                              community_id=self.community_id, stage=5,
-                                              obey_robots=False)
-            if not result.ok or not result.text:
-                errors.append(result.error_detail or "no response")
-                continue
-            found.extend(academic_mod.parse_response(db_id, result.text))
+            # PAGE UNTIL THE DATABASE RUNS OUT, not until an arbitrary fifty.
+            # The brief asks for every paper and thesis that mentions the
+            # community, and the communities that matter most here - Tamera,
+            # Damanhur, Cloughjordan, Findhorn - are each discussed in hundreds
+            # of works. One window of fifty silently returned whichever the API
+            # ranked first and looked identical to a complete answer.
+            seen_here: set[str] = set()
+            barren = 0
+            for page in range(max_pages):
+                request = academic_mod.request_for(
+                    dict(database), query, rows=rows_per_page,
+                    api_key=api_key or None, page=page)
+                if request is None:
+                    break
+                url, headers = request
+                result = await self.fetcher.fetch(url, kind="page", headers=headers,
+                                                  community_id=self.community_id, stage=5,
+                                                  obey_robots=False)
+                if not result.ok or not result.text:
+                    if page == 0:
+                        errors.append(result.error_detail or "no response")
+                    break
+                page_records = academic_mod.parse_response(db_id, result.text)
+                if not page_records:
+                    break
+                fresh = [r for r in page_records if r.identity_key() not in seen_here]
+                seen_here.update(r.identity_key() for r in page_records)
+                found.extend(fresh)
+                # A page that adds nothing new is the end of the result set. Some
+                # APIs clamp an out-of-range page to the last one rather than
+                # returning empty, so repeats - not emptiness - are the signal.
+                barren = barren + 1 if not fresh else 0
+                if barren >= barren_limit or len(page_records) < rows_per_page:
+                    break
+                await self.supervisor.gate()
 
         if errors and not found:
             detail = "; ".join(errors[:3])
@@ -1773,20 +1842,37 @@ class CommunityRunner:
             records: list[grey_mod.GreyRecord] = []
             errors: list[str] = []
             for query in queries[:6]:
-                request = grey_mod.request_for(
-                    dict(database), query,
-                    rows=int(self.settings.get("grey", "max_results_per_database", default=50)),
-                    api_key=api_key or None)
-                if request is None:
-                    continue
-                url, headers = request
-                result = await self.fetcher.fetch(url, kind="page", headers=headers,
-                                                  community_id=self.community_id, stage=6,
-                                                  obey_robots=False)
-                if not result.ok or not result.text:
-                    errors.append(result.error_detail or "no response")
-                    continue
-                records.extend(grey_mod.parse_response(dict(database), result.text))
+                rows_per_page = int(self.settings.get(
+                    "grey", "max_results_per_database", default=100))
+                grey_pages = int(self.settings.get(
+                    "grey", "max_pages_per_database", default=10))
+                if not grey_mod.supports_paging(dict(database)):
+                    grey_pages = 1
+                seen_here: set[str] = set()
+                for page in range(grey_pages):
+                    request = grey_mod.request_for(
+                        dict(database), query, rows=rows_per_page,
+                        api_key=api_key or None, page=page)
+                    if request is None:
+                        break
+                    url, headers = request
+                    result = await self.fetcher.fetch(url, kind="page", headers=headers,
+                                                      community_id=self.community_id, stage=6,
+                                                      obey_robots=False)
+                    if not result.ok or not result.text:
+                        if page == 0:
+                            errors.append(result.error_detail or "no response")
+                        break
+                    page_records = grey_mod.parse_response(dict(database), result.text)
+                    if not page_records:
+                        break
+                    fresh = [r for r in page_records
+                             if (r.url or r.title) not in seen_here]
+                    seen_here.update((r.url or r.title) for r in page_records)
+                    records.extend(fresh)
+                    if not fresh or len(page_records) < rows_per_page:
+                        break
+                    await self.supervisor.gate()
 
             if errors and not records:
                 unreachable += 1

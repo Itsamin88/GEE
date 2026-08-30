@@ -152,6 +152,11 @@ class CommunityJob:
     coder_id: str = ""
     mode: str = "FULL"
     fixture: bool = False
+    #: Sites to walk in full rather than sample - the community's own domains.
+    deep_crawl_urls: list[str] = field(default_factory=list)
+    #: Exact query strings for the exhaustive academic harvest.
+    academic_search_terms: list[str] = field(default_factory=list)
+    crawl_policy: str | None = None
 
     workload_units: float = 0.0
     estimate_low_s: float = 0.0
@@ -172,6 +177,9 @@ class CommunityJob:
             "urls": list(self.urls), "latitude": self.latitude,
             "longitude": self.longitude, "country": self.country,
             "coder_id": self.coder_id, "mode": self.mode, "fixture": self.fixture,
+            "deep_crawl_urls": list(self.deep_crawl_urls),
+            "academic_search_terms": list(self.academic_search_terms),
+            "crawl_policy": self.crawl_policy,
             "workload_units": self.workload_units,
             "estimate_low_s": self.estimate_low_s,
             "estimate_high_s": self.estimate_high_s,
@@ -413,6 +421,11 @@ def build_plan(
             coder_id=str(entry.get("coder_id") or ""),
             mode=str(entry.get("mode") or mode),
             fixture=bool(entry.get("fixture", fixture)),
+            deep_crawl_urls=[str(u).strip() for u in (entry.get("deep_crawl_urls") or [])
+                             if str(u).strip()],
+            academic_search_terms=[str(t).strip() for t in
+                                   (entry.get("academic_search_terms") or []) if str(t).strip()],
+            crawl_policy=entry.get("crawl_policy"),
             workload_units=units,
             estimate_low_s=low,
             estimate_high_s=high,

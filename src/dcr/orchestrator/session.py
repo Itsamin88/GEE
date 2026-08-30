@@ -224,7 +224,32 @@ def _normalise_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
         "coder_id": str(entry.get("coder_id") or "").strip(),
         "mode": (str(entry.get("mode") or "").strip().upper() or "FULL"),
         "urls": _split_urls(entry.get("urls")),
+        # --- crawl policy, when the master file carries it ------------------
+        # Optional by design: a plain two-column sheet of names and URLs still
+        # loads, and simply gets the standard treatment for every address.
+        "deep_crawl_urls": _split_urls(entry.get("deep_crawl_urls")),
+        "academic_search_terms": _split_terms(entry.get("academic_search_terms")),
+        "crawl_policy": (str(entry.get("crawl_policy") or "").strip().upper() or None),
     }
+
+
+def _split_terms(value: Any) -> list[str]:
+    """Search strings, split only on the pipe.
+
+    Not `_split_urls`: a query is ordinary prose. It contains spaces, and it may
+    contain a comma or a semicolon - "Baireni, Udayapur" is one term, not two -
+    so only the pipe delimiter the master file uses may separate them.
+    """
+    if isinstance(value, (list, tuple)):
+        items = [str(v) for v in value]
+    else:
+        items = str(value or "").split("|")
+    out: list[str] = []
+    for item in items:
+        term = item.strip()
+        if term and term not in out:
+            out.append(term)
+    return out
 
 
 # ===========================================================================

@@ -133,6 +133,9 @@ def run_job(payload: Mapping[str, Any], event_queue: Any = None,
             country=payload.get("country"),
             coder_id=str(payload.get("coder_id") or ""),
             fixture=bool(payload.get("fixture", False)),
+            deep_crawl_urls=list(payload.get("deep_crawl_urls") or []),
+            academic_search_terms=list(payload.get("academic_search_terms") or []),
+            crawl_policy=payload.get("crawl_policy"),
             assigned_id=site_id or None,
         )
 

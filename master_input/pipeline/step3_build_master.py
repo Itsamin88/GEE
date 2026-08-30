@@ -27,9 +27,11 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -48,11 +50,8 @@ COLUMNS = [
     # --- identity, with the original preserved
     "community_name_original", "community_name_normalized",
     "name_repair_applied", "alternative_names", "register_mode",
-    # --- coordinates, with every candidate the source gave
-    "source_rows", "coordinate_primary_rule", "coordinate_candidate_count",
-    "coordinate_candidate_spread_km", "coordinate_candidates",
-    "coordinate_status", "latitude_as_exported", "longitude_as_exported",
-    "coordinate_confidence", "coordinate_evidence",
+    # --- coordinates: the researcher's verified values, one pair, no candidates
+    "source_rows", "coordinate_source",
     # --- country, and how it was established
     "country_iso2", "country_iso3", "admin_region", "country_confidence",
     "country_verification_method", "country_verification_source",
@@ -65,6 +64,8 @@ COLUMNS = [
     # --- the seed source set
     "seed_url_count", "independence_group_count", "source_classes",
     "strongest_source_class", "seed_sources_json",
+    # --- what the crawler should DO with them
+    "crawl_policy", "deep_crawl_urls", "academic_search_terms",
     # --- address validation; the live pass writes the last four
     "seed_url_verification_method", "seed_url_validated_count",
     "seed_url_dead_count", "seed_url_blocked_count",
@@ -124,22 +125,128 @@ def ranked_urls(sources: list[dict]) -> list[str]:
     return out
 
 
-RESOLUTION = Path("master_input/pipeline/coordinate_resolution.json")
+FINAL_COORDINATES = Path("master_input/pipeline/final_coordinates.csv")
+
+#: Sources whose whole site is worth walking rather than sampling. These are the
+#: community's own voice - the current site, any former domain it still holds,
+#: and its own blog - where the archive, the gallery, the newsletter and the
+#: buried PDF all belong to the community and all bear on its history.
+DEEP_CRAWL_CLASSES = {"S4"}
+DEEP_CRAWL_PLATFORMS = {"own website", "secondary or former website", "blog platform"}
 
 
-def load_resolutions() -> dict[str, dict]:
-    """Per-community verdicts from step6, keyed by seq. Empty if step6 never ran."""
-    if RESOLUTION.exists():
-        return json.loads(RESOLUTION.read_text(encoding="utf-8"))
-    return {}
+def load_final_coordinates() -> dict[str, tuple[str, str]]:
+    """The researcher's verified latitude and longitude, keyed by community_id.
+
+    These are authoritative. The export shipped four geocoder candidates for the
+    last 34 communities and chose none; the researcher checked those by hand and
+    returned one pair per community. Nothing in this file second-guesses them.
+    """
+    if not FINAL_COORDINATES.exists():
+        return {}
+    with FINAL_COORDINATES.open(encoding="utf-8-sig", newline="") as handle:
+        return {r["community_id"]: (r["latitude"], r["longitude"])
+                for r in csv.DictReader(handle)}
+
+
+#: Words that mark an admin_region segment as a description rather than a place
+#: name - "between Colos and Reliquias", "on the Quko River", "near Crymych".
+#: Pasted into a literature query these produce nothing.
+_NOT_A_PLACE = re.compile(
+    r"\b(between|near|on the|about|north|south|east|west|km|miles|"
+    r"district of|area|region of|former|the mesa|delta)\b", re.I)
+
+
+def _locality(discovery: dict | None) -> str:
+    """The narrowest published place name usable as a literature search anchor.
+
+    `admin_region` runs coarse to fine - "Bahia; Marau; Peninsula de Marau" - so
+    the last segment is normally what a paper's abstract would name. But some
+    segments are descriptions, not names, and pasting "between Colos and
+    Reliquias" into a database query returns nothing. Those are skipped, and a
+    coarser but real place is used instead.
+    """
+    admin = (discovery or {}).get("admin_region", "")
+    for part in reversed([a.strip() for a in admin.split(";") if a.strip()]):
+        if part.upper().startswith("CONFLICT"):
+            continue
+        candidate = part.split(",")[0].split("(")[0].split("/")[0].strip()
+        if not candidate or _NOT_A_PLACE.search(candidate):
+            continue
+        if len(candidate.split()) > 4 or not candidate[0].isupper():
+            continue
+        return candidate
+    return ""
+
+
+def site_root(url: str) -> str:
+    """The origin, so a whole-site walk starts at the front door.
+
+    Discovery recorded the single most useful page on each site - Tamera's
+    water-retention-landscape page, say - because that is what a ranked seed
+    list wants. A crawler told to walk the whole site needs the root instead, or
+    it starts three levels down and reaches the archive only by luck.
+    """
+    parts = urlsplit(url)
+    if not parts.scheme or not parts.netloc:
+        return url
+    return f"{parts.scheme}://{parts.netloc}/"
+
+
+def academic_search_terms(name: str, discovery: dict | None) -> list[str]:
+    """Exact query strings for the exhaustive academic harvest.
+
+    Written into the file rather than re-derived at crawl time so the harvest is
+    reproducible and auditable: a reader can see precisely which strings were
+    searched, and a community that turns up nothing can be distinguished from
+    one that was never asked about properly.
+
+    Every distinct name the community is known by becomes a query, because the
+    literature does not agree on names - Khula Dhamma is published as Khula
+    Dharma, Ecovila Raiz do Anuhmas as Anhumas, Zeleni Kruchi under Dubravushka.
+    Each name is also paired with its locality, which is what separates a paper
+    about this Baireni from the several other places called Baireni.
+    """
+    names: list[str] = []
+
+    def add(value: str) -> None:
+        value = value.strip()
+        if value and value.lower() not in {n.lower() for n in names}:
+            names.append(value)
+
+    add(name)
+    for alt in (discovery or {}).get("alternative_names", "").split(";"):
+        # Drop parenthetical glosses: "Dubravushka (former name to 2018)".
+        add(re.sub(r"\s*\(.*?\)", "", alt))
+
+    terms = list(names)
+    locality = _locality(discovery)
+    country = (discovery or {}).get("country", "")
+    for anchor in (locality, country):
+        if not anchor:
+            continue
+        for n in names[:3]:
+            # "Cloughjordan Cloughjordan" is not a query. If the name already
+            # carries the place, pairing them again only wastes a request.
+            if anchor.lower() in n.lower():
+                continue
+            candidate = f"{n} {anchor}"
+            if candidate not in terms:
+                terms.append(candidate)
+    # Two subject pairings, which is how much of this literature is indexed -
+    # skipped where the name already says it, so no query reads "X ecovillage
+    # ecovillage".
+    for n in names[:1]:
+        for subject in ("ecovillage", "intentional community"):
+            if subject.split()[0].lower() not in n.lower():
+                terms.append(f"{n} {subject}")
+    return terms
 
 
 def build_row(community: dict, discovery: dict | None,
-              resolution: dict | None = None) -> dict[str, str]:
+              final_coordinate: tuple[str, str] | None = None) -> dict[str, str]:
     points = community["coordinate_candidates"]
-    exported = points[0]
-    primary = points[resolution["chosen_candidate"] - 1] if (
-        resolution and resolution["resolved"]) else exported
+    primary = points[0]
     gaz = primary["geocode"]
     reviews: list[str] = []
     notes: list[str] = []
@@ -151,45 +258,19 @@ def build_row(community: dict, discovery: dict | None,
         notes.append("name repaired from a mis-encoded export; original preserved")
 
     # ---- coordinates ----------------------------------------------------
-    candidates = URL_DELIMITER.join(
-        f"{p['latitude']:.6f},{p['longitude']:.6f}" for p in points)
-    coordinate_rule = "single_source_row"
-    coordinate_confidence = "HIGH"
-    coordinate_evidence = ""
-    if len(points) == 1:
-        coordinate_status = "SINGLE"
-    elif resolution and resolution["resolved"]:
-        # The export listed four geocoder candidates and chose none. step6
-        # checked each against this community's own published address; the
-        # winner is promoted to latitude/longitude for the crawler and the
-        # export's original first row is kept in its own columns.
-        coordinate_status = "MULTIPLE_CANDIDATES_RESOLVED"
-        coordinate_rule = f"verified_against_published_address_candidate_{resolution['chosen_candidate']}"
-        coordinate_confidence = resolution["confidence"]
-        coordinate_evidence = (
-            f"published locality: {resolution['published_locality']} "
-            f"[{resolution['locality_source']}]. {resolution['reasoning']}")
-        if coordinate_confidence != "HIGH":
-            reviews.append("coordinate_resolved_below_high")
-        notes.append(
-            f"the export gave {len(points)} geocoder candidates and picked none; "
-            f"candidate {resolution['chosen_candidate']} is the one that matches this "
-            "community's published address, and is what latitude/longitude now carry - "
-            "the export's original first candidate is kept in "
-            "latitude_as_exported/longitude_as_exported")
+    if final_coordinate:
+        latitude, longitude = final_coordinate
+        coordinate_source = ("researcher_verified" if len(points) > 1
+                             else "source_export_single_row")
     else:
-        coordinate_status = "MULTIPLE_CANDIDATES_UNRESOLVED"
-        coordinate_confidence = "LOW"
-        coordinate_rule = "first_source_row"
-        reviews.append("multiple_coordinate_candidates")
-        if resolution:
-            coordinate_evidence = (
-                f"published locality: {resolution['published_locality']} "
-                f"[{resolution['locality_source']}]. {resolution['reasoning']}")
-        notes.append(
-            f"the source file gave {len(points)} coordinates for this one name, "
-            f"up to {community['candidate_spread_km']:.0f} km apart, so at most one "
-            "can be the site; all are preserved and none is asserted")
+        latitude = f"{primary['latitude']:.6f}"
+        longitude = f"{primary['longitude']:.6f}"
+        coordinate_source = "source_export_first_row"
+        if len(points) > 1:
+            reviews.append("coordinate_not_verified")
+            notes.append(
+                f"the export gave {len(points)} coordinates for this name and no "
+                "verified pair was supplied; the first is used and is not asserted")
 
     # ---- country --------------------------------------------------------
     gaz_code = gaz["country_code"]
@@ -250,6 +331,31 @@ def build_row(community: dict, discovery: dict | None,
     # ---- the source set --------------------------------------------------
     sources = discovery["sources"] if discovery else []
     urls = ranked_urls(sources)
+
+    # ---- what the crawler should DO with them ---------------------------
+    # An address is walked in full when it is the community's own voice: its
+    # site, a former domain, its blog. Those hold the galleries, the newsletter
+    # archives and the buried reports, and sampling them the way a directory
+    # listing is sampled loses exactly the material this study needs.
+    deep_sources = [
+        s for s in sources
+        if (s["source_class"] in DEEP_CRAWL_CLASSES
+            or s["platform_type"] in DEEP_CRAWL_PLATFORMS)
+        and not s["url"].rstrip("/").endswith("ecovillage.org")
+    ]
+    deep_urls: list[str] = []
+    for source in deep_sources:
+        root = site_root(source["url"])
+        if root not in deep_urls:
+            deep_urls.append(root)
+    deep_hosts = {urlsplit(u).netloc for u in deep_urls}
+    search_terms = academic_search_terms(normalized, discovery)
+    crawl_policy = "EXHAUSTIVE_SITE_AND_ACADEMIC" if deep_urls else "ACADEMIC_EXHAUSTIVE_ONLY"
+    if not deep_urls:
+        notes.append(
+            "no site of the community's own was found, so there is nothing to walk "
+            "in full; the academic harvest still runs exhaustively")
+
     groups = sorted({s["independence_group"] for s in sources})
     classes = sorted({s["source_class"] for s in sources})
     payload = [
@@ -257,7 +363,13 @@ def build_row(community: dict, discovery: dict | None,
          "source_class": s["source_class"], "platform_type": s["platform_type"],
          "independence_group": s["independence_group"],
          "confidence": s["confidence"], "quality_score": s["score"],
-         "verification": "search_index", "evidence": s["evidence"]}
+         "verification": "search_index", "evidence": s["evidence"],
+         # exhaustive: walk the whole site and take every asset with it.
+         # targeted: this page and what it links to, sampled adaptively.
+         "crawl_scope": ("exhaustive" if urlsplit(s["url"]).netloc in deep_hosts
+                         else "targeted"),
+         "asset_download": ("all" if urlsplit(s["url"]).netloc in deep_hosts
+                            else "evidence_bearing")}
         for s in sources
     ]
     payload.append({
@@ -265,6 +377,7 @@ def build_row(community: dict, discovery: dict | None,
         "source_class": "S3", "platform_type": "directory listing",
         "independence_group": "G1", "confidence": "HIGH", "quality_score": 0.10,
         "verification": "fixed_global_source",
+        "crawl_scope": "targeted", "asset_download": "evidence_bearing",
         "evidence": "Mandatory Global Ecovillage Network network-level seed, "
                     "present on every row; not evidence that this community is "
                     "GEN-registered - see gen_community_status",
@@ -294,8 +407,8 @@ def build_row(community: dict, discovery: dict | None,
     return {
         "community_id": f"IC{community['seq']:03d}",
         "name": normalized,
-        "latitude": f"{primary['latitude']:.6f}",
-        "longitude": f"{primary['longitude']:.6f}",
+        "latitude": latitude,
+        "longitude": longitude,
         "country": country,
         "mode": "FULL",
         "coder_id": "",
@@ -306,15 +419,7 @@ def build_row(community: dict, discovery: dict | None,
         "alternative_names": (discovery or {}).get("alternative_names", ""),
         "register_mode": "SETTLEMENT",
         "source_rows": LIST_DELIMITER.join(str(r) for r in community["source_rows"]),
-        "coordinate_primary_rule": coordinate_rule,
-        "coordinate_candidate_count": str(community["candidate_count"]),
-        "coordinate_candidate_spread_km": f"{community['candidate_spread_km']:.3f}",
-        "coordinate_candidates": candidates,
-        "coordinate_status": coordinate_status,
-        "latitude_as_exported": f"{exported['latitude']:.6f}",
-        "longitude_as_exported": f"{exported['longitude']:.6f}",
-        "coordinate_confidence": coordinate_confidence,
-        "coordinate_evidence": coordinate_evidence,
+        "coordinate_source": coordinate_source,
         "country_iso2": iso2,
         "country_iso3": iso3_for(iso2),
         "admin_region": admin,
@@ -339,6 +444,9 @@ def build_row(community: dict, discovery: dict | None,
         "strongest_source_class": (classes or ["S3"])[0],
         "seed_sources_json": json.dumps(payload, ensure_ascii=False,
                                         separators=(",", ":")),
+        "crawl_policy": crawl_policy,
+        "deep_crawl_urls": URL_DELIMITER.join(deep_urls),
+        "academic_search_terms": URL_DELIMITER.join(search_terms),
         "seed_url_verification_method": (
             "search_index" if discovery else "none"),
         "seed_url_validated_count": "", "seed_url_dead_count": "",
@@ -358,9 +466,9 @@ def main() -> None:
         Path("master_input/pipeline/communities_geocoded.json").read_text(encoding="utf-8"))
     discovery = json.loads(Path("master_input/pipeline/discovery.json").read_text(encoding="utf-8"))
 
-    resolutions = load_resolutions()
+    final = load_final_coordinates()
 
-    rows = [build_row(c, discovery.get(str(c["seq"])), resolutions.get(str(c["seq"])))
+    rows = [build_row(c, discovery.get(str(c["seq"])), final.get(f"IC{c['seq']:03d}"))
             for c in communities]
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

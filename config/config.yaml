@@ -66,9 +66,41 @@ crawl:
   # keeps yielding evidence; it is cut off when it stops.
   base_pages_per_source: 40
   max_pages_per_source: 400
-  max_pages_per_run: 4000
+  max_pages_per_run: 40000
   min_depth: 3
   max_depth: 6
+
+  # TWO SCOPES, BECAUSE TWO KINDS OF ADDRESS ARE NOT THE SAME JOB.
+  #
+  # A directory listing is one page about the community, and the useful thing
+  # to do with it is read it and follow what it points at. The community's OWN
+  # site is a different object entirely: the gallery, the newsletter archive
+  # going back fifteen years, the annual reports as PDFs, the land-use plan
+  # nobody linked from the front page. Sampling that the way a directory is
+  # sampled loses exactly the material a documentary study exists to find.
+  #
+  # So an address named in `deep_crawl_urls` in the master file is walked in
+  # full, and everything else keeps the adaptive sampling above. Exhaustion
+  # still applies to both - a site that has genuinely run out of pages stops -
+  # but an exhaustive source is not cut off merely for being large.
+  scopes:
+    targeted:
+      base_pages_per_source: 40
+      max_pages_per_source: 400
+      max_depth: 6
+      max_pagination_pages: 60
+      asset_download: evidence_bearing
+    exhaustive:
+      base_pages_per_source: 500
+      # A large community site runs to a few thousand pages. This is a stop on
+      # runaway generated URLs, not a research budget; the trap rules below and
+      # the exhaustion window are what normally end an exhaustive walk.
+      max_pages_per_source: 25000
+      max_depth: 25
+      max_pagination_pages: 1000
+      # Take the images, the PDFs, the documents - not only what already looks
+      # like evidence. On the community's own site, everything is in scope.
+      asset_download: all
   # A source earns extra budget when its recent pages yielded evidence.
   yield_window: 10
   yield_threshold: 0.15
@@ -124,7 +156,23 @@ archive:
 
 academic:
   enabled: true
-  max_results_per_database: 50
+  # PAGE SIZE, NOT A CEILING. It was a ceiling, and that was the defect: one
+  # request per database per query, fifty rows, stop. For a community with a
+  # handful of papers that is the whole literature; for Tamera, Findhorn,
+  # Damanhur or Cloughjordan, which are each discussed in hundreds of works, it
+  # silently returned the first fifty an API happened to rank highest and
+  # reported nothing missing. The brief asks for every paper and thesis that
+  # mentions the community, so the harvest now pages until a database stops
+  # returning new records.
+  max_results_per_database: 100
+  # How many pages deep to go per database per query. 100 x 20 = up to 2,000
+  # records from one database for one query string, and the master file gives
+  # each community around a dozen query strings.
+  max_pages_per_database: 20
+  # Stop paging early when a page adds nothing new - the honest end of a
+  # result set, rather than walking empty pages to the cap.
+  stop_after_barren_pages: 2
+  # Chase full text rather than settling for an abstract.
   # Chase full text rather than settling for an abstract.
   fetch_full_text: true
   citation_chaining_rounds: 1
@@ -135,7 +183,8 @@ academic:
 
 grey:
   enabled: true
-  max_results_per_database: 50
+  max_results_per_database: 100
+  max_pages_per_database: 10
 
 images:
   enabled: true
@@ -144,6 +193,10 @@ images:
   min_bytes: 12000
   max_images_per_source: 400
   max_images_per_community: 1500
+  # An exhaustively-crawled source is the community's own site, where the
+  # gallery IS the record. These apply in place of the two above for those.
+  max_images_per_exhaustive_source: 4000
+  max_images_per_community_exhaustive: 12000
   # Keep 'possible' images too; the researcher decides. Only 'decorative' is dropped.
   keep_classes: [likely_relevant, possibly_relevant, uncertain]
   extract_from_documents: true

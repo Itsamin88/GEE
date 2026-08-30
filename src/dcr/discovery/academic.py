@@ -145,9 +145,71 @@ def build_queries(
 # ---------------------------------------------------------------------------
 # Response adapters — one per API. Each returns records, never assumptions.
 # ---------------------------------------------------------------------------
+#: Databases that can be paged, and how. Each entry says which parameter moves
+#: the window and whether it counts in pages or in records.
+#:
+#: THIS IS THE FIX FOR A REAL LOSS OF EVIDENCE. Before it, every database was
+#: asked once for fifty rows and that was the literature. For a community with
+#: six papers that is the whole record; for Tamera, Findhorn, Damanhur or
+#: Cloughjordan, each discussed in hundreds of works, it returned whichever
+#: fifty an API happened to rank first and reported nothing missing - the exact
+#: shape of failure register v2.4 field I12 exists to prevent.
+PAGING = {
+    "openalex": ("page", "page", 1),          # 1-based page number
+    "crossref": ("offset", "offset", 0),      # 0-based record offset
+    "semantic_scholar": ("offset", "offset", 0),
+    "core": ("offset", "offset", 0),
+    "openaire": ("page", "page", 1),
+    "openaire_projects": ("page", "page", 1),
+    "openaire_country": ("page", "page", 1),
+    "narcis_worldcat": ("page", "page", 1),
+    "iris": ("page", "page", 1),
+    "dk_openaire": ("page", "page", 1),
+    "doaj": ("page", "page", 1),
+    "datacite": ("page[number]", "page", 1),
+    "theses_fr": ("debut", "offset", 0),
+    "hal": ("start", "offset", 0),
+    "dnb": ("startRecord", "offset", 1),      # SRU is 1-based
+    "base": ("offset", "offset", 0),          # BASE HttpSearchInterface
+}
+
+
+def supports_paging(database: dict[str, Any]) -> bool:
+    return database.get("id") in PAGING
+
+
+def _page_param(db_id: str, page: int, rows: int) -> dict[str, str]:
+    """The one extra parameter that moves a database's result window."""
+    entry = PAGING.get(db_id)
+    if not entry or page <= 0:
+        return {}
+    name, style, base = entry
+    if style == "page":
+        return {name: str(base + page)}
+    return {name: str(base + page * rows)}
+
+
 def request_for(database: dict[str, Any], query: str, *, rows: int, api_key: str | None,
-                extra: dict[str, str] | None = None) -> tuple[str, dict[str, str]] | None:
-    """Build the request URL and headers for a database, or None if not automatable."""
+                extra: dict[str, str] | None = None,
+                page: int = 0) -> tuple[str, dict[str, str]] | None:
+    """Build the request URL and headers for a database, or None if not automatable.
+
+    `page` is 0-based and selects the result window. A database absent from
+    `PAGING` ignores it and always returns its first window, which is why the
+    caller stops paging as soon as a page repeats what it already has.
+    """
+    built = _build_request(database, query, rows=rows, api_key=api_key, extra=extra)
+    if built is None or not page:
+        return built
+    url, headers = built
+    return _with_page(url, str(database.get("id")), page, rows), headers
+
+
+def _build_request(database: dict[str, Any], query: str, *, rows: int,
+                   api_key: str | None,
+                   extra: dict[str, str] | None = None
+                   ) -> tuple[str, dict[str, str]] | None:
+    """The first result window for a database. Paging is layered on above."""
     db_id = database.get("id")
     endpoint = database.get("endpoint")
     if database.get("access") != "api" or not endpoint:
@@ -195,6 +257,14 @@ def request_for(database: dict[str, Any], query: str, *, rows: int, api_key: str
     if extra:
         return f"{endpoint}?{urlencode({**extra, 'q': query})}", headers
     return None
+
+
+def _with_page(url: str, db_id: str, page: int, rows: int) -> str:
+    extra = _page_param(str(db_id), page, rows)
+    if not extra:
+        return url
+    joiner = "&" if "?" in url else "?"
+    return f"{url}{joiner}{urlencode(extra)}"
 
 
 def parse_response(database_id: str, payload: str) -> list[AcademicRecord]:

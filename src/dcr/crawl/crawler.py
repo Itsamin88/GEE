@@ -86,6 +86,18 @@ class SourceContext:
     budget: SourceBudget
     scope_domains: set[str] = field(default_factory=set)
     language: str | None = None
+    #: "exhaustive" for a site named in the master file's `deep_crawl_urls` -
+    #: the community's own domains, walked in full. "targeted" for everything
+    #: else, which keeps the adaptive sampling.
+    crawl_scope: str = "targeted"
+    #: Depth ceiling for THIS source. An exhaustive walk of a site whose blog
+    #: archive is nested five levels under a year/month/day path needs more
+    #: than the shared default, and a directory listing needs less.
+    max_depth: int | None = None
+
+    @property
+    def exhaustive(self) -> bool:
+        return self.crawl_scope == "exhaustive"
 
 
 class Crawler:
@@ -145,6 +157,13 @@ class Crawler:
                                             ["likely_relevant", "possibly_relevant", "uncertain"]))
         self.max_images_per_source = int(image_cfg.get("max_images_per_source", 400))
         self.max_images_per_community = int(image_cfg.get("max_images_per_community", 1500))
+        # On the community's own site the gallery IS the record: dated field
+        # photographs, site plans, before-and-after pairs. Capping it at the
+        # allowance meant for a directory listing throws that away.
+        self.max_images_per_exhaustive_source = int(
+            image_cfg.get("max_images_per_exhaustive_source", 4000))
+        self.max_images_per_community_exhaustive = int(
+            image_cfg.get("max_images_per_community_exhaustive", 12000))
         # Which priority bands are worth the bandwidth. LOW and DUPLICATE are
         # recorded in the ledger with their metadata but never downloaded
         # (brief SS5, SS7).
@@ -204,6 +223,18 @@ class Crawler:
 
     def register_source(self, context: SourceContext) -> None:
         self.sources[context.source_id] = context
+
+    def _image_cap_for(self, context: SourceContext | None) -> int:
+        """Per-source image ceiling, larger for the community's own site.
+
+        A directory listing offers a logo and a stock photograph. The
+        community's own site offers fifteen years of dated field photography,
+        site plans and before-and-after pairs, and capping that at the
+        directory's allowance discards the best image evidence there is.
+        """
+        if context is not None and getattr(context, "exhaustive", False):
+            return self.max_images_per_exhaustive_source
+        return self.max_images_per_source
 
     def source_for(self, source_id: str | None) -> SourceContext | None:
         """The registered context, or a read-only one rebuilt from the database.
@@ -494,7 +525,9 @@ class Crawler:
                 # candidate source instead, for Stage 0 to decide on.
                 self._note_external(normalized, item, method)
                 return
-            if resolved_kind == "page" and depth > self.max_depth:
+            depth_limit = (context.max_depth if context and context.max_depth
+                           else self.max_depth)
+            if resolved_kind == "page" and depth > depth_limit:
                 return
             if archive_template and archive_timestamp:
                 # Keep following the site as it was on that date.
@@ -841,7 +874,14 @@ class Crawler:
         becoming four thousand downloads however enthusiastically it is
         captioned.
         """
-        base = self.max_images_per_community
+        # Which base allowance applies depends only on whether any of this
+        # community's addresses is one of its own sites. Read defensively so
+        # the adaptive logic below stays testable in isolation.
+        exhaustive = any(getattr(c, "exhaustive", False)
+                         for c in getattr(self, "sources", {}).values())
+        base = (getattr(self, "max_images_per_community_exhaustive",
+                        self.max_images_per_community)
+                if exhaustive else self.max_images_per_community)
         kept = max(0, self.stats.images_kept)
         if kept < self.image_allowance_warmup:
             return base
@@ -894,7 +934,7 @@ class Crawler:
                            "was already spent; the candidate is recorded with its "
                            "caption and file name, which often carry a date")
                 continue
-            if kept_for_source >= self.max_images_per_source:
+            if kept_for_source >= self._image_cap_for(context):
                 self.triage.record(candidate, decision="skipped_budget",
                                    reason="this source's image budget was already spent")
                 continue
