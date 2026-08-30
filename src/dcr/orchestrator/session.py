@@ -38,6 +38,7 @@ from __future__ import annotations
 import csv
 import json
 import time
+from multiprocessing.managers import BaseManager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -59,6 +60,13 @@ from .store import (CANCELLED, COMPLETED, FAILED, PAUSED_MANUAL, PAUSED_NETWORK,
                     QUEUED, RUN_CANCELLED, RUN_COMPLETED, RunStore)
 
 log = get_logger("orchestrator.session")
+
+
+class _BrokerManager(BaseManager):
+    """Serves the one `HostBroker` that every worker process shares.
+
+    Must stay at module level: see `RunSession._start_broker`.
+    """
 
 #: Columns a community file may carry. Only `name` is required; a community
 #: with no addresses at all is a legitimate job — stage 0 goes looking.
@@ -406,13 +414,20 @@ class RunSession:
         A `multiprocessing.Manager` proxy, which behaves identically on Windows
         and POSIX — there is no forked shared memory here, and nothing assumes
         any (brief §42).
+
+        `_BrokerManager` is defined at module level, and that is not a style
+        preference. `multiprocessing` on Windows starts its manager process with
+        `spawn`, which re-imports the module and looks the class up by qualified
+        name; a class defined inside this method is
+        `RunSession._start_broker.<locals>._BrokerManager`, which no import can
+        resolve. The manager then failed to start on Windows and every run fell
+        back to per-worker politeness — silently, because the fallback is
+        deliberately non-fatal. That matters most where it is least visible:
+        `https://ecovillage.org` is a seed on all 212 rows of the cohort, so
+        without the shared broker sixteen workers hit one host at once, which is
+        both rude and a good way to be blocked halfway through an overnight run.
         """
         try:
-            from multiprocessing.managers import BaseManager
-
-            class _BrokerManager(BaseManager):
-                pass
-
             _BrokerManager.register(
                 "HostBroker", HostBroker,
                 exposed=("acquire", "release", "defer", "shared", "snapshot", "stats"))

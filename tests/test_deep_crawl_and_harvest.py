@@ -203,3 +203,45 @@ def test_the_harvest_is_configured_to_go_deeper_than_one_window():
     reachable = (cfg["academic"]["max_results_per_database"]
                  * cfg["academic"]["max_pages_per_database"])
     assert reachable >= 1000, "Tamera and Findhorn have hundreds of papers each"
+
+
+# ---------------------------------------------------------------------------
+# Shared politeness across worker processes
+# ---------------------------------------------------------------------------
+def test_the_host_broker_class_can_survive_spawn():
+    """The manager class must be importable by name, or Windows loses politeness.
+
+    `multiprocessing` on Windows starts its manager with `spawn`, which
+    re-imports the module and looks the class up by qualified name. A class
+    defined inside a method is `RunSession._start_broker.<locals>._BrokerManager`
+    and no import can resolve that, so the manager failed to start and every run
+    fell back to per-worker politeness — silently, because that fallback is
+    deliberately non-fatal.
+
+    It matters most where it is least visible: `https://ecovillage.org` is a
+    seed on all 212 rows of the cohort, so with no shared broker sixteen workers
+    hit one host at once.
+    """
+    import pickle
+
+    from dcr.orchestrator.session import _BrokerManager
+
+    assert "<locals>" not in _BrokerManager.__qualname__
+    assert pickle.loads(pickle.dumps(_BrokerManager)) is _BrokerManager
+
+
+def test_the_shared_broker_actually_starts():
+    """Not just picklable — it has to serve a working proxy."""
+    from dcr.orchestrator.hosts import HostBroker
+    from dcr.orchestrator.session import _BrokerManager
+
+    _BrokerManager.register(
+        "HostBroker", HostBroker,
+        exposed=("acquire", "release", "defer", "shared", "snapshot", "stats"))
+    manager = _BrokerManager()
+    manager.start()
+    try:
+        broker = manager.HostBroker(config={})
+        assert isinstance(broker.snapshot(), list)
+    finally:
+        manager.shutdown()
