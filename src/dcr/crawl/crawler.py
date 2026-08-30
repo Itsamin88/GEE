@@ -36,7 +36,8 @@ from ..net.mime import is_html
 from ..storage import CommunityStorage
 from ..supervisor import NullSupervisor
 from .frontier import Frontier, SourceBudget
-from .normalize import TrapDetector, classify_url, normalize, registrable_domain, same_site
+from .normalize import (TrapDetector, classify_url, normalize, path_extension,
+                        registrable_domain, same_site)
 from .platform import detect_platform, is_website_like
 
 log = get_logger("crawl")
@@ -86,10 +87,16 @@ class SourceContext:
     budget: SourceBudget
     scope_domains: set[str] = field(default_factory=set)
     language: str | None = None
-    #: "exhaustive" for a site named in the master file's `deep_crawl_urls` -
-    #: the community's own domains, walked in full. "targeted" for everything
-    #: else, which keeps the adaptive sampling.
-    crawl_scope: str = "targeted"
+    #: How much of this address to take.
+    #:   site  the community's own domain: every page, every asset
+    #:   page  somebody else's site: THIS page only, follow nothing
+    #:   file  a direct document link: download it, crawl nothing
+    crawl_scope: str = "page"
+    #: False for `page` and `file`. This is the single flag that keeps a run
+    #: inside its window: a news article about a community sits on a site with
+    #: fifty thousand pages of no interest, and following its links would spend
+    #: hours to learn nothing.
+    follow_links: bool = True
     #: Depth ceiling for THIS source. An exhaustive walk of a site whose blog
     #: archive is nested five levels under a year/month/day path needs more
     #: than the shared default, and a directory listing needs less.
@@ -97,7 +104,8 @@ class SourceContext:
 
     @property
     def exhaustive(self) -> bool:
-        return self.crawl_scope == "exhaustive"
+        """Is this the community's own site, taken in full?"""
+        return self.crawl_scope == "site"
 
 
 class Crawler:
@@ -155,6 +163,10 @@ class Crawler:
         self.image_min_height = int(image_cfg.get("min_height", 240))
         self.image_keep = set(image_cfg.get("keep_classes",
                                             ["likely_relevant", "possibly_relevant", "uncertain"]))
+        harvest_cfg = dict(config.get("harvest", {}) or {})
+        self.asset_extensions: set[str] = set()
+        for group in (harvest_cfg.get("asset_types") or {}).values():
+            self.asset_extensions.update(str(e).lower() for e in group)
         self.max_images_per_source = int(image_cfg.get("max_images_per_source", 400))
         self.max_images_per_community = int(image_cfg.get("max_images_per_community", 1500))
         # On the community's own site the gallery IS the record: dated field
@@ -506,6 +518,13 @@ class Crawler:
                      *, archive_timestamp: str | None = None) -> int:
         """Queue in-scope links; record out-of-scope ones as candidate sources."""
         added = 0
+        # A `page`- or `file`-scoped address contributes its own assets and
+        # nothing else. Returning here is what stops the crawler wandering into
+        # a newspaper's back catalogue because one article mentioned the
+        # community.
+        if context is not None and not context.follow_links:
+            self._queue_assets_only(parsed, item, context, stage)
+            return 0
         depth = item.depth + 1
         scope = context.scope_domains if context else set()
         if not scope:
@@ -558,6 +577,47 @@ class Crawler:
             self._note_external(url, item, "footer")
         return added
 
+    def _queue_assets_only(self, parsed: ParsedPage, item: Any,
+                           context: SourceContext, stage: int) -> None:
+        """Take the documents linked from ONE page, and follow nothing.
+
+        This is what a `page`-scoped address is for. A GEN listing, a news
+        article or a university page is one page of interest on a site that has
+        no other interest, and the material worth keeping - the annual report
+        PDF, the thesis, the site plan - hangs directly off it.
+
+        Only documents are queued here. Images are harvested separately from the
+        parsed page itself, so they are already collected without following
+        anything; and pages are not queued at all, which is the whole point.
+        """
+        for url, _ in parsed.document_links:
+            normalized = normalize(url, item.normalized_url)
+            if not normalized or classify_url(normalized) != "document":
+                continue
+            if not self.wants_asset(normalized):
+                continue
+            if self.frontier.add(normalized, source_id=item.source_id, depth=item.depth,
+                                 kind="document", stage=stage,
+                                 discovery_method="link_on_page_scoped_source",
+                                 source_priority=context.retrieval_priority,
+                                 prefer_oldest=self.prefer_oldest):
+                self.stats.urls_discovered += 1
+                self._log_discovery(stage, "link_on_page_scoped_source", normalized,
+                                    "new_url", item.normalized_url)
+
+    def wants_asset(self, url: str) -> bool:
+        """Is this a file type the harvest collects?
+
+        The researcher asked for text, images, PDFs, Word files and
+        spreadsheets. Everything else - video, audio, archives, slide decks,
+        installers - is recorded in the manifest with its address and left
+        unfetched, because it is large and nothing downstream reads it.
+        """
+        if not self.asset_extensions:
+            return True
+        ext = path_extension(url)
+        return (not ext) or ext in self.asset_extensions
+
     def _note_external(self, url: str, item: Any, method: str) -> None:
         normalized = normalize(url)
         if not normalized:
@@ -578,6 +638,21 @@ class Crawler:
 
     # -- documents ---------------------------------------------------------
     async def _fetch_document(self, item: Any, context: SourceContext | None, stage: int) -> None:
+        # The harvest collects text, images, PDFs, Word files and spreadsheets.
+        # A video, an audio file, a zip or a slide deck is recorded with its
+        # address - so the researcher can see it exists and fetch it by hand -
+        # and not downloaded, because it is large and nothing downstream reads
+        # it. Checked before the triage below, since the cheapest download is
+        # the one never started.
+        if not self.wants_asset(item.normalized_url):
+            self.stats.documents_skipped += 1
+            self._log_discovery(stage, "asset_type_filter", item.normalized_url,
+                                "out_of_scope",
+                                f"{path_extension(item.normalized_url) or 'no extension'} "
+                                "is not a collected file type; recorded, not downloaded")
+            self.frontier.complete(item.url_key, "skipped", "file type not collected")
+            return
+
         # What a document is can usually be told from its address before a byte
         # of it is downloaded, and that judgement costs nothing (brief §10, §41).
         verdict = self.doc_triage.judge(

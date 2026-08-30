@@ -487,9 +487,23 @@ def budget_from_settings(settings: Any, *, carried_active_s: float = 0.0,
     """Build the clock from configuration, so every number is visible."""
     config = dict(settings.get("budget", default={}) or {}) if settings else {}
     shares = config.get("stage_shares") or {}
+
+    # HARVEST MODE SETS A CEILING, AND MEANS IT.
+    #
+    # The default is no ceiling, because a fixed cap is what cost this program
+    # evidence before. But a 212-community run has to land inside a stated
+    # window, and "no ceiling" plus one community with a fifty-thousand-page
+    # site is how a two-day run becomes a two-week one. `budget.active_minutes`
+    # still wins if an operator sets it explicitly; otherwise harvest mode's
+    # per-community figure applies, and a community stopped by it is reported
+    # COMPLETE_WITH_TRUNCATION rather than as though it had finished.
+    ceiling_minutes = float(config.get("active_minutes", 0) or 0)
+    if not ceiling_minutes and settings is not None:
+        ceiling_minutes = float(
+            settings.get("harvest", "max_minutes_per_community", default=0) or 0)
+
     return WorkBudget(
-        # 0 (the default) means no research-runtime ceiling at all.
-        ceiling_s=float(config.get("active_minutes", 0) or 0) * 60.0,
+        ceiling_s=ceiling_minutes * 60.0,
         finalisation_reserve_s=float(config.get("finalisation_reserve_minutes", 3)) * 60.0,
         wind_down_s=float(config.get("wind_down_minutes", 2)) * 60.0,
         stage_shares={int(k): float(v) for k, v in shares.items()} or None,

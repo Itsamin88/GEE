@@ -36,6 +36,7 @@ def _budget(scope: str, **kw) -> SourceBudget:
 
 
 def _context(scope: str, **kw) -> SourceContext:
+    kw.setdefault("follow_links", scope == "site")
     return SourceContext(
         source_id="S1", url="https://example.org/", platform_type="own website",
         source_class="S4", retrieval_priority="B", independence_group="G1",
@@ -51,15 +52,15 @@ def test_an_exhaustive_source_is_not_abandoned_for_a_quiet_stretch():
     A newsletter archive can be forty pages of links before the first PDF. The
     targeted window would call that exhausted and walk away from the archive.
     """
-    targeted = _budget("targeted", )
-    exhaustive = _budget("exhaustive")
+    targeted = _budget("page")
+    exhaustive = _budget("site")
     assert exhaustive.exhaustion_window > targeted.exhaustion_window * 5
     assert exhaustive.dead_source_window > targeted.dead_source_window
 
 
 def test_an_exhaustive_source_still_stops():
     """Widened, not removed: coverage is the goal, not an unbounded crawl."""
-    exhaustive = _budget("exhaustive")
+    exhaustive = _budget("site")
     assert exhaustive.exhaustion_window < 10_000
     assert exhaustive.maximum > 0
 
@@ -70,39 +71,57 @@ def test_the_scope_is_recorded_on_the_source_not_inferred():
     Not the platform type: a community may hold three domains, and a directory
     listing can sit on the same host as something unrelated.
     """
-    assert _context("exhaustive").exhaustive is True
-    assert _context("targeted").exhaustive is False
-    assert SourceContext(
-        source_id="S", url="https://x.org/", platform_type="own website",
-        source_class="S4", retrieval_priority="B", independence_group="G1",
-        login_walled=False, budget=_budget("targeted")).crawl_scope == "targeted"
+    assert _context("site").exhaustive is True
+    assert _context("page").exhaustive is False
+    assert _context("file").exhaustive is False
 
 
-def test_the_config_gives_an_exhaustive_walk_a_bigger_budget_and_more_depth():
-    """The two scopes must actually differ, or naming them buys nothing."""
+def test_only_the_communitys_own_site_follows_links():
+    """The rule that keeps 212 communities inside two days.
+
+    A news article about a community is one useful page on a site with fifty
+    thousand useless ones. Following its links would spend hours to learn
+    nothing, so `page` and `file` take what is on the page and stop.
+    """
+    assert _context("site").follow_links is True
+    assert _context("page").follow_links is False
+    assert _context("file").follow_links is False
+
+
+def test_the_three_scopes_differ_in_the_way_that_matters():
+    """Naming three scopes buys nothing unless they behave differently."""
     import yaml
     from pathlib import Path
 
-    cfg = yaml.safe_load(Path("config/config.yaml").read_text(encoding="utf-8"))
-    scopes = cfg["crawl"]["scopes"]
-    deep, shallow = scopes["exhaustive"], scopes["targeted"]
-    assert deep["max_pages_per_source"] > shallow["max_pages_per_source"] * 10
-    assert deep["base_pages_per_source"] > shallow["base_pages_per_source"]
-    assert deep["max_depth"] > shallow["max_depth"]
-    assert deep["max_pagination_pages"] > shallow["max_pagination_pages"]
-    # And it takes the assets with it, rather than only what already reads as
-    # evidence - on the community's own site everything is in scope.
-    assert deep["asset_download"] == "all"
-    assert shallow["asset_download"] == "evidence_bearing"
+    scopes = yaml.safe_load(
+        Path("config/config.yaml").read_text(encoding="utf-8"))["crawl"]["scopes"]
+    site, page, one_file = scopes["site"], scopes["page"], scopes["file"]
+
+    # The community's own site is walked; nobody else's is.
+    assert site["follow_links"] is True
+    assert page["follow_links"] is False
+    assert one_file["follow_links"] is False
+
+    # Exactly one page is fetched from somebody else's site.
+    assert page["max_pages_per_source"] == 1
+    assert one_file["max_pages_per_source"] == 1
+    assert page["max_depth"] == 0
+
+    assert site["max_pages_per_source"] > page["max_pages_per_source"] * 100
+    assert site["max_depth"] > page["max_depth"]
+
+    # But every scope still takes the assets on the page it did fetch - a
+    # directory listing's linked annual report is exactly what is wanted.
+    assert all(s["asset_download"] == "all" for s in (site, page, one_file))
 
 
 def test_the_run_wide_page_ceiling_can_hold_an_exhaustive_walk():
-    """A per-source budget of 25,000 is a lie if the run stops at 4,000."""
+    """A large per-source budget is a lie if the run-wide ceiling is smaller."""
     import yaml
     from pathlib import Path
 
     cfg = yaml.safe_load(Path("config/config.yaml").read_text(encoding="utf-8"))["crawl"]
-    assert cfg["max_pages_per_run"] >= cfg["scopes"]["exhaustive"]["max_pages_per_source"]
+    assert cfg["max_pages_per_run"] >= cfg["scopes"]["site"]["max_pages_per_source"]
 
 
 # ---------------------------------------------------------------------------

@@ -30,7 +30,7 @@ from urllib.parse import urlsplit
 from .config import Settings
 from .crawl.crawler import Crawler, SourceContext
 from .crawl.frontier import Frontier, SourceBudget
-from .crawl.normalize import normalize, registrable_domain
+from .crawl.normalize import classify_url, normalize, registrable_domain
 from .crawl.platform import (
     LOGIN_WALLED, default_source_class, detect_platform, is_website_like, profile_for,
 )
@@ -240,16 +240,23 @@ class CommunityRunner:
     # entry point
     # =====================================================================
     def _scope_for(self, url: str) -> str:
-        """`exhaustive` for the community's own domains, `targeted` otherwise.
+        """`site`, `page` or `file` for one address.
 
-        The master file decides this, not a guess from the platform type: a
-        community may hold three domains and a directory listing may sit on the
-        same host as something unrelated. `deep_crawl_urls` is the researcher's
-        statement of which sites are the community's own.
+        The master file decides, not a guess from the platform type: a community
+        may hold three domains, and a directory listing can sit on the same host
+        as something unrelated. `deep_crawl_urls` is the researcher's statement
+        of which domains are the community's own.
+
+        Everything else is `page` - fetch that one page, take its assets, follow
+        nothing. That single rule is what keeps 212 communities inside a two-day
+        window: a news article about a community is one useful page on a site
+        with fifty thousand useless ones.
         """
+        if classify_url(url) == "document":
+            return "file"
         domain = registrable_domain(url)
-        return "exhaustive" if domain and domain in getattr(
-            self, "deep_domains", set()) else "targeted"
+        return "site" if domain and domain in getattr(
+            self, "deep_domains", set()) else "page"
 
     async def run(self, community: CommunityInput) -> RunOutcome:
         record = self._ensure_community(community)
@@ -1042,6 +1049,7 @@ class CommunityRunner:
                 scope_domains={registrable_domain(row["url"])},
                 language=row["language"],
                 crawl_scope=scope,
+                follow_links=bool(scope_cfg.get("follow_links", scope == "site")),
                 max_depth=int(scope_cfg.get("max_depth",
                                             crawl_cfg.get("max_depth", 6))),
             )

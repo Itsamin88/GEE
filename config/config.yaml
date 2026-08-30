@@ -83,23 +83,44 @@ crawl:
   # full, and everything else keeps the adaptive sampling above. Exhaustion
   # still applies to both - a site that has genuinely run out of pages stops -
   # but an exhaustive source is not cut off merely for being large.
+  # THREE SCOPES, SET PER ADDRESS IN THE MASTER FILE.
+  #
+  # `site` is the community's OWN domain, and only ever that. It is walked in
+  # full: every page, and every image, PDF, Word file and spreadsheet on it.
+  #
+  # `page` is somebody else's site - a directory listing, a news article, a
+  # university page. Exactly ONE page is fetched, plus the assets on it.
+  # Nothing is followed. This is the rule that keeps the run inside its window:
+  # a news article about a community is one page of interest on a site with
+  # fifty thousand pages of no interest, and walking it would spend hours to
+  # learn nothing.
+  #
+  # `file` is a direct link to a document. It is downloaded and nothing else.
   scopes:
-    targeted:
-      base_pages_per_source: 40
-      max_pages_per_source: 400
-      max_depth: 6
-      max_pagination_pages: 60
-      asset_download: evidence_bearing
-    exhaustive:
-      base_pages_per_source: 500
-      # A large community site runs to a few thousand pages. This is a stop on
-      # runaway generated URLs, not a research budget; the trap rules below and
-      # the exhaustion window are what normally end an exhaustive walk.
-      max_pages_per_source: 25000
-      max_depth: 25
-      max_pagination_pages: 1000
-      # Take the images, the PDFs, the documents - not only what already looks
-      # like evidence. On the community's own site, everything is in scope.
+    site:
+      base_pages_per_source: 400
+      # A generous ceiling, not a target. Most community sites finish well
+      # inside it; the few that do not are recorded as truncated rather than
+      # quietly cut short (register v2.4 I12).
+      max_pages_per_source: 2500
+      max_depth: 20
+      max_pagination_pages: 400
+      follow_links: true
+      asset_download: all
+    page:
+      base_pages_per_source: 1
+      max_pages_per_source: 1
+      max_depth: 0
+      max_pagination_pages: 0
+      # THE POINT OF THIS SCOPE: fetch the page, take what is on it, stop.
+      follow_links: false
+      asset_download: all
+    file:
+      base_pages_per_source: 1
+      max_pages_per_source: 1
+      max_depth: 0
+      max_pagination_pages: 0
+      follow_links: false
       asset_download: all
   # A source earns extra budget when its recent pages yielded evidence.
   yield_window: 10
@@ -120,6 +141,37 @@ crawl:
   # Blog/news archives: how far back through pagination to walk.
   max_pagination_pages: 60
   prefer_oldest_first: true
+
+# ---------------------------------------------------------------------------
+# HARVEST-ONLY MODE
+# ---------------------------------------------------------------------------
+# This installation has no LLM key, so the program cannot read a document and
+# decide what it means. Pretending otherwise produced a workbook full of
+# unfilled cells and a very large review queue.
+#
+# So it does the thing it CAN do well, and only that: find the material, fetch
+# it, save it, and label it so a human can tell what came from where. No
+# workbook, no semantic evaluation, no reading of papers - the files are
+# collected for the researcher to read.
+harvest:
+  enabled: true
+  # Skip the Stage 1 workbook entirely. The manifests below are the deliverable.
+  write_workbook: false
+  # What is worth downloading. Anything not in this list is recorded in the
+  # manifest with its URL, and not fetched.
+  asset_types:
+    image: [".jpg", ".jpeg", ".png", ".gif", ".webp", ".tif", ".tiff", ".bmp", ".svg"]
+    pdf: [".pdf"]
+    word: [".doc", ".docx", ".odt", ".rtf"]
+    spreadsheet: [".csv", ".tsv", ".xls", ".xlsx", ".xlsm", ".ods"]
+  # Deliberately NOT downloaded: video, audio, archives, presentations,
+  # executables. They are large, and nothing downstream reads them.
+  #
+  # THE RUN HAS TO FIT A WINDOW. 212 communities on 8 workers is about 26 each;
+  # at 60 minutes apiece that is roughly 27 hours, inside the 24-48 hour target.
+  # A community stopped by this is COMPLETE_WITH_TRUNCATION and says so - it is
+  # never reported as if it had finished.
+  max_minutes_per_community: 60
 
 archive:
   enabled: true

@@ -407,6 +407,32 @@ class Application:
         )
         workbook_path = storage.final / workbook_name
 
+        # HARVEST-ONLY: no workbook.
+        #
+        # Without an LLM key the program cannot read a document and decide what
+        # it means, so a Stage 1 workbook came out mostly empty with everything
+        # of substance dumped into the review queue - the appearance of coded
+        # research over an uncoded pile. The manifests below are the honest
+        # deliverable: what was found, where it came from, and where it is now
+        # on disk, for the researcher to read themselves.
+        if not self.settings.get("harvest", "write_workbook", default=True):
+            event(log, "EXPORT",
+                  "harvest-only mode: no workbook written. The manifests in "
+                  f"{storage.final.name} are the deliverable.")
+            manifest_counts = manifests.export_all(self.db, community_id, storage.final)
+            (storage.final / "run_manifest.json").write_text(
+                json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
+            qc = QualityControl(self.db, community_id, self.settings.schema,
+                                storage_root=storage.root)
+            qc_report = qc.run(workbook_path=None)
+            return {
+                "workbook": None,
+                "workbook_written": False,
+                "harvest_only": True,
+                "manifests": manifest_counts,
+                "qc": qc_report,
+            }
+
         def build_exporter(*, aggressive: bool = False, core_only: bool = False):
             return WorkbookExporter(
                 self.settings.workbook_template, self.settings.schema, self.db,

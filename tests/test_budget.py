@@ -77,12 +77,45 @@ def test_a_productive_community_is_never_stopped_by_the_clock(minutes):
         f"a community still producing evidence was refused work at {minutes} min")
 
 
-def test_the_default_configuration_sets_no_ceiling(settings):
+def test_the_budget_section_itself_still_ships_no_ceiling(settings):
+    """`budget.active_minutes` stays 0. The old defect must not come back.
+
+    A fixed per-stage clock is what cost this program evidence: a community
+    handing over a dated report every forty seconds was cut off by the same rule
+    as one whose archive held nothing. Nothing may reintroduce that as a
+    *default* in the budget section.
+    """
+    import yaml
+    from pathlib import Path
+
+    config = yaml.safe_load(Path("config/config.yaml").read_text(encoding="utf-8"))
+    assert config["budget"]["active_minutes"] == 0
+    assert budget_from_settings(None).bounded is False
+
+
+def test_harvest_mode_supplies_a_ceiling_and_it_fits_the_stated_window(settings):
+    """Harvest mode is the one place a ceiling is deliberate, and it is stated.
+
+    212 communities have to land inside 24-48 hours. Without any ceiling, one
+    community with a fifty-thousand-page site turns a two-day run into a
+    two-week one. A community stopped by it is COMPLETE_WITH_TRUNCATION and says
+    so; it is never reported as though it had finished.
+    """
+    import yaml
+    from pathlib import Path
+
     configured = budget_from_settings(settings)
-    assert not configured.bounded, (
-        "shipping a ceiling by default would reintroduce the defect")
+    assert configured.bounded, "harvest mode must bound a 212-community run"
     assert configured.finalisation_reserve_s > 0
     assert configured.stage_shares
+
+    config = yaml.safe_load(Path("config/config.yaml").read_text(encoding="utf-8"))
+    minutes = config["harvest"]["max_minutes_per_community"]
+    assert configured.ceiling_s == minutes * 60
+    workers = config["orchestrator"]["workers"]["start_workers"]
+    worst_case_hours = 212 * minutes / workers / 60
+    assert 12 <= worst_case_hours <= 48, (
+        f"worst case {worst_case_hours:.1f} h is outside the 24-48 h target")
 
 
 # ---------------------------------------------------------------------------
