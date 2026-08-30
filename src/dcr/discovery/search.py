@@ -17,6 +17,8 @@ from urllib.parse import parse_qs, quote, unquote, urlencode, urlsplit
 
 from bs4 import BeautifulSoup
 
+from ..soup import soup as make_soup
+
 from ..crawl.normalize import normalize
 
 
@@ -109,7 +111,7 @@ def _parse_json(engine_id: str, body: str) -> list[SearchHit]:
 
 
 def _parse_html(engine_id: str, body: str) -> list[SearchHit]:
-    soup = BeautifulSoup(body, "lxml")
+    soup = make_soup(body)
     hits: list[SearchHit] = []
     seen: set[str] = set()
     for anchor in soup.find_all("a", href=True):

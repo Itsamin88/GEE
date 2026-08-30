@@ -17,6 +17,8 @@ from urllib.parse import urljoin, urlsplit
 
 from bs4 import BeautifulSoup
 
+from ..soup import xml_soup as make_xml_soup
+
 from ..crawl.normalize import classify_url, normalize
 from ..extract.html import parse_date_string
 
@@ -48,7 +50,7 @@ def parse_sitemap(xml_text: str, base_url: str) -> tuple[list[SitemapEntry], lis
     try:
         soup = BeautifulSoup(xml_text, "xml")
     except Exception:
-        soup = BeautifulSoup(xml_text, "lxml")
+        soup = make_xml_soup(xml_text)
 
     for node in soup.find_all("sitemap"):
         loc = node.find("loc")
@@ -113,7 +115,7 @@ def parse_feed(xml_text: str, base_url: str) -> list[FeedEntry]:
     try:
         soup = BeautifulSoup(xml_text, "xml")
     except Exception:
-        soup = BeautifulSoup(xml_text, "lxml")
+        soup = make_xml_soup(xml_text)
 
     for item in soup.find_all(["item", "entry"]):
         link = ""

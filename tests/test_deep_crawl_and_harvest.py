@@ -264,3 +264,77 @@ def test_the_shared_broker_actually_starts():
         assert isinstance(broker.snapshot(), list)
     finally:
         manager.shutdown()
+
+
+# ---------------------------------------------------------------------------
+# A missing parser must degrade, not empty the run
+# ---------------------------------------------------------------------------
+def test_html_parses_without_lxml(monkeypatch):
+    """One missing package must not silently produce a run with nothing in it.
+
+    Hard-coding BeautifulSoup(html, "lxml") at four call sites turned an absent
+    package into a run that fetched every page, failed to parse every one, and
+    finished reporting zero evidence, zero documents and zero images - while the
+    banner said the program "still runs and records what it could not do". A
+    researcher watching that had no way to tell an empty internet from an empty
+    pip install.
+    """
+    import bs4
+
+    import dcr.soup as soup_module
+
+    real = bs4.BeautifulSoup
+
+    def no_lxml(markup, features=None, *args, **kwargs):
+        if features and "lxml" in features:
+            raise bs4.FeatureNotFound("lxml is not installed")
+        return real(markup, features, *args, **kwargs)
+
+    monkeypatch.setattr(soup_module, "BeautifulSoup", no_lxml)
+    monkeypatch.setattr(soup_module, "_chosen", None)
+    monkeypatch.setattr(soup_module, "_announced", False)
+
+    assert soup_module.parser_name() == "html.parser"
+    parsed = soup_module.soup('<p>hello <a href="/land">land</a></p>')
+    assert parsed.get_text() == "hello land"
+    assert parsed.find("a")["href"] == "/land"
+
+
+def test_the_real_page_extractor_survives_a_missing_parser(monkeypatch):
+    """Not just the helper - the function the crawl actually calls."""
+    import bs4
+
+    import dcr.soup as soup_module
+    from dcr.extract.html import parse_html
+
+    real = bs4.BeautifulSoup
+
+    def no_lxml(markup, features=None, *args, **kwargs):
+        if features and "lxml" in features:
+            raise bs4.FeatureNotFound("lxml is not installed")
+        return real(markup, features, *args, **kwargs)
+
+    monkeypatch.setattr(soup_module, "BeautifulSoup", no_lxml)
+    monkeypatch.setattr(soup_module, "_chosen", None)
+    monkeypatch.setattr(soup_module, "_announced", False)
+
+    page = parse_html(
+        '<html><head><title>Our Land</title></head><body>'
+        '<h1>The farm</h1><p>We bought 40 hectares in 2003.</p>'
+        '<a href="/history">history</a>'
+        '<img src="/photo.jpg" alt="the meadow">'
+        '<a href="/report.pdf">annual report</a>'
+        '</body></html>',
+        "https://example.org/about")
+    assert "40 hectares" in page.text
+    assert page.title == "Our Land"
+    assert any("history" in u for u, _ in page.links)
+    assert page.images, "images must still be found without lxml"
+    assert any("report.pdf" in u for u, _ in page.document_links)
+
+
+def test_lxml_is_a_declared_dependency_not_an_optional_one():
+    """It is required, so it belongs in requirements.txt where pip will get it."""
+    from pathlib import Path
+
+    assert "lxml" in Path("requirements.txt").read_text(encoding="utf-8")

@@ -15,6 +15,8 @@ from urllib.parse import urljoin, urlsplit
 
 from bs4 import BeautifulSoup, Tag
 
+from ..soup import soup as make_soup
+
 BOILERPLATE_TAGS = ("script", "style", "noscript", "template", "svg", "iframe")
 
 _WS = re.compile(r"[ \t ]+")
@@ -101,7 +103,7 @@ class ParsedPage:
 
 
 def parse_html(html: str, base_url: str) -> ParsedPage:
-    soup = BeautifulSoup(html, "lxml")
+    soup = make_soup(html)
     page = ParsedPage()
 
     html_tag = soup.find("html")
