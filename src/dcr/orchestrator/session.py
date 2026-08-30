@@ -498,6 +498,17 @@ class RunSession:
             "workers": {}, "wall_s": 0.0,
         }
         jobs = self.store.jobs(self.run_id)
+        if not jobs and self.plan is not None and self.plan.jobs:
+            # A run that queued three communities must never report "0 of 0".
+            # Whatever went wrong - workers terminated before they checkpointed,
+            # a store write lost - the communities were real and the researcher
+            # needs a row for each saying so. Reporting nothing at all is the
+            # one outcome that tells them less than the failure did.
+            log.warning(
+                "[RUN] the job store returned no rows for %s, but %d communities "
+                "were queued; reporting them from the plan so the status table is "
+                "not silently empty", self.run_id, len(self.plan.jobs))
+            jobs = [_JobFromPlan(job) for job in self.plan.jobs]
         summary = self._summary(snapshot, jobs)
         final = self.output_root
         self._write_progress(snapshot)
@@ -519,6 +530,12 @@ class RunSession:
         for job in jobs:
             key = job.final_status or job.state
             by_status[key] = by_status.get(key, 0) + 1
+        # The denominator is how many communities were ASKED for, which is the
+        # plan. Taking it from the store means a lost write turns three failed
+        # communities into "0 of 0 communities completed" - a sentence that
+        # reads like nothing was attempted.
+        if self.plan is not None and self.plan.jobs:
+            counts["TOTAL"] = max(int(counts.get("TOTAL", 0)), len(self.plan.jobs))
         governor = self.scheduler.governor if self.scheduler else None
         stats = self.scheduler.stats if self.scheduler else None
         return {
@@ -681,6 +698,31 @@ class RunSession:
         self._stop_broker()
         if self.store is not None:
             self.store.close()
+
+
+class _JobFromPlan:
+    """A status-table row for a community the job store has no record of.
+
+    Everything countable is zero because nothing was counted; the point is that
+    the community APPEARS, with its identity and its output directory, so the
+    researcher can see it was attempted and go and look.
+    """
+
+    def __init__(self, job: Any):
+        self.job_id = job.job_id
+        self.site_id = job.site_id
+        self.name = job.name
+        self.state = "UNKNOWN"
+        self.final_status = "NO_RESULT_RECORDED"
+        self.sources = self.documents = self.images = 0
+        self.evidence = self.claims = self.conflicts = 0
+        self.yield_units = 0.0
+        self.active_s = self.wall_s = 0.0
+        self.attempts = 0
+        self.workbook_path = ""
+        self.output_dir = job.output_dir
+        self.last_error = ("no result was recorded for this community; see "
+                           "global_error_log.csv")
 
 
 def _write_json(path: Path, payload: Mapping[str, Any]) -> None:

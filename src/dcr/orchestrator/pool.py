@@ -234,8 +234,20 @@ class WorkerPool:
                 reason = (f"the worker process exited with code {exitcode} without "
                           "reporting a result")
                 if exitcode is not None and exitcode < 0:
-                    reason = (f"the worker process was killed by signal {-exitcode} — "
-                              "usually a native crash inside a parser")
+                    # WE may have sent that signal. Reporting the orchestrator's
+                    # own terminate() as "usually a native crash inside a parser"
+                    # is not a small inaccuracy: it sends whoever reads the error
+                    # log hunting for a parser bug that does not exist, when the
+                    # real story is in the WORKER_HUNG row logged moments before.
+                    if handle.stopping:
+                        reason = (
+                            f"the orchestrator stopped this worker (signal "
+                            f"{-exitcode}). This is not a crash — see the "
+                            "WORKER_HUNG or cancellation entry logged just "
+                            "before it for why it was stopped")
+                    else:
+                        reason = (f"the worker process was killed by signal {-exitcode} — "
+                                  "usually a native crash inside a parser")
             elif not summary:
                 reason = "the worker exited cleanly but reported no result"
             else:

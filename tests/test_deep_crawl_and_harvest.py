@@ -491,3 +491,58 @@ def test_the_master_file_asks_for_harvest_mode():
     rows = list(csv.DictReader(io.StringIO(master.read_text(encoding="utf-8"))))
     assert rows
     assert {r["mode"] for r in rows} == {"HARVEST"}
+
+
+# ---------------------------------------------------------------------------
+# A failed run must still say what it attempted
+# ---------------------------------------------------------------------------
+def test_a_community_with_no_stored_result_still_gets_a_row():
+    """"0 of 0 communities completed" reads like nothing was even attempted.
+
+    Three communities were queued, all three were terminated as hung, the error
+    log recorded six entries naming them - and the status table came out with a
+    header and no rows, and the summary said "0 of 0". The failure was real and
+    was worth reporting; reporting nothing told the researcher less than the
+    failure itself would have.
+    """
+    from dcr.orchestrator.plan import CommunityJob
+    from dcr.orchestrator.session import _JobFromPlan
+
+    row = _JobFromPlan(CommunityJob(
+        job_id="C001", site_id="IC001", name="Somewhere",
+        output_dir="/out/IC001_Somewhere"))
+
+    assert row.job_id == "C001"
+    assert row.site_id == "IC001"
+    assert row.name == "Somewhere"
+    assert row.output_dir == "/out/IC001_Somewhere"
+    # Not "COMPLETED", and not blank either: it says what is true.
+    assert row.final_status == "NO_RESULT_RECORDED"
+    assert "global_error_log.csv" in row.last_error
+    # Counts are zero because nothing was counted, not because zero was measured.
+    assert row.sources == row.documents == row.images == 0
+
+    # Every column the status table writes must be present, or the row is
+    # written as blanks and the fix achieves nothing.
+    columns = ("job_id", "site_id", "name", "state", "final_status", "sources",
+               "documents", "images", "evidence", "claims", "conflicts",
+               "yield_units", "active_s", "wall_s", "attempts",
+               "workbook_path", "output_dir", "last_error")
+    for column in columns:
+        assert hasattr(row, column), column
+
+
+def test_the_orchestrators_own_terminate_is_not_reported_as_a_parser_crash():
+    """Signal 15 from us is not "usually a native crash inside a parser".
+
+    That message sent a whole debugging session hunting a parser bug that did
+    not exist, when the real cause - WORKER_HUNG - was logged three rows above
+    it in the same file.
+    """
+    from pathlib import Path
+
+    source = Path("src/dcr/orchestrator/pool.py").read_text(encoding="utf-8")
+    # The honest branch exists and is guarded by our own stopping flag.
+    assert "if handle.stopping:" in source
+    assert "the orchestrator stopped this worker" in source
+    assert "WORKER_HUNG or cancellation entry" in source
