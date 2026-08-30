@@ -160,9 +160,16 @@ def test_every_api_database_in_the_configured_set_can_be_paged():
     from pathlib import Path
 
     sources = yaml.safe_load(Path("config/sources.yaml").read_text(encoding="utf-8"))
+    # BOTH lists the runner actually searches: the core databases, and the
+    # national thesis portals it adds for the community's own country. The
+    # second is where a country-specific thesis actually lives, so leaving it
+    # out of this check would miss exactly the databases that matter most for a
+    # non-English community.
     apis = [d for d in sources["academic_databases"] if d.get("access") == "api"]
-    assert apis, "the fixture is meaningless if no database is an API"
-    unpaged = [d["id"] for d in apis if not academic.supports_paging(d)]
+    apis += [d for portals in sources["national_thesis_portals"].values()
+             for d in portals if d.get("access") == "api"]
+    assert len(apis) >= 15, "the fixture is meaningless if the set has shrunk"
+    unpaged = sorted({d["id"] for d in apis if not academic.supports_paging(d)})
     assert not unpaged, f"academic APIs with no paging rule: {unpaged}"
 
 

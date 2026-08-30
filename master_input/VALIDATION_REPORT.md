@@ -1,17 +1,18 @@
 # Validation report — `Paper1_Final_Only_Ecovillages_Master_Input.csv`
 
-**Status: complete for the work that could be done offline. One environment
-limit remains and is not disguised anywhere in the file.**
+**Status: the file is finished as a crawler input. One environment limit
+remains and is not disguised anywhere in it.**
 
-All 212 communities have been researched. Every row carries a determined
-country, an actively-checked Global Ecovillage Network status, and a ranked
-seed source set. The 34 communities the export gave four coordinates for have
-been worked through individually; 31 are resolved against their own published
-addresses and 3 are left open on purpose.
+212 communities, 51 columns, 1,307 seed addresses. Coordinates are the
+researcher's own verified values. The nine columns that carried the export's
+unresolved geocoder candidates have been removed. Three new columns tell the
+crawler what to do with each address: which sites to walk in full, and which
+query strings to run the literature harvest with.
 
 **What is still owed: not one URL has been opened over HTTP.** The egress proxy
 in this container answers `403 Forbidden` to `CONNECT` for every research host,
-re-tested at the end of this pass:
+re-tested at the end of this pass against both `ecovillage.org` and
+`api.openalex.org`:
 
 ```
 CONNECT ecovillage.org:443 HTTP/1.1
@@ -19,15 +20,21 @@ CONNECT ecovillage.org:443 HTTP/1.1
 * CONNECT tunnel failed, response 403
 ```
 
-`WebSearch` works, because it runs through a different path; direct fetching of
-arbitrary hosts does not. So `seed_url_validated_count`, `seed_url_dead_count`,
-`seed_url_blocked_count` and `seed_url_duplicate_count` are **empty on every
-row, not zero**. Empty means not measured. Zero would be a measurement, and it
-would be a false one. `seed_url_verification_method` says `search_index`, which
-is exactly what was done: every address was seen in a search index and its
-identity checked against the community, but the page itself was never fetched.
-`master_input/pipeline/step5_validate_urls.py` is written and ready; it needs
-only an environment that permits outbound HTTPS.
+So `seed_url_validated_count`, `seed_url_dead_count`, `seed_url_blocked_count`
+and `seed_url_duplicate_count` are **empty on every row, not zero**. Empty means
+not measured; zero would be a measurement, and a false one. The crawl itself —
+the whole-site walks and the literature harvest this pass was built for — runs
+on a machine with outbound HTTPS. Everything needed for it is in place and
+tested offline.
+
+**One value to check before you run it.** `IC206` Sadhana Forest Kenya pairs
+candidate 4's latitude (`0.867336`) with candidate 1's longitude (`36.765913`),
+so the returned point is not any of the four the export offered — about 4 km
+from candidate 4, whose longitude is `36.806313`. That has the shape of a
+spreadsheet fill slip rather than a deliberate choice. Your value is used
+exactly as supplied; it is flagged because it is cheaper to check now than after
+a crawl. Both other previously-unresolved rows (Grishino, Rodnoe) came back as
+exactly the candidate this pipeline's own analysis had pointed at.
 
 ---
 
@@ -59,38 +66,32 @@ required, and the relationship is stated in the notes on each.
 
 | | Count |
 |---|---|
-| `SINGLE` — the export gave one coordinate | 178 |
-| `MULTIPLE_CANDIDATES_RESOLVED` | 31 |
-| `MULTIPLE_CANDIDATES_UNRESOLVED` | 3 |
-| Coordinate confidence HIGH / MEDIUM / LOW | 204 / 5 / 3 |
+| `researcher_verified` | 34 |
+| `source_export_single_row` | 178 |
+| Rows whose coordinate this build altered | **0** |
 
-The 34 multi-coordinate communities are the **last 34 in file order**, seq
-179–212 with no gaps, each with exactly four candidates — the signature of a
-geocoder asked for candidates rather than an answer. Slot 3 is a decoy that
-lands on the nearest large city; slot 4 is the community; **slot 1, which the
-export puts first and which this file was previously shipping, is frequently
-wrong by up to ninety kilometres.**
+The export gave four geocoder candidates each for the last 34 communities in
+file order and chose none. Those 34 were checked by hand and returned as one
+pair per community; `master_input/pipeline/final_coordinates.csv` is that
+answer, and the build takes it verbatim — a test compares every row in the
+master file against it and fails on any difference.
 
-Nearly every "location conflict" flagged during source discovery turned out to
-be that artefact rather than a real disagreement. Sadhana Forest Haiti was
-pointing near Port-au-Prince instead of Anse-à-Pitres, in the wrong department.
-Cité Écologique's slot-1 coordinate is what drove the gazetteer to vote Canada
-for a community in New Hampshire.
+The nine columns that carried the unresolved candidates
+(`coordinate_primary_rule`, `coordinate_candidate_count`,
+`coordinate_candidate_spread_km`, `coordinate_candidates`, `coordinate_status`,
+`latitude_as_exported`, `longitude_as_exported`, `coordinate_confidence`,
+`coordinate_evidence`) have been removed, and a test fails if any reappears.
+They described a problem that no longer exists, and a stale `coordinate_status`
+in a crawler input invites a reader to trust something that no longer describes
+anything.
 
-Each of the 31 resolutions was verified against **that** community's published
-address, not inferred from the pattern — §33 forbids transferring a result
-between communities, and this is precisely where that temptation was strongest.
-Every pick carries its published locality, the URL that published it, and the
-reasoning, in `coordinate_evidence`.
-
-Three are unresolved and say why: **Grishino** (no gazetteer city near any
-candidate, so no slot betrays itself), **Rodnoe** (sources name only an oblast,
-and a hundred one-hectare kin domains have no single point), and **Sadhana
-Forest Kenya** (sources say only "the Maralal area", and the planting is
-scattered across family farms county-wide, so no point represents it).
-
-Nothing was discarded: all four candidates remain in `coordinate_candidates`
-and the export's original first coordinate has its own two columns.
+Worth recording, because it bears on the earlier analysis: this pipeline had
+resolved 31 of the 34 by identifying that the export's slot 3 was a
+nearest-large-city decoy and slot 4 was the community, then verifying each pick
+against that community's own published address. It left three open. Two of
+those three — Grishino and Rodnoe — came back from the researcher as **exactly
+candidate 4**, the slot that analysis had pointed at. That is an independent
+check on the method, arrived at by a different route.
 
 ## 3. Country
 
@@ -201,9 +202,107 @@ global seed **last** on every row, so a peer-reviewed article always outranks
 the network URL. 36 rows lead with an S1 academic source; 74 with an S2
 institutional one.
 
+## 5b. The crawl policy — depth of extraction
+
+Two limits in the crawler meant a list of good addresses still produced a thin
+extraction. Both are fixed, and the master file now carries the instructions.
+
+### Walking the community's own site in full
+
+A directory listing is one page about a community, and the right thing to do
+with it is read it and follow what it points at. The community's **own** site
+is a different object: the gallery, the newsletter archive going back fifteen
+years, annual reports as PDFs, the land-use plan nobody linked from the front
+page. Sampling the second the way you sample the first loses exactly the
+material a documentary study exists to find.
+
+| | Count |
+|---|---|
+| `EXHAUSTIVE_SITE_AND_ACADEMIC` | 159 |
+| `ACADEMIC_EXHAUSTIVE_ONLY` | 53 |
+| Site roots to walk in full (`deep_crawl_urls`) | **208** |
+
+The 53 in the second group are communities where no site of their own was
+found — mostly small projects whose whole public presence is a GEN page and a
+Facebook account. There is nothing to walk in full; the literature harvest still
+runs exhaustively.
+
+What the two scopes differ by, per address:
+
+| | `targeted` | `exhaustive` |
+|---|---|---|
+| base pages | 40 | 500 |
+| max pages | 400 | 25,000 |
+| max depth | 6 | 25 |
+| pagination pages | 60 | 1,000 |
+| images per source | 400 | 4,000 |
+| assets | evidence-bearing only | **everything: images, PDFs, documents** |
+
+`max_pages_per_run` rose from 4,000 to 40,000, because a 25,000-page source
+budget behind a 4,000-page run ceiling would have been a lie.
+
+An exhaustive walk still **stops**: its exhaustion window is widened, not
+removed, because a newsletter archive can be forty barren pages of links before
+the first PDF — but a site that has genuinely run out of pages ends the walk
+like any other. "Exhaustive" must not mean "never terminates".
+
+Two details worth naming. The deep targets are **site roots**, not pages:
+discovery had recorded the single most useful page on each site, and a crawler
+told to walk the whole site and handed
+`tamera.org/water-retention-landscape/` starts three levels down and reaches
+the archive only by luck. And `ecovillage.org` is never a deep target — it is
+212 communities' shared directory, and walking it in full would crawl the whole
+Global Ecovillage Network once per community without reaching a word of that
+community's own voice. (`ecovillage.org.in`, Govardhan Ecovillage's own domain,
+*is* walked in full: the check is on the host, not a substring. A test caught
+that distinction.)
+
+### Harvesting the whole literature
+
+Every academic database was asked **once, for fifty rows**, and that was the
+literature. For a community with six papers that is complete. For Tamera,
+Damanhur or Cloughjordan — each discussed in hundreds of works — it returned
+whichever fifty an API happened to rank first and looked exactly like a
+complete answer. That is the failure register v2.4 field I12 exists to name:
+absence of effort presented as absence of evidence.
+
+| | |
+|---|---|
+| Academic APIs that now page | **15 of 15** |
+| Grey-literature APIs that now page | 4 |
+| Records reachable per database per query | 100 × 20 pages = **2,000** |
+| Query strings supplied by the master file | **2,266** (10.7 per community) |
+
+That is 8 core databases plus the 7 national thesis-portal APIs the crawler
+adds for the community's own country — which is where a country-specific thesis
+actually lives, and so where the gap would have hurt most for a non-English
+community.
+
+Each database is paged **in its own units**. Sending a page number where an API
+wants a record offset silently re-reads the first window and looks exactly like
+exhaustion, so OpenAlex, DOAJ, OpenAIRE and DataCite take page numbers while
+Crossref, Semantic Scholar, CORE, HAL, theses.fr, BASE and the DNB's SRU take
+offsets. Paging stops when a page adds nothing new, which is the honest end of a
+result set — some APIs clamp an out-of-range page to the last one rather than
+returning empty, so *repeats*, not emptiness, are the signal.
+
+A test written for this found a real gap in it: **BASE had no paging rule**, so
+that database alone would have silently capped at one window. It is in now, and
+the test fails if anyone adds an API to `sources.yaml` and forgets its paging
+entry.
+
+The query strings are written into the file rather than re-derived at crawl
+time, which is what makes the literature search reproducible: a reader can see
+precisely which strings were searched, and a community that turns up nothing can
+be told apart from one that was never asked about properly. Every name the
+community is known by becomes a query, because **the literature does not agree
+on names** — Khula Dhamma is published as Khula Dharma, Ecovila Raiz do Anuhmas
+as Anhumas, Zeleni Kruchi under Dubravushka. A test fails if any recorded
+alternative name is missing from the harvest.
+
 ## 6. Review queue (§38)
 
-**68 rows** carry `review_required = yes`, each with machine-readable reasons:
+**64 rows** carry `review_required = yes`, each with machine-readable reasons:
 
 | Reason | Rows |
 |---|---|
@@ -213,8 +312,9 @@ institutional one.
 | `country_corrected_from_gazetteer` | 8 |
 | `gazetteer_split` | 8 |
 | `thin_source_set` | 6 |
-| `coordinate_resolved_below_high` | 5 |
-| `multiple_coordinate_candidates` | 3 |
+
+The two coordinate reasons are gone: with verified coordinates in hand, no row
+is still asking about them. A test fails if either reappears.
 
 Findings a coder should see before analysis, all flagged in the file:
 
@@ -256,6 +356,21 @@ this file.
 | Addresses delivered | 1,307 |
 | Rows with a name, coordinates and a country | 212 |
 | Every row's last URL is the GEN seed | ✅ |
+| Deep-crawl roots surfaced to the crawler | 208 |
+| Academic query strings surfaced | 2,266 |
+| Policy columns are optional (a plain sheet still loads) | ✅ |
+
+The reader takes the eight crawler columns plus the three policy columns and
+ignores the other forty — those are provenance and QC for the researcher, not
+instructions. The policy columns are optional by design: a two-column sheet of
+names and URLs still loads and simply gets the standard treatment for every
+address, which a test checks.
+
+One parser detail that mattered: search terms are split **only** on the pipe.
+"Baireni, Udayapur" is one query string, and splitting it the way an address
+list is split would search "Baireni" and "Udayapur" separately, quietly losing
+the disambiguation that makes the query work. A test asserts that at least one
+term in the cohort contains a comma, so the guard cannot rot into a tautology.
 
 **The original export would have loaded as zero communities.** Its header says
 `Ecovillage_Name`; the parser wanted `name`. Three further defects were found
@@ -278,7 +393,7 @@ weighs only `,`, `;` and tab, so it cannot mis-fire on it.
 | Valid CSV, `QUOTE_MINIMAL` | ✅ |
 | UTF-8, no BOM | ✅ |
 | CRLF line endings | ✅ 213 (header + 212) |
-| Consistent row length | ✅ 56 fields on every row |
+| Consistent row length | ✅ 51 fields on every row |
 | Parses with `csv` | ✅ |
 | Parses with `pandas` | ✅ |
 | Opens in Excel | not tested — no Excel here. The file meets the requirements (valid CSV, CRLF, `QUOTE_MINIMAL`), but note it is UTF-8 **without** BOM, which some Windows builds of Excel mis-render for non-ASCII names unless the file is imported rather than double-clicked. A BOM was left off because a BOM is not part of UTF-8 and trips many naive parsers; this crawler is not one of them — prepending a BOM was tested and it still reads all 212 rows. |
@@ -287,27 +402,45 @@ weighs only `,`, `;` and tab, so it cannot mis-fire on it.
 | Address list reconstructs deterministically from `seed_sources_json` | ✅ |
 | Separate QC file created | ❌ none — QC is inside this CSV, as §23 requires |
 
-Size 833,554 bytes.
+Size 1,005,871 bytes. 51 columns.
 
 ## 9. Automated checks
 
-`tests/test_master_input.py` — **37 tests, all passing.** They are written as
-falsifiable claims, not smoke tests. Among them:
+**`tests/test_master_input.py` — 42 tests.** Written as falsifiable claims, not
+smoke tests:
 
+* the coordinates are the researcher's verified ones, compared row by row
+  against their own file;
+* the nine candidate columns are gone, and none may reappear;
+* the 34 rows a human checked say so, and they are exactly `IC179`–`IC212`;
+* every deep-crawl target is a bare site root, not a page;
+* the network seed is never walked exhaustively;
+* `deep_crawl_urls` and the per-source `crawl_scope` cannot disagree;
+* every alternative name a community is known by is actually searched;
+* search terms survive the reader intact, commas and all;
 * the fixed network seed is on every single row;
 * absence of a GEN page is never dressed up as a search having been run;
 * GEN never counts as an independent second voice;
 * no community GEN URL was invented;
 * the address list reconstructs exactly from the structured column;
-* the exported coordinate is never lost;
-* a single-coordinate row is never second-guessed;
-* a moved coordinate is one of the exported candidates, verbatim, never a new point;
-* every moved coordinate cites the address that justifies it;
-* an unresolved coordinate still carries the exported value and its review flag;
-* the crawler reads all 212 communities;
-* the original export would now load too.
+* the crawler reads all 212 communities, and the original export would too.
 
-Full suite: **558 passed**, 114 skipped, 3 failed. The three failures are in
+**`tests/test_deep_crawl_and_harvest.py` — 15 tests** on the two new
+capabilities:
+
+* an exhaustive source is not abandoned for a quiet stretch — and still stops;
+* the two scopes actually differ in budget, depth, pagination and assets;
+* the run-wide page ceiling can hold an exhaustive walk (a 25,000-page source
+  budget behind a 4,000-page run limit would have been a lie);
+* page zero is byte-identical to the request that was always made, so paging is
+  purely additive and nothing regresses;
+* each database is paged in its own units — page numbers and record offsets are
+  not interchangeable;
+* **every API database in `sources.yaml` has a paging rule.** This is the test
+  that found BASE missing, and the one that fails when someone adds a database
+  and forgets.
+
+Full suite: **578 passed**, 114 skipped, 3 failed. The three failures are in
 `tests/test_extraction.py` and are pre-existing container problems — a missing
 `reportlab` and a broken `_cffi_backend` behind `cryptography` — untouched by
 and unrelated to this work.
@@ -315,14 +448,21 @@ and unrelated to this work.
 ## 10. What a reader should not conclude from this file
 
 * **That any address resolves.** None has been fetched. The four validation
-  columns are empty for that reason and must stay empty until step 5 runs.
-* **That a `NOT_FOUND` GEN status means a community is not in GEN.** It means
-  no community page was returned by a `site:ecovillage.org` query. Several of
-  the 36 are demonstrably in the network — Arterra Bizimodu is a GEN Europe
-  full member and hosts GEN Europe's office; Ecodorp Bergen is reported as the
-  first Dutch initiative to hold full membership. GEN's site structure and its
+  columns are empty for that reason and must stay empty until the crawl runs.
+* **That the extraction has happened.** This file is the *input* to it. It says
+  which sites to walk in full and which queries to run; it does not contain the
+  images, documents or papers those will produce.
+* **That a `NOT_FOUND` GEN status means a community is not in GEN.** It means no
+  community page was returned by a `site:ecovillage.org` query. Several of the
+  36 are demonstrably in the network — Arterra Bizimodu is a GEN Europe full
+  member and hosts GEN Europe's office; Ecodorp Bergen is reported as the first
+  Dutch initiative to hold full membership. GEN's site structure and its
   membership are not the same thing.
 * **That a thin row means a thin community.** Register field I12
   (`crawl_truncated`) exists precisely so that absence of effort is never
   mistaken for absence of evidence, and rows where the record is genuinely
   sparse say so in `qc_notes` rather than looking merely unremarkable.
+* **That 2,000 records per database per query will all be relevant.** It is a
+  reachable ceiling, not an expectation. The relevance scoring and the
+  verification requirement in `config/config.yaml` still apply to every record,
+  and an unverified one goes to the review queue rather than to the workbook.

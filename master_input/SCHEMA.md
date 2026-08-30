@@ -1,11 +1,11 @@
 # `Paper1_Final_Only_Ecovillages_Master_Input.csv` — schema
 
 The master source table for the 212-community documentary crawl. One row per
-community. Fifty-six columns in eight groups: what the crawler reads, who the
+community. Fifty-one columns in nine groups: what the crawler reads, who the
 community is, where it is, what country that is and how it was established, its
-Global Ecovillage Network status, its seed source set, the address validation
-state, and the quality control that lets a reader tell a thin record from a
-thorough one.
+Global Ecovillage Network status, its seed source set, **what the crawler should
+do with that source set**, the address validation state, and the quality control
+that lets a reader tell a thin record from a thorough one.
 
 * **File**: UTF-8, no BOM, CRLF line endings, `QUOTE_MINIMAL`, 212 data rows.
 * **Multi-value delimiters**: addresses and coordinate pairs use `" | "`
@@ -58,7 +58,7 @@ crawler ignores it.
 |---|---|---|---|
 | `community_id` | no | `IC001`–`IC212` | Workbook `site_id`. Assigned in original file order, stable across rebuilds. |
 | `name` | **yes** | text | The normalised community name. Equal to `community_name_normalized`. |
-| `latitude` | **yes** | decimal, 6 dp | The coordinate to crawl. Identical to the export for the 181 rows the export gave one coordinate or left unresolved; for the 31 resolved rows it is the candidate that matches the community's published address. See group 3, and `latitude_as_exported` for the original. |
+| `latitude` | **yes** | decimal, 6 dp | The researcher's verified coordinate. See group 3. |
 | `longitude` | **yes** | decimal, 6 dp | As above. |
 | `country` | **yes** | ISO 3166 English short name | One spelling per country throughout (§29). Drives the local-language sweep and domain guessing. |
 | `mode` | **yes** | `FULL` | The **run** mode, from `MODE_STAGES`. Not the register's SETTLEMENT/CONTROL — that is `register_mode`. Putting `SETTLEMENT` here would break stage selection. |
@@ -77,78 +77,42 @@ crawler ignores it.
 
 ## Group 3 — coordinates
 
-The source file gave 314 rows for 212 communities. 34 communities appear four
-times, with four coordinates 27–101 km apart, and at most one of each set can
-be the site.
+**One pair per community, verified by the researcher.** No candidates, no
+status, no resolution machinery.
 
-Those 34 are not scattered through the file. They are the **last 34 in file
-order**, `seq` 179–212 with no gaps, each with exactly four candidates. That
-pattern is the signature of a geocoder asked for candidates rather than for an
-answer, whose output was pasted into the export without anyone choosing between
-them. Reading the four slots against the offline gazetteer makes the structure
-plain:
+The export gave 314 rows for 212 communities: the last 34 in file order, `seq`
+179–212 with no gaps, carried four coordinates each — the signature of a
+geocoder asked for candidates rather than an answer, whose output was pasted
+into the export without anyone choosing between them. That is now settled. The
+researcher checked those 34 by hand and returned one latitude and longitude per
+community, and `master_input/pipeline/final_coordinates.csv` is that answer.
+The build takes it verbatim: nothing here rounds it, overrides it or
+second-guesses it.
 
-* **Slot 3 is a decoy.** It repeatedly lands within a kilometre or two of the
-  nearest large city — Ansbach 0 km, Butterworth 0 km, Maralal 0 km, Castricum
-  0 km, Victoria 1 km, Kirksville 1 km, Delmas 2 km, George 2 km, Randers 3 km,
-  Vladimir 4 km, Odense 4 km. A geocoder falling back to the nearest populated
-  place produces exactly this.
-* **Slot 4 is the community**, when checked against the street or village
-  address gathered independently for that row during source discovery.
-* **Slot 1 — the coordinate the export puts first** — is frequently wrong, by
-  up to ninety kilometres.
-
-That last point matters more than the other two. Nearly every "location
-conflict" recorded during discovery turned out to be this artefact rather than
-a real disagreement: Sadhana Forest Haiti pointed near Port-au-Prince instead
-of Anse-à-Pitres, in the wrong department; Cité Écologique's slot-1 coordinate
-is what drove the gazetteer to vote Canada for a community in New Hampshire.
-
-`master_input/pipeline/step6_resolve_coordinates.py` settles them. Master-brief
-§33 forbids transferring a factual result from one community to another without
-independent verification, and that rule binds hardest here — it would be easy,
-and wrong, to declare "slot 4 always" and move on. So the script carries a
-per-community verification table in which every pick is justified by **that**
-community's published address, with the source URL beside it, and the gazetteer
-evidence is recomputed at run time so each choice can be audited. **31 rows
-resolve, 26 of them at HIGH confidence. Three are left unresolved on purpose**
-(see below).
+The nine columns that used to carry the unresolved candidates
+(`coordinate_primary_rule`, `coordinate_candidate_count`,
+`coordinate_candidate_spread_km`, `coordinate_candidates`, `coordinate_status`,
+`latitude_as_exported`, `longitude_as_exported`, `coordinate_confidence`,
+`coordinate_evidence`) **have been removed**. They existed only to describe a
+problem that no longer exists, and a stale `coordinate_status` in a crawler
+input invites a reader to trust something that no longer describes anything.
 
 | Column | Values | Notes |
 |---|---|---|
-| `source_rows` | `"; "`-delimited integers | Line numbers in the original CSV. Full traceability. |
-| `coordinate_primary_rule` | `single_source_row` / `verified_against_published_address_candidate_N` / `first_source_row` | How `latitude`/`longitude` were chosen. The third value means unresolved: the export's first row was kept because nothing better was established. |
-| `coordinate_candidate_count` | 1 or 4 | |
-| `coordinate_candidate_spread_km` | decimal | 0 for single-coordinate communities. |
-| `coordinate_candidates` | `" | "`-delimited `lat,lon` | **Every** coordinate the source gave, in source order. All 314 remain recoverable from this column. |
-| `coordinate_status` | `SINGLE` (178) / `MULTIPLE_CANDIDATES_RESOLVED` (31) / `MULTIPLE_CANDIDATES_UNRESOLVED` (3) | |
-| `latitude_as_exported` | decimal, 6 dp | The coordinate the export put first, always. Byte-for-byte recoverable whatever `latitude` now carries. |
-| `longitude_as_exported` | decimal, 6 dp | As above. |
-| `coordinate_confidence` | `HIGH` (204) / `MEDIUM` (5) / `LOW` (3) | `LOW` means unresolved. |
-| `coordinate_evidence` | prose | Empty for single-coordinate rows. Otherwise the published locality, the URL that published it, and why that candidate and not another. |
+| `source_rows` | `"; "`-delimited integers | Line numbers in the original export. Traceability back to the source file. |
+| `coordinate_source` | `researcher_verified` (34) / `source_export_single_row` (178) | Whether a human checked this pair, or the export gave exactly one and it was kept. |
 
-**Nothing is discarded.** All four candidates stay in `coordinate_candidates`,
-and the export's original first coordinate has its own two columns, so any
-choice made here is reversible by a coder who disagrees. Five tests guard this:
-the exported coordinate must stay byte-for-byte recoverable; a single-coordinate
-row is never second-guessed; a moved coordinate must appear verbatim among the
-four candidates rather than being a new point; every move must cite the address
-and source justifying it; and an unresolved row must still carry the exported
-coordinate and its review flag.
+The 34 verified rows are `IC179`–`IC212` — precisely the block the export
+mis-geocoded. Two of them (Grishino, Rodnoe) came back as exactly the candidate
+this pipeline's own decoy-slot analysis had pointed at, which is a useful
+independent check on that method.
 
-### The three left unresolved
-
-Guessing at these would be worth less than saying so plainly.
-
-| Community | Why |
-|---|---|
-| Grishino Ecovillage | No city above the gazetteer's size threshold lies near any candidate, so no slot betrays itself as the nearest-city fallback. Two candidates sit in Podporozhsky District, two further north in Karelia, and the published record names the district but no point. |
-| Rodnoe (Rodnoye) Settlement | Sources name only Vladimir Oblast. Slot 3 is Vladimir city and can be excluded, but that does not choose among the rest — and a settlement of roughly a hundred one-hectare kin domains has no single point anyway. |
-| Sadhana Forest Kenya | Sources say only "the Maralal area". The point matters less here than almost anywhere in the cohort: the planting is done in family *shambas* scattered across Samburu County, not on one parcel, so no single coordinate represents the work. |
-
-Register field A5 (`coordinate_agreement`) remains where a researcher records
-their own resolution; this file's job is to make sure the evidence for that
-decision was never thrown away.
+**One value to check before publication.** `IC206` Sadhana Forest Kenya pairs
+candidate 4's latitude with candidate 1's longitude, so the returned point is
+not any of the four the export offered — about 4 km from candidate 4. That has
+the shape of a spreadsheet fill slip rather than a deliberate choice. The
+researcher's value is used as supplied; it is flagged here because it is
+cheaper to check now than after a crawl.
 
 ## Group 4 — country, and how it was established
 
@@ -271,6 +235,68 @@ document richness (a PDF site plan above a homepage). It falls for generic
 profiles and login-walled social accounts. It exists to order the crawl, and
 the crawler crawls every supplied address regardless of it.
 
+## Group 6b — the crawl policy
+
+Three columns that turn a list of addresses into instructions. Everything here
+is **optional** for the reader: a plain sheet of names and URLs still loads and
+simply gets the standard treatment for every address.
+
+| Column | Values | Notes |
+|---|---|---|
+| `crawl_policy` | `EXHAUSTIVE_SITE_AND_ACADEMIC` (159) / `ACADEMIC_EXHAUSTIVE_ONLY` (53) | The second means no site of the community's own was found, so there is nothing to walk in full. The literature harvest still runs exhaustively. |
+| `deep_crawl_urls` | `" | "`-delimited **site roots** | The community's own domains: current site, former domain, its blog. 208 roots across 159 communities. |
+| `academic_search_terms` | `" | "`-delimited query strings | 2,266 across the cohort, 10.7 per community. |
+
+### Why `deep_crawl_urls` holds roots, not pages
+
+Discovery recorded the single most useful page on each site, because that is
+what a ranked seed list wants — Tamera's water-retention-landscape page, not
+`tamera.org`. A crawler told to walk the whole site and handed that page starts
+three levels down and reaches the newsletter archive only by luck. So this
+column holds origins (`https://www.tamera.org/`), and the specific pages stay
+in `urls` where their ranking still means something.
+
+`ecovillage.org` is never a deep target. It is 212 communities' shared
+directory, and walking it in full would crawl the whole Global Ecovillage
+Network once per community without reaching one word of that community's own
+voice. (`ecovillage.org.in` — Govardhan Ecovillage's own domain — is a
+different host and *is* walked in full; the check is on the host, not a
+substring.)
+
+### What the two scopes actually differ by
+
+Set in `config/config.yaml` under `crawl.scopes`, and mirrored per address in
+`seed_sources_json` as `crawl_scope` and `asset_download`.
+
+| | `targeted` | `exhaustive` |
+|---|---|---|
+| base pages | 40 | 500 |
+| max pages | 400 | 25,000 |
+| max depth | 6 | 25 |
+| pagination pages | 60 | 1,000 |
+| images per source | 400 | 4,000 |
+| assets | evidence-bearing only | everything: images, PDFs, documents |
+
+An exhaustive walk still **stops**. Its exhaustion window is widened, not
+removed, because a newsletter archive can be forty barren pages of links before
+the first PDF — but a site that has genuinely run out of pages ends the walk
+like any other.
+
+### Why the search terms are written down
+
+Putting the queries in the file rather than re-deriving them at crawl time is
+what makes the literature search reproducible and auditable: a reader can see
+precisely which strings were searched, and a community that turns up nothing
+can be told apart from one that was never asked about properly.
+
+Every name the community is known by becomes a query, because **the literature
+does not agree on names**: Khula Dhamma is published as Khula Dharma, Ecovila
+Raiz do Anuhmas as Anhumas, Zeleni Kruchi under Dubravushka. Each name is also
+paired with its locality, which is what separates a paper about *this* Baireni
+from the several other places in Nepal called Baireni. A locality that is a
+description rather than a name — "between Colos and Reliquias", "on the Quko
+River" — is skipped, since pasting it into a database query returns nothing.
+
 ## Group 7 — address validation
 
 | Column | Values | Notes |
@@ -322,22 +348,32 @@ column says which verification actually happened.
 ```
 master_input/pipeline/repair_text.py            undo the export's mojibake (idempotent)
 master_input/pipeline/step1_normalise.py        original CSV -> 212 communities, names repaired
-master_input/pipeline/step2_geocode.py          offline k-nearest country vote for all 314 coordinates
+master_input/pipeline/step2_geocode.py          offline k-nearest country vote
 master_input/pipeline/discovery_store.py        the discovery record, with vocabulary validation
+master_input/pipeline/final_coordinates.csv     THE RESEARCHER'S VERIFIED LATITUDE AND LONGITUDE
 master_input/pipeline/step3_build_master.py     assemble the master CSV
 master_input/pipeline/step4_resume_discovery.py list what is still PENDING; emit a record skeleton
 master_input/pipeline/step5_validate_urls.py    open every address, write the results back in place
-master_input/pipeline/step6_resolve_coordinates.py  choose among the export's four geocoder candidates,
-                                                per community, against each one's published address
-tests/test_master_input.py      37 checks: faithfulness, format, coordinate resolution,
-                                and the crawler's own reader
+tests/test_master_input.py                      42 checks on the file and the crawler's own reader
+tests/test_deep_crawl_and_harvest.py            15 checks on the crawl scopes and the paging
 ```
 
-Run step 6 before step 3: step 3 reads `coordinate_resolution.json` if it is
-present and falls back to the export's first row if it is not, so the build
-degrades safely rather than failing.
+Steps 1–3 are deterministic and safe to re-run. `final_coordinates.csv` is
+authoritative input, not a derived artefact: step 3 reads it and takes it
+verbatim. To correct a coordinate, edit that file and rebuild — never edit the
+master CSV by hand, or the next rebuild silently reverts it.
 
-Steps 1–3 are deterministic and safe to re-run. Step 3 folds in whatever
-discovery has recorded so far, so completing the pending rows is a matter of
-adding to `master_input/pipeline/discovery.json` and rebuilding — the file is designed to be
-finished incrementally, not regenerated from scratch.
+`master_input/pipeline/step6_resolve_coordinates.py` is retained for the record.
+It is what analysed the export's four-candidate block and identified the decoy
+slot; its conclusions have since been superseded by the researcher's own
+verification, so it no longer runs as part of the build.
+
+### Running the crawl against this file
+
+```
+python RUN.py --communities master_input/Paper1_Final_Only_Ecovillages_Master_Input.csv
+```
+
+The reader is `read_community_file()` in `src/dcr/orchestrator/session.py`. It
+takes the eight crawler columns plus the three policy columns, and ignores the
+other forty — they are provenance and QC for the researcher, not instructions.
