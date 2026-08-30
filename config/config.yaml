@@ -16,7 +16,7 @@ paths:
 identity:
   # Contact string sent in the User-Agent so site owners can reach the researcher.
   # Overridable with DCR_CONTACT in .env
-  contact: "academic documentary research; set DCR_CONTACT in .env"
+  contact: "ramin.rainlove@gmail.com (academic documentary research)"
   user_agent_template: "DocumentaryResearchCrawler/{version} (+academic research; {contact})"
 
 network:

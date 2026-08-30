@@ -410,7 +410,7 @@ def test_the_original_export_would_now_load_too():
 # ---------------------------------------------------------------------------
 # The crawl policy: what the file tells the crawler to DO
 # ---------------------------------------------------------------------------
-def test_every_deep_crawl_target_is_a_bare_site_root(rows):
+def test_every_site_scoped_target_is_a_bare_site_root(rows):
     """A whole-site walk has to start at the front door.
 
     Discovery recorded the single most useful page on each site, because that is
@@ -421,7 +421,7 @@ def test_every_deep_crawl_target_is_a_bare_site_root(rows):
     """
     seen = 0
     for row in rows:
-        for url in row["deep_crawl_urls"].split(URL_DELIMITER):
+        for url in row["site_urls"].split(URL_DELIMITER):
             if not url:
                 continue
             seen += 1
@@ -443,27 +443,54 @@ def test_the_network_seed_is_never_walked_exhaustively(rows):
     community's own domain and has nothing to do with the network's site.
     """
     for row in rows:
-        for url in row["deep_crawl_urls"].split(URL_DELIMITER):
+        for url in row["site_urls"].split(URL_DELIMITER):
             if not url:
                 continue
             host = urlsplit(url).netloc.lower().removeprefix("www.")
             assert host != "ecovillage.org", row["community_id"]
 
 
-def test_deep_targets_and_source_scopes_agree(rows):
-    """`deep_crawl_urls` and the per-source `crawl_scope` cannot disagree.
+def test_the_scope_columns_and_the_per_source_scopes_agree(rows):
+    """The three columns and the per-source `crawl_scope` are one decision.
 
-    They are two views of one decision, and a crawler may read either.
+    A crawler may read either, so they cannot disagree. Every address in the
+    source set must appear in exactly one of the three columns, or be reachable
+    because its whole domain is being walked.
     """
     for row in rows:
-        deep_hosts = {urlsplit(u).netloc for u in
-                      row["deep_crawl_urls"].split(URL_DELIMITER) if u}
+        site_hosts = {urlsplit(u).netloc for u in
+                      row["site_urls"].split(URL_DELIMITER) if u}
+        columns = {
+            "site": {u for u in row["site_urls"].split(URL_DELIMITER) if u},
+            "page": {u for u in row["page_urls"].split(URL_DELIMITER) if u},
+            "file": {u for u in row["file_urls"].split(URL_DELIMITER) if u},
+        }
         for source in json.loads(row["seed_sources_json"]):
-            expected = "exhaustive" if urlsplit(
-                source["url"]).netloc in deep_hosts else "targeted"
-            assert source["crawl_scope"] == expected, (row["community_id"], source["url"])
-            assert source["asset_download"] == (
-                "all" if expected == "exhaustive" else "evidence_bearing")
+            scope = source["crawl_scope"]
+            assert scope in {"site", "page", "file"}, (row["community_id"], scope)
+            # Every scope takes the assets on the page it fetched.
+            assert source["asset_download"] == "all"
+            assert source["max_pages"] == (2500 if scope == "site" else 1)
+            if scope == "page":
+                # Either listed, or already covered by a site-scoped walk.
+                assert (source["url"] in columns["page"]
+                        or urlsplit(source["url"]).netloc in site_hosts), (
+                    row["community_id"], source["url"])
+            elif scope == "file":
+                assert source["url"] in columns["file"], (row["community_id"], source["url"])
+
+
+def test_only_one_page_is_ever_taken_from_somebody_elses_site(rows):
+    """The rule that makes a 24-48 hour run possible for 212 communities.
+
+    A news article about a community is one useful page on a site with fifty
+    thousand useless ones. Every non-own-site address costs exactly one fetch.
+    """
+    page_scoped = [s for row in rows
+                   for s in json.loads(row["seed_sources_json"])
+                   if s["crawl_scope"] in {"page", "file"}]
+    assert page_scoped
+    assert all(s["max_pages"] == 1 for s in page_scoped)
 
 
 def test_academic_terms_exist_for_every_community_and_carry_the_names(rows):

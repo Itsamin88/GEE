@@ -65,7 +65,8 @@ COLUMNS = [
     "seed_url_count", "independence_group_count", "source_classes",
     "strongest_source_class", "seed_sources_json",
     # --- what the crawler should DO with them
-    "crawl_policy", "deep_crawl_urls", "academic_search_terms",
+    "crawl_policy", "site_urls", "page_urls", "file_urls",
+    "academic_search_terms",
     # --- address validation; the live pass writes the last four
     "seed_url_verification_method", "seed_url_validated_count",
     "seed_url_dead_count", "seed_url_blocked_count",
@@ -133,6 +134,29 @@ FINAL_COORDINATES = Path("master_input/pipeline/final_coordinates.csv")
 #: buried PDF all belong to the community and all bear on its history.
 DEEP_CRAWL_CLASSES = {"S4"}
 DEEP_CRAWL_PLATFORMS = {"own website", "secondary or former website", "blog platform"}
+
+#: File extensions that make an address a direct download rather than a page.
+FILE_EXTENSIONS = {".pdf", ".doc", ".docx", ".odt", ".rtf",
+                   ".csv", ".tsv", ".xls", ".xlsx", ".xlsm", ".ods"}
+
+#: How many pages each scope is allowed. `page` is 1 by definition: that is the
+#: rule that keeps 212 communities inside two days.
+SCOPE_MAX_PAGES = {"site": 2500, "page": 1, "file": 1}
+
+
+def url_scope(url: str, source: dict) -> str:
+    """`site`, `page` or `file` for one address.
+
+    A direct link to a PDF or a spreadsheet is a `file`: download it, crawl
+    nothing. An address on one of the community's own domains is a `site`.
+    Everything else is a `page` - one fetch, take its assets, follow nothing.
+    """
+    if Path(urlsplit(url).path).suffix.lower() in FILE_EXTENSIONS:
+        return "file"
+    if (source.get("source_class") in DEEP_CRAWL_CLASSES
+            or source.get("platform_type") in DEEP_CRAWL_PLATFORMS):
+        return "site"
+    return "page"
 
 
 def load_final_coordinates() -> dict[str, tuple[str, str]]:
@@ -337,18 +361,35 @@ def build_row(community: dict, discovery: dict | None,
     # site, a former domain, its blog. Those hold the galleries, the newsletter
     # archives and the buried reports, and sampling them the way a directory
     # listing is sampled loses exactly the material this study needs.
-    deep_sources = [
-        s for s in sources
-        if (s["source_class"] in DEEP_CRAWL_CLASSES
-            or s["platform_type"] in DEEP_CRAWL_PLATFORMS)
-        and not s["url"].rstrip("/").endswith("ecovillage.org")
-    ]
-    deep_urls: list[str] = []
-    for source in deep_sources:
-        root = site_root(source["url"])
-        if root not in deep_urls:
-            deep_urls.append(root)
-    deep_hosts = {urlsplit(u).netloc for u in deep_urls}
+    scopes = {}
+    for source in sources:
+        scope = url_scope(source["url"], source)
+        if scope == "site" and urlsplit(
+                source["url"]).netloc.lower().removeprefix("www.") == "ecovillage.org":
+            # The network's shared directory is nobody's own site.
+            scope = "page"
+        scopes[source["url"]] = scope
+
+    site_urls: list[str] = []
+    for source in sources:
+        if scopes[source["url"]] == "site":
+            root = site_root(source["url"])
+            if root not in site_urls:
+                site_urls.append(root)
+    deep_hosts = {urlsplit(u).netloc for u in site_urls}
+    # An address on a domain already being walked in full needs no separate
+    # entry: the walk reaches it.
+    page_urls = [s["url"] for s in sources
+                 if scopes[s["url"]] == "page"
+                 and urlsplit(s["url"]).netloc not in deep_hosts]
+    file_urls = [s["url"] for s in sources if scopes[s["url"]] == "file"]
+    # The fixed network seed is an address like any other and is page-scoped:
+    # ecovillage.org is 212 communities' shared directory, so exactly one page
+    # of it is taken. Listing it here keeps the three columns a complete account
+    # of the source set rather than a partial one.
+    if GEN_GLOBAL_URL not in page_urls:
+        page_urls.append(GEN_GLOBAL_URL)
+    deep_urls = site_urls
     search_terms = academic_search_terms(normalized, discovery)
     crawl_policy = "EXHAUSTIVE_SITE_AND_ACADEMIC" if deep_urls else "ACADEMIC_EXHAUSTIVE_ONLY"
     if not deep_urls:
@@ -366,10 +407,11 @@ def build_row(community: dict, discovery: dict | None,
          "verification": "search_index", "evidence": s["evidence"],
          # exhaustive: walk the whole site and take every asset with it.
          # targeted: this page and what it links to, sampled adaptively.
-         "crawl_scope": ("exhaustive" if urlsplit(s["url"]).netloc in deep_hosts
-                         else "targeted"),
-         "asset_download": ("all" if urlsplit(s["url"]).netloc in deep_hosts
-                            else "evidence_bearing")}
+         "crawl_scope": scopes[s["url"]],
+         "max_pages": SCOPE_MAX_PAGES[scopes[s["url"]]],
+         # Every scope takes the assets on the page it did fetch. A directory
+         # listing's linked annual report is exactly what is wanted.
+         "asset_download": "all"}
         for s in sources
     ]
     payload.append({
@@ -377,7 +419,7 @@ def build_row(community: dict, discovery: dict | None,
         "source_class": "S3", "platform_type": "directory listing",
         "independence_group": "G1", "confidence": "HIGH", "quality_score": 0.10,
         "verification": "fixed_global_source",
-        "crawl_scope": "targeted", "asset_download": "evidence_bearing",
+        "crawl_scope": "page", "max_pages": 1, "asset_download": "all",
         "evidence": "Mandatory Global Ecovillage Network network-level seed, "
                     "present on every row; not evidence that this community is "
                     "GEN-registered - see gen_community_status",
@@ -445,7 +487,9 @@ def build_row(community: dict, discovery: dict | None,
         "seed_sources_json": json.dumps(payload, ensure_ascii=False,
                                         separators=(",", ":")),
         "crawl_policy": crawl_policy,
-        "deep_crawl_urls": URL_DELIMITER.join(deep_urls),
+        "site_urls": URL_DELIMITER.join(site_urls),
+        "page_urls": URL_DELIMITER.join(page_urls),
+        "file_urls": URL_DELIMITER.join(file_urls),
         "academic_search_terms": URL_DELIMITER.join(search_terms),
         "seed_url_verification_method": (
             "search_index" if discovery else "none"),

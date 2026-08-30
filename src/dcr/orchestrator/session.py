@@ -235,7 +235,17 @@ def _normalise_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
         # --- crawl policy, when the master file carries it ------------------
         # Optional by design: a plain two-column sheet of names and URLs still
         # loads, and simply gets the standard treatment for every address.
-        "deep_crawl_urls": _split_urls(entry.get("deep_crawl_urls")),
+        #
+        # Three scopes, because three kinds of address are three different jobs:
+        # the community's own site is walked in full; somebody else's site gives
+        # up exactly the one page that mentions the community; a direct document
+        # link is downloaded and nothing around it is crawled.
+        "site_urls": _split_urls(entry.get("site_urls")),
+        "page_urls": _split_urls(entry.get("page_urls")),
+        "file_urls": _split_urls(entry.get("file_urls")),
+        # The old name, still accepted so an older master file keeps working.
+        "deep_crawl_urls": _split_urls(
+            entry.get("site_urls") or entry.get("deep_crawl_urls")),
         "academic_search_terms": _split_terms(entry.get("academic_search_terms")),
         "crawl_policy": (str(entry.get("crawl_policy") or "").strip().upper() or None),
     }

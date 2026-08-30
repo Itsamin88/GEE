@@ -646,7 +646,7 @@
   "gen_evidence": "Search returned a GEN community page on the legacy host gen.ecovillage.org; no current ecovillage.org/project page surfaced. Recorded as GEN-associated on a legacy GEN URL - re-check on the live site.",
   "alternative_names": "Konohana Family; Konohana Farm; Konohana Familii",
   "identity_confidence": "HIGH",
-  "notes": "Founded 1994 as Konohana Farm, 20 founding members; ~60-100 residents, 16 ha, 250+ crops at the foot of Mt Fuji.",
+  "notes": "Founded 1994 as Konohana Farm, 20 founding members; ~60-100 residents, 16 ha, 250+ crops at the foot of Mt Fuji. MEASURED FOOTPRINT: 0.8 earths against a Japanese average of 2.3. Described in the literature as the oldest and most established of Japan's ecovillages.",
   "sources": [
    {
     "url": "https://ourworld.unu.edu/en/konohana",
@@ -710,6 +710,24 @@
     "confidence": "LOW",
     "score": 0.24,
     "evidence": "Third-party ecovillage directory entry"
+   },
+   {
+    "url": "https://mail.japanesestudies.org.uk/ejcjs/vol13/iss3/brecher.html",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G45",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "'Sustainability as Community', Electronic Journal of Contemporary Japanese Studies vol 13 - a peer-reviewed article taking this community as its primary case, and the source of the 0.8-earths footprint figure against a Japanese average of 2.3"
+   },
+   {
+    "url": "https://www.academia.edu/2287958/Modern_place_making_in_Konohana_Family",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G46",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "'Modern place-making in Konohana Family' - anthropological fieldwork on site"
    }
   ]
  },
@@ -2143,7 +2161,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Matavenero y Poibueno - Global Ecovillage Network' directory entry plus a /project/matavenero-y-poibueno/ sub-page",
   "alternative_names": "Matavenero; Matavenero y Poibueno; Poibueno",
   "identity_confidence": "HIGH",
-  "notes": "Two abandoned Bierzo hamlets resettled from 1989 by people from the Rainbow movement, on land granted by the provincial administration; ~60 residents at 1,000 m in chestnut forest. The land grant is a dated institutional record worth pursuing.",
+  "notes": "Two abandoned Bierzo hamlets resettled from 1989 by people from the Rainbow movement, on land granted by the provincial administration; ~60 residents at 1,000 m in chestnut forest. The land grant is a dated institutional record worth pursuing. AN EXCEPTIONALLY CLEAN LAND-USE HISTORY: the village was ABANDONED in the late 1960s when its people left for city work, and REPOPULATED FROM 1989 by an international group out of the Rainbow movement. So the pre-1989 imagery shows a ghost village reverting to scrub, and everything after is re-occupation of an existing settlement, not new build. About 60 inhabitants including a dozen children, mostly German, Spanish, French and Danish. El Bierzo mountains; off-grid.",
   "sources": [
    {
     "url": "https://matavenero.net/",
@@ -2198,6 +2216,42 @@
     "confidence": "HIGH",
     "score": 0.62,
     "evidence": "Spanish encyclopaedic article with administrative placement"
+   },
+   {
+    "url": "https://www.nationalgeographic.com/history/article/how-a-derelict-countryside-bloomed-into-an-ecoparadise",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G48",
+    "confidence": "HIGH",
+    "score": 0.78,
+    "evidence": "National Geographic on the repopulation of the derelict countryside - international journalism, and the closest thing to a documented account of the land-cover change here"
+   },
+   {
+    "url": "https://www.smithsonianmag.com/smart-news/spain-has-repopulated-ghost-town-now-thrives-grid-eco-village-180956773/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G49",
+    "confidence": "MEDIUM",
+    "score": 0.72,
+    "evidence": "Smithsonian Magazine on the ghost town's repopulation"
+   },
+   {
+    "url": "https://naturalhomes.org/timeline/matavenero.htm",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G50",
+    "confidence": "MEDIUM",
+    "score": 0.64,
+    "evidence": "naturalhomes.org timeline - a natural-building archive's dated record of the buildings"
+   },
+   {
+    "url": "https://www.imdb.com/title/tt7989796/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G51",
+    "confidence": "MEDIUM",
+    "score": 0.52,
+    "evidence": "'Matavenero: el Pueblo Arco Iris' - a documentary film record of the community"
    }
   ]
  },
@@ -2290,7 +2344,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Tamera - Global Ecovillage Network' at /project/tamera-0/ - note the '-0' slug suffix, which is why GEN URLs must never be constructed",
   "alternative_names": "Tamera; Tamera Healing Biotope I; Tamera Heilungsbiotop; Terra Nova",
   "identity_confidence": "HIGH",
-  "notes": "Founded in Germany 1978, moved to Portugal 1995; ~170 people on 330 acres. The Water Retention Landscape (29 lakes 2006-2015, water bodies from 0.62 ha to 8.32 ha) is exactly the kind of dated, measured earthwork the study is looking for, and it is documented in peer-reviewed and EU-platform sources.",
+  "notes": "Founded in Germany 1978, moved to Portugal 1995; ~170 people on 330 acres. The Water Retention Landscape (29 lakes 2006-2015, water bodies from 0.62 ha to 8.32 ha) is exactly the kind of dated, measured earthwork the study is looking for, and it is documented in peer-reviewed and EU-platform sources. DOCUMENTS ADDED: two full theses as direct PDFs, one on Tamera's own server and one on a Portuguese university's.",
   "sources": [
    {
     "url": "https://www.tamera.org/water-retention-landscape/",
@@ -2345,6 +2399,42 @@
     "confidence": "HIGH",
     "score": 0.58,
     "evidence": "Verified GEN project page"
+   },
+   {
+    "url": "https://www.tamera.org/wp-content/uploads/Masterarbeit_Sarah_Daum.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G9",
+    "confidence": "HIGH",
+    "score": 0.94,
+    "evidence": "DIRECT PDF: Sarah Daum, MSc Geoecology thesis, 'Water quality and sustainability of the water retention landscape at Tamera'. Hosted on Tamera's own site."
+   },
+   {
+    "url": "https://www.dcea.fct.unl.pt/sites/www.dcea.fct.unl.pt/files/ficheiros/7.%20Tamera%20-%20Water%20Retention%20Landscapes%20(Christpoh%20Ulbig).pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G10",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "DIRECT PDF: Christoph Ulbig, Tamera Ecological Department, on the water retention landscapes. Hosted by FCT NOVA (Universidade Nova de Lisboa)."
+   },
+   {
+    "url": "https://www.permaculture.org.uk/article/master-thesis-geocology-water-quality-and-sustainability-water-retention-landscape-tamera",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G11",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Permaculture Association record of the Daum thesis - the landing page for it"
+   },
+   {
+    "url": "https://www.bfi.org/challenge/2012/water-retention-landscape-of-tamera/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G12",
+    "confidence": "MEDIUM",
+    "score": 0.66,
+    "evidence": "Buckminster Fuller Institute Challenge 2012 entry for the Water Retention Landscape - an independent award record with a dated submission"
    }
   ]
  },
@@ -2800,7 +2890,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Sieben Linden Ecovillage - Global Ecovillage Network' project page",
   "alternative_names": "Okodorf Sieben Linden; Sieben Linden; Siebenlinden",
   "identity_confidence": "HIGH",
-  "notes": "Settlement begun 1997 on 22 ha outside Poppau; 100+ adults and 40 children; nine large straw-bale houses plus ~40 insulated trailers; explicitly a model AND RESEARCH project, so the academic yield should be high. Two domains in use (siebenlinden.org and siebenlinden.de).",
+  "notes": "Settlement begun 1997 on 22 ha outside Poppau; 100+ adults and 40 children; nine large straw-bale houses plus ~40 insulated trailers; explicitly a model AND RESEARCH project, so the academic yield should be high. Two domains in use (siebenlinden.org and siebenlinden.de). RESEARCH INDEX FOUND: the community publishes its own list of the ~70 studies written about it. Two university footprint studies exist - Gesamthochschule Kassel (data 2002, published 2004, 'Gemeinschaftlich - nachhaltig') and Politecnico di Torino (data 2014, published 2019, 'The Environmental Impact of Sieben Linden Ecovillage').",
   "sources": [
    {
     "url": "https://siebenlinden.org/en/",
@@ -2864,6 +2954,33 @@
     "confidence": "MEDIUM",
     "score": 0.48,
     "evidence": "Netzwerk Zukunft Sachsen-Anhalt sustainability record"
+   },
+   {
+    "url": "https://siebenlinden.org/de/vernetzung/forschung/",
+    "source_class": "S4",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "THE RESEARCH INDEX. The community's own page listing the academic work done on it - reported as around 70 papers, which makes this the single most valuable address for this community. Walked as part of the site scope."
+   },
+   {
+    "url": "https://siebenlinden.org/de/oekologische-fussabdruck/",
+    "source_class": "S4",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "The community's own account of the two university footprint studies, with the 27%-of-German-average figure"
+   },
+   {
+    "url": "https://gen-deutschland.de/2019/09/24/der-oekologischer-fussabdruck-im-oekodorf-sieben-linden/",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G14",
+    "confidence": "MEDIUM",
+    "score": 0.56,
+    "evidence": "GEN Deutschland, 24 September 2019, on the Turin footprint study"
    }
   ]
  },
@@ -3196,7 +3313,7 @@
   "gen_evidence": "site:ecovillage.org returned 'ZEGG - Global Ecovillage Network' project page",
   "alternative_names": "ZEGG; Zentrum fuer experimentelle Gesellschaftsgestaltung; Centre for Experimental Cultural Design; ZEGG gGmbH",
   "identity_confidence": "HIGH",
-  "notes": "Founded 1991 on a 15 ha former Nazi sports camp and later Stasi facility; ~100 residents. Ecological sewage plant, CO2-neutral heating, organic gardens. The site's prior institutional history means German federal and Brandenburg state records may carry dated land documentation.",
+  "notes": "Founded 1991 on a 15 ha former Nazi sports camp and later Stasi facility; ~100 residents. Ecological sewage plant, CO2-neutral heating, organic gardens. The site's prior institutional history means German federal and Brandenburg state records may carry dated land documentation. TWO DOMAINS: zegg.de (the seminar centre) and zegg-gemeinschaft.de (the community), with the PDF archive on the second. Zentrum fuer experimentelle Gesellschaftsgestaltung, on the edge of Bad Belzig about 80 km south-west of Berlin. A regional study covering it was published under the WIRinREGIONEN research project.",
   "sources": [
    {
     "url": "https://www.zegg.de/en/",
@@ -3251,6 +3368,33 @@
     "confidence": "MEDIUM",
     "score": 0.44,
     "evidence": "Independent comparative account of the community"
+   },
+   {
+    "url": "https://www.zegg-gemeinschaft.de/images/pdfs/zegg-reader/ZEGG-Reader-2008.pdf",
+    "source_class": "S4",
+    "platform_type": "other",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "DIRECT PDF: the ZEGG Reader 2008, the community's own substantial published account of itself"
+   },
+   {
+    "url": "https://www.zegg-gemeinschaft.de/de/aktuelles/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.78,
+    "evidence": "SECOND DOMAIN: the community runs zegg-gemeinschaft.de alongside zegg.de, and the PDF archive lives on this one - both must be walked"
+   },
+   {
+    "url": "https://lernorte.gen-deutschland.de/lernort/zegg/",
+    "source_class": "S3",
+    "platform_type": "directory listing",
+    "independence_group": "G14",
+    "confidence": "MEDIUM",
+    "score": 0.5,
+    "evidence": "GEN Deutschland 'Lernorte' record"
    }
   ]
  },
@@ -3325,7 +3469,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Findhorn Foundation Community Eco-village Project - Findhorn, UK' and a /map/community/thepark-ecovillagefindhorn/ directory entry",
   "alternative_names": "Findhorn Ecovillage; The Park; Findhorn Foundation; Park Ecovillage Trust",
   "identity_confidence": "HIGH",
-  "notes": "Begun 1962; Foundation created early 1970s; ~300-350 residents on roughly an 800-acre estate. A FOUNDING MEMBER of GEN - the 1995 conference here established the network. Community land purchase completed November 2024 with over 415,000 GBP raised, a dated tenure event. Among the most heavily studied communities in the cohort; expect a large academic yield.",
+  "notes": "Begun 1962; Foundation created early 1970s; ~300-350 residents on roughly an 800-acre estate. A FOUNDING MEMBER of GEN - the 1995 conference here established the network. Community land purchase completed November 2024 with over 415,000 GBP raised, a dated tenure event. Among the most heavily studied communities in the cohort; expect a large academic yield. UN-Habitat Best Practice designation 1998. Measured footprint about half the Scottish average.",
   "sources": [
    {
     "url": "https://www.findhorn.org/",
@@ -3389,6 +3533,42 @@
     "confidence": "HIGH",
     "score": 0.56,
     "evidence": "GEN article recording the November 2024 land purchase"
+   },
+   {
+    "url": "https://www.ecovillagefindhorn.com/docs/FF%20Footprint.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G9",
+    "confidence": "HIGH",
+    "score": 0.94,
+    "evidence": "DIRECT PDF: 'Ecological Footprint of the Findhorn Foundation and Community', Sustainable Development Research Centre, Forres - the study behind the half-of-the-Scottish-average figure"
+   },
+   {
+    "url": "https://www.sciencedirect.com/science/article/abs/pii/S0959652619326903",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G15",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "'The impact of community sustainability: a life cycle assessment of three ecovillages', Journal of Cleaner Production 2019 - peer-reviewed LCA including Findhorn"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/328857318_Current_thinking_on_sustainable_human_habitat_the_Findhorn_Ecovillagecase",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G16",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "'Current thinking on sustainable human habitat: the Findhorn Ecovillage case', 2018"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/318343433_Quantifying_the_environmental_impact_of_ecovillages_and_co-housing_communities_a_systematic_literature_review",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G17",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "Systematic literature review quantifying ecovillage environmental impact, 2017 - a review, so it also serves as a bibliography for the whole cohort"
    }
   ]
  },
@@ -4339,7 +4519,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Ecovillage Torri Superiore - Global Ecovillage Network' project page",
   "alternative_names": "Torri Superiore; Ecovillaggio Torri Superiore; Associazione Culturale Torri Superiore",
   "identity_confidence": "HIGH",
-  "notes": "COUNTRY CONFIRMED against a border-ambiguous coordinate: the gazetteer split IT/FR/MC; the village is 11 km from Ventimiglia and 16 km from the French border, in ITALY. A 13th/14th-century single-building village of 162 rooms; the cultural association was founded 1989 to restore it; ~20 residents. The restoration itself is a long, dated, physically visible intervention.",
+  "notes": "COUNTRY CONFIRMED against a border-ambiguous coordinate: the gazetteer split IT/FR/MC; the village is 11 km from Ventimiglia and 16 km from the French border, in ITALY. A 13th/14th-century single-building village of 162 rooms; the cultural association was founded 1989 to restore it; ~20 residents. The restoration itself is a long, dated, physically visible intervention. RESTORATION, NOT CONSTRUCTION: a medieval hamlet in the Bevera valley near Ventimiglia, abandoned to ruin through the last century and restored from the early 1990s under a recycling plan that preserved its historical character. The land-cover signal is building repair, not new build.",
   "sources": [
    {
     "url": "https://www.torri-superiore.org/en/ecovillage/about-us/",
@@ -4385,6 +4565,42 @@
     "confidence": "MEDIUM",
     "score": 0.3,
     "evidence": "Official page"
+   },
+   {
+    "url": "https://doi.org/10.3390/su18010188",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G9",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "'Ecovillages as Living Labs for Social Innovation: The Case of Torri Superiore', Sustainability - a peer-reviewed article on this site specifically, open access via DOI"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/255980471_Novelties_retro-innovation_and_fantasy_Torri_Superiore_Ecovillage_as_a_form_of_resistance_to_the_abandonment_of_rural_marginal_areas_in_Italy_Cpdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G18",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "'Novelties, retro-innovation and fantasy: Torri Superiore Ecovillage as a form of resistance to the abandonment of rural marginal areas in Italy'"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/301272821_Community-led_approaches_and_interventions_for_the_regeneration_of_abandoned_towns_in_Southern_Italy",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G19",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "'Community-led approaches and interventions for the regeneration of abandoned towns in Southern Italy' - Torri Superiore as case study"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Torri_Superiore",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G20",
+    "confidence": "MEDIUM",
+    "score": 0.54,
+    "evidence": "Encyclopaedia article on the hamlet itself, which predates the community by centuries"
    }
   ]
  },
@@ -5137,7 +5353,7 @@
   "gen_evidence": "site:ecovillage.org returned no GEN community page for Dancing Rabbit; results were the community's own site, IC.org, Wikipedia and social accounts. No GEN URL recorded rather than constructing one.",
   "alternative_names": "Dancing Rabbit; Dancing Rabbit Ecovillage; DR",
   "identity_confidence": "HIGH",
-  "notes": "280 acres bought by the community land trust in 1997; ~70 residents under ecological covenants. LAND DETAIL IS UNUSUALLY GOOD: six ponds, a seasonal creek, 40 acres woodland, 30 acres with 12,000+ trees planted, ~20 acres of restored native prairie - dated, quantified, and directly measurable from imagery.",
+  "notes": "280 acres bought by the community land trust in 1997; ~70 residents under ecological covenants. LAND DETAIL IS UNUSUALLY GOOD: six ponds, a seasonal creek, 40 acres woodland, 30 acres with 12,000+ trees planted, ~20 acres of restored native prairie - dated, quantified, and directly measurable from imagery. Roughly 70 members. Ecological covenants bind members to sustainably generated electricity only and no personally owned vehicles on community property - so the absence of cars and of a grid connection is by rule, not by poverty. 'Achieving one-planet living through transitions in social practice' (Sustainability: Science, Practice & Policy, 2016) studies this site.",
   "sources": [
    {
     "url": "https://www.dancingrabbit.org/ecovillage-life/our-land/",
@@ -5201,6 +5417,42 @@
     "confidence": "MEDIUM",
     "score": 0.44,
     "evidence": "Foundation for Intentional Community entry"
+   },
+   {
+    "url": "https://www.dancingrabbit.org/dancing-rabbit-inc-nonprofit/research/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "THE RESEARCH INDEX: the community's own list of academic publications about it"
+   },
+   {
+    "url": "https://digital.library.unt.edu/ark:/67531/metadc700019/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G21",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "'Toward Sustainable Community: Assessing Progress at Dancing Rabbit Ecovillage' - full-text thesis in the University of North Texas digital library"
+   },
+   {
+    "url": "https://go.gale.com/ps/anonymous?id=GALE%7CA474768225&sid=googleScholar&v=2.1&it=r&linkaccess=abs&issn=07391250&p=AONE&sw=w",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G22",
+    "confidence": "HIGH",
+    "score": 0.78,
+    "evidence": "'A case study analysis of Dancing Rabbit Ecovillage, Missouri' via Gale Academic OneFile"
+   },
+   {
+    "url": "https://communityhousinglaw.org/in-depth-profiles-of-communities/dancing-rabbit-ecovillage/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G23",
+    "confidence": "MEDIUM",
+    "score": 0.66,
+    "evidence": "Community Housing Law in-depth profile - the legal and covenant structure, which is where the ecological covenants are set out"
    }
   ]
  },
@@ -5215,7 +5467,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Earthaven Ecovillage - Global Ecovillage Network' plus several GEN articles about Earthaven",
   "alternative_names": "Earthaven; Earthaven Ecovillage; School of Integrated Living; SOIL",
   "identity_confidence": "HIGH",
-  "notes": "Founded 1994 on 329 forested mountain acres at 2,000-2,600 ft; ~75 adults and 25 children; permaculture site plans, natural building, renewable energy, organic farms. One of the best documented US ecovillages; an on-site education arm (School of Integrated Living) and substantial academic literature.",
+  "notes": "Founded 1994 on 329 forested mountain acres at 2,000-2,600 ft; ~75 adults and 25 children; permaculture site plans, natural building, renewable energy, organic farms. One of the best documented US ecovillages; an on-site education arm (School of Integrated Living) and substantial academic literature. FOUNDED 1994 ON 329 FORESTED, MOUNTAINOUS ACRES near Asheville. Forested at acquisition, so the expected signal is selective clearing for homesites inside standing forest, not afforestation.",
   "sources": [
    {
     "url": "https://www.earthaven.org/what-is-earthaven/",
@@ -5279,6 +5531,33 @@
     "confidence": "MEDIUM",
     "score": 0.46,
     "evidence": "GEN article on ecovillage zoning naming Earthaven - planning-law angle"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/313822527_Sustainability_in_Practice_A_Comparative_Case_Study_Analysis_of_the_EcoVillage_at_Ithaca_Earthaven_and_Sirius",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G28",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "'Sustainability in Practice: A Comparative Case Study Analysis of the EcoVillage at Ithaca, Earthaven, and Sirius' - covers this site directly"
+   },
+   {
+    "url": "https://ecovillagebook.org/ecovillages/earthaven/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G30",
+    "confidence": "HIGH",
+    "score": 0.74,
+    "evidence": "'Ecovillages: Lessons for Sustainable Community' (Karen Litfin) chapter site - an academic book's case record"
+   },
+   {
+    "url": "https://www.npr.org/2025/06/10/nx-s1-5340713/north-carolina-climate-change-solutions",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G31",
+    "confidence": "MEDIUM",
+    "score": 0.68,
+    "evidence": "NPR, 10 June 2025, on the community as a climate-change response - national broadcast journalism, and recent"
    }
   ]
  },
@@ -5722,7 +6001,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Twin Oaks Community - Global Ecovillage Network' project page",
   "alternative_names": "Twin Oaks; Twin Oaks Community; Twin Oaks Intentional Community",
   "identity_confidence": "HIGH",
-  "notes": "Founded 1967 on the Planner/Manager system from Skinner's Walden Two; ~85-100 adults on 485 acres of farm and forest; income-sharing, Federation of Egalitarian Communities. Very long, well documented history; large expected academic yield.",
+  "notes": "Founded 1967 on the Planner/Manager system from Skinner's Walden Two; ~85-100 adults on 485 acres of farm and forest; income-sharing, Federation of Egalitarian Communities. Very long, well documented history; large expected academic yield. Founded 1967 - among the oldest in the cohort. About 85 adults and 15 children. Income- and resource-sharing, so consumption is collective and per-capita figures behave differently from a village of separate households.",
   "sources": [
    {
     "url": "https://www.twinoaks.org/",
@@ -5777,6 +6056,42 @@
     "confidence": "MEDIUM",
     "score": 0.52,
     "evidence": "Virginia Dogwood feature"
+   },
+   {
+    "url": "https://digitalcollections.sit.edu/capstones/2494/",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G34",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "'Twin Oaks: A Case Study of an Intentional Egalitarian Community', Katharina F. McCarty - full-text capstone in the SIT digital collections"
+   },
+   {
+    "url": "https://www.emerald.com/books/edited-volume/12070/chapter-abstract/82116207/Work-and-Sustainability-at-Twin-Oaks-Intentional",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G35",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "'Work and Sustainability at Twin Oaks Intentional Community', in Ethnographies of Work (Emerald) - a peer-reviewed book chapter"
+   },
+   {
+    "url": "https://academic.oup.com/book/45610/chapter/394837978",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G36",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "'Music as Ethics: Stories from Virginia' (Oxford Academic) - a comparative ethnography of four Virginia communities including this one"
+   },
+   {
+    "url": "https://www.twinoaks.org/twin-oaks-ecovillage/outsider-assessment",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.7,
+    "evidence": "The community's own page collecting outside assessments of it - an unusual and useful index"
    }
   ]
  },
@@ -6109,7 +6424,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Ecovillage at Ithaca - Global Ecovillage Network' community page plus a GEN feature article",
   "alternative_names": "EcoVillage at Ithaca; EVI; Frog, Song and Tree neighborhoods; West Haven Farm; Thrive Ithaca",
   "identity_confidence": "HIGH",
-  "notes": "Developing since 1991; 170-175 acres, 100 homes, 200+ residents in three cohousing neighbourhoods - among the largest cohousing communities in the world. WEST HAVEN FARM (from 1992, certified organic, Ithaca's longest-running CSA) sits on the land under a PERMANENT CONSERVATION EASEMENT held via the Finger Lakes Land Trust - a dated, legally recorded land instrument and an independent farm voice.",
+  "notes": "Developing since 1991; 170-175 acres, 100 homes, 200+ residents in three cohousing neighbourhoods - among the largest cohousing communities in the world. WEST HAVEN FARM (from 1992, certified organic, Ithaca's longest-running CSA) sits on the land under a PERMANENT CONSERVATION EASEMENT held via the Finger Lakes Land Trust - a dated, legally recorded land instrument and an independent farm voice. ONE OF THE BEST-STUDIED ECOVILLAGES ANYWHERE, and unusually it has MEASURED footprint figures: about 40% lower per-capita ecological footprint than the US average, and Moos et al. (2006) found a 42% reduction against comparable local development patterns. Two neighbourhoods with different heating systems - FROG on district heating serving clusters of 6-8 houses, SONG on shared furnaces and radiant floors.",
   "sources": [
    {
     "url": "https://ecovillageithaca.org/",
@@ -6173,6 +6488,51 @@
     "confidence": "MEDIUM",
     "score": 0.56,
     "evidence": "Downloadable West Haven Farm material - a document route"
+   },
+   {
+    "url": "https://files01.core.ac.uk/download/pdf/36682992.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G9",
+    "confidence": "HIGH",
+    "score": 0.94,
+    "evidence": "DIRECT PDF via CORE: 'Building resistance from home: EcoVillage at Ithaca as a model of sustainable living'"
+   },
+   {
+    "url": "https://www.academia.edu/2914499/11_Realizing_Utopia_An_Overview_of_Research_on_Ecovillage_at_Ithaca",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G32",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "'Realizing Utopia: an overview of research on EcoVillage at Ithaca' - a survey of the literature on this one site, which is the fastest route into it"
+   },
+   {
+    "url": "https://www.environmentandsociety.org/perspectives/2012/8/article/overview-research-ecovillage-ithaca",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G32",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "The same overview in the Rachel Carson Center's Environment & Society Portal - open access"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/289365001_Sustainable_living_and_community_building_in_Ecovillage_at_Ithaca_The_challenges_of_incorporating_social_justice_concerns_into_the_practices_of_an_ecological_cohousing_community",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G33",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "'Sustainable living and community building in EcoVillage at Ithaca: the challenges of incorporating social justice concerns'"
+   },
+   {
+    "url": "https://www.sciencedirect.com/science/article/abs/pii/S0959652619326903",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G15",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "'The impact of community sustainability: a life cycle assessment of three ecovillages', Journal of Cleaner Production 2019 - includes this site"
    }
   ]
  },
@@ -6652,7 +7012,7 @@
   "gen_evidence": "site:ecovillage.org returned 'Crystal Waters - Global Ecovillage Network' community page",
   "alternative_names": "Crystal Waters; Crystal Waters Permaculture Village; Crystal Waters Eco Village; Crystal Waters Community Co-operative",
   "identity_confidence": "HIGH",
-  "notes": "Established 1987/88 - AUSTRALIA'S FIRST INTENTIONAL PERMACULTURE COMMUNITY; 640 acres of bushland at the Mary River headwaters, 83-85 lots, ~250 residents. Won the 1996 WORLD HABITAT AWARD for low-impact sustainable living. Classified 'Land for Wildlife'. A foundational permaculture case with a long literature.",
+  "notes": "Established 1987/88 - AUSTRALIA'S FIRST INTENTIONAL PERMACULTURE COMMUNITY; 640 acres of bushland at the Mary River headwaters, 83-85 lots, ~250 residents. Won the 1996 WORLD HABITAT AWARD for low-impact sustainable living. Classified 'Land for Wildlife'. A foundational permaculture case with a long literature. 640 ACRES adjoining Conondale Range National Park. Described as the world's first intentional permaculture village; designed by Max Lindegger, Robert Tap and Geoff Young. World Habitat Award 1996.",
   "sources": [
    {
     "url": "https://crystalwaters.org.au/",
@@ -6707,6 +7067,33 @@
     "confidence": "MEDIUM",
     "score": 0.3,
     "evidence": "Official page"
+   },
+   {
+    "url": "https://world-habitat.org/awards/winners/crystal-waters-permaculture-village/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G24",
+    "confidence": "HIGH",
+    "score": 0.8,
+    "evidence": "World Habitat Award 1996 citation - an independent UN-linked award record with a hard date, for pioneering low-impact sustainable living"
+   },
+   {
+    "url": "https://www.abc.net.au/news/2018-07-03/crystal-waters-eco-village-celebrates-30-years/9929342",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G26",
+    "confidence": "MEDIUM",
+    "score": 0.7,
+    "evidence": "ABC News, 3 July 2018, on the village's thirtieth anniversary - national broadcast journalism with a hard date"
+   },
+   {
+    "url": "https://www.context.org/iclib/ic29/cluster/",
+    "source_class": "S6",
+    "platform_type": "other",
+    "independence_group": "G27",
+    "confidence": "MEDIUM",
+    "score": 0.6,
+    "evidence": "In Context magazine's early account of the cluster of ecovillages, contemporaneous with the founding"
    }
   ]
  },
@@ -9922,7 +10309,7 @@
   "gen_evidence": "site:ecovillage.org returned the 'Damanhur Federation' project page",
   "alternative_names": "Damanhur; Federation of Damanhur; Federazione di Damanhur; Damanhur Federation of Communities",
   "identity_confidence": "HIGH",
-  "notes": "One of the largest and oldest in the cohort. Founded 1975 by Oberto Airaudi. SPREAD OVER 1,200+ ACRES of woodland, farmland and residential land in Valchiusella, Piedmont - a federation of many nucleo-communities rather than a single site, so a single coordinate under-represents it and the crawl should expect dispersed built area. Temples of Humankind are underground and will not appear in imagery. Has its own constitution and internal currency.",
+  "notes": "One of the largest and oldest in the cohort. Founded 1975 by Oberto Airaudi. SPREAD OVER 1,200+ ACRES of woodland, farmland and residential land in Valchiusella, Piedmont - a federation of many nucleo-communities rather than a single site, so a single coordinate under-represents it and the crawl should expect dispersed built area. Temples of Humankind are underground and will not appear in imagery. Has its own constitution and internal currency. Described in the literature as one of Europe's longest-lasting esoteric communities but, until recently, almost unstudied scientifically - so the Springer collection and the UWA thesis carry more weight here than a larger bibliography would elsewhere.",
   "sources": [
    {
     "url": "https://damanhur.org/",
@@ -9959,6 +10346,42 @@
     "confidence": "HIGH",
     "score": 0.3,
     "evidence": "Fixed network seed source"
+   },
+   {
+    "url": "https://api.research-repository.uwa.edu.au/ws/portalfiles/portal/9603941/Salter_Kara_2015.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G9",
+    "confidence": "HIGH",
+    "score": 0.94,
+    "evidence": "DIRECT PDF: Kara Salter's 2015 thesis, 'Structure and anti-structure: communitas in Damanhur, federation of communities', University of Western Australia repository - fieldwork in Valchiusella 2009-2010"
+   },
+   {
+    "url": "https://link.springer.com/book/10.1007/978-3-031-10137-3",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G42",
+    "confidence": "HIGH",
+    "score": 0.9,
+    "evidence": "'Damanhur: An Esoteric Community Open to the World' (Springer) - a multidisciplinary scholarly collection on this community's social, cultural and organisational life"
+   },
+   {
+    "url": "https://www.academia.edu/30911465/Damanhur_Local_Economy_and_Cult_Controversies_of_a_Magical_Community_in_Italy",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G43",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "Massimo Introvigne, 'Damanhur: Local Economy and Cult Controversies of a Magical Community in Italy' - the local economy, which bears on the land holdings"
+   },
+   {
+    "url": "https://en.wikipedia.org/wiki/Federation_of_Damanhur",
+    "source_class": "S3",
+    "platform_type": "other",
+    "independence_group": "G44",
+    "confidence": "MEDIUM",
+    "score": 0.58,
+    "evidence": "Encyclopaedia article on the federation"
    }
   ]
  },
@@ -11665,7 +12088,7 @@
   "gen_evidence": "site:ecovillage.org returned only ARTICLE pages about the community - /schloss-tempelhof/ ('The first Earthship in Germany') and a resources-library article - not a /project/ or /ecovillage/ community profile. Articles are recorded as sources; they are not promoted to a community page.",
   "alternative_names": "Schloss Tempelhof; Gemeinschaft Schloss Tempelhof; Gemeinschaft Tempelhof; Tempelhof (Gemeinschaft); Stiftung Schloss Tempelhof",
   "identity_confidence": "HIGH",
-  "notes": "FOUNDING YEAR CORRECTED: 2010, not 2012 - German Wikipedia, GLS Bank and GEN all give 2010. FULL LAND BREAKDOWN, one of the most precise in the cohort: 34 HECTARES TOTAL, comprising 4 HA OF BUILDING LAND with numerous existing structures, 28 HA OF AGRICULTURAL LAND and 2 HA OF FOREST. Around 150 residents (roughly 100 adults and 50 children). Solidarische Landwirtschaft (community-supported agriculture) on permaculture principles. Site of the FIRST OFFICIALLY APPROVED EARTHSHIP IN GERMANY - an off-grid community building with kitchen, dining and living space and facilities for 25 people, at the centre of experimental living units in yurts and site trailers, so part of the residential stock is non-permanent and may not read as building. The site was an existing manor estate before 2010, so pre-community imagery shows farm buildings, not open land. FINANCING LEAVES A PAPER TRAIL: GLS Bank, the German ethical bank, publishes its role in the project. COORDINATE RESOLVED: the apparent location conflict on this row was not a conflict in the underlying record. The export carried four geocoder candidates for this community and picked none; the first of them - the one a reader takes by default - was the wrong one. Candidate 4 matches the published address above and is now what latitude/longitude carry. The export's original first coordinate is preserved in latitude_as_exported/longitude_as_exported and all four candidates remain in coordinate_candidates.",
+  "notes": "FOUNDING YEAR CORRECTED: 2010, not 2012 - German Wikipedia, GLS Bank and GEN all give 2010. FULL LAND BREAKDOWN, one of the most precise in the cohort: 34 HECTARES TOTAL, comprising 4 HA OF BUILDING LAND with numerous existing structures, 28 HA OF AGRICULTURAL LAND and 2 HA OF FOREST. Around 150 residents (roughly 100 adults and 50 children). Solidarische Landwirtschaft (community-supported agriculture) on permaculture principles. Site of the FIRST OFFICIALLY APPROVED EARTHSHIP IN GERMANY - an off-grid community building with kitchen, dining and living space and facilities for 25 people, at the centre of experimental living units in yurts and site trailers, so part of the residential stock is non-permanent and may not read as building. The site was an existing manor estate before 2010, so pre-community imagery shows farm buildings, not open land. FINANCING LEAVES A PAPER TRAIL: GLS Bank, the German ethical bank, publishes its role in the project. COORDINATE RESOLVED: the apparent location conflict on this row was not a conflict in the underlying record. The export carried four geocoder candidates for this community and picked none; the first of them - the one a reader takes by default - was the wrong one. Candidate 4 matches the published address above and is now what latitude/longitude carry. The export's original first coordinate is preserved in latitude_as_exported/longitude_as_exported and all four candidates remain in coordinate_candidates. About 130 adults, adolescents and children plus people working in its businesses. Address: Tempelhof 3, 74594 Kressberg.",
   "sources": [
    {
     "url": "https://www.schloss-tempelhof.de/",
@@ -11729,6 +12152,24 @@
     "confidence": "HIGH",
     "score": 0.3,
     "evidence": "Fixed network seed source"
+   },
+   {
+    "url": "https://www.schloss-tempelhof.de/gemeinschaft/forschung/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "THE RESEARCH INDEX: the community's own research page. It states that it hosts and supervises student research - mainly master's theses - on natural and social science questions, and publishes what comes out of them."
+   },
+   {
+    "url": "https://zukunftskommunen.de/kommunen/gemeinschaft-schloss-tempelhof/",
+    "source_class": "S2",
+    "platform_type": "other",
+    "independence_group": "G52",
+    "confidence": "MEDIUM",
+    "score": 0.62,
+    "evidence": "Zukunftskommunen record - a German municipal-futures programme's institutional entry"
    }
   ]
  },
@@ -11954,6 +12395,51 @@
     "confidence": "HIGH",
     "score": 0.3,
     "evidence": "Fixed network seed source"
+   },
+   {
+    "url": "https://www.thevillage.ie/about-us/research-publications/",
+    "source_class": "S4",
+    "platform_type": "own website",
+    "independence_group": "G1",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "THE RESEARCH INDEX: the community's own list of the theses and papers written about it, which is substantial - social sustainability, production of space, ecological footprinting, volunteer tourism, education for sustainability"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/311960398_Cloughjordan_Ecovillage_Modelling_the_Transition_to_a_Low-Carbon_Society",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G38",
+    "confidence": "HIGH",
+    "score": 0.88,
+    "evidence": "'Cloughjordan Ecovillage: Modelling the Transition to a Low-Carbon Society' - three years of action research on site using the Viable System Model"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/283370847_Chapter_5_Sustainable_Housing_A_Case_Study_of_the_Cloughjordan_Eco-Village_Ireland",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G39",
+    "confidence": "HIGH",
+    "score": 0.86,
+    "evidence": "'Sustainable Housing: A Case Study of the Cloughjordan Eco-Village, Ireland' - the building standards, the district heating and the community farm"
+   },
+   {
+    "url": "https://sciencepublishinggroup.com/article/10.11648/j.jppa.20180204.12",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G40",
+    "confidence": "HIGH",
+    "score": 0.84,
+    "evidence": "'Sustainability and Resilience in the Collaborative Economy: An Introduction to the Cloughjordan Ecovillage' - open access, from three months of fieldwork"
+   },
+   {
+    "url": "https://www.researchgate.net/publication/345484961_Cloughjordan_Ecovillage_Community-Led_Transitioning_to_a_Low-Carbon_Future",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G41",
+    "confidence": "HIGH",
+    "score": 0.82,
+    "evidence": "'Cloughjordan Ecovillage: Community-Led Transitioning to a Low-Carbon Future'"
    }
   ]
  },
@@ -12028,7 +12514,7 @@
   "gen_evidence": "site:ecovillage.org run for Lammas and for Welsh ecovillages: no ecovillage.org community page was returned. The best-known ecovillage in Wales is documented through its planning record and the academic literature rather than through GEN.",
   "alternative_names": "Lammas Ecovillage; Lammas; Tir y Gafel; Tir-y-Gafel; Lammas Tir y Gafel; Glandwr ecovillage",
   "identity_confidence": "HIGH",
-  "notes": "THE STRONGEST PLANNING AND LAND-USE RECORD IN THE ENTIRE COHORT, and the one site where the land-cover change is not merely observed but LEGALLY REQUIRED AND MONITORED. Nine households plus a community hub on a 76-ACRE (31 HA) SITE at Glandwr near Crymych. Planning took from DECEMBER 2006 to AUGUST 2009 under Pembrokeshire's Policy 52 on low-impact development; in AUGUST 2009 a Welsh Government planning inspector granted temporary permission ON APPEAL for nine households to develop smallholdings on 70 ACRES OF FORMER PASTURELAND. THE CONDITION IS THE KEY FACT: each household must demonstrate that AT LEAST 75% OF ITS NEEDS - food, energy and livelihood - are met on site through agriculture, forestry or related enterprise. That means (a) the prior land cover is documented as pasture, (b) the start date is exact, and (c) the occupants were legally obliged to convert that pasture to productive use and to report on it annually. Lammas directly informed the Welsh Government's ONE PLANET DEVELOPMENT policy, introduced in 2011, and was among the first projects to benefit from it - so this single site has a national policy literature attached to it. ADDITIONAL: Lammas was THE FIRST ECOVILLAGE IN THE UK TO OBTAIN PROSPECTIVE PLANNING PERMISSION, won in 2009 after a three-year campaign that ended in a public hearing - so the appeal documents themselves are a public record of the site's condition before development. COORDINATE RESOLVED: the apparent location conflict on this row was not a conflict in the underlying record. The export carried four geocoder candidates for this community and picked none; the first of them - the one a reader takes by default - was the wrong one. Candidate 4 matches the published address above and is now what latitude/longitude carry. The export's original first coordinate is preserved in latitude_as_exported/longitude_as_exported and all four candidates remain in coordinate_candidates.",
+  "notes": "THE STRONGEST PLANNING AND LAND-USE RECORD IN THE ENTIRE COHORT, and the one site where the land-cover change is not merely observed but LEGALLY REQUIRED AND MONITORED. Nine households plus a community hub on a 76-ACRE (31 HA) SITE at Glandwr near Crymych. Planning took from DECEMBER 2006 to AUGUST 2009 under Pembrokeshire's Policy 52 on low-impact development; in AUGUST 2009 a Welsh Government planning inspector granted temporary permission ON APPEAL for nine households to develop smallholdings on 70 ACRES OF FORMER PASTURELAND. THE CONDITION IS THE KEY FACT: each household must demonstrate that AT LEAST 75% OF ITS NEEDS - food, energy and livelihood - are met on site through agriculture, forestry or related enterprise. That means (a) the prior land cover is documented as pasture, (b) the start date is exact, and (c) the occupants were legally obliged to convert that pasture to productive use and to report on it annually. Lammas directly informed the Welsh Government's ONE PLANET DEVELOPMENT policy, introduced in 2011, and was among the first projects to benefit from it - so this single site has a national policy literature attached to it. ADDITIONAL: Lammas was THE FIRST ECOVILLAGE IN THE UK TO OBTAIN PROSPECTIVE PLANNING PERMISSION, won in 2009 after a three-year campaign that ended in a public hearing - so the appeal documents themselves are a public record of the site's condition before development. COORDINATE RESOLVED: the apparent location conflict on this row was not a conflict in the underlying record. The export carried four geocoder candidates for this community and picked none; the first of them - the one a reader takes by default - was the wrong one. Candidate 4 matches the published address above and is now what latitude/longitude carry. The export's original first coordinate is preserved in latitude_as_exported/longitude_as_exported and all four candidates remain in coordinate_candidates. THE BEST QUANTITATIVE SERIES IN THE COHORT, AND IT IS PUBLIC. Because permission was conditional on meeting 75% of each household's needs on site, the community must file an ANNUAL MONITORING REPORT with Pembrokeshire County Council, and publishes them as PDFs. That gives a year-by-year record of land productivity and ecological footprint from 2010 onward - 0.82 to 1.36 planets across the early years, 1.55 gha per capita in 2014, 0.8 planets in 2015. Very few sites anywhere have a legally-mandated annual land-use record of this kind.",
   "sources": [
    {
     "url": "https://lammas.org.uk/en/ecovillage/",
@@ -12083,6 +12569,51 @@
     "confidence": "HIGH",
     "score": 0.3,
     "evidence": "Fixed network seed source"
+   },
+   {
+    "url": "http://lammas.org.uk/wp-content/uploads/2013/04/Tir-y-Gafel-Annual-Monitoring-Report-2010.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G9",
+    "confidence": "HIGH",
+    "score": 0.96,
+    "evidence": "DIRECT PDF: Tir y Gafel Annual Monitoring Report 2010 - the FIRST year's report, filed with Pembrokeshire County Council"
+   },
+   {
+    "url": "http://lammas.org.uk/wp-content/uploads/2013/03/Tir-y-Gafel-Annual-Monitoring-Report-2014-year-5.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G9",
+    "confidence": "HIGH",
+    "score": 0.96,
+    "evidence": "DIRECT PDF: Annual Monitoring Report 2014, year 5 - records an ecological footprint of 1.55 global hectares per capita"
+   },
+   {
+    "url": "http://lammas.org.uk/wp-content/uploads/2013/03/Tir-y-Gafel-Annual-Monitoring-Report-2015-year-6.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G9",
+    "confidence": "HIGH",
+    "score": 0.96,
+    "evidence": "DIRECT PDF: Annual Monitoring Report 2015, year 6 - a 0.8-planet footprint, against 0.82 to 1.36 in earlier years"
+   },
+   {
+    "url": "http://www.oneplanetcouncil.org.uk/wp-content/uploads/2015/02/Gardd-Y-Gafel-Management-Plan.pdf",
+    "source_class": "S1",
+    "platform_type": "other",
+    "independence_group": "G53",
+    "confidence": "HIGH",
+    "score": 0.92,
+    "evidence": "DIRECT PDF: the One Planet Development Management Plan for a holding on this site - the land-use plan a household had to file to get permission"
+   },
+   {
+    "url": "https://westwalesnewsreview.wordpress.com/tag/tir-y-gafel/",
+    "source_class": "S6",
+    "platform_type": "news outlet",
+    "independence_group": "G5",
+    "confidence": "MEDIUM",
+    "score": 0.66,
+    "evidence": "West Wales News Review's archive of its Tir y Gafel coverage - local journalism across years, not a single article"
    }
   ]
  },
