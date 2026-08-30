@@ -312,6 +312,16 @@ llm:
 
 browser:
   enabled: auto        # auto = use Playwright if installed
+  # WHICH Chromium to drive. Empty means: Playwright's own downloaded build
+  # first, then Google Chrome, then Microsoft Edge if either is installed.
+  #
+  # `playwright install` fetches its build from a Google CDN that refuses
+  # connections from some countries outright - a researcher in Iran gets
+  # "this service is not available in your location". That is geography, not
+  # configuration, and it should not cost the whole browser feature on a machine
+  # that already has Chrome or Edge. Set this to "chrome" or "msedge" to skip
+  # straight to an installed browser.
+  channel: ""
   # Only escalate to a browser when static HTML looks JS-rendered.
   min_text_chars_for_static: 400
   max_browser_pages_per_source: 40

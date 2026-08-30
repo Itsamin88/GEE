@@ -338,3 +338,119 @@ def test_lxml_is_a_declared_dependency_not_an_optional_one():
     from pathlib import Path
 
     assert "lxml" in Path("requirements.txt").read_text(encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# A blocked browser download must not cost the whole browser feature
+# ---------------------------------------------------------------------------
+def test_the_browser_falls_back_to_an_installed_chrome(monkeypatch):
+    """`playwright install` is geo-blocked in some countries. Chrome is not.
+
+    Playwright fetches its private Chromium from a Google CDN that refuses
+    connections from some locations outright - a researcher in Iran gets "this
+    service is not available in your location". That is geography, not
+    configuration, and it should not cost the browser feature on a machine that
+    already has Chrome or Edge installed.
+    """
+    import asyncio
+
+    from dcr.net.browser import BrowserPool
+
+    tried: list[dict] = []
+
+    class FakeChromium:
+        async def launch(self, **kwargs):
+            tried.append(kwargs)
+            if "channel" not in kwargs:          # the bundled build is missing
+                raise RuntimeError("Executable doesn't exist")
+            if kwargs["channel"] != "chrome":    # Edge is not installed either
+                raise RuntimeError("channel not found")
+            return object()
+
+    class FakePlaywright:
+        chromium = FakeChromium()
+
+    class FakeStarter:
+        async def start(self):
+            return FakePlaywright()
+
+    import sys
+    import types
+
+    pool = BrowserPool(enabled=True)
+    module = types.ModuleType("playwright.async_api")
+    module.async_playwright = lambda: FakeStarter()
+    monkeypatch.setitem(sys.modules, "playwright", types.ModuleType("playwright"))
+    monkeypatch.setitem(sys.modules, "playwright.async_api", module)
+
+    asyncio.run(pool.start())
+
+    assert pool.available, f"should have fallen back: {pool.unavailable_reason}"
+    assert "channel" not in tried[0], "the bundled build must still be tried first"
+    assert any(t.get("channel") == "chrome" for t in tried)
+
+
+def test_a_configured_channel_is_tried_first(monkeypatch):
+    """An operator who knows Edge is the only browser can say so."""
+    import asyncio
+    import sys
+    import types
+
+    from dcr.net.browser import BrowserPool
+
+    tried: list[dict] = []
+
+    class FakeChromium:
+        async def launch(self, **kwargs):
+            tried.append(kwargs)
+            return object()
+
+    class FakePlaywright:
+        chromium = FakeChromium()
+
+    class FakeStarter:
+        async def start(self):
+            return FakePlaywright()
+
+    module = types.ModuleType("playwright.async_api")
+    module.async_playwright = lambda: FakeStarter()
+    monkeypatch.setitem(sys.modules, "playwright", types.ModuleType("playwright"))
+    monkeypatch.setitem(sys.modules, "playwright.async_api", module)
+
+    pool = BrowserPool(enabled=True, channel="msedge")
+    asyncio.run(pool.start())
+    assert pool.available
+    assert tried[0].get("channel") == "msedge"
+    assert len(tried) == 1, "a configured channel that works needs no fallbacks"
+
+
+def test_no_browser_at_all_is_still_only_a_degradation(monkeypatch):
+    """With nothing installed the run continues on HTTP, and says why."""
+    import asyncio
+    import sys
+    import types
+
+    from dcr.net.browser import BrowserPool
+
+    class FakeChromium:
+        async def launch(self, **kwargs):
+            raise RuntimeError("Executable doesn't exist")
+
+    class FakePlaywright:
+        chromium = FakeChromium()
+
+    class FakeStarter:
+        async def start(self):
+            return FakePlaywright()
+
+    module = types.ModuleType("playwright.async_api")
+    module.async_playwright = lambda: FakeStarter()
+    monkeypatch.setitem(sys.modules, "playwright", types.ModuleType("playwright"))
+    monkeypatch.setitem(sys.modules, "playwright.async_api", module)
+
+    pool = BrowserPool(enabled=True)
+    asyncio.run(pool.start())
+    assert not pool.available
+    # The message has to name the way out, not just the failure.
+    assert "playwright install" in pool.unavailable_reason
+    assert "Chrome" in pool.unavailable_reason

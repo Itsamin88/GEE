@@ -80,8 +80,11 @@ class BrowserPool:
     """A small pool of browser pages. Absent Playwright, it reports unavailable."""
 
     def __init__(self, *, enabled: bool = True, pool_size: int = 2, timeout_s: float = 45.0,
-                 user_agent: str | None = None):
+                 user_agent: str | None = None, channel: str | None = None):
         self.requested = enabled
+        #: Force a particular installed browser, e.g. "chrome" or "msedge".
+        #: Empty means: try Playwright's own build first, then what is installed.
+        self.channel = (channel or "").strip()
         self.pool_size = max(1, pool_size)
         self.timeout_ms = int(timeout_s * 1000)
         self.user_agent = user_agent
@@ -102,18 +105,60 @@ class BrowserPool:
             self.unavailable_reason = "playwright is not installed"
             log.info("[BROWSER] unavailable: %s — HTTP-only extraction", self.unavailable_reason)
             return
+        args = ["--no-sandbox", "--disable-dev-shm-usage"]
+        # `playwright install` downloads a private Chromium from a Google CDN
+        # that refuses connections from some countries outright - a researcher in
+        # Iran gets "this service is not available in your location". That is a
+        # geography problem, not a configuration one, and it should not cost the
+        # whole browser feature when the machine already has Chrome or Edge.
+        #
+        # So: the downloaded build first, then the browsers Windows and macOS
+        # ship with anyway. `channel` tells Playwright to drive an installed
+        # browser rather than its own.
+        attempts: list[tuple[str, dict]] = [
+            ("bundled chromium", {}),
+            ("installed Chrome", {"channel": "chrome"}),
+            ("installed Edge", {"channel": "msedge"}),
+        ]
+        configured = self.channel
+        if configured:
+            attempts.insert(0, (f"configured channel {configured!r}",
+                                {"channel": configured}))
+
+        failures: list[str] = []
         try:
             self._playwright = await async_playwright().start()
-            self._browser = await self._playwright.chromium.launch(
-                args=["--no-sandbox", "--disable-dev-shm-usage"]
-            )
+        except Exception as exc:
+            self.unavailable_reason = f"{type(exc).__name__}: {exc}"
+            log.info("[BROWSER] unavailable: %s — HTTP-only extraction",
+                     self.unavailable_reason)
+            return
+
+        for label, options in attempts:
+            try:
+                self._browser = await self._playwright.chromium.launch(
+                    args=args, **options)
+            except Exception as exc:
+                failures.append(f"{label}: {type(exc).__name__}")
+                continue
             self._semaphore = asyncio.Semaphore(self.pool_size)
             self.available = True
             self.unavailable_reason = ""
-            log.info("[BROWSER] chromium ready (pool of %d)", self.pool_size)
-        except Exception as exc:
-            self.unavailable_reason = f"{type(exc).__name__}: {exc}"
-            log.info("[BROWSER] unavailable: %s — HTTP-only extraction", self.unavailable_reason)
+            log.info("[BROWSER] %s ready (pool of %d)", label, self.pool_size)
+            if label != "bundled chromium":
+                log.warning(
+                    "[BROWSER] using %s because Playwright's own build is not "
+                    "present. This is fine. If you want the bundled one, "
+                    "`playwright install` must be able to reach "
+                    "cdn.playwright.dev.", label)
+            return
+
+        self.unavailable_reason = (
+            "no usable Chromium: " + "; ".join(failures)
+            + ". Install one with `playwright install`, or install Google Chrome "
+              "or Microsoft Edge and it will be used automatically")
+        log.info("[BROWSER] unavailable: %s — HTTP-only extraction",
+                 self.unavailable_reason)
 
     async def close(self) -> None:
         try:

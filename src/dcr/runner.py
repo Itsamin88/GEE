@@ -338,6 +338,7 @@ class CommunityRunner:
             pool_size=int(browser_cfg.get("pool_size", 2)),
             timeout_s=float(browser_cfg.get("timeout_s", 45)),
             user_agent=self.settings.user_agent,
+            channel=str(browser_cfg.get("channel", "") or ""),
         )
         await browser.start()
 
