@@ -1,0 +1,1070 @@
+{
+ "blocks": [
+  {
+   "letter": "A",
+   "label": "Identity and location",
+   "fields": [
+    {
+     "fid": "A1",
+     "name": "community_name_official",
+     "values": null,
+     "required": "required",
+     "purpose": "Identifies the community and anchors every source search.",
+     "downstream": "Source retrieval; the code-to-name key held privately for T12.",
+     "missing": "Cannot be missing — a community with no findable name is not enumerable."
+    },
+    {
+     "fid": "A2",
+     "name": "alternative_names",
+     "values": null,
+     "required": "optional",
+     "purpose": "Former names, local names, transliterations and network variants.",
+     "downstream": "Each variant is a separate academic and archive search string. Directly raises Stage 5/6 yield, which is where rank-1 onset evidence lives.",
+     "missing": "Write 'not found'. Search yield is lower; record it in negative_consultations."
+    },
+    {
+     "fid": "A3",
+     "name": "country",
+     "values": null,
+     "required": "required",
+     "purpose": "Nation-state the site sits in.",
+     "downstream": "Stage 2 matching criterion (same country, holding policy and tenure constant); T1 sample description; country income group in T12.",
+     "missing": "Cannot be missing — it is derivable from the coordinates."
+    },
+    {
+     "fid": "A4",
+     "name": "admin_region",
+     "values": null,
+     "required": "required",
+     "purpose": "Province, state or county.",
+     "downstream": "SC12 leave-region-out reference anchoring; reporting where Tier 2 and Tier 3 quartets cluster (T2).",
+     "missing": "Derive from the coordinates and record that you did."
+    },
+    {
+     "fid": "A5",
+     "name": "coordinate_agreement",
+     "values": [
+      "agrees",
+      "differs",
+      "no published location"
+     ],
+     "required": "required",
+     "purpose": "Whether published sources place the community where the held coordinates do.",
+     "downstream": "The polygon, the rings, the reference circle and every extraction are drawn about the held coordinates. A wrong centre invalidates all of them.",
+     "missing": "'no published location' is a valid value and is not a gap."
+    }
+   ]
+  },
+  {
+   "letter": "B",
+   "label": "Eligibility",
+   "fields": [
+    {
+     "fid": "B1",
+     "name": "e1_network_listing",
+     "values": null,
+     "required": "required",
+     "purpose": "Which networks or directories list the community.",
+     "downstream": "Inclusion criterion E1. Also supplies the directory whose archive gives last_listing_year.",
+     "missing": "If nothing lists it, e1_pathway must be 'independent self-identification'."
+    },
+    {
+     "fid": "B2",
+     "name": "e1_pathway",
+     "values": [
+      "network/directory listing",
+      "independent self-identification",
+      "both"
+     ],
+     "required": "required",
+     "purpose": "How the community qualifies under E1.",
+     "downstream": "Inclusion record. Makes the sample definition auditable.",
+     "missing": "Cannot be missing; if neither route holds the community is ineligible."
+    },
+    {
+     "fid": "B3",
+     "name": "e1_self_identification",
+     "values": null,
+     "required": "required",
+     "purpose": "A published phrase, under 25 words, stating ecological aims.",
+     "downstream": "The evidence for E1. Without it, eligibility is an assertion.",
+     "missing": "Where none exists, eligibility rests on B1 alone; record that."
+    },
+    {
+     "fid": "B4",
+     "name": "e2_settlement_type",
+     "values": [
+      "village-scale permanent residence",
+      "retreat centre",
+      "campus",
+      "business",
+      "single household",
+      "urban co-housing",
+      "unclear"
+     ],
+     "required": "required",
+     "purpose": "What kind of entity the site is.",
+     "downstream": "Exclusion criterion E2. Retreat centres, single households, businesses and urban co-housing leave the sample. The highest-consequence categorical in Stage 1.",
+     "missing": "'unclear' keeps the community in and flags it; report how many."
+    },
+    {
+     "fid": "B5",
+     "name": "e2_evidence_note",
+     "values": null,
+     "required": "required",
+     "purpose": "One line stating why B4 was coded as it was.",
+     "downstream": "Makes the exclusion decision auditable and double-codeable.",
+     "missing": "Cannot be missing where B4 is coded."
+    },
+    {
+     "fid": "B6",
+     "name": "e8_setting_at_onset",
+     "values": [
+      "rural",
+      "peri-urban",
+      "urban",
+      "unclear"
+     ],
+     "required": "required",
+     "purpose": "Rural or peri-urban at onset, rather than urban.",
+     "downstream": "Exclusion criterion E8; Stage 2 matches on rural classification.",
+     "missing": "'unclear' keeps the community in and flags it."
+    }
+   ]
+  },
+  {
+   "letter": "C",
+   "label": "Onset dating",
+   "fields": [
+    {
+     "fid": "C1",
+     "name": "date_formal_founding",
+     "values": null,
+     "required": "optional",
+     "purpose": "Year the community was established as an entity.",
+     "downstream": "Distinguishes founding from onset, which is the study's central dating rule; supplies founding_decade, a named confounder in A4.",
+     "missing": "'not found'. founding_decade is then blank and A4 loses one named confounder."
+    },
+    {
+     "fid": "C2",
+     "name": "date_land_acquisition",
+     "values": null,
+     "required": "optional",
+     "purpose": "Year the land was bought, leased or occupied.",
+     "downstream": "The hardest available lower bound on onset: intervention cannot precede tenure. It is the field that makes onset_lower_bound defensible rather than guessed.",
+     "missing": "'not found'. onset_lower_bound then rests on evidence rank alone and should be widened."
+    },
+    {
+     "fid": "C3",
+     "name": "date_intervention_onset",
+     "values": null,
+     "required": "required",
+     "purpose": "Year the first deliberate action to alter vegetation, soil, water or land cover for ecological purposes is documented. NOT the founding year.",
+     "downstream": "ONSET_AGE in A4; cohort membership in A7; the age smooth carried as a confounder in A8; onset decade in T1; T12 context.",
+     "missing": "'not found'. The site leaves A4 and cannot enter the cohort. It stays in every other analysis."
+    },
+    {
+     "fid": "C4",
+     "name": "onset_lower_bound",
+     "values": null,
+     "required": "required",
+     "purpose": "Earliest plausible onset year.",
+     "downstream": "A4 propagates the band by multiple imputation, so a community with a wide band contributes less than one with a narrow band.",
+     "missing": "Where C3 is 'not found', leave blank; the site is out of A4 anyway."
+    },
+    {
+     "fid": "C5",
+     "name": "onset_upper_bound",
+     "values": null,
+     "required": "required",
+     "purpose": "Latest plausible onset year.",
+     "downstream": "As C4.",
+     "missing": "As C4."
+    },
+    {
+     "fid": "C6",
+     "name": "onset_evidence_rank",
+     "values": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+     ],
+     "required": "required",
+     "purpose": "Strength of the onset evidence, 1 strongest to 5 weakest.",
+     "downstream": "Sets the expected band width; reported in T12; the basis on which conflicting sources are resolved.",
+     "missing": "Cannot be missing where C3 is coded."
+    },
+    {
+     "fid": "C7",
+     "name": "onset_evidence_description",
+     "values": null,
+     "required": "required",
+     "purpose": "One line saying what the evidence actually is.",
+     "downstream": "Makes the rank auditable and double-codeable.",
+     "missing": "Cannot be missing where C3 is coded."
+    },
+    {
+     "fid": "C8",
+     "name": "onset_conflicting_sources",
+     "values": null,
+     "required": "required",
+     "purpose": "Where sources disagree, what each says.",
+     "downstream": "Absolute rule: a source conflict is never resolved silently. Feeds the resolution rule and the disagreement log.",
+     "missing": "'none' is a valid and common value."
+    },
+    {
+     "fid": "C9",
+     "name": "onset_proxy_flag",
+     "values": [
+      "yes",
+      "no"
+     ],
+     "required": "required",
+     "purpose": "Whether C3 is a founding year used as a substitute for an onset year.",
+     "downstream": "A proxy onset is excluded from A4. This flag is the exclusion switch.",
+     "missing": "Cannot be missing; default 'no' only when C3 is genuinely an onset."
+    },
+    {
+     "fid": "C10",
+     "name": "onset_confidence_tier",
+     "values": [
+      "A",
+      "B",
+      "C"
+     ],
+     "required": "required",
+     "purpose": "A precise, B plus or minus one year, C uncertain beyond that.",
+     "downstream": "Cohort admission: A7 admits tier A and B only. Decision D4 counts on it.",
+     "missing": "Cannot be missing where C3 is coded."
+    },
+    {
+     "fid": "C11",
+     "name": "onset_first_or_major",
+     "values": [
+      "first intervention",
+      "major new project",
+      "unclear"
+     ],
+     "required": "required",
+     "purpose": "Whether the onset is the community's first intervention or a later major project at an established community.",
+     "downstream": "The cohort must either restrict to first interventions or report the two groups separately; they are different treatments.",
+     "missing": "'unclear' is valid; report how many."
+    },
+    {
+     "fid": "C12",
+     "name": "cohort_candidate",
+     "values": [
+      "core (2020-2021)",
+      "extension (2019)",
+      "no",
+      "uncertain"
+     ],
+     "required": "required",
+     "purpose": "Whether onset falls in the cohort window.",
+     "downstream": "Assembles the longitudinal cohort; drives the running tally behind decision D4.",
+     "missing": "'uncertain' must be resolved before decision D4."
+    }
+   ]
+  },
+  {
+   "letter": "D",
+   "label": "Evidence verification",
+   "fields": [
+    {
+     "fid": "D1",
+     "name": "v1_self_documentation",
+     "values": [
+      "yes",
+      "no"
+     ],
+     "required": "required",
+     "purpose": "The community describes particular actions rather than aims.",
+     "downstream": "Channel 1 of evidence_tier.",
+     "missing": "'no' where only aims are stated."
+    },
+    {
+     "fid": "D2",
+     "name": "v2_external_documentation",
+     "values": [
+      "yes",
+      "no"
+     ],
+     "required": "required",
+     "purpose": "An academic account, thesis, project record, certification, grant award or media coverage of the work exists.",
+     "downstream": "Channel 2, and the channel that distinguishes tier A. Carries SC18.",
+     "missing": "'no' is the expected value for most communities."
+    },
+    {
+     "fid": "D3",
+     "name": "v3_substantive_affiliation",
+     "values": [
+      "yes",
+      "no"
+     ],
+     "required": "required",
+     "purpose": "Membership of a body that assesses practice, named.",
+     "downstream": "Channel 3.",
+     "missing": "'no'."
+    },
+    {
+     "fid": "D4",
+     "name": "v4_visual_documentation",
+     "values": [
+      "yes",
+      "no"
+     ],
+     "required": "required",
+     "purpose": "Dated photographs, site plans, design drawings or maps exist.",
+     "downstream": "Channel 4.",
+     "missing": "'no'."
+    },
+    {
+     "fid": "D5",
+     "name": "v5_continuity_evidence",
+     "values": [
+      "yes",
+      "no"
+     ],
+     "required": "required",
+     "purpose": "The work is described consistently across years.",
+     "downstream": "Channel 5.",
+     "missing": "'no'."
+    }
+   ]
+  },
+  {
+   "letter": "E",
+   "label": "Size and land",
+   "fields": [
+    {
+     "fid": "E1",
+     "name": "population_value",
+     "values": null,
+     "required": "required",
+     "purpose": "Permanent residents only. Not visitors, volunteers or students.",
+     "downstream": "Stage 2 matching criterion (population within a factor of three); a model covariate; a named confounder in A4 and A8; population band in T1 and T12.",
+     "missing": "'not found'. The quartet is matched on the remaining criteria and flagged; report how many."
+    },
+    {
+     "fid": "E2",
+     "name": "population_lower",
+     "values": null,
+     "required": "optional",
+     "purpose": "Lower end where a source gives a range.",
+     "downstream": "Bounds the matching tolerance where the point value is soft.",
+     "missing": "Blank where the source gives a single figure."
+    },
+    {
+     "fid": "E3",
+     "name": "population_upper",
+     "values": null,
+     "required": "optional",
+     "purpose": "Upper end where a source gives a range.",
+     "downstream": "As E2.",
+     "missing": "Blank where the source gives a single figure."
+    },
+    {
+     "fid": "E4",
+     "name": "population_source_date",
+     "values": null,
+     "required": "required",
+     "purpose": "The year the population figure refers to.",
+     "downstream": "A 2009 figure and a 2024 figure are not in conflict; without the year the matching tolerance is applied to an unknown quantity.",
+     "missing": "'not found'. Treat the figure as undated and widen the tolerance."
+    },
+    {
+     "fid": "E5",
+     "name": "managed_area_ha",
+     "values": null,
+     "required": "required",
+     "purpose": "Land the community actively works ecologically, in hectares. NOT the total holding.",
+     "downstream": "The only independent check on the drawn polygon. Feeds area_ratio, area_agreement_tier, table T10 and the SC16 restriction.",
+     "missing": "'not found'. area_agreement_tier becomes B and the polygon stands unaffected. This is a complete and correct answer."
+    },
+    {
+     "fid": "E6",
+     "name": "managed_area_lower_ha",
+     "values": null,
+     "required": "optional",
+     "purpose": "Lowest plausible worked area the sources support.",
+     "downstream": "A source saying 'about 15 ha' and a polygon of 11 ha are not in conflict; a source saying '15.4 ha under cultivation' and the same polygon are. The band is what makes the check meaningful.",
+     "missing": "Blank where the source gives a firm single figure."
+    },
+    {
+     "fid": "E7",
+     "name": "managed_area_upper_ha",
+     "values": null,
+     "required": "optional",
+     "purpose": "Highest plausible worked area.",
+     "downstream": "As E6.",
+     "missing": "Blank where the source gives a firm single figure."
+    },
+    {
+     "fid": "E8",
+     "name": "managed_area_basis",
+     "values": [
+      "measured",
+      "stated",
+      "inferred",
+      "not found"
+     ],
+     "required": "required",
+     "purpose": "How the documentary figure was arrived at.",
+     "downstream": "Weights the corroboration. A 'measured' figure disagreeing with the polygon means something different from a 'stated' one disagreeing.",
+     "missing": "'not found' where E5 is 'not found'."
+    },
+    {
+     "fid": "E9",
+     "name": "managed_area_source_class",
+     "values": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8"
+     ],
+     "required": "conditional",
+     "purpose": "Which source class supplied the area figure.",
+     "downstream": "Records whether the only external check on the geometry is itself the community's own voice.",
+     "missing": "Blank where E5 is 'not found'."
+    },
+    {
+     "fid": "E10",
+     "name": "documentary_area_note",
+     "values": null,
+     "required": "conditional",
+     "purpose": "Anything qualifying the figure: whether it plainly refers to worked land or to the whole holding, whether it covers one parcel or several, and the year it refers to.",
+     "downstream": "The text a tier C investigation is resolved from.",
+     "missing": "Blank where E5 is 'not found'."
+    },
+    {
+     "fid": "E11",
+     "name": "total_holding_ha",
+     "values": null,
+     "required": "optional",
+     "purpose": "The whole landholding.",
+     "downstream": "Exists so that the total holding is never silently substituted for the worked area, and so a tier C disagreement can be explained. A community holding 200 ha and working 15 ha has managed_area_ha = 15.",
+     "missing": "'not found'."
+    },
+    {
+     "fid": "E12",
+     "name": "area_type",
+     "values": [
+      "actively managed",
+      "total holding only",
+      "both recorded",
+      "not stated"
+     ],
+     "required": "required",
+     "purpose": "Which of the two area figures the sources actually give.",
+     "downstream": "Distinguishes 'the community says it works 15 ha' from 'the community says it holds 200 ha and says nothing about what it works'.",
+     "missing": "'not stated'."
+    },
+    {
+     "fid": "E13",
+     "name": "parcel_structure",
+     "values": [
+      "contiguous",
+      "non-contiguous",
+      "unknown"
+     ],
+     "required": "required",
+     "purpose": "One block or several.",
+     "downstream": "A non-contiguous holding is the legitimate reason a documentary area can exceed the polygon area: the polygon excludes detached parcels more than 500 m from the centre. Without it, that case is indistinguishable from a total-holding confusion.",
+     "missing": "'unknown'."
+    }
+   ]
+  },
+  {
+   "letter": "F",
+   "label": "Status and survivorship",
+   "fields": [
+    {
+     "fid": "F1",
+     "name": "status_current",
+     "values": [
+      "active",
+      "dormant",
+      "transformed",
+      "relocated",
+      "dissolved",
+      "unknown"
+     ],
+     "required": "required",
+     "purpose": "Present state of the community.",
+     "downstream": "Eligibility criterion E5; the survivorship limitation; T1 sample description. Dissolved sites are analysed separately.",
+     "missing": "'unknown'. UNKNOWN IS NOT DISSOLVED."
+    },
+    {
+     "fid": "F2",
+     "name": "status_evidence",
+     "values": null,
+     "required": "required",
+     "purpose": "What the status rests on.",
+     "downstream": "Dissolution requires positive evidence. This field is that evidence.",
+     "missing": "Cannot be missing where F1 is coded."
+    },
+    {
+     "fid": "F3",
+     "name": "last_listing_year",
+     "values": null,
+     "required": "optional",
+     "purpose": "Most recent year the community appears in any directory or archive.",
+     "downstream": "The dating evidence behind status_current; the input to the attrition estimate in the survivorship section.",
+     "missing": "'not found'."
+    },
+    {
+     "fid": "F4",
+     "name": "dissolution_year",
+     "values": null,
+     "required": "conditional",
+     "purpose": "If dissolved, when.",
+     "downstream": "Places a dissolved community on the timeline for the separate analysis.",
+     "missing": "'n/a' unless F1 = dissolved."
+    },
+    {
+     "fid": "F5",
+     "name": "delisting_reason",
+     "values": [
+      "dissolution",
+      "relocation",
+      "changed network",
+      "administrative removal",
+      "lost contact",
+      "unknown",
+      "n/a"
+     ],
+     "required": "conditional",
+     "purpose": "Why the community left a directory.",
+     "downstream": "Separates dissolution from relocation and administrative removal, which is the discipline that stops a vanished website becoming a vanished community.",
+     "missing": "'n/a' where the community is still listed."
+    }
+   ]
+  },
+  {
+   "letter": "G",
+   "label": "Context",
+   "fields": [
+    {
+     "fid": "G1",
+     "name": "external_funding_or_programme",
+     "values": null,
+     "required": "required",
+     "purpose": "Any documented state, NGO or grant-funded restoration programme at the site.",
+     "downstream": "Stage 2 exclusion criterion: a control with a documented external restoration programme is excluded, and at a settlement such a programme is a second intervention running in parallel. Also frequently rank-1 onset evidence.",
+     "missing": "'none found'."
+    },
+    {
+     "fid": "G2",
+     "name": "protected_area_status",
+     "values": [
+      "inside",
+      "adjacent",
+      "no",
+      "unclear"
+     ],
+     "required": "required",
+     "purpose": "Inside or adjacent to a protected area.",
+     "downstream": "Stage 2 exclusion criterion: controls inside protected areas are excluded.",
+     "missing": "'unclear'; the quartet is flagged."
+    },
+    {
+     "fid": "G3",
+     "name": "notable_context",
+     "values": null,
+     "required": "required",
+     "purpose": "War, drought, land dispute, major fire or relocation AFFECTING LAND COVER INSIDE THE STUDY WINDOW. Not a general history field.",
+     "downstream": "Resolution of flagged outliers in DP10, where an extreme value must be classed as a data error, an undetected disturbance or a genuine extreme.",
+     "missing": "'none found'."
+    }
+   ]
+  },
+  {
+   "letter": "H",
+   "label": "Source provenance",
+   "fields": [
+    {
+     "fid": "H1",
+     "name": "pages_opened_count",
+     "values": null,
+     "required": "required",
+     "purpose": "Distinct URLs actually opened, including those yielding nothing.",
+     "downstream": "Effort audit. Separates a thin record from a thin search.",
+     "missing": "Cannot be missing."
+    },
+    {
+     "fid": "H2",
+     "name": "source_classes_found",
+     "values": null,
+     "required": "required",
+     "purpose": "Which of S1-S8 were located.",
+     "downstream": "Shows at a glance whether anything outside the community's own voice was found.",
+     "missing": "Cannot be missing."
+    },
+    {
+     "fid": "H3",
+     "name": "search_languages",
+     "values": null,
+     "required": "required",
+     "purpose": "Which languages were searched.",
+     "downstream": "A community that publishes only in its own language and was searched only in English produces an absence of effort, not an absence of evidence.",
+     "missing": "Cannot be missing."
+    },
+    {
+     "fid": "H4",
+     "name": "negative_consultations",
+     "values": null,
+     "required": "required",
+     "purpose": "Source classes and databases checked and found empty.",
+     "downstream": "The field that makes 'evidence absent' distinguishable from 'not looked for'. Required by the three-state success criterion.",
+     "missing": "Cannot be missing."
+    },
+    {
+     "fid": "H5",
+     "name": "documents_opened",
+     "values": null,
+     "required": "required",
+     "purpose": "PDFs, spreadsheets and other files opened, by title.",
+     "downstream": "Documents carry most rank-1 and rank-2 onset evidence; this records whether any were reached.",
+     "missing": "'none' is valid."
+    },
+    {
+     "fid": "H6",
+     "name": "academic_search_log",
+     "values": null,
+     "required": "required",
+     "purpose": "Which databases searched, how many hits, how many opened in full text versus abstract only. UNPACKS INTO Search_Log ROWS, one per database.",
+     "downstream": "The negative consultation record for Stage 5, which is now the highest-priority evidence route.",
+     "missing": "Rows must exist even where every database returned nothing."
+    },
+    {
+     "fid": "H7",
+     "name": "grey_literature_log",
+     "values": null,
+     "required": "required",
+     "purpose": "Grey sources found, by type. UNPACKS INTO Search_Log ROWS.",
+     "downstream": "The negative consultation record for Stage 6.",
+     "missing": "Rows must exist even where nothing was found."
+    },
+    {
+     "fid": "H8",
+     "name": "source_set_supplied",
+     "values": null,
+     "required": "required",
+     "purpose": "Every address supplied: URL, platform type, independence group, crawl status, pages opened. UNPACKS INTO Source_Set ROWS.",
+     "downstream": "Proves each supplied address was opened separately rather than collapsed into one.",
+     "missing": "Every supplied address must appear with a status."
+    },
+    {
+     "fid": "H9",
+     "name": "source_set_discovered",
+     "values": null,
+     "required": "required",
+     "purpose": "Every address found during the crawl that was not supplied. UNPACKS INTO Source_Set ROWS.",
+     "downstream": "Former domains hold the oldest material and are the best open-web dating source. This is where onset yield usually comes from.",
+     "missing": "'none discovered' is valid."
+    },
+    {
+     "fid": "H10",
+     "name": "independence_groups",
+     "values": null,
+     "required": "required",
+     "purpose": "How many distinct independence groups the sources fall into.",
+     "downstream": "channel_count and evidence_tier are built on groups, never on URLs. Also the number behind any claim that sources corroborate each other.",
+     "missing": "Cannot be missing."
+    },
+    {
+     "fid": "H11",
+     "name": "stages_completed",
+     "values": null,
+     "required": "required",
+     "purpose": "Which of stages 0-9 were completed, cut short, or never reached.",
+     "downstream": "Turns a silent half-search into a recorded one.",
+     "missing": "Cannot be missing."
+    },
+    {
+     "fid": "H12",
+     "name": "crawl_truncated",
+     "values": [
+      "yes",
+      "no"
+     ],
+     "required": "required",
+     "purpose": "Did the run stop before the protocol was finished?",
+     "downstream": "Without it, a community searched for four minutes and a community searched exhaustively that genuinely has nothing look identical in the data. They mean opposite things.",
+     "missing": "Cannot be missing."
+    }
+   ]
+  }
+ ],
+ "derived": [
+  {
+   "name": "channel_count",
+   "values": null,
+   "purpose": "How many of V1-V5 are satisfied.",
+   "downstream": "Input to evidence_tier.",
+   "missing": "Computed; blank until V1-V5 are entered."
+  },
+  {
+   "name": "evidence_tier",
+   "values": [
+    "A",
+    "B",
+    "C",
+    "Fail"
+   ],
+   "purpose": "A = 3 or more channels including at least one external; B = 2 channels including at least one of visual or continuity; C = 2 community-originated channels; Fail = fewer than 2. AN EVIDENCE-QUALITY VARIABLE, NOT AN ECOLOGICAL-PERFORMANCE VARIABLE.",
+   "downstream": "Named confounder in A4; sample description T1 and T5; the restriction in SC18; T12 context.",
+   "missing": "Computed; blank until V1-V5 are entered."
+  },
+  {
+   "name": "founding_decade",
+   "values": null,
+   "purpose": "Decade of date_formal_founding.",
+   "downstream": "Named confounder (cohort) in A4.",
+   "missing": "Blank where date_formal_founding is 'not found'."
+  },
+  {
+   "name": "onset_band_width_years",
+   "values": null,
+   "purpose": "onset_upper_bound minus onset_lower_bound.",
+   "downstream": "The width A4's multiple imputation draws over.",
+   "missing": "Blank until both bounds are entered."
+  },
+  {
+   "name": "below_minimum_flag",
+   "values": null,
+   "purpose": "'yes' where the polygon is under 1.0 ha.",
+   "downstream": "Sends the site to a 75 m circle and flags it.",
+   "missing": "Computed from polygon_area_ha."
+  },
+  {
+   "name": "reference_circle",
+   "values": [
+    "r75",
+    "r110",
+    "r150",
+    "r210",
+    "r300"
+   ],
+   "purpose": "Which of the five reference-circle sizes the site is rescaled against, whichever is closest in AREA to the polygon.",
+   "downstream": "Rescaling. A site rescaled against a reference distribution computed on the wrong unit size is biased, invisibly.",
+   "missing": "Computed from polygon_area_ha."
+  },
+  {
+   "name": "equal_area_circle_radius_m",
+   "values": null,
+   "purpose": "Radius of the circle whose area equals the polygon's: sqrt(A/pi).",
+   "downstream": "The alternative measurement geometry for SC1, generated rather than hand-computed.",
+   "missing": "Computed from polygon_area_ha."
+  },
+  {
+   "name": "area_ratio",
+   "values": null,
+   "purpose": "documentary managed area divided by polygon area.",
+   "downstream": "Input to area_agreement_tier and to table T10.",
+   "missing": "Blank where either figure is absent."
+  },
+  {
+   "name": "area_agreement_tier",
+   "values": [
+    "A",
+    "B",
+    "C"
+   ],
+   "purpose": "A = within 30 per cent; B = no documentary figure, or a gap of 30 to 100 per cent; C = a gap beyond a factor of two.",
+   "downstream": "The SC16 restriction. The polygon stands in every case; the tier records how well corroborated it is.",
+   "missing": "A site with a polygon and no documentary figure is tier B, NEVER blank."
+  }
+ ],
+ "researcher": [
+  {
+   "name": "site_id",
+   "values": null,
+   "required": "required",
+   "purpose": "The study's sole key. Names are not unique; identifiers must be.",
+   "downstream": "Every join in DP8. A key mismatch drops rows silently.",
+   "missing": "Cannot be missing."
+  },
+  {
+   "name": "latitude",
+   "values": null,
+   "required": "required",
+   "purpose": "Held coordinate, latitude.",
+   "downstream": "The centre of the polygon, the rings and the common circle.",
+   "missing": "Cannot be missing."
+  },
+  {
+   "name": "longitude",
+   "values": null,
+   "required": "required",
+   "purpose": "Held coordinate, longitude.",
+   "downstream": "As latitude.",
+   "missing": "Cannot be missing."
+  },
+  {
+   "name": "polygon_area_ha",
+   "values": null,
+   "required": "required",
+   "purpose": "Area enclosed by the hand-drawn outline of the managed ground.",
+   "downstream": "THE PRIMARY MEASUREMENT GEOMETRY. Picks the reference circle; the predictor in A8; the translated control geometry.",
+   "missing": "Cannot be missing. Every settlement is drawn."
+  },
+  {
+   "name": "polygon_file_id",
+   "values": null,
+   "required": "required",
+   "purpose": "The exported shapefile or GeoJSON feature id.",
+   "downstream": "The Earth Engine table asset join. A mismatch fails the DP8 join.",
+   "missing": "Cannot be missing."
+  },
+  {
+   "name": "polygon_imagery_date",
+   "values": null,
+   "required": "required",
+   "purpose": "Capture date of the imagery drawn on.",
+   "downstream": "Imagery outside the study window may show an extent that did not exist during it.",
+   "missing": "Cannot be missing."
+  },
+  {
+   "name": "polygon_imagery_source",
+   "values": [
+    "Google Earth",
+    "Bing Maps",
+    "Esri World Imagery",
+    "other"
+   ],
+   "required": "required",
+   "purpose": "Which imagery was drawn on.",
+   "downstream": "Provenance of the primary measurement.",
+   "missing": "Cannot be missing."
+  },
+  {
+   "name": "polygon_confidence",
+   "values": [
+    "clear",
+    "moderate",
+    "poor"
+   ],
+   "required": "required",
+   "purpose": "How clear the managed boundary was: clear, moderate or poor.",
+   "downstream": "Reported beside the redraw overlap in the reliability table.",
+   "missing": "Cannot be missing."
+  },
+  {
+   "name": "polygon_redrawn",
+   "values": [
+    "yes",
+    "no"
+   ],
+   "required": "required",
+   "purpose": "Whether this site is in the 20 per cent redraw subsample.",
+   "downstream": "Identifies the reliability subsample.",
+   "missing": "Cannot be missing."
+  },
+  {
+   "name": "redraw_area_ha",
+   "values": null,
+   "required": "conditional",
+   "purpose": "Area of the second, independent drawing.",
+   "downstream": "Reliability of the primary geometry.",
+   "missing": "Blank unless polygon_redrawn = yes."
+  },
+  {
+   "name": "polygon_iou",
+   "values": null,
+   "required": "conditional",
+   "purpose": "Shared area divided by combined area between the two drawings.",
+   "downstream": "THE reliability statistic for the study's primary measurement. Reported as its own table. A mean below 0.80 makes SC1 the primary specification.",
+   "missing": "Blank unless polygon_redrawn = yes."
+  },
+  {
+   "name": "agreement_note",
+   "values": null,
+   "required": "conditional",
+   "purpose": "What was found when a tier C disagreement was investigated.",
+   "downstream": "Absolute rule: a source conflict is never resolved silently.",
+   "missing": "Blank unless area_agreement_tier = C."
+  },
+  {
+   "name": "controls_translated",
+   "values": [
+    "yes",
+    "no"
+   ],
+   "required": "required",
+   "purpose": "Whether the polygon has been translated onto all three controls.",
+   "downstream": "A control measured over a circle while its settlement is measured over a drawn shape would produce a difference from geometry alone.",
+   "missing": "Cannot be missing at Stage 1 close."
+  }
+ ],
+ "never_search": [
+  [
+   "VM1-VM14",
+   "All fourteen vegetation condition metrics",
+   "Sentinel-2, computed in the pipeline"
+  ],
+  [
+   "PM1-PM3",
+   "Provisioning metrics",
+   "Sentinel-2, computed in the pipeline"
+  ],
+  [
+   "FC1-FC4",
+   "Flag components",
+   "Sentinel-2 and CHIRPS"
+  ],
+  [
+   "CA",
+   "Contour alignment",
+   "SRTM aspect and land-cover boundary orientation"
+  ],
+  [
+   "VCI, VCI-P/S/T/C, PCI, MDS, LCC",
+   "The index and its components",
+   "Derived from the above"
+  ],
+  [
+   "built_fraction, tree_cover_pct",
+   "Land-cover fractions",
+   "Dynamic World"
+  ],
+  [
+   "elevation_m, slope_deg, terrain class",
+   "Terrain",
+   "SRTM"
+  ],
+  [
+   "water_dist_m",
+   "Distance to permanent water",
+   "Global Surface Water"
+  ],
+  [
+   "koppen_group, biome",
+   "Stratifiers",
+   "Beck et al. / RESOLVE ecoregions"
+  ],
+  [
+   "rainfall, driest month, drought-year classification",
+   "Climate",
+   "CHIRPS"
+  ],
+  [
+   "n_clear",
+   "Clear-observation count",
+   "Extraction output"
+  ],
+  [
+   "polygon_area_ha, polygon_iou, reference_circle, equal_area_circle_radius_m",
+   "The drawn geometry",
+   "The researcher's own drawing. Never estimated from imagery by anyone else"
+  ],
+  [
+   "control_distance_km",
+   "How far each control sits from its settlement",
+   "A Stage 2 matching output, not documentary coding"
+  ]
+ ],
+ "hypotheses": [
+  [
+   "H1",
+   "A1",
+   "PRIMARY",
+   "H1",
+   "Settlements score HIGHER than their matched controls on vegetation condition"
+  ],
+  [
+   "H2",
+   "A2",
+   "PRIMARY",
+   "H2",
+   "Settlements are NOT LOWER than their controls on provisioning capacity, within a declared margin"
+  ],
+  [
+   "H3",
+   "A3",
+   "Secondary",
+   "H3",
+   "The settlement advantage is larger near the centre and smaller further out"
+  ],
+  [
+   "H4",
+   "A4",
+   "Secondary",
+   "H4",
+   "The advantage is larger at settlements that began intervening longer ago"
+  ],
+  [
+   "H5",
+   "A5",
+   "Secondary",
+   "H5",
+   "The advantage holds when only management-diagnostic metrics are used"
+  ],
+  [
+   "H6",
+   "A6",
+   "Secondary",
+   "H7",
+   "The advantage is not explained by low settlement density alone"
+  ],
+  [
+   "H7",
+   "A7",
+   "Secondary",
+   "H8",
+   "Among communities whose work began in 2020-2021, vegetation condition IMPROVES over the four years after onset relative to matched controls, with no divergence in the three years BEFORE onset"
+  ],
+  [
+   "H8",
+   "A8",
+   "Secondary",
+   "H9",
+   "The settlement advantage varies with how much land a community works, BEYOND what measurement dilution alone predicts"
+  ]
+ ],
+ "counts": {
+  "hypotheses": 8,
+  "primary_hypotheses": 2,
+  "secondary_hypotheses": 6,
+  "analyses": 8,
+  "objectives": 8,
+  "sensitivity_checks": 18,
+  "placebo_tests": 3,
+  "reported_robustness_items": 21,
+  "multiplicity_families": 1,
+  "fdr_family_size": 6,
+  "condition_metrics": 14,
+  "supplementary_metrics": 1,
+  "provisioning_metrics": 3,
+  "flag_components": 4,
+  "flags": 2,
+  "mds_metrics": 7,
+  "dimensions": 4,
+  "reference_pools": 3,
+  "reference_radii": 5,
+  "zones_per_study_site": 7,
+  "settlements": 212,
+  "controls": 636,
+  "study_sites": 848,
+  "cohort_settlements": 65,
+  "cohort_sites": 260,
+  "reference_sites": 1350,
+  "total_sites": 2458,
+  "panel_rows": 105182,
+  "register_fields": 61,
+  "register_blocks": 8,
+  "workbook_sheets": 15,
+  "reliability_variables": 14,
+  "crawl_stages": 10,
+  "anti_fabrication_rules": 12,
+  "study_years": 7,
+  "cohort_years": 9,
+  "detectable_difference_sd": 0.222
+ }
+}
