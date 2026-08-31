@@ -2,6 +2,7 @@ COMMUNITY: Ecovillage Bhrugu Aranya | COORDINATES: 49.610737, 19.816232 | MODE: 
 
 RUN DATE: 2026-08-31
 RUN ID: IC001-RUN01
+RECORD: records/IC001_bhrugu_aranya_run01.md (branch claude/ecovillage-documentary-coding-xqbzf3)
 
 -- SOURCE SET --
 
