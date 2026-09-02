@@ -111,7 +111,12 @@ ONLY_QUARTET_IDS: [3],
 ```
 
 That queues a single task. Run it, then read its **Runtime** and
-**EECU-seconds** in the Tasks tab and multiply by 212. If the total is more
+**EECU-seconds** in the Tasks tab and multiply by 212.
+
+**Use a settlement you have not run before.** Earth Engine caches computed
+tiles, so re-running the same settlement reports a fraction of its real cost —
+in testing, a fourth run of the same site reported 44 EECU-seconds against a
+cold cost of about 1,850. Budget on the cold figure. If the total is more
 than you want to spend, the knobs in the tuning table below are where to spend
 less — `SEARCH_MAX_KM` is by far the biggest, because search area grows with
 its square.

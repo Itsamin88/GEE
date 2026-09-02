@@ -1781,8 +1781,9 @@ function queueNamedSettlements() {
   print('Queued ONE task for settlement(s) ' + found + ' at a ' +
         CFG.SEARCH_MAX_KM + ' km search radius.');
   print('Run it, then read its Runtime and EECU-seconds in the Tasks tab. ' +
-        'That is your real per-settlement cost: multiply by 212 before ' +
-        'committing to a full run.');
+        'Use a settlement you have NOT run before: Earth Engine caches ' +
+        'computed tiles, so re-running the same one reports a fraction of ' +
+        'its real cost. Multiply the cold figure by 212.');
   Export.table.toDrive({
     collection:     out,
     description:    CFG.FILE_PREFIX + '_named',
