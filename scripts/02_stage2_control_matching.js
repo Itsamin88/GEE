@@ -85,7 +85,12 @@ var CFG = {
   // settlement on the map; only then is EXPORT worth queueing.
   RUN_MODE:                'PREFLIGHT',   // 'PREFLIGHT' | 'PREVIEW' | 'EXPORT'
   PREVIEW_QUARTET_ID:      3,
-  BATCH_SIZE:              4,      // settlements per export task
+  // ONE settlement per task. The total compute is the same however it is
+  // sliced, but a task that fails, stalls or gets cancelled then costs one
+  // settlement rather than four, its name says which settlement, and re-running
+  // it is a one-line change. Raise this only if you would rather click fewer
+  // times than lose less work.
+  BATCH_SIZE:              1,      // settlements per export task
   // The Code Editor builds the whole expression graph for every settlement it
   // touches, in the browser, before anything is sent anywhere. Queueing all
   // 27 tasks in one run means building 212 settlements' graphs at once, which
@@ -93,7 +98,7 @@ var CFG = {
   // raise FIRST_BATCH by BATCHES_PER_RUN, run again. The script tells you
   // exactly what to set next each time.
   FIRST_BATCH:             0,      // first batch this run queues
-  BATCHES_PER_RUN:         6,      // how many tasks to queue per script run
+  BATCHES_PER_RUN:         20,     // how many tasks to queue per script run
   // Run ONLY these settlements, as a single task, ignoring the batching above.
   // Two uses: [3] queues one settlement so you can read its real runtime and
   // EECU cost before committing to all 212; and after a full run, the list of
@@ -1822,12 +1827,19 @@ function queueExports() {
       out = (out === null) ? res.rows : out.merge(res.rows);
     }
 
-    var tag = 'b' + (b < 10 ? '0' + b : '' + b);
+    // three digits, so b011 sorts before b100 when BATCH_SIZE is 1 and there
+    // are 212 batches rather than 53
+    var tag = 'b' + ('00' + b).slice(-3);
+    // With BATCH_SIZE 1 the task name carries the quartet id, so a failed or
+    // cancelled task names the settlement it belongs to without any counting.
+    var label = (CFG.BATCH_SIZE === 1)
+      ? tag + '_q' + ('00' + EV_TABLE[start][0]).slice(-3)
+      : tag;
     Export.table.toDrive({
       collection:     out,
-      description:    CFG.FILE_PREFIX + '_' + tag,
+      description:    CFG.FILE_PREFIX + '_' + label,
       folder:         CFG.DRIVE_FOLDER,
-      fileNamePrefix: CFG.FILE_PREFIX + '_' + tag,
+      fileNamePrefix: CFG.FILE_PREFIX + '_' + label,
       fileFormat:     'CSV',
       selectors:      OUT_COLUMNS
     });
