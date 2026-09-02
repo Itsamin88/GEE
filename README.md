@@ -64,33 +64,52 @@ Writes `data/ecovillages_212.csv`, `data/existing_conventional_rural_controls.cs
 and `data/ecovillages_212_inline.js` — the last of which is already embedded in
 the Earth Engine script, so there is nothing to upload.
 
-**2 — Preview one settlement**
+**2 — Preflight (seconds)**
 
 Paste `scripts/02_stage2_control_matching.js` into the
-[Earth Engine Code Editor](https://code.earthengine.google.com/). Set
+[Earth Engine Code Editor](https://code.earthengine.google.com/). It opens on
+`RUN_MODE: 'PREFLIGHT'`. Run it.
+
+This samples every base layer at one point in a single call. If a dictionary
+prints, every asset id, every asset **type** (`ee.Image` against
+`ee.ImageCollection`) and every band name is good. Do this first: an asset
+mistake otherwise stays invisible until an export task fails, an hour after you
+queued it.
+
+**3 — Preview one settlement (a minute)**
 
 ```js
-PREVIEW_MODE:       true,
+RUN_MODE:           'PREVIEW',
 PREVIEW_QUARTET_ID: 3,
 ```
 
-and run. You get the search ring, every built-up patch found, the candidates
-that were measured, the eligible ones and the selected ones as separate map
-layers, plus the printed table. **Do this before launching the exports**, on two
-or three settlements in different landscapes — a dense European countryside, a
-sparse arid one — and satisfy yourself the detector is behaving. It is much
-cheaper to adjust a threshold now than after 27 export tasks.
+You get the search ring, every built-up patch found, the candidates that were
+measured, the eligible ones and the selected ones as separate map layers, plus
+the printed table. Do this on two or three settlements in contrasting
+landscapes — a dense European countryside, a sparse arid one — and satisfy
+yourself the village detector is behaving. It is much cheaper to adjust a
+threshold now than after 27 export tasks.
 
-**3 — Export**
+**4 — Export, a few batches at a time**
 
-Set `PREVIEW_MODE: false` and run again. The script queues one task per batch of
-8 settlements — **27 tasks** — writing to Google Drive folder
-`GEE_Stage2_Controls`. Start them from the Tasks tab.
+```js
+RUN_MODE:        'EXPORT',
+FIRST_BATCH:     0,
+BATCHES_PER_RUN: 6,
+```
 
-Batching is deliberate: a single task covering all 212 settlements at a 100 km
-search radius will time out.
+Each run queues 6 tasks (48 settlements) to Google Drive folder
+`GEE_Stage2_Controls`, and prints the `FIRST_BATCH` to set next. Five runs
+cover all 27 batches: 0, 6, 12, 18, 24.
 
-**4 — Merge and check**
+Both layers of chunking are deliberate. A single export task covering all 212
+settlements at a 100 km search radius will time out on the server; and the Code
+Editor builds every settlement's expression graph **in the browser** before
+anything is sent, so queueing all 27 tasks at once is what makes the page hang.
+If your machine handles it comfortably, raise `BATCHES_PER_RUN`; if the page
+still labours, lower it.
+
+**5 — Merge and check**
 
 ```bash
 python3 scripts/03_merge_and_qc.py ~/Drive/GEE_Stage2_Controls \
@@ -116,7 +135,8 @@ knobs that matter most:
 |---|---|---|
 | `CONTROLS_PER_SETTLEMENT` | 15 | How many controls to keep. A three-control analysis needs no re-run — filter `control_rank <= 3`. |
 | `SEARCH_MAX_KM` | 100 | The dominant cost. 50 km runs roughly four times faster and still satisfies the plan's first ladder step. |
-| `BATCH_SIZE` | 8 | Settlements per export task. Lower it if tasks time out. |
+| `BATCH_SIZE` | 8 | Settlements per export task. Lower it if tasks time out on the server. |
+| `BATCHES_PER_RUN` | 6 | Tasks queued per script run. Lower it if the Code Editor page is slow to respond; this is browser-side, not server-side. |
 | `LANDCOVER_SOURCE` | `ESA_WORLDCOVER` | `DYNAMIC_WORLD` for exact conformance with the plan's §4.1, at a materially longer run. |
 | `KOPPEN_ASSET` | *(empty)* | Point at your uploaded Beck et al. raster to replace the WorldClim-derived main groups. |
 | `PA_EXCLUSION_MODE` | `IUCN_I_II` | `ANY` for the stricter reading of "not inside a protected area". Both are reported regardless. |

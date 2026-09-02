@@ -229,6 +229,14 @@ shortlist you can check by hand, instead of a world you cannot.
   Sites in Scandinavia therefore carry coarser elevation and slope than sites
   further south. `elevation_m` is still comparable within a quartet, because
   both arms of a quartet are in the same country and so on the same source.
+- **Asset types.** Earth Engine fails an `ee.Image('…')` on an ImageCollection
+  only when the task runs, with `Asset '…' is not an Image`. The types used
+  here have been checked against the catalogue: `CSP/HM/GlobalHumanModification`,
+  VIIRS, WorldClim, the GHSL layers and ESA WorldCover are **ImageCollections**;
+  Oxford accessibility, Hansen, GSW, SRTM and GMTED are **Images**. `RUN_MODE:
+  'PREFLIGHT'` re-checks all of them in seconds. Oxford accessibility and
+  Hansen are flagged *deprecated* in the catalogue — they still load, and both
+  ids sit in `CFG` so a successor can be swapped in without touching the code.
 - **The 100 km search radius** is four times the area of a 50 km one, and most
   of the run time. If you only need three controls, set `SEARCH_MAX_KM = 50` and
   the run gets roughly four times faster.

@@ -80,11 +80,20 @@ var SCRIPT_VERSION = 'stage2_control_matching v1.0';
 var CFG = {
 
   // ---- run control ---------------------------------------------------------
-  PREVIEW_MODE:            false,  // true = one settlement, drawn on the map
+  // Work through these in order. PREFLIGHT takes seconds and proves every
+  // asset id, type and band name; PREVIEW takes a minute and shows you one
+  // settlement on the map; only then is EXPORT worth queueing.
+  RUN_MODE:                'PREFLIGHT',   // 'PREFLIGHT' | 'PREVIEW' | 'EXPORT'
   PREVIEW_QUARTET_ID:      3,
   BATCH_SIZE:              8,      // settlements per export task
-  FIRST_BATCH:             0,      // inclusive
-  LAST_BATCH:              -1,     // -1 = all batches
+  // The Code Editor builds the whole expression graph for every settlement it
+  // touches, in the browser, before anything is sent anywhere. Queueing all
+  // 27 tasks in one run means building 212 settlements' graphs at once, which
+  // is what makes the page hang. Queue them a few at a time instead: run,
+  // raise FIRST_BATCH by BATCHES_PER_RUN, run again. The script tells you
+  // exactly what to set next each time.
+  FIRST_BATCH:             0,      // first batch this run queues
+  BATCHES_PER_RUN:         6,      // how many tasks to queue per script run
   DRIVE_FOLDER:            'GEE_Stage2_Controls',
   FILE_PREFIX:             'stage2_rural_controls',
 
@@ -170,6 +179,11 @@ var CFG = {
   DW_END:            '2023-01-01',
   KOPPEN_ASSET:      '',   // optional: your uploaded Beck et al. 1 km raster
   KOPPEN_ASSET_IS_MAIN_GROUP: false,     // true if it already holds 1..5
+  // Both of these are Images, and both are flagged 'deprecated' in the Earth
+  // Engine catalogue - they still load, but they are named here so you can
+  // swap in a successor without hunting through the code.
+  ASSET_TRAVEL:      'Oxford/MAP/accessibility_to_cities_2015_v1_0',
+  ASSET_HANSEN:      'UMD/hansen/global_forest_change_2024_v1_12',
   WATER_OCCURRENCE_PCT: 80,              // GSW occurrence >= 80% = permanent
   WATER_DT_SCALE_M:  240,
   WATER_DT_NEIGHBOURHOOD_PX: 256,        // 256 x 240 m = 61 km reach
@@ -382,14 +396,22 @@ function landcoverStack() {
 var LANDCOVER = landcoverStack();
 
 // --- accessibility, human pressure, disturbance ------------------------------
-var TRAVEL = ee.Image('Oxford/MAP/accessibility_to_cities_2015_v1_0')
+// Asset TYPE matters here, and the two kinds are not interchangeable:
+// ee.Image() on an ImageCollection fails at task time with "Asset ... is not an
+// Image", which is not visible until the export runs. Verified types:
+//   Image            Oxford accessibility, Hansen, GSW, SRTM, GMTED
+//   ImageCollection  CSP human modification, VIIRS, WorldClim, GHSL, WorldCover
+// Run CFG.RUN_MODE = 'PREFLIGHT' to check every one of them in a few seconds
+// before queueing any export.
+var TRAVEL = ee.Image(CFG.ASSET_TRAVEL)
                .select('accessibility').unmask(0).rename('travel_time_min');
-var GHM    = ee.Image('CSP/HM/GlobalHumanModification').select('gHM')
+var GHM    = ee.ImageCollection('CSP/HM/GlobalHumanModification')
+               .mosaic().select('gHM')
                .unmask(0).rename('human_modification');
 var VIIRS  = ee.ImageCollection('NOAA/VIIRS/DNB/ANNUAL_V22')
                .filterDate('2021-01-01', '2022-12-31').select('average')
                .mean().unmask(0).rename('nightlight_radiance');
-var HANSEN = ee.Image('UMD/hansen/global_forest_change_2024_v1_12');
+var HANSEN = ee.Image(CFG.ASSET_HANSEN);
 var GAIN   = HANSEN.select('gain').unmask(0);
 var LOSS   = HANSEN.select('loss').unmask(0);
 
@@ -590,7 +612,7 @@ function describePatchGeometry(patches, evPoint, existingPoint) {
  * Patch-level statistics and the three cheap hard gates (Koppen, biome,
  * country). Pruning here is what keeps the expensive footprint stage small.
  */
-function screenPatches(patches, region, pKop, pBio, pAdm, pElev, pPop) {
+function screenPatches(patches, ctxImg, pKop, pBio, pAdm, pElev, pPop) {
 
   var contPatch = ee.Image.cat([
     BUILT_FRAC.rename('s_built_frac'),
@@ -601,7 +623,7 @@ function screenPatches(patches, region, pKop, pBio, pAdm, pElev, pPop) {
 
   var catPatch = ee.Image.cat([
     KOPPEN.rename('g_koppen'),
-    contextImage(region).rename(['g_biome', 'g_adm0'])
+    ctxImg.rename(['g_biome', 'g_adm0'])
   ]).toInt();
 
   // The continuous statistics are read over the patch itself. The categorical
@@ -674,7 +696,7 @@ function screenPatches(patches, region, pKop, pBio, pAdm, pElev, pPop) {
  * so no fraction is quietly destroyed by a coarse pyramid. Every feature is
  * measured over a circle of CFG.SITE_RADIUS_M centred on its own point.
  */
-function measureFootprints(points, region, lon, lat) {
+function measureFootprints(points, site) {
 
   var footprints = points.map(function (f) {
     var xy = ee.List(f.geometry().coordinates());
@@ -697,7 +719,7 @@ function measureFootprints(points, region, lon, lat) {
     GAIN.multiply(100).rename('forest_gain_pct'),
     LOSS.multiply(100).rename('forest_loss_pct'),
     PERM_WATER.multiply(100).rename('footprint_water_pct'),
-    protectedAreaImage(region),
+    site.pa,
     studySiteImage(),
     externalProgrammeImage()
   ]).toFloat();
@@ -716,14 +738,14 @@ function measureFootprints(points, region, lon, lat) {
     reducer: ee.Reducer.mean(), scale: 30, tileScale: CFG.TILE_SCALE});
   out = img100.reduceRegions({collection: out,
     reducer: ee.Reducer.mean(), scale: 100, tileScale: CFG.TILE_SCALE});
-  out = waterDistanceImage(lon, lat).reduceRegions({collection: out,
+  out = site.water.reduceRegions({collection: out,
     reducer: ee.Reducer.mean(), scale: CFG.WATER_DT_SCALE_M,
     tileScale: CFG.TILE_SCALE});
   out = ee.Image.cat([TRAVEL, GHM, VIIRS]).toFloat().reduceRegions({
     collection: out, reducer: ee.Reducer.mean(), scale: 927,
     tileScale: CFG.TILE_SCALE});
   // Categorical layers: the modal class over the footprint, never one pixel.
-  out = ee.Image.cat([KOPPEN, contextImage(region),
+  out = ee.Image.cat([KOPPEN, site.ctx,
                       GHS_SMOD.rename('smod_class')]).toInt()
           .reduceRegions({collection: out, reducer: ee.Reducer.mode(),
                           scale: 100, tileScale: CFG.TILE_SCALE});
@@ -1223,21 +1245,57 @@ function processSettlement(row) {
   var ring      = region.difference(evPoint.buffer(CFG.SEARCH_MIN_KM * 1000),
                                     CFG.GEOM_MAXERR);
   var gridPatch = localGrid(evLon, evLat, CFG.PATCH_SCALE_M);
+  var footprint = evPoint.buffer(CFG.SITE_RADIUS_M);
 
-  // The settlement's own footprint is measured FIRST, so that its values can
-  // gate the candidate search cheaply.
-  var evFc = ee.FeatureCollection([ee.Feature(evPoint)]);
-  var ev   = ee.Feature(measureFootprints(evFc, region, evLon, evLat).first());
-  var pPop = hasDoc ? ee.Number(popDoc) : footprintPopulation(ev);
+  // The three layers that have to be cut to this settlement's search region
+  // are built ONCE and passed around. Rebuilding them per measurement pass is
+  // what made the Code Editor slow to respond: each one filters and paints a
+  // global FeatureCollection, and the browser has to construct that graph.
+  var site = {
+    ctx:   contextImage(region),
+    pa:    protectedAreaImage(region),
+    water: waterDistanceImage(evLon, evLat)
+  };
+
+  // The candidate search needs four of the settlement's own values before it
+  // can gate anything, so they are read here in two cheap reduceRegion calls
+  // rather than by running the whole six-call measurement chain twice. The
+  // categorical read uses the SAME reducer and scale as the full measurement
+  // below, so the gate can never disagree with the value finally reported.
+  var gCat = ee.Image.cat([KOPPEN, site.ctx]).toInt().reduceRegion({
+    reducer: ee.Reducer.mode(), geometry: footprint, scale: 100,
+    maxPixels: 1e8, tileScale: CFG.TILE_SCALE});
+  var gCon = ee.Image.cat([DEM, POP_DENS.rename('pop_density_km2')]).toFloat()
+               .reduceRegion({
+                 reducer: ee.Reducer.mean(), geometry: footprint, scale: 100,
+                 maxPixels: 1e8, tileScale: CFG.TILE_SCALE});
+  var footprintKm2 = Math.PI * CFG.SITE_RADIUS_M * CFG.SITE_RADIUS_M / 1e6;
+  var pPop = hasDoc
+    ? ee.Number(popDoc)
+    : ee.Number(gCon.get('pop_density_km2')).multiply(footprintKm2);
 
   var patches   = findPatches(gridPatch, ring);
   var described = describePatchGeometry(patches, evPoint, exPoint);
-  var screened  = screenPatches(described, region,
-                                num(ev, 'koppen_group'), num(ev, 'biome_num'),
-                                num(ev, 'adm0_code'), num(ev, 'elevation_m'),
+  var screened  = screenPatches(described, site.ctx,
+                                ee.Number(gCat.get('koppen_group')),
+                                ee.Number(gCat.get('biome_num')),
+                                ee.Number(gCat.get('adm0_code')),
+                                ee.Number(gCon.get('elevation_m')),
                                 pPop);
-  var measured  = measureFootprints(screened, region, evLon, evLat);
-  var scored    = evaluateCandidates(measured, ev, popDoc, hasDoc);
+
+  // ONE measurement pass covering the settlement and its candidates together.
+  // Measuring both arms in the same call is not only half the work; it is also
+  // the guarantee the design rests on, that nothing differs between them
+  // except the ground itself.
+  var both = ee.FeatureCollection([ee.Feature(evPoint, {is_parent: 1})])
+               .merge(screened.map(function (f) {
+                 return f.set('is_parent', 0);
+               }));
+  var measured = measureFootprints(both, site);
+  var ev     = ee.Feature(measured.filter(ee.Filter.gt('is_parent', 0.5))
+                                  .first());
+  var cands  = measured.filter(ee.Filter.lt('is_parent', 0.5));
+  var scored = evaluateCandidates(cands, ev, popDoc, hasDoc);
 
   var eligible  = scored.filter(ee.Filter.gt('eligible', 0.5))
                         .sort('sort_key');
@@ -1408,9 +1466,19 @@ function previewOneSettlement() {
 
 function queueExports() {
   var nBatches = Math.ceil(EV_TABLE.length / CFG.BATCH_SIZE);
-  var last = (CFG.LAST_BATCH < 0) ? nBatches - 1 : CFG.LAST_BATCH;
-  print('Settlements: ' + EV_TABLE.length + '   batches: ' + nBatches +
-        '   queueing batches ' + CFG.FIRST_BATCH + ' to ' + last);
+  var last = Math.min(CFG.FIRST_BATCH + CFG.BATCHES_PER_RUN - 1, nBatches - 1);
+
+  if (CFG.FIRST_BATCH >= nBatches) {
+    print('FIRST_BATCH is ' + CFG.FIRST_BATCH + ' but there are only ' +
+          nBatches + ' batches (0 to ' + (nBatches - 1) + '). ' +
+          'Every settlement has already been queued - nothing to do.');
+    return;
+  }
+
+  print('Settlements ' + (CFG.FIRST_BATCH * CFG.BATCH_SIZE + 1) + ' to ' +
+        Math.min((last + 1) * CFG.BATCH_SIZE, EV_TABLE.length) + ' of ' +
+        EV_TABLE.length + '  ->  queueing batches ' + CFG.FIRST_BATCH +
+        ' to ' + last + ' of 0 to ' + (nBatches - 1) + '.');
 
   for (var b = CFG.FIRST_BATCH; b <= last; b++) {
     var start = b * CFG.BATCH_SIZE;
@@ -1433,12 +1501,77 @@ function queueExports() {
       selectors:      OUT_COLUMNS
     });
   }
-  print('Tasks queued. Open the Tasks tab, run them all, then merge the ' +
-        'batch CSVs with scripts/03_merge_and_qc.py.');
+  var next = last + 1;
+  if (next < nBatches) {
+    print('Run these ' + (last - CFG.FIRST_BATCH + 1) + ' tasks from the ' +
+          'Tasks tab. Then set CFG.FIRST_BATCH = ' + next +
+          ' and run the script again to queue the next ' +
+          Math.min(CFG.BATCHES_PER_RUN, nBatches - next) + '.');
+  } else {
+    print('This is the LAST group - batches 0 to ' + (nBatches - 1) +
+          ' have now all been queued. Run them, then merge every batch CSV ' +
+          'with scripts/03_merge_and_qc.py.');
+  }
+}
+
+/**
+ * Sample every base layer at one point, in a single reduceRegion. If this
+ * prints a dictionary, then every asset id exists, every asset TYPE is right
+ * (ee.Image against ee.ImageCollection), and every band name is spelled
+ * correctly. It costs a few seconds, and it is the cheapest possible way to
+ * find out that something is wrong - the alternative is queueing 27 export
+ * tasks and reading the failure an hour later.
+ */
+function preflight() {
+  var row  = EV_TABLE[0];
+  var lon  = row[3], lat = row[2];
+  var pt   = ee.Geometry.Point([lon, lat]);
+  var region = pt.buffer(20000);
+
+  var stack = ee.Image.cat([
+    BUILT_FRAC.rename('ghsl_built_frac'),
+    NRES_FRAC.rename('ghsl_nonres_frac'),
+    POP_DENS.rename('ghsl_pop_density_km2'),
+    GHS_SMOD.rename('ghsl_smod_class'),
+    BC_RES.rename('ghsl_built_c_residential'),
+    DEM, SLOPE, TRI,
+    PERM_WATER.rename('gsw_permanent_water'),
+    KOPPEN,
+    LANDCOVER.select('tree_cover_pct'),
+    TRAVEL, GHM, VIIRS,
+    GAIN.rename('hansen_gain'),
+    contextImage(region),
+    protectedAreaImage(region),
+    studySiteImage(),
+    externalProgrammeImage(),
+    waterDistanceImage(lon, lat)
+  ]).toFloat();
+
+  print('PREFLIGHT - every base layer sampled at settlement ' + row[0] +
+        ' (' + row[1] + ').');
+  print('If the dictionary below prints, every asset id, type and band name ' +
+        'in this script is good. If it throws, the message names the layer.',
+        stack.reduceRegion({
+          reducer:   ee.Reducer.first(),
+          geometry:  pt,
+          scale:     100,
+          maxPixels: 1e8,
+          tileScale: CFG.TILE_SCALE
+        }));
+  print('Next: set CFG.RUN_MODE to PREVIEW, then to EXPORT.');
 }
 
 function main() {
-  if (CFG.PREVIEW_MODE) { previewOneSettlement(); } else { queueExports(); }
+  if (CFG.RUN_MODE === 'PREFLIGHT') {
+    preflight();
+  } else if (CFG.RUN_MODE === 'PREVIEW') {
+    previewOneSettlement();
+  } else if (CFG.RUN_MODE === 'EXPORT') {
+    queueExports();
+  } else {
+    print('CFG.RUN_MODE must be PREFLIGHT, PREVIEW or EXPORT; got ' +
+          CFG.RUN_MODE);
+  }
 }
 
 // =============================================================================
