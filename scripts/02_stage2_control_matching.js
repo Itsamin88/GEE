@@ -124,6 +124,7 @@ var CFG = {
 
   // ---- village detection ---------------------------------------------------
   GHSL_EPOCH:              2020,
+  PATCH_SCALE_M:           100,    // detector grid; GHSL's own native scale
   SEED_BUILT_FRAC:         0.03,   // >= 3% of a 100 m cell is built surface
   SEED_POP_PER_CELL:       0.20,   // some resident population in the cell
   CLOSE_RADIUS_M:          150,    // morphological closing: merge one village
@@ -582,10 +583,14 @@ function findPatches(ring) {
   // bridges. The same rejection happens later, for free: V5 measures water
   // under each surviving patch (a few hundred of them, not a whole region) and
   // V2 rejects linear structures on shape alone.
+  // setDefaultProjection, NOT reproject: it declares which grid this image
+  // lives on so the focal radii below are honest metres and the vectoriser
+  // knows where the pixels are, without resampling anything.
   var seed = BUILT_FRAC.gte(CFG.SEED_BUILT_FRAC)
                .and(GHS_SMOD.gte(11))
                .and(GHS_SMOD.lte(CFG.MAX_SMOD_CLASS))
-               .and(GHS_POP.gte(CFG.SEED_POP_PER_CELL));
+               .and(GHS_POP.gte(CFG.SEED_POP_PER_CELL))
+               .setDefaultProjection(GHSL_GRID);
 
   // Morphological closing: the scattered buildings of ONE village become ONE
   // patch, while genuinely separate villages stay separate.
@@ -597,7 +602,11 @@ function findPatches(ring) {
 
   return closed.selfMask().rename('patch').toInt().reduceToVectors({
     geometry:       ring,
+    // reduceToVectors REQUIRES a scale or crsTransform whenever a crs is
+    // given - it will not take the scale from the projection object, and the
+    // task fails in about a second if you leave it out.
     crs:            GHSL_GRID,
+    scale:          CFG.PATCH_SCALE_M,
     geometryType:   'polygon',
     eightConnected: true,
     labelProperty:  'patch_label',

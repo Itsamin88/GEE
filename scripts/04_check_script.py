@@ -16,7 +16,9 @@ silently:
      measurement stacks.
 
   3. No footprint reduction runs at a scale as coarse as the footprint itself.
-     A reducer that finds no pixel centre in its region returns null.
+     A reducer that finds no pixel centre in its region returns null. And no
+     reducer is given a crs without a scale or crsTransform, which Earth Engine
+     rejects outright.
 
   4. Every declared output column is set somewhere, and none is declared twice.
 
@@ -97,6 +99,20 @@ def main():
             fails.append("line %d: scale %d m is not finer than the %d m "
                          "footprint radius; the reducer can find no pixel "
                          "centre and return null" % (line, scale, radius))
+
+    # ---- 3b. crs always accompanied by scale or crsTransform ---------------
+    # reduceToVectors and friends reject a crs given on its own: "You must
+    # specify a scale or crsTransform when specifying a crs". The task fails in
+    # about a second, so it costs nothing but a round trip - which is exactly
+    # what a static check is for.
+    for m in re.finditer(r"\.(reduceToVectors|reduceRegions?|reduceResolution)"
+                         r"\(\{(.*?)\}\)", src, re.S):
+        args, line = m.group(2), src[:m.start()].count("\n") + 1
+        if re.search(r"\bcrs\s*:", args) and not re.search(
+                r"\b(scale|crsTransform)\s*:", args):
+            fails.append("line %d: %s is given a crs with no scale or "
+                         "crsTransform; Earth Engine rejects that"
+                         % (line, m.group(1)))
 
     # ---- 4. output columns -------------------------------------------------
     cols = re.findall(r"'([^']+)'",
