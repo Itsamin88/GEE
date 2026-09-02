@@ -314,6 +314,16 @@ function failTag(name, failFlag) {
 
 function num(f, key) { return ee.Number(f.get(key)); }
 
+/**
+ * The first value of a property across a collection, or a fallback when the
+ * collection is empty. aggregate_* returns null on an empty collection, and a
+ * null does not fail where it is made - it fails later, in whatever arithmetic
+ * first touches it. Appending the fallback to the list makes that impossible.
+ */
+function firstOr(fc, prop, fallback) {
+  return ee.Number(ee.List(fc.aggregate_array(prop)).add(fallback).get(0));
+}
+
 // Properties a candidate must actually carry before any arithmetic touches it.
 // A reducer that finds no pixel in a region returns null rather than failing,
 // and the null only surfaces later, as an error naming an operator rather than
@@ -1419,6 +1429,10 @@ function communityRow(qid, evName, evLon, evLat, ev, blk, hasDocPop,
     n_patches_pooled:       blk.pooled,
     patch_pool_capped:      tf(blk.pooled.lt(blk.inRing).multiply(1)),
     n_candidates_screened:  nScreened,
+    workbook_ctrl_patch_dist_m: blk.wbDist,
+    workbook_ctrl_eligible:     tf(blk.wbOk.gt(0.5).multiply(1)),
+    workbook_ctrl_d_value:      blk.wbD,
+    workbook_ctrl_match_tier:   blk.wbTier,
     match_tier:             maxTier,
     tier_label:             lut(TIER_NAME, maxTier),
     quartet_grade:          lut(TIER_NAME, maxTier),
@@ -1519,6 +1533,7 @@ function processSettlement(row) {
                        .filter(ee.Filter.notNull(FOOTPRINT_REQUIRED));
   var scored = evaluateCandidates(cands, ev, popDoc, hasDoc);
 
+  var nearestToWorkbook = scored.limit(1, 'dist_to_existing_ctrl_m', true);
   var eligible  = scored.filter(ee.Filter.gt('eligible', 0.5))
                         .sort('sort_key');
   var chosen    = eligible.limit(
@@ -1547,7 +1562,16 @@ function processSettlement(row) {
     nTier2:    chosen.filter(ee.Filter.eq('match_tier', 2)).size(),
     nTier3:    chosen.filter(ee.Filter.eq('match_tier', 3)).size(),
     inRing:    located.size(),
-    pooled:    pool.size()
+    pooled:    pool.size(),
+    // Does this search independently rediscover the conventional-rural control
+    // the researcher already chose? The patch nearest that control is forced
+    // into the pool, so if it survived screening it is the first row here.
+    // A large wbDist means its patch did NOT survive - the old control is not
+    // a village this method recognises, which is a finding in itself.
+    wbDist:    firstOr(nearestToWorkbook, 'dist_to_existing_ctrl_m', -1),
+    wbD:       firstOr(nearestToWorkbook, 'd_value', -1),
+    wbTier:    firstOr(nearestToWorkbook, 'match_tier', 0),
+    wbOk:      firstOr(nearestToWorkbook, 'eligible', 0)
   };
 
   var community = communityRow(qid, evName, evLon, evLat, ev, blk, hasDoc,
@@ -1581,6 +1605,10 @@ function processSettlement(row) {
       n_patches_pooled:       blk.pooled,
       patch_pool_capped:      tf(blk.pooled.lt(blk.inRing).multiply(1)),
       n_candidates_screened:  screened.size(),
+      workbook_ctrl_patch_dist_m: blk.wbDist,
+      workbook_ctrl_eligible:     tf(blk.wbOk.gt(0.5).multiply(1)),
+      workbook_ctrl_d_value:      blk.wbD,
+      workbook_ctrl_match_tier:   blk.wbTier,
       search_radius_km:       CFG.SEARCH_MAX_KM,
       koppen_source:         CFG.KOPPEN_ASSET ? CFG.KOPPEN_ASSET
                                : 'WorldClim v1 monthly, Beck et al. logic',
@@ -1671,6 +1699,8 @@ var OUT_COLUMNS = [
   'n_controls_within_50km', 'n_tier1_controls', 'n_tier2_controls',
   'n_tier3_controls', 'n_patches_found', 'n_patches_pooled',
   'patch_pool_capped', 'n_candidates_screened',
+  'workbook_ctrl_patch_dist_m', 'workbook_ctrl_eligible',
+  'workbook_ctrl_d_value', 'workbook_ctrl_match_tier',
   'ladder_step', 'quartet_grade', 'search_radius_km', 'koppen_source',
   'landcover_source', 'script_version', 'run_date'
 ];
@@ -1713,6 +1743,12 @@ function previewOneSettlement() {
     'village_tests_passed', 'criteria_failed']));
 
   Map.centerObject(ee.Geometry.Point([row[3], row[2]]), 10);
+  // Water distance is a matching criterion and this layer was wrong once, so
+  // it is drawn: zoom in and check against the basemap that the blue matches
+  // the rivers and lakes you can see. If a river you know is there is missing,
+  // WATER_OCCURRENCE_PCT is too high for this basin.
+  Map.addLayer(PERM_WATER.selfMask(), {palette: ['0066ff']},
+               'permanent water, as the script sees it', false);
   Map.addLayer(r.allPatches, {color: 'dddd88'}, 'all built-up patches', false);
   Map.addLayer(r.patches, {color: 'cccc00'}, 'patches carried forward', false);
   Map.addLayer(r.scored, {color: '00aaff'}, 'measured candidates', false);

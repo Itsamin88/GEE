@@ -220,6 +220,10 @@ The file holds **one row per settlement** (`row_type = COMMUNITY`) followed by *
 | `n_patches_pooled` | both rows | How many of those patches were carried into the statistics, after the per-band cap and the shape gate. |
 | `patch_pool_capped` | both rows | TRUE when the ring held more patches than the cap allowed, so the pool is a sample rather than the whole ring. Bands keep that sample spread across the ring instead of clustered near the settlement. |
 | `n_candidates_screened` | both rows | How many of those survived the cheap gates and were measured in full. |
+| `workbook_ctrl_patch_dist_m` | both rows | How far the nearest SCORED patch is from the conventional-rural control this settlement already holds in the Study 1 workbook. The patch nearest that control is forced into the candidate pool, so a small value means the search reached the researcher's own choice and judged it; a large value means that patch did not survive the village tests or the cheap gates, which is itself a finding about the old control. -1 means nothing reached scoring. |
+| `workbook_ctrl_eligible` | both rows | TRUE when that patch passed every hard gate, i.e. the new method would accept the control the researcher already chose. |
+| `workbook_ctrl_d_value` | both rows | Its weighted standardised distance, for comparison against the controls actually selected. |
+| `workbook_ctrl_match_tier` | both rows | Its tier, 0 if it was not eligible. |
 | `ladder_step` | both rows | The worst tier among the settlement's best three controls: 1 all close, 2 the search was extended or a tolerance missed, 3 best available. |
 | `quartet_grade` | both rows | That same tier, in words. Graded on the BEST THREE controls, which is the quartet the plan's tiers were written for - grading fifteen by their worst member makes every block Tier 3 and says nothing. |
 | `search_radius_km` | both rows | The outer search radius used, in km. |
