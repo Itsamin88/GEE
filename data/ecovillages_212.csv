@@ -1,0 +1,213 @@
+quartet_id,ecovillage_name,latitude,longitude,population_documentary,founding_year,koppen_group_workbook,e8_not_urban_at_founding,e10_no_exogenous_shocks,website,existing_control_lat,existing_control_lon
+1,Soheili Village_Hara,26.790237,55.771104,,2018,B,True,TRUE (not GEE-checked; researcher-verified),,26.745194,55.934976
+2,Ecovillage Bhrugu Aranya,49.610737,19.816232,,1996,D,True,TRUE (not GEE-checked; researcher-verified),,49.407189,19.827935
+3,Lost Valley Education Center,43.891293,-122.825738,,1994,C,True,TRUE (not GEE-checked; researcher-verified),https://www.lostvalley.org/,43.82325,-123.131455
+4,Dream village biohub,8.202246,-0.125017,,2016,A,True,TRUE (not GEE-checked; researcher-verified),https://new.dreamvillageghana.org/,8.038907,0.231801
+5,Kuthumba Ecovillage,-33.978198,23.493313,,1993,C,True,TRUE (not GEE-checked; researcher-verified),https://www.kuthumba.co.za/,-34.02803,23.170619
+6,Ssamba Foundation – Uganda Volunteer Program,0.513729,32.732357,,2006,A,True,TRUE (not GEE-checked; researcher-verified),https://ssamba.org/,0.583064,32.732703
+7,SEKEM,30.420438,31.635801,,1977,B,True,TRUE (not GEE-checked; researcher-verified),https://sekem.com/,30.508677,31.510029
+8,Kufunda Village,-17.976451,31.156586,,2004,C,True,TRUE (not GEE-checked; researcher-verified),www.kufunda.org,-18.036591,31.203081
+9,The Unity Eco-Village,28.224812,83.879931,,2016,C,True,TRUE (not GEE-checked; researcher-verified),https://www.unityecovillage.com.np/,28.213274,84.075498
+10,Cabiokid Foundation,15.229279,120.848381,,2001,A,True,TRUE (not GEE-checked; researcher-verified),https://cabiokid.wordpress.com/?fbclid=IwY2xjawUAIC1wZG9mBWV4dG4DYWVtAjEwAGJyaWQRMUZrRjFqeHVjT01OOEd6emdzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeHguK33GP3ukp7Z8is1_81twuLn6weuFRNec6lk9S5zuzPt5YIHUt8hKM4RQ_aem_Hmagvqsl2GWOqK1TaMUMpg,15.2082,120.913474
+11,Konohana Family,35.255504,138.567401,,1994,C,True,TRUE (not GEE-checked; researcher-verified),https://konohana-family.org/,35.211726,138.547131
+12,Southern Life Community,26.203635,119.19017,,2015,C,True,TRUE (not GEE-checked; researcher-verified),http://cscing.com/,26.544457,119.432939
+13,Manav Chetna Vikas Kendra (MCVK),22.625327,76.03297,,2007,A,True,TRUE (not GEE-checked; researcher-verified),https://mcvk.org/,22.643863,76.097458
+14,Kibbutz Lotan,29.988996,35.086617,,1993,B,True,TRUE (not GEE-checked; researcher-verified),https://kibbutzlotan.com/,30.082668,35.13079
+15,Biosphere Foundation,-8.16064,114.585539,15,1992,A,True,TRUE (not GEE-checked; researcher-verified),https://biospherefoundation.org/,-8.345773,114.253752
+16,TI EcoVillage,12.833221,77.498425,55,1995,A,True,TRUE (not GEE-checked; researcher-verified),https://medium.com/@genoa.ecovillage/celebrating-the-gifts-of-ecovillage-design-education-ede-and-culture-of-regeneration-fbd2f1ac60e2,12.746921,77.412924
+17,Govardhan Ecovillage,19.655445,72.967781,350,2003,A,True,TRUE (not GEE-checked; researcher-verified),https://www.ecovillage.org.in/,19.70108,72.893382
+18,Kibbutz Gezer,31.876067,34.920482,300,1983,C,True,TRUE (not GEE-checked; researcher-verified),https://gezerolives.com/,31.831506,34.756642
+19,Taman Petanu Eco Neighborhood,-8.54869,115.290196,50,2009,A,True,TRUE (not GEE-checked; researcher-verified),https://www.tamanpetanu.com/,-8.491055,115.388811
+20,Sadhana Forest India,11.980512,79.777322,20,2003,A,True,TRUE (not GEE-checked; researcher-verified),https://sadhanaforest.org/,12.082296,79.706088
+21,Better In Belize Eco-Community,16.995635,-89.046671,25,2009,A,True,TRUE (not GEE-checked; researcher-verified),https://betterinbelize.com/,17.079554,-89.016382
+22,Rancho Mastatal,9.673092,-84.373902,22,2000,A,True,TRUE (not GEE-checked; researcher-verified),https://ranchomastatal.com/,9.655272,-84.451962
+23,Sat Yoga Ashram &amp; Wisdom School,9.409167,-83.831672,25,2008,A,True,TRUE (not GEE-checked; researcher-verified),https://www.satyoga.org/,9.784185,-83.845379
+24,VerdEnergia Pacifica,9.736122,-84.463414,10,2006,A,True,TRUE (not GEE-checked; researcher-verified),https://www.verdenergiapacifica.com/,10.052932,-84.462822
+25,Gaia Terra,45.893946,13.061545,15,2017,C,True,TRUE (not GEE-checked; researcher-verified),https://www.progettogaiaterra.com/,45.846532,12.965043
+26,Cambium · Leben in Gemeinschaft,46.93244,16.020261,70,2017,D,True,TRUE (not GEE-checked; researcher-verified),https://www.cambium.at/,46.891045,16.095489
+27,Boekel Ecovillage,51.59507,5.68108,61,2017,C,True,TRUE (not GEE-checked; researcher-verified),https://www.ecodorpboekel.nl/,51.849542,5.56591
+28,Co-housing project HASENDORF (= bunny,48.300822,15.829862,36,2016,D,True,TRUE (not GEE-checked; researcher-verified),https://wohnprojekt-hasendorf.at/,48.265406,15.944758
+29,La Bolina,36.92968,-3.583287,10,2016,C,True,TRUE (not GEE-checked; researcher-verified),https://labolina.org/,36.990087,-3.590452
+30,EcoVillage de Pourgues,43.177351,1.435599,25,2017,C,True,TRUE (not GEE-checked; researcher-verified),https://www.ecovillagedepourgues.coop/,43.24496,1.288749
+31,Oasis du coq à l'Âme,45.88003,0.134812,30,2016,C,True,TRUE (not GEE-checked; researcher-verified),https://oasis-ducoqalame.fr/,45.881669,-0.105381
+32,meltemi,38.004674,24.021794,184,1946,C,True,TRUE (not GEE-checked; researcher-verified),,38.202777,23.96653
+33,ECOlonie – Centre Ecologique International,48.050363,6.105263,10,1989,C,True,TRUE (not GEE-checked; researcher-verified),https://www.ecolonie.eu/,47.921663,6.097229
+34,Matavenero y Poibueno,42.537166,-6.372006,70,1989,C,True,TRUE (not GEE-checked; researcher-verified),https://matavenero.net/,42.582011,-6.312672
+35,Communauté de l’Arche de Saint-Antoine,45.176013,5.217054,50,1987,C,True,TRUE (not GEE-checked; researcher-verified),https://www.arche-sta.com/,45.121219,5.093767
+36,Tamera,37.720593,-8.518849,170,1995,C,True,TRUE (not GEE-checked; researcher-verified),https://www.tamera.org/,37.81318,-8.497341
+37,Cheiry,46.751193,6.836893,60,2014,D,True,TRUE (not GEE-checked; researcher-verified),https://ecopol.net/,46.760402,6.748892
+38,Hallingelille Ecovillage,55.494351,11.819877,52,2004,D,True,TRUE (not GEE-checked; researcher-verified),https://www.hallingelille.dk/,55.329647,11.882766
+39,Munksøgårds,55.657897,12.132336,225,1998,D,True,TRUE (not GEE-checked; researcher-verified),https://www.munksoegaard.dk/,55.682575,11.892698
+40,Lebensgarten Steyerberg,52.585216,9.020483,60,1985,C,True,TRUE (not GEE-checked; researcher-verified),https://www.lebensgarten.de/,52.547651,9.209823
+41,Braziers Park,51.554688,-1.083638,20,2000,C,True,TRUE (not GEE-checked; researcher-verified),https://web.braziers.org.uk/,51.563265,-1.461936
+42,Sólheimar Iceland,64.065725,-20.644837,120,1930,C,True,TRUE (not GEE-checked; researcher-verified),https://www.solheimar.is/,64.117357,-20.498838
+43,Sieben Linden Ecovillage,52.689416,11.143641,140,1997,C,True,TRUE (not GEE-checked; researcher-verified),https://siebenlinden.org/,52.719774,11.372092
+44,Schloss Glarisegg,47.654734,8.956555,,2011,D,True,TRUE (not GEE-checked; researcher-verified),https://seminare-glarisegg.ch//https://schloss-glarisegg.ch/,47.262049,8.967357
+45,Villaggio Verde,45.650872,8.413166,,1982,C,True,TRUE (not GEE-checked; researcher-verified),https://www.villaggioverde.com//https://www.villaggioverde.org/,45.802775,8.429808
+46,hagaby,59.148556,15.116483,,1995,D,True,TRUE (not GEE-checked; researcher-verified),,59.218215,14.899258
+47,La CittÃ della Luce,43.662751,13.123505,,2006,C,True,TRUE (not GEE-checked; researcher-verified),https://lacittadellaluce.org/,43.600483,13.270313
+48,Sunseed Desert Technology,37.088377,-2.073451,,1987,B,True,TRUE (not GEE-checked; researcher-verified),https://www.sunseed.org.uk/,37.114694,-2.013009
+49,ZEGG,52.157004,12.590874,,1991,D,True,TRUE (not GEE-checked; researcher-verified),https://www.zegg.de/,52.111895,12.748534
+50,Green Commune Belica,41.401714,20.952099,,2007,C,True,TRUE (not GEE-checked; researcher-verified),,41.232557,21.089224
+51,"The Park, Ecovillage Findhorn",57.653174,-3.593418,,1983,C,True,TRUE (not GEE-checked; researcher-verified),,57.700813,-3.395008
+52,Holistic Center Manas,45.992388,14.658149,,2009,D,True,TRUE (not GEE-checked; researcher-verified),https://manas.si/,46.032604,14.716812
+53,Hertha Levefællesskab/Hertha Living Community,56.181872,9.971224,,1996,D,True,TRUE (not GEE-checked; researcher-verified),https://www.hertha.dk/,56.180211,9.888343
+54,Bowden House Community,50.417254,-3.688328,,2005,C,True,TRUE (not GEE-checked; researcher-verified),http://www.bowdenhouse.co.uk/,50.387177,-3.862117
+55,Vlierhof,51.846842,6.081005,,2002,C,True,TRUE (not GEE-checked; researcher-verified),,51.683339,6.034345
+56,Charlottendals Farm and EcoVillage,59.090864,17.532511,,1995,D,True,TRUE (not GEE-checked; researcher-verified),,58.927319,17.099631
+57,LUMEN Ecovillage,45.035623,9.933535,,1995,C,True,TRUE (not GEE-checked; researcher-verified),,44.978394,10.079465
+58,The Hollies Centre for Practical Sustainability,51.761673,-8.954811,,1999,C,True,TRUE (not GEE-checked; researcher-verified),,51.780873,-8.867639
+59,Selba – Artosilla,42.425796,-0.262284,,1986,C,True,TRUE (not GEE-checked; researcher-verified),,42.578517,-0.113526
+60,Ecoaldea Los Portales,37.784434,-5.9569,,1984,C,True,TRUE (not GEE-checked; researcher-verified),,38.084279,-6.078634
+61,Herzfeld Sennrueti,47.376031,9.192655,,2009,D,True,TRUE (not GEE-checked; researcher-verified),,47.317686,9.050645
+62,Lebenstraumgemeinschaft Jahnishausen,51.273941,13.28541,,2002,D,True,TRUE (not GEE-checked; researcher-verified),,51.33771,13.192147
+63,Zonca Ecovillage Italy,46.057074,8.205941,,1995,D,True,TRUE (not GEE-checked; researcher-verified),,45.999547,8.58871
+64,Suderbyn Permaculture Eco-village,57.573741,18.208672,,2008,D,True,TRUE (not GEE-checked; researcher-verified),,57.161113,18.333076
+65,DNS The Necessary Teacher Training,56.25716,8.27804,,1980,D,True,TRUE (not GEE-checked; researcher-verified),,56.111988,8.422854
+66,Bhakti Tirtha Dhama,49.809769,29.514843,,2008,D,True,TRUE (not GEE-checked; researcher-verified),,49.891615,29.3922
+67,Ecovillage Torri Superiore,43.840361,7.551118,,1992,C,True,TRUE (not GEE-checked; researcher-verified),,43.828035,7.654786
+68,Freedom Village Georgia,33.360134,-82.863336,,2015,C,True,TRUE (not GEE-checked; researcher-verified),,33.5366,-83.081106
+69,Hearthstone Village,49.781734,-124.337462,,2019,C,True,TRUE (not GEE-checked; researcher-verified),,49.892165,-124.560029
+70,Windekind Commons Vermont Cohousing,44.315808,-72.941782,,2018,D,True,TRUE (not GEE-checked; researcher-verified),,44.042115,-72.603479
+71,HawaiiSPACE,19.408572,-154.927618,,1987,A,True,TRUE (not GEE-checked; researcher-verified),,19.744333,-155.106879
+72,Greenbriar Community School,30.249293,-97.346087,,1983,C,True,TRUE (not GEE-checked; researcher-verified),,30.286531,-97.239925
+73,White Hawk Ecovillage,42.362704,-76.493173,,2008,D,True,TRUE (not GEE-checked; researcher-verified),,42.618089,-76.724826
+74,The Farm,35.479582,-87.328645,,1974,C,True,TRUE (not GEE-checked; researcher-verified),,35.323776,-87.303772
+75,Camphill Village Minnesota,45.848562,-94.911001,,1980,D,True,TRUE (not GEE-checked; researcher-verified),,45.80039,-95.083921
+76,eastwind community,36.558903,-92.308975,,1978,C,True,TRUE (not GEE-checked; researcher-verified),,36.39646,-91.983332
+77,Cinderland Ecovillage,19.518199,-154.844215,,2000,A,True,TRUE (not GEE-checked; researcher-verified),,19.49392,-154.946304
+78,Whole Village,43.860761,-80.106729,,2002,D,True,TRUE (not GEE-checked; researcher-verified),,43.792347,-80.322747
+79,Synergia Ranch (HQ of Ecotechnics),35.491047,-106.095476,,1969,B,True,TRUE (not GEE-checked; researcher-verified),,35.395322,-105.946757
+80,Dancing Rabbit Ecovillage,40.332966,-92.096463,,1997,D,True,TRUE (not GEE-checked; researcher-verified),,40.487284,-92.367534
+81,Earthaven Ecovillage,35.519705,-82.202311,,1994,C,True,TRUE (not GEE-checked; researcher-verified),,35.479283,-82.348162
+82,Living Well Community,35.73697,-79.681773,,2007,C,True,TRUE (not GEE-checked; researcher-verified),,35.794218,-79.548599
+83,Sirius Community,42.419219,-72.425852,,1978,D,True,TRUE (not GEE-checked; researcher-verified),,42.423086,-72.104825
+84,Hickory Nut Forest Eco-Community,35.47263,-82.339856,,2004,C,True,TRUE (not GEE-checked; researcher-verified),,35.451487,-82.287069
+85,Villages at Crest Mountain,35.610457,-82.616044,,2004,C,True,TRUE (not GEE-checked; researcher-verified),,35.655129,-82.696187
+86,IDEAL Society,49.354342,-115.296459,,1993,D,True,TRUE (not GEE-checked; researcher-verified),,49.416062,-115.423628
+87,"Cite Ecologique (Qc, Canada)",45.855019,-71.639806,,1984,D,True,TRUE (not GEE-checked; researcher-verified),,45.903944,-71.646884
+88,Cedar Moon,45.44079,-122.684757,,2004,C,True,TRUE (not GEE-checked; researcher-verified),,45.408333,-122.922265
+89,Twin Oaks Community,37.932583,-77.992429,,1967,C,True,TRUE (not GEE-checked; researcher-verified),,37.775639,-77.899928
+90,Cobb Hill Cohousing,43.548718,-72.425999,,1997,D,True,TRUE (not GEE-checked; researcher-verified),,43.534244,-72.35633
+91,Avalon Organic Gardens &amp; EcoVillage,31.575956,-111.041119,,1994,B,True,TRUE (not GEE-checked; researcher-verified),,31.577358,-111.330663
+92,Ixixtlan,18.870572,-98.398332,,2006,C,True,TRUE (not GEE-checked; researcher-verified),,18.891371,-98.572339
+93,Abundance Ecovillage,41.042021,-91.959907,,2000,D,True,TRUE (not GEE-checked; researcher-verified),,40.957398,-92.051316
+94,Stowe Farm Community,42.702264,-72.775739,,2007,D,True,TRUE (not GEE-checked; researcher-verified),,42.525879,-72.789554
+95,Ecovillage at Ithaca,42.441648,-76.542637,,1995,D,True,TRUE (not GEE-checked; researcher-verified),,42.232787,-76.34217
+96,The Garden,36.5982,-85.931557,,2009,C,True,TRUE (not GEE-checked; researcher-verified),,36.640071,-85.792279
+97,Gita Nagari Eco-Farm and Sanctuary,40.490405,-77.461402,,1989,D,True,TRUE (not GEE-checked; researcher-verified),,40.535893,-77.818059
+98,The Camphill School,40.136841,-75.707889,,1963,D,True,TRUE (not GEE-checked; researcher-verified),,40.12952,-75.637765
+99,Hundredfold Farm,39.889294,-77.376676,,1998,D,True,TRUE (not GEE-checked; researcher-verified),,40.009052,-77.1164
+100,Sawyer Hill Ecovillage,42.372911,-71.626188,,2006,D,True,TRUE (not GEE-checked; researcher-verified),,42.433632,-71.608996
+101,Moora Moora Co-operative,-37.720704,145.569887,,1974,C,True,TRUE (not GEE-checked; researcher-verified),,-37.53839,145.474226
+102,The Ecovillage at Currumbin,-28.176828,153.432741,,2002,C,True,TRUE (not GEE-checked; researcher-verified),,-28.430035,153.470574
+103,Crystal Waters,-26.78553,152.718245,,1987,C,True,TRUE (not GEE-checked; researcher-verified),,-26.729528,152.718551
+104,Atamai Village,-41.141905,172.956729,,2006,C,True,TRUE (not GEE-checked; researcher-verified),,-41.271814,173.006472
+105,Narara Ecovillage,-33.392643,151.328289,,2013,C,True,TRUE (not GEE-checked; researcher-verified),,-33.224186,151.278573
+106,Tui Community,-40.811793,172.957757,,1984,C,True,TRUE (not GEE-checked; researcher-verified),,-40.848993,172.806874
+107,Wilderland,-36.886277,175.674232,,1964,C,True,TRUE (not GEE-checked; researcher-verified),,-36.731139,175.730585
+108,Bellbunya Sustainable Community,-26.491096,152.853409,,2008,C,True,TRUE (not GEE-checked; researcher-verified),,-26.594966,152.726214
+109,Aldinga Arts Ecovillage,-35.265685,138.479025,,2002,C,True,TRUE (not GEE-checked; researcher-verified),,-35.391444,138.46338
+110,Gulpa Creek Community,-35.722683,144.893102,,1975,B,True,TRUE (not GEE-checked; researcher-verified),,-35.997911,145.111709
+111,Eco Aldea de los glaciares sagrados – Maras,-13.339833,-72.144032,,2017,C,True,TRUE (not GEE-checked; researcher-verified),,-13.629295,-72.232709
+112,Terra Luminous,-24.02194,-47.068398,,2013,C,True,TRUE (not GEE-checked; researcher-verified),,-23.795549,-46.926605
+113,Ecovilla GAIA – Argentina,-34.947362,-59.337962,,1996,C,True,TRUE (not GEE-checked; researcher-verified),,-35.052645,-59.51279
+114,El Manzano,-37.15607,-72.286233,,2000,C,True,TRUE (not GEE-checked; researcher-verified),,-37.130076,-72.187405
+115,Agrovilla El Prado,4.787184,-75.643927,,2001,A,True,TRUE (not GEE-checked; researcher-verified),,4.937266,-75.73855
+116,Aldeafeliz Ecovillage,4.987656,-74.279152,,2006,A,True,TRUE (not GEE-checked; researcher-verified),,5.061372,-74.236755
+117,Peoples Coast Ecovillage Network,13.089183,-16.759665,,2015,A,True,TRUE (not GEE-checked; researcher-verified),,13.176568,-16.657114
+118,Tlholego Ecovillage and Learning Centre,-25.684519,27.099662,,1991,C,True,TRUE (not GEE-checked; researcher-verified),,-25.632318,26.967176
+119,Green Village Bali,-8.574186,115.214248,,2010,A,False,TRUE (not GEE-checked; researcher-verified),,-8.494753,115.081379
+120,Assalam eco-village by the Indian Ocean,-6.448134,39.466153,,2018,A,True,TRUE (not GEE-checked; researcher-verified),,-6.365779,39.453167
+121,The Sustainability Institute and Lynedoch,-33.982689,18.768245,,2004,C,True,TRUE (not GEE-checked; researcher-verified),,-33.893539,18.958776
+122,Chisapani Ecovillage Tarebhir,28.20735,83.906688,,2018,C,True,TRUE (not GEE-checked; researcher-verified),,28.31353,83.878369
+123,"Ruma Eco Village , Mayagdi Nepal",28.412866,83.384985,,2018,C,True,TRUE (not GEE-checked; researcher-verified),,28.464414,83.668348
+124,Suwan organic farmstay,17.671088,102.839151,,2017,A,True,TRUE (not GEE-checked; researcher-verified),,17.518994,102.955463
+125,Daruma Ecovillage,13.236989,100.952719,,2007,A,True,TRUE (not GEE-checked; researcher-verified),,13.042134,101.309328
+126,Protopia Community,10.593709,-84.841019,,2019,A,True,TRUE (not GEE-checked; researcher-verified),,10.42625,-84.750713
+127,Eco Aldeia do Vale â€&quot; Instituto Permacultura,38.880436,-9.307763,,2016,C,True,TRUE (not GEE-checked; researcher-verified),,38.990948,-9.240627
+128,Spoluzemě Vrábsko,49.46448,14.103488,,2020,D,True,TRUE (not GEE-checked; researcher-verified),,49.481349,14.440453
+129,Friskoven,55.095061,14.944695,,2020,D,True,TRUE (not GEE-checked; researcher-verified),,55.030884,14.993181
+130,Gemeinschaft Sulzbrunn,47.670555,10.384863,,2015,D,True,TRUE (not GEE-checked; researcher-verified),,47.640664,10.483004
+131,Eotopia,46.709743,3.681777,,2016,C,True,TRUE (not GEE-checked; researcher-verified),,46.651895,3.716473
+132,ComunitÃ rigenerative,45.994696,12.999064,,2018,C,True,TRUE (not GEE-checked; researcher-verified),,46.058297,12.983499
+133,Thabarwa Nature Centre EU,44.703496,8.851423,,2019,C,True,TRUE (not GEE-checked; researcher-verified),,44.661085,8.803369
+134,Gut Alaune,51.526603,11.919516,,2016,C,True,TRUE (not GEE-checked; researcher-verified),,51.552848,11.787221
+135,Ängsbacka,59.601268,13.700271,,1997,D,True,TRUE (not GEE-checked; researcher-verified),,59.557291,13.051997
+136,New Mayapur,47.084388,1.405437,,2013,C,True,TRUE (not GEE-checked; researcher-verified),,46.964371,1.373627
+137,Los Guindales,36.566965,-5.278144,,2013,C,True,TRUE (not GEE-checked; researcher-verified),,36.633683,-5.2027
+138,"Ferme de la Chaux, Goshen",47.218402,4.671591,,2009,C,True,TRUE (not GEE-checked; researcher-verified),,47.245936,4.586472
+139,Aletheia Springs,38.394538,-122.550868,,2016,C,True,TRUE (not GEE-checked; researcher-verified),,38.346771,-122.973058
+140,Entelechy,48.805441,-123.489671,,2019,C,True,TRUE (not GEE-checked; researcher-verified),,48.629878,-123.437678
+141,Pura Vida Village at Tico Time River Resort,36.98919,-107.87048,,2019,B,True,TRUE (not GEE-checked; researcher-verified),,37.094296,-108.170304
+142,ReTribe at NorthernShire,44.506074,-72.86514,,2018,D,True,TRUE (not GEE-checked; researcher-verified),,44.636197,-72.373328
+143,PORTAL XIBALBA: ECO-VILLAGE IN THE JUNGLE OF PLAYA DEL CARMEN,20.699931,-87.06081,,2004,A,True,TRUE (not GEE-checked; researcher-verified),,20.848968,-87.257291
+144,Emerald Earth Sanctuary,39.025389,-123.292036,,1989,C,True,TRUE (not GEE-checked; researcher-verified),,39.009686,-123.367868
+145,Maleny Eco Village,-26.758032,152.84838,,2019,C,True,TRUE (not GEE-checked; researcher-verified),,-26.662654,152.874061
+146,Billen Cliff,-28.612343,153.133824,,1982,C,True,TRUE (not GEE-checked; researcher-verified),,-28.414116,153.33673
+147,Arca Verde,-29.465191,-50.500893,,2005,C,True,TRUE (not GEE-checked; researcher-verified),,-29.100879,-50.633341
+148,Villa Productiva Agroecológica JANUS,-38.74731,-68.11762,,2009,B,True,TRUE (not GEE-checked; researcher-verified),,-38.972625,-68.13145
+149,Wisdom Forest,-1.055126,-77.895996,,2006,A,True,TRUE (not GEE-checked; researcher-verified),,-1.052041,-77.58532
+150,Bambako Eco Farm / YIRABAH Gambia,13.405483,-15.767966,,2010,B,True,TRUE (not GEE-checked; researcher-verified),,13.330654,-16.010259
+151,Honeyville Farm,-33.931231,24.764866,,2020,C,True,TRUE (not GEE-checked; researcher-verified),,-33.872566,25.028221
+152,Yasna Sloboda,54.756701,37.875068,,2015,D,True,TRUE (not GEE-checked; researcher-verified),,54.76888,37.996379
+153,Ecovillage Kovcheg,55.061992,36.128649,,2001,D,True,TRUE (not GEE-checked; researcher-verified),,55.207609,35.770937
+154,Yeniköy,39.933706,26.165414,,2010,C,True,TRUE (not GEE-checked; researcher-verified),,39.974498,26.277327
+155,Serene Eco Village,18.315759,73.624871,,2001,A,True,TRUE (not GEE-checked; researcher-verified),,18.297391,73.722415
+156,Tasman Ecovillage,-43.093448,147.742258,,2013,C,True,TRUE (not GEE-checked; researcher-verified),,-42.819808,147.801153
+157,Patanga,-30.438118,152.694861,,1979,C,True,TRUE (not GEE-checked; researcher-verified),,-30.47042,152.940369
+158,Ecolieu Argoumbat,43.910315,0.98036,,2017,C,True,TRUE (not GEE-checked; researcher-verified),,43.933009,0.876668
+159,Arterra Bizimodu,42.715388,-1.325865,,2014,C,True,TRUE (not GEE-checked; researcher-verified),,42.669069,-1.345455
+160,Keuruu Ecovillage,62.306323,24.622492,,1998,D,True,TRUE (not GEE-checked; researcher-verified),,62.203563,24.782437
+161,Zeleni Kruchi,49.425633,30.869992,,2012,D,True,TRUE (not GEE-checked; researcher-verified),,49.449808,30.716784
+162,Damanhur,45.431012,7.757471,,1975,C,True,TRUE (not GEE-checked; researcher-verified),,45.557945,7.830989
+163,Soheili Village,26.755264,55.787829,,2018,B,True,TRUE (not GEE-checked; researcher-verified),,26.73963,55.661757
+164,Land van Aine,52.867512,7.088633,,2018,C,True,TRUE (not GEE-checked; researcher-verified),,53.199015,7.087184
+165,Bali Ecovillage,-8.268028,115.249245,,2008,A,True,TRUE (not GEE-checked; researcher-verified),,-8.303242,115.220089
+166,Pun Pun,19.214646,99.012448,,2005,A,True,TRUE (not GEE-checked; researcher-verified),,19.299291,99.188755
+167,Neot Semadar,30.048671,35.026633,,1998,B,True,TRUE (not GEE-checked; researcher-verified),,30.903621,34.397062
+168,Witchcliffe Ecovillage,-34.024552,115.104041,,2019,C,True,TRUE (not GEE-checked; researcher-verified),,-34.263387,115.124676
+169,Almost Heaven Farms,26.88519,88.043108,,2015,C,True,TRUE (not GEE-checked; researcher-verified),,26.93048,87.690319
+170,Baireni Ecovillage,26.981135,86.533428,,2012,C,True,TRUE (not GEE-checked; researcher-verified),,27.243992,86.284456
+171,Blue Star Tapovan Trinidad,10.349735,-61.452866,,2012,A,False,TRUE (not GEE-checked; researcher-verified),,10.282388,-61.382822
+172,Chambalabamba,-4.274831,-79.203292,,2012,A,True,TRUE (not GEE-checked; researcher-verified),,-4.364657,-79.176765
+173,Chanchos de Monte,10.793327,-84.393727,,2019,A,True,TRUE (not GEE-checked; researcher-verified),,10.453156,-84.274345
+174,Ecovila Piracanga,-14.214697,-38.995034,,2010,A,True,TRUE (not GEE-checked; researcher-verified),,-14.257663,-39.265282
+175,Ecovila Raiz do Anuhmas,-22.791348,-47.05044,,2011,C,True,TRUE (not GEE-checked; researcher-verified),,-22.625981,-46.914141
+176,Ecovila Santa Margarida,-22.789479,-47.069783,,2016,C,False,TRUE (not GEE-checked; researcher-verified),,-22.994257,-47.188068
+177,Ecovillage Pentierebougou,13.086727,-7.940589,,2017,A,True,TRUE (not GEE-checked; researcher-verified),,13.135917,-8.048391
+178,Jyagdi EcoVillage Chapakot Syangja Nepal,27.93584,83.878329,,2007,C,True,TRUE (not GEE-checked; researcher-verified),,28.037134000000002,83.799074
+179,Habiba Community,29.010284,34.670396,,2007,B,True,TRUE (not GEE-checked; researcher-verified),,28.612207,34.557279
+180,Fruit Haven EcoVillage Ecuador,-3.527531,-78.52983,,2016,A,True,TRUE (not GEE-checked; researcher-verified),,-3.204382,-78.434897
+181,Valle de Sensaciones,36.95727,-3.136732,,2002,C,True,TRUE (not GEE-checked; researcher-verified),,37.01,-2.739901
+182,Las Cañadas Bosque de Niebla,19.176892,-96.972307,,1995,C,True,TRUE (not GEE-checked; researcher-verified),,19.381856,-97.078764
+183,Valdepielagos,40.760722,-3.465693,,2007,C,True,TRUE (not GEE-checked; researcher-verified),,40.867064,-3.057009
+184,Earthship Greater World Community,36.494782,-105.752179,,1994,D,True,TRUE (not GEE-checked; researcher-verified),,36.438188,-105.544605
+185,Wind Spirit Community,33.14686,-110.835378,,1995,B,True,TRUE (not GEE-checked; researcher-verified),,32.920233,-110.728282
+186,TerraSante Village,32.111705,-111.254893,,2008,B,True,TRUE (not GEE-checked; researcher-verified),,31.952695,-110.933283
+187,Catfarm,43.498233,3.657874,,2015,C,True,TRUE (not GEE-checked; researcher-verified),,43.518894,3.142473
+188,Grishino Ecovillage,61.087028,34.0813,,1993,D,True,TRUE (not GEE-checked; researcher-verified),,61.425742,34.439842
+189,Hurdal Ecovillage,60.411096,11.052614,,2002,D,True,TRUE (not GEE-checked; researcher-verified),,60.740503,11.36602
+190,Nackunga Community,59.024944,17.564475,,2015,D,True,TRUE (not GEE-checked; researcher-verified),,58.921292,17.450216
+191,Tuggelite Ecovillage,59.422998,13.438836,,1984,D,True,TRUE (not GEE-checked; researcher-verified),,59.38474,13.047757
+192,Ecotopia Romania — Stanciova,45.862744,21.575335,,2000,D,True,TRUE (not GEE-checked; researcher-verified),,45.894688,21.880667
+193,Schloss Tempelhof,49.126124,10.206793,,2010,D,True,TRUE (not GEE-checked; researcher-verified),,49.1941,10.369826
+194,Possibility Alliance,40.074724,-92.458811,,2007,D,True,TRUE (not GEE-checked; researcher-verified),,40.147564,-92.378033
+195,Rodnoe (Rodnoye) Settlement,55.915364,40.553046,,2003,D,True,TRUE (not GEE-checked; researcher-verified),,56.140901,40.87087
+196,Cloughjordan Ecovillage,52.946515,-8.036953,,2009,C,True,TRUE (not GEE-checked; researcher-verified),,52.984386,-7.924957
+197,O.U.R Ecovillage,48.640102,-123.610282,,2002,C,True,TRUE (not GEE-checked; researcher-verified),,48.69161,-123.603499
+198,Lammas Ecovillage (Tir-y-Gafel),51.934066,-4.623775,,2009,C,True,TRUE (not GEE-checked; researcher-verified),,51.894809,-4.906431
+199,Friland,56.280995,10.58589,,2002,D,True,TRUE (not GEE-checked; researcher-verified),,56.400436,10.712567
+200,Sadhana Forest Haiti,18.04636,-71.762129,,2010,B,True,TRUE (not GEE-checked; researcher-verified),,18.572554,-72.072359
+201,Hockerton Housing Project,53.097341,-0.929501,,1996,C,True,TRUE (not GEE-checked; researcher-verified),,53.277152,-0.79406
+202,Den Selvforsynende Landsby (Self-Sufficient Village),55.09841,10.426727,,2004,C,True,TRUE (not GEE-checked; researcher-verified),,55.538228,10.34717
+203,Cité Écologique (New Hampshire),44.935101,-71.47749,,2007,D,True,TRUE (not GEE-checked; researcher-verified),,44.810547,-71.884611
+204,Brithdir Mawr,52.000928,-4.806572,,1994,C,True,TRUE (not GEE-checked; researcher-verified),,51.946032,-5.087031
+205,Permatopia,55.301696,12.19072,,2016,C,True,TRUE (not GEE-checked; researcher-verified),,55.40829,11.88774
+206,Sadhana Forest Kenya,0.867336,36.806313,,2014,C,True,TRUE (not GEE-checked; researcher-verified),,0.949224,36.765913
+207,Ecodorp Bergen,52.651081,4.693376,,2013,C,True,TRUE (not GEE-checked; researcher-verified),,52.544906,4.980055
+208,Eco Truly Park,-11.636889,-77.217187,,1989,B,True,TRUE (not GEE-checked; researcher-verified),,-11.469052,-77.27115
+209,Khula Dhamma Community,-32.697527,28.19499,,2002,C,True,TRUE (not GEE-checked; researcher-verified),,-32.728124,28.123413
+210,Umphakatsi Peace Ecovillage,-26.132179,30.97823,,2012,C,True,TRUE (not GEE-checked; researcher-verified),,-26.032377,31.049217
+211,Green Canvas of Light,-33.982512,22.673458,,2012,C,True,TRUE (not GEE-checked; researcher-verified),,-34.034836,22.236375
+212,Agatha Amani House,-0.735154,36.473129,,2014,C,True,TRUE (not GEE-checked; researcher-verified),,-0.787038,36.506111
