@@ -238,10 +238,18 @@ var CFG = {
   // swap in a successor without hunting through the code.
   ASSET_TRAVEL:      'Oxford/MAP/accessibility_to_cities_2015_v1_0',
   ASSET_HANSEN:      'UMD/hansen/global_forest_change_2024_v1_12',
-  WATER_OCCURRENCE_PCT: 80,              // GSW occurrence >= 80% = permanent
-  WATER_DT_SCALE_M:  240,
-  WATER_DT_NEIGHBOURHOOD_PX: 256,        // 256 x 240 m = 61 km reach
-  WATER_DIST_MAX_M:  60000,
+  // GSW occurrence >= 80% counts as permanent. Note what that excludes:
+  // reservoirs with a large seasonal drawdown spend part of the year dry and
+  // can fall below it, so in regulated river basins the measure is distance to
+  // water that is there ALL year. That is a defensible reading of "permanent",
+  // and it is applied identically at both arms, but it is a choice - lower it
+  // if seasonal water should count.
+  WATER_OCCURRENCE_PCT: 80,
+  // 120 m keeps rivers sharp; 256 cells of it reach 30.7 km, which is well
+  // past any distance the +/-50% tolerance can still discriminate.
+  WATER_DT_SCALE_M:  120,
+  WATER_DT_NEIGHBOURHOOD_PX: 256,
+  WATER_DIST_MAX_M:  30000,
 
   // ---- misc ----------------------------------------------------------------
   GEOM_MAXERR:       10,
@@ -376,8 +384,17 @@ var TRI   = DEM.reduceNeighborhood(ee.Reducer.stdDev(), ee.Kernel.square(1))
                .rename('tri');
 
 // --- water -------------------------------------------------------------------
-var PERM_WATER = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('occurrence')
-                   .unmask(0).gte(CFG.WATER_OCCURRENCE_PCT).rename('perm_water');
+// The threshold is applied at the layer's OWN 30 m grid, pinned with
+// reproject, and only then aggregated to whatever grid a consumer asks for.
+// Order matters here and it is not a detail: aggregating occurrence FIRST and
+// thresholding after erases every watercourse narrower than the coarse cell,
+// because a 240 m cell holding a 70 m river averages to about 30% occurrence
+// and fails a ">= 80%" test. That is how Lost Valley, 1.6 km from the Middle
+// Fork Willamette, came back 7.25 km from "permanent water".
+var GSW_OCCURRENCE = ee.Image('JRC/GSW1_4/GlobalSurfaceWater').select('occurrence');
+var PERM_WATER = GSW_OCCURRENCE.unmask(0).gte(CFG.WATER_OCCURRENCE_PCT)
+                   .reproject(GSW_OCCURRENCE.projection())
+                   .rename('perm_water');
 
 // --- climate: Koppen main group ----------------------------------------------
 /**
@@ -514,10 +531,20 @@ function localGrid(lon, lat, scaleM) {
   return ee.Projection(wkt).atScale(scaleM);
 }
 
-/** Distance to permanent surface water, in metres, on a local metric grid. */
+/**
+ * Distance to permanent surface water, in metres, on a local metric grid.
+ *
+ * The 30 m water mask is carried up to the transform's grid with a MAX
+ * reducer, so a cell counts as water if it contains ANY permanent water. Using
+ * reproject alone would re-threshold the averaged occurrence and delete every
+ * river narrower than the cell.
+ */
 function waterDistanceImage(lon, lat) {
   var grid = localGrid(lon, lat, CFG.WATER_DT_SCALE_M);
-  return PERM_WATER.reproject(grid)
+  var water = PERM_WATER
+    .reduceResolution({reducer: ee.Reducer.max(), maxPixels: 256})
+    .reproject(grid);
+  return water
     .fastDistanceTransform(CFG.WATER_DT_NEIGHBOURHOOD_PX, 'pixels',
                            'squared_euclidean')
     .sqrt().multiply(CFG.WATER_DT_SCALE_M)
@@ -1178,6 +1205,8 @@ function evaluateCandidates(cands, ev, parentPopDoc, hasDocPop) {
       elevation_diff_m:         elevDiff,
       tree_cover_diff_pp:       treeDiff,
       water_dist_diff_m:        waterDiff,
+      water_dist_censored:      tf(water.gte(CFG.WATER_DIST_MAX_M - 1)
+                                    .or(pWater.gte(CFG.WATER_DIST_MAX_M - 1))),
       water_dist_tol_m:         tolWater,
       travel_time_tol_min:      tolTravel,
       population_est_footprint: popFootprint,
@@ -1299,6 +1328,8 @@ function communityRow(qid, evName, evLon, evLat, ev, blk, hasDocPop,
     water_dist_m:              num(ev, 'water_dist_m'),
     parent_water_dist_m:       num(ev, 'water_dist_m'),
     water_dist_diff_m:         0,
+    water_dist_censored:       tf(num(ev, 'water_dist_m')
+                                    .gte(CFG.WATER_DIST_MAX_M - 1)),
     water_dist_tol_m:          num(ev, 'water_dist_m')
                                  .multiply(CFG.TOL_WATER_REL)
                                  .max(CFG.TOL_WATER_FLOOR_M),
@@ -1456,7 +1487,15 @@ function processSettlement(row) {
   // drawn from a disc around the settlement. Sorting on a property costs
   // nothing; measuring the shape of thousands of patches, and reducing
   // statistics over them, does.
-  var pool = describePatchShape(bandedPool(located));
+  // The patch nearest the settlement's existing workbook control is always
+  // added to the pool, whatever band it falls in and whether or not that band
+  // is full. It costs one extra patch and it buys a direct check: does this
+  // search independently rediscover the control the researcher already chose?
+  // is_existing_workbook_control answers that per row.
+  var pool = describePatchShape(
+    bandedPool(located)
+      .merge(located.limit(1, 'dist_to_existing_ctrl_m', true))
+      .distinct(['control_lon', 'control_lat']));
 
   var screened  = screenPatches(pool, site.ctx,
                                 ee.Number(gCat.get('koppen_group')),
@@ -1592,7 +1631,7 @@ var OUT_COLUMNS = [
   'C5_distance_5_50km', 'C5b_distance_5_100km',
   // ---- C6 distance to permanent water --------------------------------------
   'water_dist_m', 'parent_water_dist_m', 'water_dist_diff_m',
-  'water_dist_tol_m', 'C6_water_dist_within_tol',
+  'water_dist_tol_m', 'water_dist_censored', 'C6_water_dist_within_tol',
   // ---- C7 accessibility ----------------------------------------------------
   'travel_time_min', 'parent_travel_time_min', 'travel_time_tol_min',
   'C7_travel_within_50pct',

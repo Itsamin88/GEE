@@ -90,10 +90,11 @@ The file holds **one row per settlement** (`row_type = COMMUNITY`) followed by *
 
 | Column | Applies to | Meaning |
 |---|---|---|
-| `water_dist_m` | both rows | Distance to permanent surface water (JRC GSW occurrence >= 80%), on a local equidistant grid, capped at 60 km. |
+| `water_dist_m` | both rows | Distance to permanent surface water (JRC GSW occurrence >= 80%), on a local equidistant grid, capped at 30 km. The mask is thresholded at GSW's own 30 m grid and carried up with a max reducer, so narrow rivers survive; note that occurrence >= 80% excludes reservoirs with a large seasonal drawdown, so in regulated basins this is distance to year-round water. |
 | `parent_water_dist_m` | both rows | The settlement's distance to permanent water. |
 | `water_dist_diff_m` | controls | Absolute difference in metres. |
 | `water_dist_tol_m` | both rows | The tolerance actually applied here: 50% of the settlement's own value, but never stricter than 500 m. |
+| `water_dist_censored` | both rows | TRUE when this site or its settlement sits at the search cap (30 km) rather than at a measured distance, so C6 compared two censored values. Rare, but it means the criterion told you nothing for that pair. |
 | `C6_water_dist_within_tol` | controls | TRUE when the difference is within that tolerance. The plan holds water access constant BY MATCHING; this is that criterion. SOFT. |
 
 ## C7 accessibility

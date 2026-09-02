@@ -114,6 +114,20 @@ def main():
                          "crsTransform; Earth Engine rejects that"
                          % (line, m.group(1)))
 
+    # ---- 3c. a thresholded mask must be pinned to its own grid -------------
+    # Aggregating a continuous layer and thresholding the AVERAGE deletes every
+    # feature narrower than the coarse cell. Any .gte()/.lte() applied to a
+    # raster that is later reprojected coarser has to be pinned with
+    # .reproject(<its own projection>) first, and carried up with a max
+    # reducer, not re-thresholded.
+    if re.search(r"fastDistanceTransform", src):
+        dt = src[src.index("fastDistanceTransform") - 800:
+                 src.index("fastDistanceTransform")]
+        if "reduceResolution" not in dt:
+            fails.append("the distance transform's input is reprojected "
+                         "without reduceResolution; a thresholded mask "
+                         "coarsened that way loses narrow features")
+
     # ---- 4. output columns -------------------------------------------------
     cols = re.findall(r"'([^']+)'",
                       src.split("var OUT_COLUMNS = [", 1)[1]

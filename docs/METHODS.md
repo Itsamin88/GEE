@@ -288,13 +288,18 @@ shortlist you can check by hand, instead of a world you cannot.
   nearest `MAX_PATCHES_NEAR` inside 50 km and `MAX_PATCHES_FAR` beyond it are
   carried forward, so both rungs of the distance ladder keep candidates of
   their own. `n_patches_found` in the output reports the size of that pool.
-- **What `water_dist_m` actually measures.** JRC Global Surface Water at 30 m
-  maps *permanent* water, and narrow rivers under forest canopy often fall
-  below it. In the Oregon Cascades the settlement reads 7.3 km from permanent
-  water in a landscape full of creeks. The measure is therefore distance to
-  mapped standing or large water, applied identically at both arms, which is
-  what a matching covariate needs — but do not read it as distance to the
-  nearest stream.
+- **What `water_dist_m` actually measures.** The mask is thresholded at GSW's
+  own 30 m grid and carried up to the distance-transform grid with a `max`
+  reducer, so a cell counts as water if it contains *any*. Doing it the other
+  way round — coarsening occurrence and thresholding the average — deletes
+  every watercourse narrower than the cell, and did: Lost Valley, 1.6 km from
+  the Middle Fork Willamette, first came back 7.25 km from "permanent water".
+  Separately, `occurrence >= 80 %` excludes reservoirs with a large seasonal
+  drawdown, so in regulated river basins this is distance to water that is
+  there *all year* — a defensible reading of "permanent", applied identically
+  at both arms, but a choice: lower `WATER_OCCURRENCE_PCT` if seasonal water
+  should count. Distances are capped at 30 km and `water_dist_censored` marks
+  any pair that hit the cap.
 - **Where V3 and V4 do their work.** `GHS_BUILT_S`'s non-residential band and
   `GHS_BUILT_C`'s non-residential classes are frequently zero in small rural
   hamlets, so the residential-dominance tests pass vacuously there. They bite

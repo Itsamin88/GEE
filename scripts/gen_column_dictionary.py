@@ -50,10 +50,11 @@ DESC = {
  'C5_distance_5_50km': ('TRUE when the control sits 5-50 km away: the plan\'s first ladder step. Required for Tier 1.', 'control'),
  'C5b_distance_5_100km': ('TRUE when the control sits 5-100 km away: the plan\'s extended step. HARD gate - nothing outside this range is ever selected.', 'control'),
  # C6
- 'water_dist_m': ('Distance to permanent surface water (JRC GSW occurrence >= 80%), on a local equidistant grid, capped at 60 km.', 'both'),
+ 'water_dist_m': ('Distance to permanent surface water (JRC GSW occurrence >= 80%), on a local equidistant grid, capped at 30 km. The mask is thresholded at GSW\'s own 30 m grid and carried up with a max reducer, so narrow rivers survive; note that occurrence >= 80% excludes reservoirs with a large seasonal drawdown, so in regulated basins this is distance to year-round water.', 'both'),
  'parent_water_dist_m': ('The settlement\'s distance to permanent water.', 'both'),
  'water_dist_diff_m': ('Absolute difference in metres.', 'control'),
  'water_dist_tol_m': ('The tolerance actually applied here: 50% of the settlement\'s own value, but never stricter than 500 m.', 'both'),
+ 'water_dist_censored': ('TRUE when this site or its settlement sits at the search cap (30 km) rather than at a measured distance, so C6 compared two censored values. Rare, but it means the criterion told you nothing for that pair.', 'both'),
  'C6_water_dist_within_tol': ('TRUE when the difference is within that tolerance. The plan holds water access constant BY MATCHING; this is that criterion. SOFT.', 'control'),
  # C7
  'travel_time_min': ('Travel time to the nearest city, minutes (Oxford MAP accessibility 2015).', 'both'),
