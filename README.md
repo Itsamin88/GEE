@@ -101,7 +101,24 @@ landscapes — a dense European countryside, a sparse arid one — and satisfy
 yourself the village detector is behaving. It is much cheaper to adjust a
 threshold now than after 27 export tasks.
 
-**4 — Export, a few batches at a time**
+**4 — Measure the cost on one settlement first**
+
+Before committing to 212, find out what one costs:
+
+```js
+RUN_MODE:         'EXPORT',
+ONLY_QUARTET_IDS: [3],
+```
+
+That queues a single task. Run it, then read its **Runtime** and
+**EECU-seconds** in the Tasks tab and multiply by 212. If the total is more
+than you want to spend, the knobs in the tuning table below are where to spend
+less — `SEARCH_MAX_KM` is by far the biggest, because search area grows with
+its square.
+
+Set `ONLY_QUARTET_IDS: []` again before the full run.
+
+**5 — Export, a few batches at a time**
 
 ```js
 RUN_MODE:        'EXPORT',
@@ -110,8 +127,8 @@ BATCHES_PER_RUN: 6,
 ```
 
 Each run queues 6 tasks (48 settlements) to Google Drive folder
-`GEE_Stage2_Controls`, and prints the `FIRST_BATCH` to set next. Five runs
-cover all 27 batches: 0, 6, 12, 18, 24.
+`GEE_Stage2_Controls`, and prints the `FIRST_BATCH` to set next. With `BATCH_SIZE: 4` there are 53 batches, so nine runs cover them all:
+0, 6, 12, … 48. Smaller tasks finish sooner and a cancelled one costs less.
 
 Both layers of chunking are deliberate. A single export task covering all 212
 settlements at a 100 km search radius will time out on the server; and the Code
@@ -120,7 +137,7 @@ anything is sent, so queueing all 27 tasks at once is what makes the page hang.
 If your machine handles it comfortably, raise `BATCHES_PER_RUN`; if the page
 still labours, lower it.
 
-**5 — Merge and check**
+**6 — Merge and check**
 
 ```bash
 python3 scripts/03_merge_and_qc.py ~/Drive/GEE_Stage2_Controls \
@@ -145,7 +162,9 @@ knobs that matter most:
 | Setting | Default | Effect |
 |---|---|---|
 | `CONTROLS_PER_SETTLEMENT` | 15 | How many controls to keep. A three-control analysis needs no re-run — filter `control_rank <= 3`. |
-| `SEARCH_MAX_KM` | 100 | The dominant cost. 50 km runs roughly four times faster and still satisfies the plan's first ladder step. |
+| `SEARCH_MAX_KM` | 50 | **The dominant cost** — search area grows with its square, so 100 km costs four times 50 km on every settlement. 50 km is the plan's own first ladder step; extend to 100 km only for the settlements that come up short, using `ONLY_QUARTET_IDS`. |
+| `ONLY_QUARTET_IDS` | `[]` | Run just these settlements as one task. Use `[3]` to measure cost before a full run, or the list `03_merge_and_qc.py` prints to extend the search only where it is needed. |
+| `MAX_CANDIDATES` | 40 | Candidates measured in full per settlement. 15 controls do not need many more. |
 | `BATCH_SIZE` | 8 | Settlements per export task. Lower it if tasks time out on the server. |
 | `BATCHES_PER_RUN` | 6 | Tasks queued per script run. Lower it if the Code Editor page is slow to respond; this is browser-side, not server-side. |
 | `MAX_PATCHES_NEAR` / `_FAR` | 400 / 200 | How many built-up patches are carried into the statistics, nearest first, inside and beyond 50 km. A settled countryside can return thousands; reducing over all of them breaks the request. |
@@ -158,7 +177,24 @@ knobs that matter most:
 If a settlement comes back with too few controls, `n_patches_found` and
 `n_candidates_screened` on its `COMMUNITY` row say whether the detector found
 nothing or the criteria rejected everything — which are different problems with
-different fixes.
+different fixes. `03_merge_and_qc.py` prints the short settlements as a
+ready-to-paste `ONLY_QUARTET_IDS` list.
+
+### Where the run time goes
+
+Almost all of it is the patch detector sweeping the search ring. Three things
+matter, in this order:
+
+1. **`SEARCH_MAX_KM`** — quadratic. Halving it quarters the cost.
+2. **Reprojection.** The detector runs in GHSL's own 100 m equal-area grid and
+   reprojects nothing. Forcing it into another grid resamples every input
+   across the whole ring and was, on its own, most of the cost of an early
+   version.
+3. **Layers in the seed.** Permanent water is deliberately not one of them: it
+   is 30 m data in a different projection, and reading it across tens of
+   thousands of square kilometres to reject a few bridges is a bad trade. V5
+   measures water under each surviving patch instead — a few hundred of them,
+   not a whole region — and V2 rejects linear structures on shape alone.
 
 ---
 

@@ -85,7 +85,7 @@ var CFG = {
   // settlement on the map; only then is EXPORT worth queueing.
   RUN_MODE:                'PREFLIGHT',   // 'PREFLIGHT' | 'PREVIEW' | 'EXPORT'
   PREVIEW_QUARTET_ID:      3,
-  BATCH_SIZE:              8,      // settlements per export task
+  BATCH_SIZE:              4,      // settlements per export task
   // The Code Editor builds the whole expression graph for every settlement it
   // touches, in the browser, before anything is sent anywhere. Queueing all
   // 27 tasks in one run means building 212 settlements' graphs at once, which
@@ -94,6 +94,13 @@ var CFG = {
   // exactly what to set next each time.
   FIRST_BATCH:             0,      // first batch this run queues
   BATCHES_PER_RUN:         6,      // how many tasks to queue per script run
+  // Run ONLY these settlements, as a single task, ignoring the batching above.
+  // Two uses: [3] queues one settlement so you can read its real runtime and
+  // EECU cost before committing to all 212; and after a full run, the list of
+  // settlements that came up short can be re-run here with SEARCH_MAX_KM
+  // raised to 100, which is the plan's distance ladder applied where it is
+  // actually needed. Leave empty for a normal run.
+  ONLY_QUARTET_IDS:        [],
   DRIVE_FOLDER:            'GEE_Stage2_Controls',
   FILE_PREFIX:             'stage2_rural_controls',
 
@@ -101,7 +108,12 @@ var CFG = {
   CONTROLS_PER_SETTLEMENT: 15,
   SEARCH_MIN_KM:           5,      // plan Stage 2: controls sit 5-50 km away
   SEARCH_TIER1_KM:         50,     // ladder step 1
-  SEARCH_MAX_KM:           100,    // ladder step 2, "extend to 50-100 km"
+  // Ladder step 2 extends to 100 km, but the plan extends it only for the
+  // settlements that came up short - not for all 212. Search area grows with
+  // the SQUARE of this, so 100 km costs four times what 50 km costs on every
+  // settlement, to help the few that need it. Run all 212 at 50, then re-run
+  // just the short ones at 100 using ONLY_QUARTET_IDS below.
+  SEARCH_MAX_KM:           50,
 
   // ---- geometry on which covariates are measured ---------------------------
   SITE_RADIUS_M:           500,    // identical footprint at both arms
@@ -112,20 +124,19 @@ var CFG = {
 
   // ---- village detection ---------------------------------------------------
   GHSL_EPOCH:              2020,
-  PATCH_SCALE_M:           100,    // working scale of the patch detector
   SEED_BUILT_FRAC:         0.03,   // >= 3% of a 100 m cell is built surface
   SEED_POP_PER_CELL:       0.20,   // some resident population in the cell
   CLOSE_RADIUS_M:          150,    // morphological closing: merge one village
   MAX_SMOD_CLASS:          13,     // 11/12/13 = rural (GHS-SMOD)
-  MAX_CANDIDATES:          80,     // patches carried into full evaluation
+  MAX_CANDIDATES:          40,     // patches carried into full evaluation
   // A settled countryside can hold thousands of built-up patches inside a
   // 100 km ring - Lost Valley, Oregon returns over 6000. Reducing statistics
   // over every one of them is slow enough to break the request, and needless:
   // 15 controls are wanted. The nearest patches are kept, split so that the
   // extended ring of the distance ladder still has candidates of its own.
-  MAX_PATCHES_NEAR:        400,    // nearest patches inside SEARCH_TIER1_KM
-  MAX_PATCHES_FAR:         200,    // nearest patches beyond it
-  USE_LOCAL_AEQD:          true,   // per-site equidistant grid: true metres
+  MAX_PATCHES_NEAR:        300,    // nearest patches inside SEARCH_TIER1_KM
+  MAX_PATCHES_FAR:         120,    // nearest patches beyond it
+  USE_LOCAL_AEQD:          true,   // local equidistant grid for water distance
   CATEGORICAL_READ_RADIUS_M: 200,  // disc around a patch centre for the
                                    // climate/biome/country read (see
                                    // screenPatches for why it is not the patch)
@@ -303,6 +314,11 @@ var POP_DENS    = GHS_POP.multiply(100);                            // people/km
 var GHS_SMOD    = ghslEpoch('JRC/GHSL/P2023A/GHS_SMOD_V2-0', CFG.GHSL_EPOCH)
                     .select('smod_code').unmask(10);
 var SMOD_URBAN  = GHS_SMOD.gte(21);
+
+// GHSL P2023A is stored in World Mollweide at 100 m: an equal-area grid whose
+// units are metres. Running the patch detector in it costs no reprojection at
+// all, which is the single biggest saving available in this script.
+var GHSL_GRID   = BUILT_TOTAL.projection();
 
 // GHS_BUILT_C, 10 m, 2018. This is the layer that separates RESIDENTIAL built
 // space from NON-RESIDENTIAL built space and from bare road surface, and it is
@@ -549,15 +565,27 @@ function footprintPopulation(f) {
 // =============================================================================
 
 /** Contiguous rural built-up patches inside the search annulus. */
-function findPatches(grid, ring) {
+function findPatches(ring) {
 
-  // Built-up ground that is rural, inhabited, and not standing on water.
+  // Rural, inhabited, built-up ground.
+  //
+  // Every layer here is GHSL P2023A, which is stored in World Mollweide at
+  // 100 m - an EQUAL-AREA METRIC grid. So the detector runs in that grid
+  // directly and reprojects NOTHING. The earlier version reprojected the seed
+  // into a per-site azimuthal-equidistant grid, which forced Earth Engine to
+  // resample every input across the whole search area, and that alone was most
+  // of the cost of the run.
+  //
+  // Permanent water is deliberately NOT in the seed. It is a 30 m layer in a
+  // different projection, so including it meant reading and resampling 30 m
+  // water across tens of thousands of square kilometres to reject a handful of
+  // bridges. The same rejection happens later, for free: V5 measures water
+  // under each surviving patch (a few hundred of them, not a whole region) and
+  // V2 rejects linear structures on shape alone.
   var seed = BUILT_FRAC.gte(CFG.SEED_BUILT_FRAC)
                .and(GHS_SMOD.gte(11))
                .and(GHS_SMOD.lte(CFG.MAX_SMOD_CLASS))
-               .and(GHS_POP.gte(CFG.SEED_POP_PER_CELL))
-               .and(PERM_WATER.not())
-               .reproject(grid);
+               .and(GHS_POP.gte(CFG.SEED_POP_PER_CELL));
 
   // Morphological closing: the scattered buildings of ONE village become ONE
   // patch, while genuinely separate villages stay separate.
@@ -569,7 +597,7 @@ function findPatches(grid, ring) {
 
   return closed.selfMask().rename('patch').toInt().reduceToVectors({
     geometry:       ring,
-    crs:            grid,
+    crs:            GHSL_GRID,
     geometryType:   'polygon',
     eightConnected: true,
     labelProperty:  'patch_label',
@@ -580,21 +608,43 @@ function findPatches(grid, ring) {
 }
 
 /**
- * The geometry half of the "is this really a village" test, and the cheapest
- * one: size, shape and position, before any pixel is reduced. Shape alone
- * already rejects bridges, runways, pipelines, road strips and ribbon
- * development, and doing it here keeps them out of the expensive stages.
- *
- * findPatches vectorises in the local metric grid, so the patches come back
- * with that projection: their coordinates are METRES, not degrees. Everything
- * below therefore works on the WGS84 transform of each patch, which is what
- * makes area(), length(), distance() and coordinates() mean what they say.
+ * STAGE 1 of the geometry work - the cheap half. Two operations per patch: its
+ * centroid, and how far that is from the settlement. Nothing else is computed
+ * yet, because a settled countryside returns thousands of patches and the
+ * shape maths below costs several geodesic operations each. Locate first,
+ * throw most of them away on distance, and only then measure shape.
  */
-function describePatchGeometry(patches, evPoint, existingPoint) {
+function locatePatches(patches, evPoint, existingPoint) {
+  return patches.map(function (f) {
+    var c  = f.geometry().centroid(CFG.GEOM_MAXERR)
+               .transform('EPSG:4326', CFG.GEOM_MAXERR);
+    var xy = ee.List(c.coordinates());
+    return f.set({
+      control_lon:             xy.get(0),
+      control_lat:             xy.get(1),
+      control_distance_km:     c.distance(evPoint, CFG.GEOM_MAXERR)
+                                .divide(1000),
+      dist_to_existing_ctrl_m: c.distance(existingPoint, CFG.GEOM_MAXERR)
+    });
+  }).filter(ee.Filter.and(
+      ee.Filter.gte('control_distance_km', CFG.SEARCH_MIN_KM),
+      ee.Filter.lte('control_distance_km', CFG.SEARCH_MAX_KM)));
+}
+
+/**
+ * STAGE 2 of the geometry work - size and shape, on the survivors only. Shape
+ * alone rejects bridges, runways, pipelines, road strips and ribbon
+ * development, which is why it runs before any pixel is reduced.
+ *
+ * findPatches vectorises in the GHSL grid, so the patches arrive with that
+ * projection and their coordinates are METRES. Everything below works on the
+ * WGS84 transform, which is what makes area(), length() and distance() mean
+ * what they say.
+ */
+function describePatchShape(patches) {
   return patches.map(function (f) {
     var g      = f.geometry().transform('EPSG:4326', CFG.GEOM_MAXERR);
     var areaM2 = g.area(CFG.GEOM_MAXERR);
-    var c      = g.centroid(CFG.GEOM_MAXERR);
     var coords = ee.List(ee.Geometry(g.bounds(CFG.GEOM_MAXERR))
                            .coordinates().get(0));
     var p0 = ee.List(coords.get(0)),
@@ -605,34 +655,24 @@ function describePatchGeometry(patches, evPoint, existingPoint) {
     var longSide = w.max(h), shortSide = w.min(h);
 
     var areaHa = areaM2.divide(1e4);
-    var xy     = ee.List(c.coordinates());
-    var distKm = c.distance(evPoint, CFG.GEOM_MAXERR).divide(1000);
-
     var elong  = longSide.divide(shortSide);
     var fill   = areaM2.divide(w.multiply(h));
 
-    // Geometry gate: village-sized, a place rather than a line, in the ring.
-    // These are the same thresholds V1 and V2 report on in the output; a
-    // selected control therefore always shows them TRUE, because everything
-    // that failed them was dropped here.
+    // Village-sized, and a place rather than a line. These are the same
+    // thresholds V1 and V2 report on, so a selected control always shows them
+    // TRUE: everything that failed them was dropped here.
     var gate = areaHa.gte(CFG.MIN_PATCH_HA)
                 .and(areaHa.lte(CFG.MAX_PATCH_HA))
                 .and(elong.lte(CFG.MAX_ELONGATION))
                 .and(fill.gte(CFG.MIN_BBOX_FILL))
-                .and(longSide.lte(CFG.MAX_PATCH_DIM_M))
-                .and(distKm.gte(CFG.SEARCH_MIN_KM))
-                .and(distKm.lte(CFG.SEARCH_MAX_KM));
+                .and(longSide.lte(CFG.MAX_PATCH_DIM_M));
 
     return f.setGeometry(g).set({
-      control_lon:             xy.get(0),
-      control_lat:             xy.get(1),
-      patch_area_ha:           areaHa,
-      patch_elongation:        elong,
-      patch_bbox_fill:         fill,
-      patch_max_dim_m:         longSide,
-      control_distance_km:     distKm,
-      dist_to_existing_ctrl_m: c.distance(existingPoint, CFG.GEOM_MAXERR),
-      geom_gate:               gate
+      patch_area_ha:    areaHa,
+      patch_elongation: elong,
+      patch_bbox_fill:  fill,
+      patch_max_dim_m:  longSide,
+      geom_gate:        gate
     });
   }).filter(ee.Filter.gt('geom_gate', 0.5));
 }
@@ -660,7 +700,7 @@ function screenPatches(patches, ctxImg, pKop, pBio, pAdm, pElev, pPop) {
   // may contain no pixel CENTRE of a 100 m grid, and a reducer over a region
   // with no pixel centres returns null, which would then break every
   // comparison downstream. Every value the patch geometry supplies is already
-  // stored as a property by describePatchGeometry, so the swap costs nothing.
+  // stored as a property by locatePatches, so the swap costs nothing.
   var out = contPatch.reduceRegions({
     collection: patches, reducer: ee.Reducer.mean(), scale: 30,
     tileScale: CFG.TILE_SCALE});
@@ -1290,7 +1330,6 @@ function processSettlement(row) {
   var region    = evPoint.buffer(CFG.SEARCH_MAX_KM * 1000);
   var ring      = region.difference(evPoint.buffer(CFG.SEARCH_MIN_KM * 1000),
                                     CFG.GEOM_MAXERR);
-  var gridPatch = localGrid(evLon, evLat, CFG.PATCH_SCALE_M);
   var footprint = evPoint.buffer(CFG.SITE_RADIUS_M);
 
   // The three layers that have to be cut to this settlement's search region
@@ -1320,19 +1359,19 @@ function processSettlement(row) {
     ? ee.Number(popDoc)
     : ee.Number(gCon.get('pop_density_km2')).multiply(footprintKm2);
 
-  var patches   = findPatches(gridPatch, ring);
-  var described = describePatchGeometry(patches, evPoint, exPoint);
+  var patches = findPatches(ring);
+  var located = locatePatches(patches, evPoint, exPoint);
 
-  // Keep the nearest patches only, and keep the two rings of the distance
+  // Keep the nearest patches only, and keep the two rungs of the distance
   // ladder separately so that extending the search still has candidates to
-  // extend to. Sorting on a property costs nothing; reducing statistics over
-  // several thousand patches does not.
-  var pool = described
+  // extend to. Sorting on a property costs nothing; measuring the shape of
+  // several thousand patches, and reducing statistics over them, does.
+  var pool = describePatchShape(located
     .filter(ee.Filter.lte('control_distance_km', CFG.SEARCH_TIER1_KM))
     .limit(CFG.MAX_PATCHES_NEAR, 'control_distance_km', true)
-    .merge(described
+    .merge(located
       .filter(ee.Filter.gt('control_distance_km', CFG.SEARCH_TIER1_KM))
-      .limit(CFG.MAX_PATCHES_FAR, 'control_distance_km', true));
+      .limit(CFG.MAX_PATCHES_FAR, 'control_distance_km', true)));
 
   var screened  = screenPatches(pool, site.ctx,
                                 ee.Number(gCat.get('koppen_group')),
@@ -1415,7 +1454,7 @@ function processSettlement(row) {
     eligible: eligible,
     scored:   scored,
     patches:  pool,
-    allPatches: described,
+    allPatches: located,
     ev:       ev,
     ring:     ring
   };
@@ -1541,7 +1580,40 @@ function previewOneSettlement() {
         'Layers box if you want to see what was rejected.');
 }
 
+/** A single task covering exactly the settlements named in ONLY_QUARTET_IDS. */
+function queueNamedSettlements() {
+  var wanted = CFG.ONLY_QUARTET_IDS;
+  var out = null, found = [];
+  for (var i = 0; i < EV_TABLE.length; i++) {
+    for (var k = 0; k < wanted.length; k++) {
+      if (EV_TABLE[i][0] === wanted[k]) {
+        var res = processSettlement(EV_TABLE[i]);
+        out = (out === null) ? res.rows : out.merge(res.rows);
+        found.push(EV_TABLE[i][0]);
+      }
+    }
+  }
+  if (out === null) {
+    print('None of ONLY_QUARTET_IDS ' + wanted + ' is in EV_TABLE.');
+    return;
+  }
+  print('Queued ONE task for settlement(s) ' + found + ' at a ' +
+        CFG.SEARCH_MAX_KM + ' km search radius.');
+  print('Run it, then read its Runtime and EECU-seconds in the Tasks tab. ' +
+        'That is your real per-settlement cost: multiply by 212 before ' +
+        'committing to a full run.');
+  Export.table.toDrive({
+    collection:     out,
+    description:    CFG.FILE_PREFIX + '_named',
+    folder:         CFG.DRIVE_FOLDER,
+    fileNamePrefix: CFG.FILE_PREFIX + '_named',
+    fileFormat:     'CSV',
+    selectors:      OUT_COLUMNS
+  });
+}
+
 function queueExports() {
+  if (CFG.ONLY_QUARTET_IDS.length > 0) { queueNamedSettlements(); return; }
   var nBatches = Math.ceil(EV_TABLE.length / CFG.BATCH_SIZE);
   var last = Math.min(CFG.FIRST_BATCH + CFG.BATCHES_PER_RUN - 1, nBatches - 1);
 

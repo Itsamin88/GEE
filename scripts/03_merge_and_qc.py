@@ -106,6 +106,9 @@ def main():
     ap.add_argument("-o", "--out", default="stage2_rural_controls_FINAL.csv")
     ap.add_argument("--min-separation-km", type=float, default=2.0)
     ap.add_argument("--keep-all", action="store_true")
+    ap.add_argument("--rescue-below", type=int, default=3,
+                    help="report settlements with fewer than this many "
+                         "controls, as a ready-to-paste ONLY_QUARTET_IDS list")
     args = ap.parse_args()
 
     print("Reading batch exports from %s" % args.directory)
@@ -190,8 +193,21 @@ def main():
     if zero:
         print("   settlements with NO eligible control: %s" % zero)
         print("   -> the plan says never to drop these. They stay in the CSV")
-        print("      as COMMUNITY rows with n_controls_selected = 0; widen")
-        print("      CFG.SEARCH_MAX_KM or relax a declared tolerance for them.")
+        print("      as COMMUNITY rows with n_controls_selected = 0.")
+
+    # The distance ladder, applied where it is actually needed. Re-running all
+    # 212 at a wider radius costs four times as much to help a handful; this
+    # names the handful.
+    short = sorted(q for q in communities
+                   if len(controls_by_qid.get(q, [])) < args.rescue_below)
+    if short:
+        print("\nSettlements with fewer than %d controls: %d"
+              % (args.rescue_below, len(short)))
+        print("To extend the search for JUST these, per the plan's distance")
+        print("ladder, set in the Earth Engine script:")
+        print("    SEARCH_MAX_KM:    100,")
+        print("    ONLY_QUARTET_IDS: %s," % short)
+        print("then merge the extra CSV in with the rest and re-run this.")
 
     all_ctl = [c for v in controls_by_qid.values() for c in v]
     if all_ctl:

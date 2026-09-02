@@ -252,9 +252,17 @@ shortlist you can check by hand, instead of a world you cannot.
   'PREFLIGHT'` re-checks all of them in seconds. Oxford accessibility and
   Hansen are flagged *deprecated* in the catalogue — they still load, and both
   ids sit in `CFG` so a successor can be swapped in without touching the code.
-- **The 100 km search radius** is four times the area of a 50 km one, and most
-  of the run time. If you only need three controls, set `SEARCH_MAX_KM = 50` and
-  the run gets roughly four times faster.
+- **The search radius defaults to 50 km**, which is the plan's own first ladder
+  step. Extending every settlement to 100 km costs four times as much — search
+  area is quadratic in the radius — to help the few that need it. The intended
+  workflow is the plan's: run all 212 at 50 km, then re-run only the short ones
+  at 100 km via `ONLY_QUARTET_IDS`, which `03_merge_and_qc.py` prints for you.
+- **Permanent water is not in the detection seed.** It is 30 m data in a
+  different projection from the GHSL layers, so seeding on it means reading and
+  resampling 30 m water across the whole search ring in order to reject a
+  handful of bridges. The rejection happens later instead, and more cheaply:
+  V5 measures permanent water under each surviving patch, and V2 rejects linear
+  structures on shape alone. Nothing is lost but the cost.
 - **GHS_BUILT_C is a 2018 epoch**; the other GHSL layers are 2020. A village
   built since 2018 is detected (from `GHS_BUILT_S` 2020) but scored on 2018
   characteristics.
