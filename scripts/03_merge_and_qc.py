@@ -106,6 +106,10 @@ def main():
     ap.add_argument("-o", "--out", default="stage2_rural_controls_FINAL.csv")
     ap.add_argument("--min-separation-km", type=float, default=2.0)
     ap.add_argument("--keep-all", action="store_true")
+    ap.add_argument("--max-controls", type=int, default=15,
+                    help="keep at most this many controls per settlement, "
+                         "applied AFTER the minimum-separation rule so the "
+                         "block is a full 15 rather than 13")
     ap.add_argument("--rescue-below", type=int, default=3,
                     help="report settlements with fewer than this many "
                          "controls, as a ready-to-paste ONLY_QUARTET_IDS list")
@@ -144,6 +148,16 @@ def main():
     # ---- minimum separation between the controls of one settlement ----------
     dropped = apply_min_separation(controls_by_qid, args.min_separation_km,
                                    args.keep_all)
+    # Trim to the target AFTER separation, so a block that lost a duplicate is
+    # backfilled from the selection headroom rather than left short.
+    over = 0
+    for qid in controls_by_qid:
+        if len(controls_by_qid[qid]) > args.max_controls:
+            over += len(controls_by_qid[qid]) - args.max_controls
+            controls_by_qid[qid] = controls_by_qid[qid][:args.max_controls]
+    if over:
+        print("\n%d surplus controls trimmed to the %d-per-settlement target"
+              % (over, args.max_controls))
     if dropped:
         verb = "would be dropped" if args.keep_all else "dropped"
         print("\n%d controls %s by the %.1f km minimum-separation rule:"

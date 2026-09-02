@@ -110,11 +110,24 @@ building with no residents; a factory is non-residential building with no
 residents; a bridge is a line. Each falls to a different test, which is why
 there are eight and not one.
 
+**Candidates are pooled across the whole ring, not nearest-first.** The pool has
+to be capped — a settled countryside holds thousands of patches — but capping
+it nearest-first collapses a 50 km search into a disc a third that wide. The
+first live run picked all 15 controls within 17 km and never considered the
+researcher's own existing control at 25.7 km. Controls drawn from a tight disc
+are also the ones most spatially autocorrelated with the settlement, which is
+the opposite of what the comparison wants. The ring is therefore split into
+equal-width distance bands, each capped separately. `n_patches_found`,
+`n_patches_pooled` and `patch_pool_capped` report whether the cap bound at all.
+
 **The one rule the script cannot express cheaply** is a minimum separation
 *between the controls chosen for one settlement*. Connected components are
 already distinct objects, but a large village occasionally splits into two.
 `scripts/03_merge_and_qc.py` applies a 2 km minimum separation greedily in rank
-order and reports every control it drops.
+order and reports every control it drops. The Earth Engine script selects
+`CONTROLS_PER_SETTLEMENT + SELECTION_HEADROOM` so that a block which loses a
+duplicate is backfilled rather than left short, and the merge step trims back
+to the target afterwards.
 
 ---
 
@@ -137,6 +150,18 @@ most metrics".
 The star bands reproduce the Study 1 workbook: ★★★ *D* < 0.5, ★★ 0.5 ≤ *D* < 1.5,
 ★ *D* ≥ 1.5.
 
+**Terrain class is judged by a declared rule, not by the bin edge alone.**
+`terrain_class` is a hard-binned category, so a settlement near a bin edge
+fails C4 against almost every neighbour. Lost Valley sits at 6.6°, 1.4° below
+the 8° cut: 12 of its 15 controls "failed" C4 while every one was within 10° of
+its slope, and that single brittle test kept the whole block out of Tier 1.
+`CFG.C4_MODE` therefore declares which rule counts — `CLASS` (the plan's
+literal wording), `CLASS_TOLERANT` (identical, or one class apart with slopes
+within 5°; the default), or `SLOPE_TRI` (the Study 1 workbook's own C4: slope
+within 10° and ruggedness within 50%). All three land in the CSV whichever is
+chosen, so the file can be re-filtered under a different rule without
+re-running anything.
+
 **The ladder**, from Stage 2, expressed as a single sort key:
 
 1. **Tier 1** — every soft criterion within tolerance, within 50 km, *D* ≤ 1.0.
@@ -149,6 +174,21 @@ The star bands reproduce the Study 1 workbook: ★★★ *D* < 0.5, ★★ 0.5 �
    that a settlement is never dropped for want of a good comparator. How bad
    "best available" was is visible in `d_value` and
    `d_within_declared_threshold`.
+
+Distance orders the candidates that are genuinely **distance-extended** — the
+plan's reasoning ("take the CLOSEST qualifying candidates rather than the
+best-scoring ones") is about candidates reached by widening the search. A
+control inside the first rung that is Tier 2 only because it missed a tolerance
+is not one of those, so match quality orders it instead; otherwise a poor near
+match would outrank a good one.
+
+**A block is graded on its best three controls**, not on all fifteen. The
+plan's three tiers grade a *quartet* — one settlement against three controls —
+and "at most one covariate outside tolerance" is a statement about that trio.
+Applied to fifteen it becomes a statement about the fifteenth-best match, so
+every block on earth grades Tier 3 and the grade carries no information; the
+first live run showed exactly that. `n_tier1_controls`, `n_tier2_controls` and
+`n_tier3_controls` describe the rest of the block.
 
 Controls are taken in that order until 15 are found or the eligible pool is
 exhausted. **No settlement is ever dropped**: all 212 appear in the output as
@@ -203,7 +243,11 @@ orbit. The script does two separate things and does not confuse them:
    `CFG.EXTERNAL_PROGRAMME_ASSET`. If you have a national programme boundary,
    put it there and the criterion becomes real for that country.
 2. It reports `restoration_signal_pct` — Hansen tree-cover gain in the footprint
-   — and raises `restoration_signal_flag` above 10 %. This is a **prompt for
+   — and raises `restoration_signal_flag` above 10 % **only when forest loss
+   stayed below 5 %**. Gain on its own flags ordinary rotation forestry: a
+   control near Lost Valley showed 13 % gain beside 10 % loss, which is a
+   clearcut replanted, not a programme. Real afforestation is gain without
+   matching loss. This is a **prompt for
    documentary follow-up**, not evidence. It defaults to not excluding anything;
    set `TREAT_RESTORATION_SIGNAL_AS_EXCLUSION` if you want it to.
 
@@ -244,6 +288,19 @@ shortlist you can check by hand, instead of a world you cannot.
   nearest `MAX_PATCHES_NEAR` inside 50 km and `MAX_PATCHES_FAR` beyond it are
   carried forward, so both rungs of the distance ladder keep candidates of
   their own. `n_patches_found` in the output reports the size of that pool.
+- **What `water_dist_m` actually measures.** JRC Global Surface Water at 30 m
+  maps *permanent* water, and narrow rivers under forest canopy often fall
+  below it. In the Oregon Cascades the settlement reads 7.3 km from permanent
+  water in a landscape full of creeks. The measure is therefore distance to
+  mapped standing or large water, applied identically at both arms, which is
+  what a matching covariate needs — but do not read it as distance to the
+  nearest stream.
+- **Where V3 and V4 do their work.** `GHS_BUILT_S`'s non-residential band and
+  `GHS_BUILT_C`'s non-residential classes are frequently zero in small rural
+  hamlets, so the residential-dominance tests pass vacuously there. They bite
+  where non-residential built surface actually exists — beside works, depots,
+  industrial estates and airfields — which is exactly where they are needed.
+  V2 (shape) and V7 (residents) carry the load in remote countryside.
 - **Asset types.** Earth Engine fails an `ee.Image('…')` on an ImageCollection
   only when the task runs, with `Asset '…' is not an Image`. The types used
   here have been checked against the catalogue: `CSP/HM/GlobalHumanModification`,

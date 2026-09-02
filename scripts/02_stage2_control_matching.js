@@ -106,6 +106,11 @@ var CFG = {
 
   // ---- how many controls, and how far -------------------------------------
   CONTROLS_PER_SETTLEMENT: 15,
+  // Selected on top of that, as headroom. Two controls of one settlement can
+  // be two halves of one village; 03_merge_and_qc.py enforces a minimum
+  // separation between them and trims back to CONTROLS_PER_SETTLEMENT, so the
+  // final block is a full 15 rather than 13.
+  SELECTION_HEADROOM:      5,
   SEARCH_MIN_KM:           5,      // plan Stage 2: controls sit 5-50 km away
   SEARCH_TIER1_KM:         50,     // ladder step 1
   // Ladder step 2 extends to 100 km, but the plan extends it only for the
@@ -129,14 +134,20 @@ var CFG = {
   SEED_POP_PER_CELL:       0.20,   // some resident population in the cell
   CLOSE_RADIUS_M:          150,    // morphological closing: merge one village
   MAX_SMOD_CLASS:          13,     // 11/12/13 = rural (GHS-SMOD)
-  MAX_CANDIDATES:          40,     // patches carried into full evaluation
-  // A settled countryside can hold thousands of built-up patches inside a
-  // 100 km ring - Lost Valley, Oregon returns over 6000. Reducing statistics
-  // over every one of them is slow enough to break the request, and needless:
-  // 15 controls are wanted. The nearest patches are kept, split so that the
-  // extended ring of the distance ladder still has candidates of its own.
-  MAX_PATCHES_NEAR:        300,    // nearest patches inside SEARCH_TIER1_KM
-  MAX_PATCHES_FAR:         120,    // nearest patches beyond it
+  MAX_CANDIDATES:          60,     // patches carried into full evaluation
+  // A settled countryside can hold thousands of built-up patches in the search
+  // ring - Lost Valley, Oregon returns over 6000 at 100 km - and reducing
+  // statistics over all of them is slow enough to break the request. So the
+  // pool is capped. But capping it "nearest first" across the whole ring
+  // collapses the search into a small disc: the first live run picked all 15
+  // controls within 17 km of a 50 km ring, and never even considered the
+  // researcher's own existing control at 25.7 km. Controls drawn from a tight
+  // disc are also the ones most spatially autocorrelated with the settlement,
+  // which is the opposite of what a comparison wants. The ring is therefore
+  // divided into equal-width distance bands, each capped separately, so every
+  // part of it is represented.
+  PATCH_BANDS:             4,
+  MAX_PATCHES_PER_BAND:    120,
   USE_LOCAL_AEQD:          true,   // local equidistant grid for water distance
   CATEGORICAL_READ_RADIUS_M: 200,  // disc around a patch centre for the
                                    // climate/biome/country read (see
@@ -175,6 +186,21 @@ var CFG = {
   TOL_POP_FACTOR:          3,      // "population within a factor of three"
   TOL_BUILT_PP:            10,     // built fraction, percentage points
   TERRAIN_BREAKS_DEG:      [2, 8, 15],   // flat | undulating | hilly | steep
+  // Terrain class is a hard-binned category, and a settlement sitting near a
+  // bin edge fails it against almost every neighbour. Lost Valley, at 6.6
+  // degrees, is 1.4 degrees below the 8-degree cut: 12 of its 15 controls
+  // "failed" C4 while every one of them was within 10 degrees of its slope,
+  // and that one brittle test kept the whole block out of Tier 1. How C4 is
+  // judged is therefore a declared choice:
+  //   'CLASS'           identical class - the plan's literal wording
+  //   'CLASS_TOLERANT'  identical, OR one class apart with slopes within
+  //                     TOL_TERRAIN_ADJACENT_DEG  (default)
+  //   'SLOPE_TRI'       the Study 1 workbook's own C4: slope within 10 degrees
+  //                     AND ruggedness within 50 per cent
+  // All three are reported on every row whichever is chosen, so the CSV can be
+  // re-filtered under a different rule without re-running anything.
+  C4_MODE:                  'CLASS_TOLERANT',
+  TOL_TERRAIN_ADJACENT_DEG: 5,
 
   // ---- rural classification ------------------------------------------------
   MAX_URBAN_FRACTION_PCT:  10,     // share of footprint in SMOD >= 21
@@ -186,7 +212,12 @@ var CFG = {
   PA_EXCLUSION_MODE:       'IUCN_I_II',   // 'IUCN_I_II' (workbook C9) or 'ANY'
   MAX_PA_OVERLAP_PCT:      5,      // tolerated overlap of the footprint
   EXTERNAL_PROGRAMME_ASSET: '',    // your own FeatureCollection of project areas
+  // Hansen tree-cover GAIN on its own flags ordinary rotation forestry: a
+  // control near Lost Valley showed 13% gain beside 10% loss, which is a
+  // clearcut replanted, not a restoration programme. Real afforestation is
+  // gain WITHOUT matching loss, so both bounds have to hold.
   RESTORATION_GAIN_PCT:    10,     // Hansen gain share that raises the flag
+  RESTORATION_MAX_LOSS_PCT: 5,     // ...but only if loss stayed below this
   TREAT_RESTORATION_SIGNAL_AS_EXCLUSION: false,
 
   // ---- weights of the standardised distance D ------------------------------
@@ -641,6 +672,31 @@ function locatePatches(patches, evPoint, existingPoint) {
 }
 
 /**
+ * Cap the candidate pool EVENLY ACROSS THE RING rather than nearest-first.
+ * Taking the nearest N collapses a 50 km search into a disc a third that
+ * wide, which both starves the far half of the ring and picks the controls
+ * most spatially autocorrelated with the settlement. Equal-width bands, each
+ * capped separately, keep the whole ring in play.
+ */
+function bandedPool(located) {
+  var lo = CFG.SEARCH_MIN_KM, hi = CFG.SEARCH_MAX_KM;
+  var width = (hi - lo) / CFG.PATCH_BANDS;
+  var pool = null;
+  for (var b = 0; b < CFG.PATCH_BANDS; b++) {
+    var from = lo + b * width;
+    var to   = lo + (b + 1) * width;
+    var band = located
+      .filter(ee.Filter.gte('control_distance_km', from))
+      .filter(b === CFG.PATCH_BANDS - 1
+                ? ee.Filter.lte('control_distance_km', to)
+                : ee.Filter.lt('control_distance_km', to))
+      .limit(CFG.MAX_PATCHES_PER_BAND, 'control_distance_km', true);
+    pool = (pool === null) ? band : pool.merge(band);
+  }
+  return pool;
+}
+
+/**
  * STAGE 2 of the geometry work - size and shape, on the survivors only. Shape
  * alone rejects bridges, runways, pipelines, road strips and ribbon
  * development, which is why it runs before any pixel is reduced.
@@ -915,9 +971,19 @@ function evaluateCandidates(cands, ev, parentPopDoc, hasDocPop) {
     var c2  = bio.eq(pBio).and(bio.gte(1));
     var elevDiff = elev.subtract(pElev).abs();
     var c3  = elevDiff.lte(CFG.TOL_ELEV_M);
-    var c4  = terr.eq(pTerr);
-    var c4b = slope.subtract(pSlope).abs().lte(CFG.TOL_SLOPE_DEG);
+    var slopeDiff = slope.subtract(pSlope).abs();
+    var c4  = terr.eq(pTerr);                       // the plan's literal wording
+    var c4b = slopeDiff.lte(CFG.TOL_SLOPE_DEG);
     var c4c = tri.subtract(pTri).abs().lte(tolTri);
+    // identical class, or one class apart with slopes close together: the
+    // remedy for a settlement sitting near a class boundary
+    var c4tol = c4.or(terr.subtract(pTerr).abs().eq(1)
+                        .and(slopeDiff.lte(CFG.TOL_TERRAIN_ADJACENT_DEG)));
+    var c4workbook = c4b.and(c4c);                  // the workbook's own C4
+    // whichever of the three CFG.C4_MODE names is the one that counts
+    var c4used = CFG.C4_MODE === 'CLASS' ? c4
+               : CFG.C4_MODE === 'SLOPE_TRI' ? c4workbook
+               : c4tol;
     var c5  = distKm.gte(CFG.SEARCH_MIN_KM)
                 .and(distKm.lte(CFG.SEARCH_TIER1_KM));
     var c5b = distKm.gte(CFG.SEARCH_MIN_KM)
@@ -935,7 +1001,10 @@ function evaluateCandidates(cands, ev, parentPopDoc, hasDocPop) {
     var c9  = paPct.lte(CFG.MAX_PA_OVERLAP_PCT);
 
     var restoration = num(f, 'forest_gain_pct');
-    var restFlag    = restoration.gte(CFG.RESTORATION_GAIN_PCT);
+    // gain WITHOUT matching loss; gain beside loss is rotation forestry
+    var restFlag    = restoration.gte(CFG.RESTORATION_GAIN_PCT)
+                        .and(num(f, 'forest_loss_pct')
+                               .lte(CFG.RESTORATION_MAX_LOSS_PCT));
     var extHit      = num(f, 'ext_programme_pct').gt(0);
     var c10 = extHit.not().and(CFG.TREAT_RESTORATION_SIGNAL_AS_EXCLUSION
                                  ? restFlag.not() : ee.Number(1));
@@ -1029,7 +1098,7 @@ function evaluateCandidates(cands, ev, parentPopDoc, hasDocPop) {
       c1.add(c2).add(c9).add(c10).add(c11).add(c12).add(c5b).add(villageOk));
     // SOFT criteria: counted; a Tier-2 control may miss at most one.
     var softFail = ee.Number(6).subtract(
-      c3.add(c4).add(c6).add(c7).add(c8).add(c13));
+      c3.add(c4used).add(c6).add(c7).add(c8).add(c13));
 
     var t1 = hardOk.and(softFail.eq(0)).and(c5).and(d.lte(CFG.D_MAX_TIER1));
     var t2 = hardOk.and(softFail.lte(1)).and(d.lte(CFG.D_MAX_TIER2));
@@ -1043,13 +1112,17 @@ function evaluateCandidates(cands, ev, parentPopDoc, hasDocPop) {
       .add(t2.multiply(notT1).multiply(2))
       .add(t3.multiply(notT1).multiply(ee.Number(1).subtract(t2)).multiply(3));
 
-    // The distance ladder. Tier 1 is ordered on match quality; Tier 2 is
-    // ordered on DISTANCE, because the plan says that once the search is
-    // extended you take the CLOSEST qualifying candidates, not the
-    // best-scoring ones. Tier 3 falls back to match quality again.
-    var isT2    = tier.eq(2);
-    var primary = d.multiply(ee.Number(1).subtract(isT2))
-                   .add(distKm.divide(CFG.SEARCH_MAX_KM).multiply(isT2))
+    // The distance ladder. The plan orders by DISTANCE once the search has
+    // been EXTENDED beyond the first rung - "take the CLOSEST qualifying
+    // candidates rather than the best-scoring ones". That reasoning applies to
+    // candidates that are actually far away. A control inside the first rung
+    // which is Tier 2 only because it missed a tolerance is not a
+    // distance-extended candidate, and ordering it by distance would rank a
+    // poor near match above a good one. So distance orders the far ones and
+    // match quality orders the rest.
+    var isFar   = distKm.gt(CFG.SEARCH_TIER1_KM);
+    var primary = d.multiply(ee.Number(1).subtract(isFar))
+                   .add(distKm.divide(CFG.SEARCH_MAX_KM).multiply(isFar))
                    .min(999);   // so the tier term always dominates the sort
     var sortKey = tier.multiply(1000).add(primary);
 
@@ -1060,7 +1133,7 @@ function evaluateCandidates(cands, ev, parentPopDoc, hasDocPop) {
       .cat(failTag('C1_koppen',        one.subtract(c1)))
       .cat(failTag('C2_biome',         one.subtract(c2)))
       .cat(failTag('C3_elevation',     one.subtract(c3)))
-      .cat(failTag('C4_terrain',       one.subtract(c4)))
+      .cat(failTag('C4_terrain',       one.subtract(c4used)))
       .cat(failTag('C5_distance_50km', one.subtract(c5)))
       .cat(failTag('C6_water_dist',    one.subtract(c6)))
       .cat(failTag('C7_travel_time',   one.subtract(c7)))
@@ -1120,6 +1193,9 @@ function evaluateCandidates(cands, ev, parentPopDoc, hasDocPop) {
       C2_biome_match:               tf(c2),
       C3_elevation_within_300m:     tf(c3),
       C4_terrain_class_match:       tf(c4),
+      C4_terrain_class_tolerant:    tf(c4tol),
+      C4_workbook_slope_and_tri:    tf(c4workbook),
+      C4_rule_applied:              CFG.C4_MODE,
       C4b_slope_within_10deg:       tf(c4b),
       C4c_tri_within_50pct:         tf(c4c),
       C5_distance_5_50km:           tf(c5),
@@ -1175,7 +1251,7 @@ var NA = 'n/a - settlement row';
  * settlements as well as to controls.
  */
 function communityRow(qid, evName, evLon, evLat, ev, blk, hasDocPop,
-                      parentPopDoc, nPatches, nScreened) {
+                      parentPopDoc, nScreened) {
 
   var n        = blk.nSelected;
   var maxTier  = blk.maxTier;
@@ -1305,7 +1381,12 @@ function communityRow(qid, evName, evLon, evLat, ev, blk, hasDocPop,
     // ---- the block summary ----------------------------------------------
     n_controls_selected:    n,
     n_controls_within_50km: within50,
-    n_patches_found:        nPatches,
+    n_tier1_controls:       blk.nTier1,
+    n_tier2_controls:       blk.nTier2,
+    n_tier3_controls:       blk.nTier3,
+    n_patches_found:        blk.inRing,
+    n_patches_pooled:       blk.pooled,
+    patch_pool_capped:      tf(blk.pooled.lt(blk.inRing).multiply(1)),
     n_candidates_screened:  nScreened,
     match_tier:             maxTier,
     tier_label:             lut(TIER_NAME, maxTier),
@@ -1371,16 +1452,11 @@ function processSettlement(row) {
   var patches = findPatches(ring);
   var located = locatePatches(patches, evPoint, exPoint);
 
-  // Keep the nearest patches only, and keep the two rungs of the distance
-  // ladder separately so that extending the search still has candidates to
-  // extend to. Sorting on a property costs nothing; measuring the shape of
-  // several thousand patches, and reducing statistics over them, does.
-  var pool = describePatchShape(located
-    .filter(ee.Filter.lte('control_distance_km', CFG.SEARCH_TIER1_KM))
-    .limit(CFG.MAX_PATCHES_NEAR, 'control_distance_km', true)
-    .merge(located
-      .filter(ee.Filter.gt('control_distance_km', CFG.SEARCH_TIER1_KM))
-      .limit(CFG.MAX_PATCHES_FAR, 'control_distance_km', true)));
+  // Cap the pool band by band across the ring, so the candidates are not all
+  // drawn from a disc around the settlement. Sorting on a property costs
+  // nothing; measuring the shape of thousands of patches, and reducing
+  // statistics over them, does.
+  var pool = describePatchShape(bandedPool(located));
 
   var screened  = screenPatches(pool, site.ctx,
                                 ee.Number(gCat.get('koppen_group')),
@@ -1406,24 +1482,37 @@ function processSettlement(row) {
 
   var eligible  = scored.filter(ee.Filter.gt('eligible', 0.5))
                         .sort('sort_key');
-  var chosen    = eligible.limit(CFG.CONTROLS_PER_SETTLEMENT,
-                                'sort_key', true);
+  var chosen    = eligible.limit(
+    CFG.CONTROLS_PER_SETTLEMENT + CFG.SELECTION_HEADROOM, 'sort_key', true);
 
   // The block summary, computed once and written onto every row of the block
   // so that each control is fully self-describing in the CSV.
   // aggregate_max returns null on an empty collection, so the tier list is
   // seeded with 0: a settlement that found nothing grades "not eligible"
   // rather than crashing the export.
+  // The grade comes from the BEST THREE controls, not from all of them. The
+  // plan's three tiers grade a QUARTET - one settlement against three controls
+  // - and "at most one covariate outside tolerance" is a statement about that
+  // trio. Applied to fifteen it becomes a statement about the fifteenth-best
+  // match, so every block on earth grades Tier 3 and the grade says nothing.
+  // The first live run showed exactly that. Grading the best three reproduces
+  // the plan's own unit; the tier counts describe the rest of the block.
+  var top3 = chosen.limit(3, 'sort_key', true);
   var blk = {
     nSelected: chosen.size(),
-    maxTier:   ee.Number(ee.List(chosen.aggregate_array('match_tier')).add(0)
+    maxTier:   ee.Number(ee.List(top3.aggregate_array('match_tier')).add(0)
                  .reduce(ee.Reducer.max())),
     within50:  chosen.filter(ee.Filter.lte('control_distance_km',
-                                           CFG.SEARCH_TIER1_KM)).size()
+                                           CFG.SEARCH_TIER1_KM)).size(),
+    nTier1:    chosen.filter(ee.Filter.eq('match_tier', 1)).size(),
+    nTier2:    chosen.filter(ee.Filter.eq('match_tier', 2)).size(),
+    nTier3:    chosen.filter(ee.Filter.eq('match_tier', 3)).size(),
+    inRing:    located.size(),
+    pooled:    pool.size()
   };
 
   var community = communityRow(qid, evName, evLon, evLat, ev, blk, hasDoc,
-                               popDoc, pool.size(), screened.size());
+                               popDoc, screened.size());
 
   // The community row seeds the accumulator, so the block is never an empty
   // list and the controls come out ranked, in ladder order, beneath their own
@@ -1444,9 +1533,14 @@ function processSettlement(row) {
       parent_longitude:      evLon,
       n_controls_selected:    blk.nSelected,
       n_controls_within_50km: blk.within50,
+      n_tier1_controls:       blk.nTier1,
+      n_tier2_controls:       blk.nTier2,
+      n_tier3_controls:       blk.nTier3,
       ladder_step:            blk.maxTier,
       quartet_grade:          lut(TIER_NAME, blk.maxTier),
-      n_patches_found:        pool.size(),
+      n_patches_found:        blk.inRing,
+      n_patches_pooled:       blk.pooled,
+      patch_pool_capped:      tf(blk.pooled.lt(blk.inRing).multiply(1)),
       n_candidates_screened:  screened.size(),
       search_radius_km:       CFG.SEARCH_MAX_KM,
       koppen_source:         CFG.KOPPEN_ASSET ? CFG.KOPPEN_ASSET
@@ -1491,7 +1585,8 @@ var OUT_COLUMNS = [
   'C3_elevation_within_300m',
   // ---- C4 terrain ----------------------------------------------------------
   'terrain_class', 'parent_terrain_class', 'slope_deg', 'parent_slope_deg',
-  'tri', 'parent_tri', 'C4_terrain_class_match', 'C4b_slope_within_10deg',
+  'tri', 'parent_tri', 'C4_terrain_class_match', 'C4_terrain_class_tolerant',
+  'C4_workbook_slope_and_tri', 'C4_rule_applied', 'C4b_slope_within_10deg',
   'C4c_tri_within_50pct',
   // ---- C5 distance ---------------------------------------------------------
   'C5_distance_5_50km', 'C5b_distance_5_100km',
@@ -1534,7 +1629,9 @@ var OUT_COLUMNS = [
   'forest_gain_pct', 'forest_loss_pct',
   // ---- provenance ----------------------------------------------------------
   'is_existing_workbook_control', 'n_controls_selected',
-  'n_controls_within_50km', 'n_patches_found', 'n_candidates_screened',
+  'n_controls_within_50km', 'n_tier1_controls', 'n_tier2_controls',
+  'n_tier3_controls', 'n_patches_found', 'n_patches_pooled',
+  'patch_pool_capped', 'n_candidates_screened',
   'ladder_step', 'quartet_grade', 'search_radius_km', 'koppen_source',
   'landcover_source', 'script_version', 'run_date'
 ];

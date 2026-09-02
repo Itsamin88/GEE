@@ -167,7 +167,8 @@ knobs that matter most:
 | `MAX_CANDIDATES` | 40 | Candidates measured in full per settlement. 15 controls do not need many more. |
 | `BATCH_SIZE` | 8 | Settlements per export task. Lower it if tasks time out on the server. |
 | `BATCHES_PER_RUN` | 6 | Tasks queued per script run. Lower it if the Code Editor page is slow to respond; this is browser-side, not server-side. |
-| `MAX_PATCHES_NEAR` / `_FAR` | 400 / 200 | How many built-up patches are carried into the statistics, nearest first, inside and beyond 50 km. A settled countryside can return thousands; reducing over all of them breaks the request. |
+| `PATCH_BANDS` / `MAX_PATCHES_PER_BAND` | 4 / 120 | The candidate pool is capped band by band across the search ring, so it is not a disc around the settlement. `patch_pool_capped` in the output says whether the cap bound. |
+| `C4_MODE` | `CLASS_TOLERANT` | How terrain class is judged: `CLASS` (the plan's wording), `CLASS_TOLERANT` (adjacent class with close slopes also counts), or `SLOPE_TRI` (the workbook's own C4). All three are reported regardless. |
 | `LANDCOVER_SOURCE` | `ESA_WORLDCOVER` | `DYNAMIC_WORLD` for exact conformance with the plan's §4.1, at a materially longer run. |
 | `KOPPEN_ASSET` | *(empty)* | Point at your uploaded Beck et al. raster to replace the WorldClim-derived main groups. |
 | `PA_EXCLUSION_MODE` | `IUCN_I_II` | `ANY` for the stricter reading of "not inside a protected area". Both are reported regardless. |

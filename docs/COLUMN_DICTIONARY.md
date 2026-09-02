@@ -73,6 +73,9 @@ The file holds **one row per settlement** (`row_type = COMMUNITY`) followed by *
 | `tri` | both rows | Terrain ruggedness, as the standard deviation of elevation in a 3x3 window of the DEM. |
 | `parent_tri` | both rows | The settlement's ruggedness. |
 | `C4_terrain_class_match` | controls | TRUE when both sites fall in the same terrain class. The plan's "same terrain class". SOFT. |
+| `C4_terrain_class_tolerant` | controls | TRUE when the classes are identical OR one class apart with slopes within 5 degrees. A settlement near a class boundary otherwise fails C4 against almost every neighbour: Lost Valley at 6.6 degrees, 1.4 below the 8-degree cut, failed 12 of 15 while every control was within 10 degrees of its slope. |
+| `C4_workbook_slope_and_tri` | controls | TRUE when slope is within 10 degrees AND ruggedness within 50 per cent - the Study 1 workbook's own operationalisation of C4. |
+| `C4_rule_applied` | both rows | Which of the three C4 rules actually counted towards the tier: CLASS, CLASS_TOLERANT or SLOPE_TRI. All three are reported regardless, so the CSV can be re-filtered under a different rule without re-running. |
 | `C4b_slope_within_10deg` | controls | TRUE when mean slopes are within 10 degrees. The workbook's C4, reported but not itself decisive. |
 | `C4c_tri_within_50pct` | controls | TRUE when ruggedness is within 50% of the settlement's own. The workbook's C4, reported. |
 
@@ -124,7 +127,7 @@ The file holds **one row per settlement** (`row_type = COMMUNITY`) followed by *
 | Column | Applies to | Meaning |
 |---|---|---|
 | `restoration_signal_pct` | both rows | Per cent of the footprint showing Hansen tree-cover GAIN. A satellite proxy for a restoration programme, not proof of one. |
-| `restoration_signal_flag` | both rows | TRUE when that proxy is at or above 10%. A prompt for documentary follow-up on a shortlist, not an exclusion by default. |
+| `restoration_signal_flag` | both rows | TRUE when gain is at or above 10% AND loss stayed below 5%. Gain beside matching loss is rotation forestry, not restoration, so both bounds must hold. A prompt for documentary follow-up, not an exclusion by default. |
 | `external_programme_hit` | both rows | TRUE when the site falls inside a polygon of your own CFG.EXTERNAL_PROGRAMME_ASSET. |
 | `C10_no_external_programme` | both rows | TRUE when the site is in none of those polygons (and, if you set CFG.TREAT_RESTORATION_SIGNAL_AS_EXCLUSION, also below the restoration signal). The plan's field G1. HARD gate. Read METHODS before trusting it: no global dataset of funded restoration programmes exists. |
 
@@ -209,10 +212,15 @@ The file holds **one row per settlement** (`row_type = COMMUNITY`) followed by *
 | `is_existing_workbook_control` | controls | TRUE when this control falls within 500 m of the conventional-rural control already held for this settlement in the Study 1 workbook - so you can see where the new search reproduces the old choice. |
 | `n_controls_selected` | both rows | How many controls were selected for this settlement, 0-15. Identical on every row of a block. |
 | `n_controls_within_50km` | both rows | How many of those sit inside 50 km. The rest came from the extended 50-100 km step of the ladder. |
-| `n_patches_found` | both rows | How many built-up patches the detector found in the 5-100 km ring before any criterion was applied. A low number here explains a thin block. |
+| `n_tier1_controls` | both rows | How many of this settlement's selected controls are Tier 1. |
+| `n_tier2_controls` | both rows | How many are Tier 2. |
+| `n_tier3_controls` | both rows | How many are Tier 3. |
+| `n_patches_found` | both rows | How many built-up patches the detector found in the search ring, before any cap or criterion. A low number here explains a thin block. |
+| `n_patches_pooled` | both rows | How many of those patches were carried into the statistics, after the per-band cap and the shape gate. |
+| `patch_pool_capped` | both rows | TRUE when the ring held more patches than the cap allowed, so the pool is a sample rather than the whole ring. Bands keep that sample spread across the ring instead of clustered near the settlement. |
 | `n_candidates_screened` | both rows | How many of those survived the cheap gates and were measured in full. |
-| `ladder_step` | both rows | The worst tier in this settlement's block: 1 all controls close, 2 the search was extended or a tolerance missed, 3 best available. |
-| `quartet_grade` | both rows | That same tier, in words. The plan's three-tier quartet grading. |
+| `ladder_step` | both rows | The worst tier among the settlement's best three controls: 1 all close, 2 the search was extended or a tolerance missed, 3 best available. |
+| `quartet_grade` | both rows | That same tier, in words. Graded on the BEST THREE controls, which is the quartet the plan's tiers were written for - grading fifteen by their worst member makes every block Tier 3 and says nothing. |
 | `search_radius_km` | both rows | The outer search radius used, in km. |
 | `koppen_source` | both rows | Which Koppen layer produced C1. |
 | `landcover_source` | both rows | ESA_WORLDCOVER or DYNAMIC_WORLD. |
