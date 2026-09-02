@@ -115,8 +115,15 @@ That queues a single task. Run it, then read its **Runtime** and
 
 **Use a settlement you have not run before.** Earth Engine caches computed
 tiles, so re-running the same settlement reports a fraction of its real cost —
-in testing, a fourth run of the same site reported 44 EECU-seconds against a
-cold cost of about 1,850. Budget on the cold figure. If the total is more
+in testing, a fourth run of the same site reported 44 EECU-seconds. Even the
+"first" run of a settlement you have previewed is partly warm: Lost Valley
+reported 1,850 EECU-seconds after several previews, while a genuinely cold
+four-settlement task was consuming about **4,300 EECU-seconds per settlement**.
+
+Budget on that: roughly **5 minutes and 4,000–5,000 EECU-seconds per
+settlement**, so about 18 hours of compute and 0.9–1.1 million EECU-seconds for
+all 212. That is inherent to sweeping a 50 km ring 212 times — slicing it into
+more or fewer tasks does not change the total, only what a failure costs you. If the total is more
 than you want to spend, the knobs in the tuning table below are where to spend
 less — `SEARCH_MAX_KM` is by far the biggest, because search area grows with
 its square.
@@ -127,15 +134,25 @@ Set `ONLY_QUARTET_IDS: []` again before the full run.
 
 ```js
 RUN_MODE:        'EXPORT',
+BATCH_SIZE:      1,        // one settlement per task
 FIRST_BATCH:     0,
-BATCHES_PER_RUN: 6,
+BATCHES_PER_RUN: 20,
 ```
 
-Each run queues 6 tasks (48 settlements) to Google Drive folder
-`GEE_Stage2_Controls`, and prints the `FIRST_BATCH` to set next. With `BATCH_SIZE: 4` there are 53 batches, so nine runs cover them all:
-0, 6, 12, … 48. Smaller tasks finish sooner and a cancelled one costs less.
+Each run queues 20 tasks to Google Drive folder `GEE_Stage2_Controls` and
+prints the `FIRST_BATCH` to set next. Eleven runs cover all 212:
+`0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200`.
 
-Both layers of chunking are deliberate. A single export task covering all 212
+**One settlement per task** is the default because a task that fails, stalls or
+is cancelled then costs one settlement rather than four, and its name says
+which: `stage2_rural_controls_b046_q047` is batch 46, quartet 47. Re-running a
+single settlement is `ONLY_QUARTET_IDS: [47]`. Raise `BATCH_SIZE` only if you
+would rather click fewer times than lose less work — the total compute is
+identical either way.
+
+**A 20-minute task is not stuck.** Earth Engine batch tasks routinely run for
+hours, on Google's servers, so you can close the browser and come back. Several
+run concurrently, so wall-clock time is well under the 18 hours of compute. Both layers of chunking are deliberate. A single export task covering all 212
 settlements at a 100 km search radius will time out on the server; and the Code
 Editor builds every settlement's expression graph **in the browser** before
 anything is sent, so queueing all 27 tasks at once is what makes the page hang.
@@ -169,9 +186,9 @@ knobs that matter most:
 | `CONTROLS_PER_SETTLEMENT` | 15 | How many controls to keep. A three-control analysis needs no re-run — filter `control_rank <= 3`. |
 | `SEARCH_MAX_KM` | 50 | **The dominant cost** — search area grows with its square, so 100 km costs four times 50 km on every settlement. 50 km is the plan's own first ladder step; extend to 100 km only for the settlements that come up short, using `ONLY_QUARTET_IDS`. |
 | `ONLY_QUARTET_IDS` | `[]` | Run just these settlements as one task. Use `[3]` to measure cost before a full run, or the list `03_merge_and_qc.py` prints to extend the search only where it is needed. |
-| `MAX_CANDIDATES` | 40 | Candidates measured in full per settlement. 15 controls do not need many more. |
-| `BATCH_SIZE` | 8 | Settlements per export task. Lower it if tasks time out on the server. |
-| `BATCHES_PER_RUN` | 6 | Tasks queued per script run. Lower it if the Code Editor page is slow to respond; this is browser-side, not server-side. |
+| `MAX_CANDIDATES` | 60 | Candidates measured in full per settlement. 15 controls do not need many more. |
+| `BATCH_SIZE` | 1 | Settlements per export task. 1 means a failure costs one settlement and the task name identifies it. |
+| `BATCHES_PER_RUN` | 20 | Tasks queued per script run. Lower it if the Code Editor page is slow to respond; this is browser-side, not server-side. |
 | `PATCH_BANDS` / `MAX_PATCHES_PER_BAND` | 4 / 120 | The candidate pool is capped band by band across the search ring, so it is not a disc around the settlement. `patch_pool_capped` in the output says whether the cap bound. |
 | `C4_MODE` | `CLASS_TOLERANT` | How terrain class is judged: `CLASS` (the plan's wording), `CLASS_TOLERANT` (adjacent class with close slopes also counts), or `SLOPE_TRI` (the workbook's own C4). All three are reported regardless. |
 | `LANDCOVER_SOURCE` | `ESA_WORLDCOVER` | `DYNAMIC_WORLD` for exact conformance with the plan's §4.1, at a materially longer run. |
