@@ -70,16 +70,22 @@ Paste `scripts/02_stage2_control_matching.js` into the
 [Earth Engine Code Editor](https://code.earthengine.google.com/). It opens on
 `RUN_MODE: 'PREFLIGHT'`. Run it.
 
-Two checks print. **Check 1** samples every base layer at one point: values
-mean every asset id, every asset **type** (`ee.Image` against
-`ee.ImageCollection`) and every band name is good. **Check 2** runs the real
-measurement over the 500 m footprint and shows every covariate — every entry
-must be a number, because a layer can load perfectly and still return `null`
-over a footprint, and a null fails later in whatever arithmetic first touches
-it rather than where it was made.
+Three checks print:
 
-Do this first. Both classes of mistake otherwise stay invisible until an export
-task fails, an hour after you queued it.
+- **Check 1** samples every base layer at one point. Values mean every asset
+  id, every asset **type** (`ee.Image` against `ee.ImageCollection`) and every
+  band name is good.
+- **Check 2** runs the real measurement over the 500 m footprint. Every entry
+  must be a number: a layer can load perfectly and still return `null` over a
+  footprint.
+- **Check 3** lists any covariate **missing by name**, which is a different
+  failure from a null — `reduceRegions` names its output after the reducer
+  rather than the band when handed a single-band image, so the value lands
+  under the wrong name. This list must be empty.
+
+Do this first. All three classes of mistake otherwise stay invisible until an
+export task fails, an hour after you queued it. `scripts/04_check_script.py`
+runs the same three checks statically, without touching Earth Engine.
 
 **3 — Preview one settlement (a minute)**
 
@@ -162,6 +168,7 @@ different fixes.
 scripts/01_prepare_inputs.py          workbook  ->  CSV + the script's data block
 scripts/02_stage2_control_matching.js the Earth Engine script (paste and run)
 scripts/03_merge_and_qc.py            batch CSVs -> the single deliverable, checked
+scripts/04_check_script.py            static checks on the Earth Engine script
 scripts/gen_column_dictionary.py      regenerates docs/COLUMN_DICTIONARY.md
 data/ecovillages_212.csv              the 212 settlements
 data/existing_conventional_rural_controls.csv

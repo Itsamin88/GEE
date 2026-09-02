@@ -753,12 +753,22 @@ function measureFootprints(points, site) {
     externalProgrammeImage()
   ]).toFloat();
 
-  // (c) 100 m: settlement structure and population.
+  // (c) 100 m: settlement structure, population, and distance to water.
+  //
+  // The water-distance band belongs in THIS stack rather than in a call of its
+  // own, and that is not tidiness. reduceRegions names its output after the
+  // BAND when the image has several bands, but after the REDUCER when the
+  // image has exactly one - so reducing the single-band water image on its own
+  // wrote the value to a property called 'mean' and left 'water_dist_m'
+  // missing altogether. A missing property reads as null, and the null only
+  // announced itself much later, in the first arithmetic that touched it.
+  // Keeping every reduceRegions input multi-band makes that impossible.
   var img100 = ee.Image.cat([
     POP_DENS.rename('pop_density_km2'),
     BUILT_FRAC.multiply(100).rename('built_frac_pct'),
     NRES_FRAC.multiply(100).rename('nonresidential_built_pct'),
-    SMOD_URBAN.multiply(100).rename('urban_fraction_pct')
+    SMOD_URBAN.multiply(100).rename('urban_fraction_pct'),
+    site.water
   ]).toFloat();
 
   var out = img10.reduceRegions({collection: footprints,
@@ -767,7 +777,7 @@ function measureFootprints(points, site) {
     reducer: ee.Reducer.mean(), scale: 30, tileScale: CFG.TILE_SCALE});
   out = img100.reduceRegions({collection: out,
     reducer: ee.Reducer.mean(), scale: 100, tileScale: CFG.TILE_SCALE});
-  // (d) and (e) EVERY remaining layer is reduced at CFG.FOOTPRINT_SCALE_M.
+  // (d) EVERY remaining layer is reduced at CFG.FOOTPRINT_SCALE_M.
   //     This is not a detail. The site footprint is 1 km across, so a reducer
   //     asked to work at 927 m - the native grain of the accessibility and
   //     human-modification layers - can find NO pixel centre inside it and
@@ -776,9 +786,6 @@ function measureFootprints(points, site) {
   //     and may not be null". Reducing the coarse layers on a 100 m grid
   //     instead samples the same cell values and guarantees at least 78
   //     samples inside every footprint.
-  out = site.water.reduceRegions({collection: out,
-    reducer: ee.Reducer.mean(), scale: CFG.FOOTPRINT_SCALE_M,
-    tileScale: CFG.TILE_SCALE});
   out = ee.Image.cat([TRAVEL, GHM, VIIRS]).toFloat().reduceRegions({
     collection: out, reducer: ee.Reducer.mean(),
     scale: CFG.FOOTPRINT_SCALE_M, tileScale: CFG.TILE_SCALE});
@@ -1643,11 +1650,23 @@ function preflight() {
 
   print('CHECK 2 - the real measurement over the ' + CFG.SITE_RADIUS_M +
         ' m footprint. EVERY entry below must be a number. If any shows ' +
-        'null, that layer returned nothing over the footprint and the run ' +
-        'would fail later with a confusing operator error.',
+        'null, that layer returned nothing over the footprint.',
         measured.select(FOOTPRINT_REQUIRED));
 
-  print('If both checks look right: set CFG.RUN_MODE to PREVIEW.');
+  // ---- check 3: is every covariate PRESENT, by name? ----------------------
+  // A property can go missing rather than null - reduceRegions names its
+  // output after the reducer instead of the band when it is handed a
+  // single-band image, so the value lands under the wrong name and the one you
+  // asked for simply is not there. Counting properties by eye will not find
+  // that. This names the missing one.
+  var missing = ee.List(FOOTPRINT_REQUIRED)
+                  .removeAll(measured.propertyNames());
+  print('CHECK 3 - covariates MISSING from the measurement. This list MUST ' +
+        'be empty. Anything named here would fail later as a null.', missing);
+  print('        (for reference, everything the measurement produced:)',
+        measured.propertyNames().sort());
+
+  print('If all three checks look right: set CFG.RUN_MODE to PREVIEW.');
 }
 
 function main() {
