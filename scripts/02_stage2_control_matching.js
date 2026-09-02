@@ -105,6 +105,10 @@ var CFG = {
 
   // ---- geometry on which covariates are measured ---------------------------
   SITE_RADIUS_M:           500,    // identical footprint at both arms
+  // Coarsest grid any footprint reduction may use. It MUST stay well below
+  // 2 x SITE_RADIUS_M: a reducer working on a grid as coarse as the footprint
+  // can find no pixel centre inside it and return null.
+  FOOTPRINT_SCALE_M:       100,
 
   // ---- village detection ---------------------------------------------------
   GHSL_EPOCH:              2020,
@@ -114,6 +118,13 @@ var CFG = {
   CLOSE_RADIUS_M:          150,    // morphological closing: merge one village
   MAX_SMOD_CLASS:          13,     // 11/12/13 = rural (GHS-SMOD)
   MAX_CANDIDATES:          80,     // patches carried into full evaluation
+  // A settled countryside can hold thousands of built-up patches inside a
+  // 100 km ring - Lost Valley, Oregon returns over 6000. Reducing statistics
+  // over every one of them is slow enough to break the request, and needless:
+  // 15 controls are wanted. The nearest patches are kept, split so that the
+  // extended ring of the distance ladder still has candidates of its own.
+  MAX_PATCHES_NEAR:        400,    // nearest patches inside SEARCH_TIER1_KM
+  MAX_PATCHES_FAR:         200,    // nearest patches beyond it
   USE_LOCAL_AEQD:          true,   // per-site equidistant grid: true metres
   CATEGORICAL_READ_RADIUS_M: 200,  // disc around a patch centre for the
                                    // climate/biome/country read (see
@@ -251,6 +262,24 @@ function failTag(name, failFlag) {
 }
 
 function num(f, key) { return ee.Number(f.get(key)); }
+
+// Properties a candidate must actually carry before any arithmetic touches it.
+// A reducer that finds no pixel in a region returns null rather than failing,
+// and the null only surfaces later, as an error naming an operator rather than
+// the layer. Filtering on ee.Filter.notNull turns "the whole settlement died"
+// into "one odd patch was dropped".
+var PATCH_REQUIRED = ['s_built_frac', 's_pop_dens', 'surface_water_pct',
+  's_elev', 'g_koppen', 'g_biome', 'g_adm0'];
+
+var FOOTPRINT_REQUIRED = ['tree_cover_pct', 'cropland_pct', 'grass_shrub_pct',
+  'builtup_pct', 'bare_pct', 'residential_built_pct_10m',
+  'nonres_built_pct_10m', 'road_surface_pct_10m', 'elevation_m', 'slope_deg',
+  'tri', 'forest_gain_pct', 'forest_loss_pct', 'footprint_water_pct',
+  'protected_any_pct', 'protected_iucn12_pct', 'study_site_pct',
+  'ext_programme_pct', 'pop_density_km2', 'built_frac_pct',
+  'nonresidential_built_pct', 'urban_fraction_pct', 'water_dist_m',
+  'travel_time_min', 'human_modification', 'nightlight_radiance',
+  'koppen_group', 'biome_num', 'adm0_code', 'smod_class'];
 
 // =============================================================================
 //  3.  BASE LAYERS  -  built once, all lazy
@@ -644,7 +673,7 @@ function screenPatches(patches, ctxImg, pKop, pBio, pAdm, pElev, pPop) {
     collection: out, reducer: ee.Reducer.mode(), scale: 100,
     tileScale: CFG.TILE_SCALE});
 
-  return out.map(function (f) {
+  return out.filter(ee.Filter.notNull(PATCH_REQUIRED)).map(function (f) {
     var areaHa  = num(f, 'patch_area_ha');
     var builtHa = areaHa.multiply(num(f, 's_built_frac'));
     var popPatch = num(f, 's_pop_dens').multiply(areaHa.divide(100));
@@ -738,17 +767,27 @@ function measureFootprints(points, site) {
     reducer: ee.Reducer.mean(), scale: 30, tileScale: CFG.TILE_SCALE});
   out = img100.reduceRegions({collection: out,
     reducer: ee.Reducer.mean(), scale: 100, tileScale: CFG.TILE_SCALE});
+  // (d) and (e) EVERY remaining layer is reduced at CFG.FOOTPRINT_SCALE_M.
+  //     This is not a detail. The site footprint is 1 km across, so a reducer
+  //     asked to work at 927 m - the native grain of the accessibility and
+  //     human-modification layers - can find NO pixel centre inside it and
+  //     return null. A null then reaches the first arithmetic that touches it
+  //     and the run dies with "Number.multiply: Parameter 'left' is required
+  //     and may not be null". Reducing the coarse layers on a 100 m grid
+  //     instead samples the same cell values and guarantees at least 78
+  //     samples inside every footprint.
   out = site.water.reduceRegions({collection: out,
-    reducer: ee.Reducer.mean(), scale: CFG.WATER_DT_SCALE_M,
+    reducer: ee.Reducer.mean(), scale: CFG.FOOTPRINT_SCALE_M,
     tileScale: CFG.TILE_SCALE});
   out = ee.Image.cat([TRAVEL, GHM, VIIRS]).toFloat().reduceRegions({
-    collection: out, reducer: ee.Reducer.mean(), scale: 927,
-    tileScale: CFG.TILE_SCALE});
+    collection: out, reducer: ee.Reducer.mean(),
+    scale: CFG.FOOTPRINT_SCALE_M, tileScale: CFG.TILE_SCALE});
   // Categorical layers: the modal class over the footprint, never one pixel.
   out = ee.Image.cat([KOPPEN, site.ctx,
                       GHS_SMOD.rename('smod_class')]).toInt()
           .reduceRegions({collection: out, reducer: ee.Reducer.mode(),
-                          scale: 100, tileScale: CFG.TILE_SCALE});
+                          scale: CFG.FOOTPRINT_SCALE_M,
+                          tileScale: CFG.TILE_SCALE});
 
   // Give the point geometry back; the circle was only a measuring device.
   return out.map(function (f) {
@@ -1276,7 +1315,19 @@ function processSettlement(row) {
 
   var patches   = findPatches(gridPatch, ring);
   var described = describePatchGeometry(patches, evPoint, exPoint);
-  var screened  = screenPatches(described, site.ctx,
+
+  // Keep the nearest patches only, and keep the two rings of the distance
+  // ladder separately so that extending the search still has candidates to
+  // extend to. Sorting on a property costs nothing; reducing statistics over
+  // several thousand patches does not.
+  var pool = described
+    .filter(ee.Filter.lte('control_distance_km', CFG.SEARCH_TIER1_KM))
+    .limit(CFG.MAX_PATCHES_NEAR, 'control_distance_km', true)
+    .merge(described
+      .filter(ee.Filter.gt('control_distance_km', CFG.SEARCH_TIER1_KM))
+      .limit(CFG.MAX_PATCHES_FAR, 'control_distance_km', true));
+
+  var screened  = screenPatches(pool, site.ctx,
                                 ee.Number(gCat.get('koppen_group')),
                                 ee.Number(gCat.get('biome_num')),
                                 ee.Number(gCat.get('adm0_code')),
@@ -1294,7 +1345,8 @@ function processSettlement(row) {
   var measured = measureFootprints(both, site);
   var ev     = ee.Feature(measured.filter(ee.Filter.gt('is_parent', 0.5))
                                   .first());
-  var cands  = measured.filter(ee.Filter.lt('is_parent', 0.5));
+  var cands  = measured.filter(ee.Filter.lt('is_parent', 0.5))
+                       .filter(ee.Filter.notNull(FOOTPRINT_REQUIRED));
   var scored = evaluateCandidates(cands, ev, popDoc, hasDoc);
 
   var eligible  = scored.filter(ee.Filter.gt('eligible', 0.5))
@@ -1316,7 +1368,7 @@ function processSettlement(row) {
   };
 
   var community = communityRow(qid, evName, evLon, evLat, ev, blk, hasDoc,
-                               popDoc, described.size(), screened.size());
+                               popDoc, pool.size(), screened.size());
 
   // The community row seeds the accumulator, so the block is never an empty
   // list and the controls come out ranked, in ladder order, beneath their own
@@ -1339,7 +1391,7 @@ function processSettlement(row) {
       n_controls_within_50km: blk.within50,
       ladder_step:            blk.maxTier,
       quartet_grade:          lut(TIER_NAME, blk.maxTier),
-      n_patches_found:        described.size(),
+      n_patches_found:        pool.size(),
       n_candidates_screened:  screened.size(),
       search_radius_km:       CFG.SEARCH_MAX_KM,
       koppen_source:         CFG.KOPPEN_ASSET ? CFG.KOPPEN_ASSET
@@ -1355,7 +1407,8 @@ function processSettlement(row) {
     controls: chosen,
     eligible: eligible,
     scored:   scored,
-    patches:  described,
+    patches:  pool,
+    allPatches: described,
     ev:       ev,
     ring:     ring
   };
@@ -1446,22 +1499,39 @@ function previewOneSettlement() {
     return;
   }
   var r = processSettlement(row);
-  print('Settlement ' + row[0] + ':  ' + row[1]);
-  print('Built-up patches inside the ' + CFG.SEARCH_MIN_KM + '-' +
-        CFG.SEARCH_MAX_KM + ' km ring:', r.patches.size());
-  print('Candidates carried into full measurement:', r.scored.size());
-  print('Eligible controls:', r.eligible.size());
-  print('The settlement as measured:', r.ev);
-  print('Rows that would be exported for this settlement:', r.rows);
+
+  print('=== Settlement ' + row[0] + ':  ' + row[1] + ' ===');
+  print('1. built-up patches in the ' + CFG.SEARCH_MIN_KM + '-' +
+        CFG.SEARCH_MAX_KM + ' km ring', r.allPatches.size());
+  print('2. nearest patches carried forward', r.patches.size());
+  print('3. survived the cheap gates and were measured', r.scored.size());
+  print('4. eligible controls', r.eligible.size());
+  print('5. selected (up to ' + CFG.CONTROLS_PER_SETTLEMENT + ')',
+        r.controls.size());
+
+  // Compact tables only. Printing all 122 properties of every row makes a
+  // request big enough for the Code Editor to give up on, which is not a
+  // useful thing to look at anyway.
+  print('The settlement as measured:', ee.Feature(r.ev).select([
+    'koppen_group', 'biome_num', 'adm0_code', 'elevation_m', 'slope_deg',
+    'tree_cover_pct', 'water_dist_m', 'travel_time_min', 'pop_density_km2',
+    'smod_class', 'protected_any_pct', 'protected_iucn12_pct']));
+  print('The selected controls:', r.controls.select([
+    'control_distance_km', 'd_value', 'match_tier', 'koppen_group',
+    'elevation_m', 'tree_cover_pct', 'water_dist_m', 'population_est_patch',
+    'village_tests_passed', 'criteria_failed']));
 
   Map.centerObject(ee.Geometry.Point([row[3], row[2]]), 10);
-  Map.addLayer(r.ring, {color: '999999'}, 'search ring', false);
-  Map.addLayer(r.patches, {color: 'cccc00'}, 'all built-up patches', false);
-  Map.addLayer(r.scored, {color: '00aaff'}, 'measured candidates');
+  Map.addLayer(r.allPatches, {color: 'dddd88'}, 'all built-up patches', false);
+  Map.addLayer(r.patches, {color: 'cccc00'}, 'patches carried forward', false);
+  Map.addLayer(r.scored, {color: '00aaff'}, 'measured candidates', false);
   Map.addLayer(r.eligible, {color: 'ff8800'}, 'eligible controls');
   Map.addLayer(r.controls, {color: '00ff00'}, 'SELECTED controls');
   Map.addLayer(ee.Geometry.Point([row[3], row[2]]), {color: 'ff0000'},
                'the settlement');
+  print('On the map: RED is the settlement, GREEN are its selected controls. ' +
+        'Click a green dot to read its numbers. Tick the hidden layers in the ' +
+        'Layers box if you want to see what was rejected.');
 }
 
 function queueExports() {
@@ -1526,8 +1596,9 @@ function preflight() {
   var row  = EV_TABLE[0];
   var lon  = row[3], lat = row[2];
   var pt   = ee.Geometry.Point([lon, lat]);
-  var region = pt.buffer(20000);
+  var region = pt.buffer(CFG.SEARCH_MAX_KM * 1000);
 
+  // ---- check 1: does every asset load? ------------------------------------
   var stack = ee.Image.cat([
     BUILT_FRAC.rename('ghsl_built_frac'),
     NRES_FRAC.rename('ghsl_nonres_frac'),
@@ -1547,18 +1618,36 @@ function preflight() {
     waterDistanceImage(lon, lat)
   ]).toFloat();
 
-  print('PREFLIGHT - every base layer sampled at settlement ' + row[0] +
-        ' (' + row[1] + ').');
-  print('If the dictionary below prints, every asset id, type and band name ' +
-        'in this script is good. If it throws, the message names the layer.',
+  print('=== PREFLIGHT on settlement ' + row[0] + ' (' + row[1] + ') ===');
+  print('CHECK 1 - every asset id, type and band name. Values below mean all ' +
+        'of them load.',
         stack.reduceRegion({
-          reducer:   ee.Reducer.first(),
-          geometry:  pt,
-          scale:     100,
-          maxPixels: 1e8,
+          reducer: ee.Reducer.first(), geometry: pt,
+          scale: CFG.FOOTPRINT_SCALE_M, maxPixels: 1e8,
           tileScale: CFG.TILE_SCALE
         }));
-  print('Next: set CFG.RUN_MODE to PREVIEW, then to EXPORT.');
+
+  // ---- check 2: does the REAL measurement path return a number for every
+  //      covariate? A layer can load perfectly and still hand back null if the
+  //      reducer is asked to work on a grid coarser than the footprint, and a
+  //      null does not fail where it is made - it fails later, in whatever
+  //      arithmetic first touches it. So this runs the actual measurement used
+  //      by every settlement and every control, and shows the result. ------
+  var site = {
+    ctx:   contextImage(region),
+    pa:    protectedAreaImage(region),
+    water: waterDistanceImage(lon, lat)
+  };
+  var measured = ee.Feature(
+    measureFootprints(ee.FeatureCollection([ee.Feature(pt)]), site).first());
+
+  print('CHECK 2 - the real measurement over the ' + CFG.SITE_RADIUS_M +
+        ' m footprint. EVERY entry below must be a number. If any shows ' +
+        'null, that layer returned nothing over the footprint and the run ' +
+        'would fail later with a confusing operator error.',
+        measured.select(FOOTPRINT_REQUIRED));
+
+  print('If both checks look right: set CFG.RUN_MODE to PREVIEW.');
 }
 
 function main() {

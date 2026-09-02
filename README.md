@@ -70,11 +70,16 @@ Paste `scripts/02_stage2_control_matching.js` into the
 [Earth Engine Code Editor](https://code.earthengine.google.com/). It opens on
 `RUN_MODE: 'PREFLIGHT'`. Run it.
 
-This samples every base layer at one point in a single call. If a dictionary
-prints, every asset id, every asset **type** (`ee.Image` against
-`ee.ImageCollection`) and every band name is good. Do this first: an asset
-mistake otherwise stays invisible until an export task fails, an hour after you
-queued it.
+Two checks print. **Check 1** samples every base layer at one point: values
+mean every asset id, every asset **type** (`ee.Image` against
+`ee.ImageCollection`) and every band name is good. **Check 2** runs the real
+measurement over the 500 m footprint and shows every covariate — every entry
+must be a number, because a layer can load perfectly and still return `null`
+over a footprint, and a null fails later in whatever arithmetic first touches
+it rather than where it was made.
+
+Do this first. Both classes of mistake otherwise stay invisible until an export
+task fails, an hour after you queued it.
 
 **3 — Preview one settlement (a minute)**
 
@@ -137,6 +142,7 @@ knobs that matter most:
 | `SEARCH_MAX_KM` | 100 | The dominant cost. 50 km runs roughly four times faster and still satisfies the plan's first ladder step. |
 | `BATCH_SIZE` | 8 | Settlements per export task. Lower it if tasks time out on the server. |
 | `BATCHES_PER_RUN` | 6 | Tasks queued per script run. Lower it if the Code Editor page is slow to respond; this is browser-side, not server-side. |
+| `MAX_PATCHES_NEAR` / `_FAR` | 400 / 200 | How many built-up patches are carried into the statistics, nearest first, inside and beyond 50 km. A settled countryside can return thousands; reducing over all of them breaks the request. |
 | `LANDCOVER_SOURCE` | `ESA_WORLDCOVER` | `DYNAMIC_WORLD` for exact conformance with the plan's §4.1, at a materially longer run. |
 | `KOPPEN_ASSET` | *(empty)* | Point at your uploaded Beck et al. raster to replace the WorldClim-derived main groups. |
 | `PA_EXCLUSION_MODE` | `IUCN_I_II` | `ANY` for the stricter reading of "not inside a protected area". Both are reported regardless. |

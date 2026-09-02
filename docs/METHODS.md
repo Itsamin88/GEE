@@ -229,6 +229,21 @@ shortlist you can check by hand, instead of a world you cannot.
   Sites in Scandinavia therefore carry coarser elevation and slope than sites
   further south. `elevation_m` is still comparable within a quartet, because
   both arms of a quartet are in the same country and so on the same source.
+- **Reduction scale against footprint size.** A reducer asked to work on a grid
+  as coarse as the region it is reducing over can find no pixel centre inside
+  it and returns `null`, and the null surfaces later as an error naming an
+  operator rather than the layer. The 500 m footprint is 1 km across, so every
+  footprint reduction runs at `CFG.FOOTPRINT_SCALE_M` (100 m, ≥ 78 samples)
+  even for the ~1 km accessibility and human-modification layers. Keep that
+  invariant if you change `SITE_RADIUS_M`. `RUN_MODE: 'PREFLIGHT'` check 2 runs
+  the real measurement path and shows every value, so a null is visible before
+  any task is queued.
+- **Candidate volume.** A settled countryside can hold thousands of built-up
+  patches in a 100 km ring — Lost Valley, Oregon returns over 6000. Reducing
+  statistics over all of them is slow enough to break the request. Only the
+  nearest `MAX_PATCHES_NEAR` inside 50 km and `MAX_PATCHES_FAR` beyond it are
+  carried forward, so both rungs of the distance ladder keep candidates of
+  their own. `n_patches_found` in the output reports the size of that pool.
 - **Asset types.** Earth Engine fails an `ee.Image('…')` on an ImageCollection
   only when the task runs, with `Asset '…' is not an Image`. The types used
   here have been checked against the catalogue: `CSP/HM/GlobalHumanModification`,
