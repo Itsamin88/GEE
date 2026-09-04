@@ -78,3 +78,38 @@ Australia), not a data problem.
   any) were missed.
 - Every placemark validated: well-formed XML, every coordinate in range,
   every `styleUrl` resolved, zero unescaped `&` outside CDATA content.
+
+## Adding placeholder polygons for manual drawing (scripts/07)
+
+`scripts/07_add_placeholder_polygons.py` takes a *working copy* of the review
+KML — one the researcher has already started editing in Google Earth Pro —
+and adds a 6-vertex placeholder hexagon, named `Polygon: <Ecovillage name>`,
+directly in every community folder that doesn't already have one.
+
+**It edits by text splicing, not by re-parsing and re-writing the tree.**
+`xml.etree.ElementTree` reads a `<![CDATA[...]]>` description back out as
+plain text, and writing that text back out re-escapes it — silently turning
+every working info-bubble (`<b>...</b>`) into dead, literal text
+(`&lt;b&gt;...&lt;/b&gt;`). ElementTree is used here only to *read* — folder
+names, each settlement's current coordinates, whether a folder already has a
+`Polygon:` placemark. The edit itself inserts new text into the original
+bytes, so every byte the script doesn't touch is byte-for-byte guaranteed
+unchanged, including whatever the researcher has already hand-edited.
+
+A folder already containing a `Polygon: ...` placemark is left completely
+alone — that's how a settlement the researcher has already finished (its real
+polygon drawn, its chosen controls promoted to the main folder) is recognised
+and skipped rather than given a redundant second polygon.
+
+Verified on the first working round-trip (EV001 already carried a real,
+hand-drawn 18-vertex polygon and had its coordinates changed and three
+candidates promoted to its main folder): the output re-parses as well-formed
+XML; EV001 is byte-for-byte identical before and after; every other folder's
+original content is byte-for-byte identical with exactly one new hexagon
+placemark appended, its nested "Rural Control Candidates" folder completely
+untouched; total placemark count matches the input count plus exactly the
+number of hexagons added; every new hexagon has exactly 6 vertices at the
+configured radius (default 100 m, `--radius-m` to change) from that folder's
+*current* ecovillage coordinate — not a value re-derived from the original
+CSV, so a settlement whose point has been manually moved gets its hexagon
+centred on the moved point.
