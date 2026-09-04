@@ -228,14 +228,48 @@ scripts/01_prepare_inputs.py          workbook  ->  CSV + the script's data bloc
 scripts/02_stage2_control_matching.js the Earth Engine script (paste and run)
 scripts/03_merge_and_qc.py            batch CSVs -> the single deliverable, checked
 scripts/04_check_script.py            static checks on the Earth Engine script
+scripts/05_parse_existing_kml.py      the researcher's own Paper 2 KML -> JSON
+scripts/06_build_kml.py               deliverable CSV + that JSON -> the review KML
 scripts/gen_column_dictionary.py      regenerates docs/COLUMN_DICTIONARY.md
 data/ecovillages_212.csv              the 212 settlements
 data/existing_conventional_rural_controls.csv
                                       the one control per settlement already held
 data/ecovillages_212_inline.js        the same 212, as the script's DATA BLOCK
+data/existing_selected_controls.json  the 05_parse_existing_kml.py output
 docs/METHODS.md                       criteria, thresholds, datasets, limits
-docs/COLUMN_DICTIONARY.md             all 122 output columns
+docs/COLUMN_DICTIONARY.md             all 135 output columns
+docs/KML_REVIEW_NOTES.md              what the KML merge found, and why
 ```
+
+**7 — Build the review KML**
+
+Once the deliverable CSV is merged (step 6), fold in the researcher's own
+Paper 2 KML — the one already holding a hand-picked "Conventional Village"
+control per settlement — and produce a single KML for manual review:
+
+```bash
+python3 scripts/05_parse_existing_kml.py "Paper 2 - Ecovillages....kml"
+python3 scripts/06_build_kml.py stage2_rural_controls_FINAL.csv \
+        data/existing_selected_controls.json \
+        -o "Study1_Rural Control Candidates.kml"
+```
+
+The join key is `Ecovillage ID (quartet): N`, embedded in every Paper 2
+ecovillage placemark's own description — not the KML's `EVnnn:` folder
+numbering, which was found to diverge from `quartet_id` past #49. See
+`docs/KML_REVIEW_NOTES.md` for how that was found and verified, and for two
+other things the merge surfaced: three ecovillage names carrying corrupted
+text already present in the source workbook, and two settlements (coastal
+enough that their own biome/Köppen reads as unmapped) that found zero
+candidates as a direct, correct consequence of the hard-gate logic rather
+than a bug.
+
+The output holds one folder per settlement, each containing the settlement's
+own placemark, its **existing** selected control (moved from Paper 2, marked
+with a distinct target-icon pin so it is never confused with a new
+candidate), and a nested "Rural Control Candidates" folder of this run's
+matches, colour-coded green/yellow/red by Tier 1/2/3 for quick visual
+triage.
 
 ---
 
